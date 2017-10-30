@@ -1,10 +1,11 @@
-package de.flashheart.ocfflag.sevensegdisplay;
+package de.flashheart.ocfflag.hardware.sevensegdisplay;
 
 
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
-
+import de.flashheart.ocfflag.Main;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
@@ -27,7 +28,7 @@ public class LEDBackPack {
      */
     // This next addresses is returned by "sudo i2cdetect -y 1", see above.
     public final static int LEDBACKPACK_ADDRESS = 0x70;
-
+    private final Logger logger = Logger.getLogger(getClass());
     private boolean verbose = false;
 
     private I2CBus bus;
@@ -57,17 +58,16 @@ public class LEDBackPack {
     }
 
     public LEDBackPack(int address, boolean v) throws I2CFactory.UnsupportedBusNumberException {
+        logger.setLevel(Main.getLogLevel());
         this.verbose = v;
         try {
             // Get i2c bus
             bus = I2CFactory.getInstance(I2CBus.BUS_1); // Depends onthe RasPI version
-            if (verbose)
-                System.out.println("Connected to bus. OK.");
+            logger.debug("Connected to bus. OK.");
 
             // Get device itself
             ledBackpack = bus.getDevice(address);
-            if (verbose)
-                System.out.println("Connected to device. OK.");
+            logger.debug("Connected to device. OK.");
 
             //Turn the oscillator on
             ledBackpack.write(HT16K33_REGISTER_SYSTEM_SETUP | 0x01, (byte) 0x00);

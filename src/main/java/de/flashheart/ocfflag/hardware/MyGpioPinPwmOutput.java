@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.misc;
+package de.flashheart.ocfflag.hardware;
 
 import com.pi4j.io.gpio.GpioPinPwmOutput;
 import org.apache.log4j.Logger;

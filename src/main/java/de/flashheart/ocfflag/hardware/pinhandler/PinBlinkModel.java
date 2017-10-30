@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.threads;
+package de.flashheart.ocfflag.hardware.pinhandler;
 
 import de.flashheart.ocfflag.hardware.Relay;
 import org.apache.log4j.Logger;

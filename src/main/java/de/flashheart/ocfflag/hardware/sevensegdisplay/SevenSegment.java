@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.sevensegdisplay;
+package de.flashheart.ocfflag.hardware.sevensegdisplay;
 
 import com.pi4j.io.i2c.I2CFactory;
 
