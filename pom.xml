@@ -15,7 +15,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <exec.mainClass>de.flashheart.lara.Main</exec.mainClass>
+        <exec.mainClass>de.flashheart.ocfflag.Main</exec.mainClass>
     </properties>
 
     <dependencies>
@@ -119,7 +119,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>de.flashheart.lara.Main</mainClass>
+                            <mainClass>de.flashheart.ocfflag.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

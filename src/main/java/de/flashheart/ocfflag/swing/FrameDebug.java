@@ -31,6 +31,7 @@ public class FrameDebug extends JFrame {
 
         //======== this ========
         setTitle("OCF Flaggen Simulator");
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "10*(default, $lcgap), default",
@@ -87,6 +88,18 @@ public class FrameDebug extends JFrame {
         pack();
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
+    }
+
+    public JLabel getLblBlue() {
+        return lblBlue;
+    }
+
+    public JLabel getLblRed() {
+        return lblRed;
+    }
+
+    public JLabel getLblWhite() {
+        return lblWhite;
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables

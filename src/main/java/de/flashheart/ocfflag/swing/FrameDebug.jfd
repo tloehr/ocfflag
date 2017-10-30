@@ -9,6 +9,7 @@ new FormModel {
 		} ) {
 			name: "this"
 			"title": "OCF Flaggen Simulator"
+			"defaultCloseOperation": 3
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "lblBlue"
 				"text": "00:00"
