@@ -3,7 +3,7 @@ package de.flashheart.ocfflag.hardware;
 import com.pi4j.io.i2c.I2CFactory;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.sevensegdisplay.SevenSegment;
-import de.flashheart.ocfflag.misc.Tools;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 

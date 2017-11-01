@@ -1,7 +1,5 @@
 package de.flashheart.ocfflag.hardware;
 
-import de.flashheart.ocfflag.misc.Tools;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -12,12 +10,26 @@ public class MyLED extends JLabel {
     private Icon imageOn;
     private Icon imageOff;
 
+    public  final Icon icon22ledOrangeOn = new ImageIcon(getClass().getResource("/src/main/resources/artwork/22x22/ledorange.png"));
+    public  final Icon icon22ledOrangeOff = new ImageIcon(getClass().getResource("/src/main/resources/artwork/22x22/leddarkorange.png"));
+    public  final Icon icon22ledPurpleOff = new ImageIcon(getClass().getResource("/src/main/resources/artwork/22x22/leddarkpurple.png"));
+    public  final Icon icon22ledPurpleOn = new ImageIcon(getClass().getResource("/src/main/resources/artwork/22x22/ledpurple.png"));
+    public  final Icon icon22ledBlueOff = new ImageIcon(getClass().getResource("/src/main/resources/artwork/22x22/leddarkblue.png"));
+    public  final Icon icon22ledBlueOn = new ImageIcon(getClass().getResource("/src/main/resources/artwork/22x22/ledblue.png"));
+    public  final Icon icon22ledGreenOff = new ImageIcon(getClass().getResource("/src/main/resources/artwork/22x22/leddarkgreen.png"));
+    public  final Icon icon22ledGreenOn = new ImageIcon(getClass().getResource("/src/main/resources/artwork/22x22/ledgreen.png"));
+    public  final Icon icon22ledYellowOff = new ImageIcon(getClass().getResource("/src/main/resources/artwork/22x22/leddarkyellow.png"));
+    public  final Icon icon22ledYellowOn = new ImageIcon(getClass().getResource("/src/main/resources/artwork/22x22/ledyellow.png"));
+    public  final Icon icon22ledRedOff = new ImageIcon(getClass().getResource("/src/main/resources/artwork/22x22/leddarkred.png"));
+    public  final Icon icon22ledRedOn = new ImageIcon(getClass().getResource("/src/main/resources/artwork/22x22/ledred.png"));
+
     public MyLED() {
         this(null, Color.RED);
     }
 
     public MyLED(String text, Color color) {
         super(text);
+        setText("test");
         chooseLEDFor(color);
         setOn(false);
     }
@@ -28,44 +40,36 @@ public class MyLED extends JLabel {
 
     void chooseLEDFor(Color color) {
         if (color.equals(Color.BLUE)) {
-            imageOn = Tools.icon22ledBlueOn;
-            imageOff = Tools.icon22ledBlueOff;
+            imageOn = icon22ledBlueOn;
+            imageOff = icon22ledBlueOff;
             return;
         }
         if (color.equals(Color.RED)) {
-            imageOn = Tools.icon22ledRedOn;
-            imageOff = Tools.icon22ledRedOff;
+            imageOn = icon22ledRedOn;
+            imageOff = icon22ledRedOff;
             return;
         }
         if (color.equals(Color.YELLOW)) {
-            imageOn = Tools.icon22ledYellowOn;
-            imageOff = Tools.icon22ledYellowOff;
+            imageOn = icon22ledYellowOn;
+            imageOff = icon22ledYellowOff;
             return;
         }
         if (color.equals(Color.GREEN)) {
-            imageOn = Tools.icon22ledGreenOn;
-            imageOff = Tools.icon22ledGreenOff;
+            imageOn = icon22ledGreenOn;
+            imageOff = icon22ledGreenOff;
             return;
         }
         if (color.equals(Color.ORANGE)) {
-            imageOn = Tools.icon22ledOrangeOn;
-            imageOff = Tools.icon22ledOrangeOff;
+            imageOn = icon22ledOrangeOn;
+            imageOff = icon22ledOrangeOff;
             return;
         }
         if (color.equals(Color.MAGENTA)) {
-            imageOn = Tools.icon22ledPurpleOn;
-            imageOff = Tools.icon22ledPurpleOff;
+            imageOn = icon22ledPurpleOn;
+            imageOff = icon22ledPurpleOff;
             return;
         }
     }
-
-//
-//    public MyLED(String text, Icon icon, int horizontalAlignment) {
-//        super(text, icon, horizontalAlignment);
-//        imageOn = null;
-//        imageOff = icon;
-//        off = true;
-//    }
 
     public void setOn(boolean on) {
         SwingUtilities.invokeLater(() -> {
@@ -74,33 +78,7 @@ public class MyLED extends JLabel {
             repaint();
         });
     }
-//
-//    public MyLED(String text, int horizontalAlignment) {
-//        super(text, horizontalAlignment);
-//        imageOn = null;
-//        imageOff = null;
-//        off = true;
-//    }
 
-
-//    public MyLED(Icon image, int horizontalAlignment) {
-//        super(image, horizontalAlignment);
-//        imageOn = null;
-//        imageOff = image;
-//        off = true;
-//    }
-
-//    public MyLED(Icon image) {
-//        super(image);
-//        imageOn = null;
-//        imageOff = image;
-//        off = true;
-//    }
-//
-//    public MyLED(Icon imageOn, Icon imageOff) {
-//        this(imageOff);
-//        this.imageOn = imageOn;
-//    }
 
 
 }

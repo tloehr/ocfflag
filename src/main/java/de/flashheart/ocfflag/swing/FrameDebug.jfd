@@ -66,7 +66,7 @@ new FormModel {
 				"gridX": 9
 				"gridY": 7
 			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
+			add( new FormComponent( "de.flashheart.ocfflag.hardware.MyLED" ) {
 				name: "lblLEDRed"
 				"text": "text"
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
@@ -74,7 +74,7 @@ new FormModel {
 				"gridY": 9
 			} )
 			add( new FormComponent( "javax.swing.JToggleButton" ) {
-				name: "switchMode"
+				name: "btnSwitchMode"
 				"text": "Vorbereitung"
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 15
@@ -89,7 +89,8 @@ new FormModel {
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 635, 225 )
+			"size": new java.awt.Dimension( 865, 225 )
 		} )
 	}
 }
+

@@ -8,6 +8,7 @@ import java.awt.*;
 import javax.swing.*;
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
+import de.flashheart.ocfflag.hardware.*;
 
 /**
  * @author Torsten Löhr
@@ -25,8 +26,8 @@ public class FrameDebug extends JFrame {
         btnBlue = new JButton();
         btnRed = new JButton();
         lblWhite = new JLabel();
-        lblLEDRed = new JLabel();
-        switchMode = new JToggleButton();
+        lblLEDRed = new MyLED();
+        btnSwitchMode = new JToggleButton();
         btnReset = new JButton();
 
         //======== this ========
@@ -78,9 +79,9 @@ public class FrameDebug extends JFrame {
         lblLEDRed.setText("text");
         contentPane.add(lblLEDRed, CC.xy(5, 9));
 
-        //---- switchMode ----
-        switchMode.setText("Vorbereitung");
-        contentPane.add(switchMode, CC.xy(15, 9));
+        //---- btnSwitchMode ----
+        btnSwitchMode.setText("Vorbereitung");
+        contentPane.add(btnSwitchMode, CC.xy(15, 9));
 
         //---- btnReset ----
         btnReset.setText("Reset");
@@ -102,6 +103,22 @@ public class FrameDebug extends JFrame {
         return lblWhite;
     }
 
+    public JButton getBtnBlue() {
+        return btnBlue;
+    }
+
+    public JButton getBtnRed() {
+        return btnRed;
+    }
+
+    public JButton getBtnReset() {
+        return btnReset;
+    }
+
+    public JToggleButton getBtnSwitchMode() {
+        return btnSwitchMode;
+    }
+
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JLabel lblBlue;
     private JLabel lblRed;
@@ -109,8 +126,8 @@ public class FrameDebug extends JFrame {
     private JButton btnBlue;
     private JButton btnRed;
     private JLabel lblWhite;
-    private JLabel lblLEDRed;
-    private JToggleButton switchMode;
+    private MyLED lblLEDRed;
+    private JToggleButton btnSwitchMode;
     private JButton btnReset;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
