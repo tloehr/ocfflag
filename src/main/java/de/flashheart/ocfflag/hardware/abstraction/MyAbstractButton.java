@@ -1,6 +1,9 @@
 package de.flashheart.ocfflag.hardware.abstraction;
 
+import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
+import com.pi4j.io.gpio.Pin;
+import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.event.GpioPinListener;
 
 import javax.swing.*;
@@ -9,9 +12,8 @@ import java.awt.event.ItemListener;
 
 /**
  * Created by tloehr on 15.03.16.
- *
+ * <p>
  * //todo: kann man das hier nicht vereinfachen, so dass nur ein Listener für alle Fälle gebraucht wird ?
- *
  */
 public class MyAbstractButton {
 
@@ -19,14 +21,14 @@ public class MyAbstractButton {
     private final JButton btn;
     private final JToggleButton toggleButton;
 
-    public MyAbstractButton(GpioPinDigitalInput gpio, JButton btn) {
-        this.gpio = gpio;
+    public MyAbstractButton(GpioController gpio, Pin pin, JButton btn) {
+        this.gpio = gpio == null ? null : gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
         this.btn = btn;
         toggleButton = null;
     }
 
-    public MyAbstractButton(GpioPinDigitalInput gpio, JToggleButton toggleButton) {
-        this.gpio = gpio;
+    public MyAbstractButton(GpioController gpio, Pin pin, JToggleButton toggleButton) {
+        this.gpio = gpio == null ? null : gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
         this.btn = null;
         this.toggleButton = toggleButton;
 

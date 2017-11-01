@@ -4,12 +4,25 @@ new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-			"$columnSpecs": "default, labelcompgap, default, labelcompgap, default, labelcompgap, default, labelcompgap, default, labelcompgap, default, labelcompgap, default, labelcompgap, default, labelcompgap, default, labelcompgap, default, labelcompgap, default"
-			"$rowSpecs": "fill:default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default"
+			"$columnSpecs": "default, labelcompgap, default, labelcompgap, default, labelcompgap, default, labelcompgap, default, labelcompgap, default, labelcompgap, default, labelcompgap, default, labelcompgap, default"
+			"$rowSpecs": "6dlu, linegap, fill:22dlu, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default"
 		} ) {
 			name: "this"
 			"title": "OCF Flaggen Simulator"
 			"defaultCloseOperation": 3
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblPole"
+				"opaque": true
+				"background": sfield java.awt.Color lightGray
+				"text": "Flagge"
+				"foreground": sfield java.awt.Color black
+				"horizontalAlignment": 0
+				"font": new java.awt.Font( "Dialog", 1, 20 )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridWidth": 13
+				"gridY": 3
+			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "lblBlue"
 				"text": "00:00"
@@ -17,7 +30,7 @@ new FormModel {
 				"foreground": sfield java.awt.Color blue
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 7
-				"gridY": 3
+				"gridY": 5
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "lblRed"
@@ -26,18 +39,7 @@ new FormModel {
 				"foreground": sfield java.awt.Color red
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 11
-				"gridY": 3
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "lblPole"
-				"opaque": true
-				"background": sfield java.awt.Color red
-				"text": "Flagge"
-				"foreground": sfield java.awt.Color yellow
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 19
-				"gridY": 3
-				"gridHeight": 9
+				"gridY": 5
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "btnBlue"
@@ -45,7 +47,7 @@ new FormModel {
 				"foreground": sfield java.awt.Color blue
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 3
-				"gridY": 5
+				"gridY": 7
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "btnRed"
@@ -53,7 +55,7 @@ new FormModel {
 				"foreground": sfield java.awt.Color red
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 15
-				"gridY": 5
+				"gridY": 7
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "lblWhite"
@@ -64,33 +66,32 @@ new FormModel {
 				"opaque": true
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 9
-				"gridY": 7
+				"gridY": 9
 			} )
-			add( new FormComponent( "de.flashheart.ocfflag.hardware.MyLED" ) {
+			add( new FormComponent( "de.flashheart.ocfflag.hardware.abstraction.MyLED" ) {
 				name: "lblLEDRed"
 				"text": "text"
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 5
-				"gridY": 9
+				"gridY": 11
 			} )
 			add( new FormComponent( "javax.swing.JToggleButton" ) {
 				name: "btnSwitchMode"
 				"text": "Vorbereitung"
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 15
-				"gridY": 9
+				"gridY": 11
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "btnReset"
 				"text": "Reset"
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 15
-				"gridY": 11
+				"gridY": 13
 			} )
 		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 865, 225 )
+			"location": new java.awt.Point( 0, 10 )
+			"size": new java.awt.Dimension( 600, 230 )
 		} )
 	}
 }
-

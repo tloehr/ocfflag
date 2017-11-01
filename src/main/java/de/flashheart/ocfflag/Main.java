@@ -1,11 +1,11 @@
 package de.flashheart.ocfflag;
 
 import com.pi4j.io.gpio.*;
-import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
-import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import com.pi4j.io.i2c.I2CFactory;
-import de.flashheart.ocfflag.hardware.Display7Segments4Digits;
+import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
+import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
+import de.flashheart.ocfflag.mechanics.Game;
 import de.flashheart.ocfflag.misc.SortedProperties;
 import de.flashheart.ocfflag.swing.FrameDebug;
 import org.apache.log4j.Level;
@@ -35,8 +35,13 @@ public class Main {
     private static final Pin BUTTON_RESET = RaspiPin.GPIO_15;
     private static final Pin BUTTON_SWITCH_MODE = RaspiPin.GPIO_15;
 
+    private static final Pin POLE_RGB_RED = RaspiPin.GPIO_15;
+    private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_15;
+    private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_15;
+
     private static Display7Segments4Digits display_blue, display_red, display_white;
     private static MyAbstractButton button_blue, button_red, button_reset, button_switch_mode;
+    private static MyRGBLed pole;
 
 
     public static void main(String[] args) throws Exception {
@@ -56,18 +61,15 @@ public class Main {
         display_red = new Display7Segments4Digits(DISPLAY_RED, getFrameDebug().getLblRed());
         display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblWhite());
 
-        button_blue = new MyAbstractButton(GPIO.provisionDigitalInputPin(BUTTON_BLUE, PinPullResistance.PULL_UP), frameDebug.getBtnBlue());
-        button_red = new MyAbstractButton(GPIO.provisionDigitalInputPin(BUTTON_RED, PinPullResistance.PULL_UP), frameDebug.getBtnRed());
-        button_reset = new MyAbstractButton(GPIO.provisionDigitalInputPin(BUTTON_RESET, PinPullResistance.PULL_UP), frameDebug.getBtnReset());
-        button_switch_mode = new MyAbstractButton(GPIO.provisionDigitalInputPin(BUTTON_SWITCH_MODE, PinPullResistance.PULL_UP), frameDebug.getBtnSwitchMode());
+        button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue());
+        button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed());
+        button_reset = new MyAbstractButton(GPIO, BUTTON_RESET, frameDebug.getBtnReset());
+        button_switch_mode = new MyAbstractButton(GPIO, BUTTON_SWITCH_MODE, frameDebug.getBtnSwitchMode());
 
-        button_reset.addListener(new GpioPinListenerDigital() {
-            @Override
-            public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+        pole = new MyRGBLed(GPIO, POLE_RGB_RED, POLE_RGB_GREEN, POLE_RGB_BLUE, frameDebug.getLblPole());
 
-            }
-        });
-
+        Game game = new Game(display_blue,display_red,display_white,button_blue,button_red,button_reset,button_switch_mode, pole);
+        game.run();
 
     }
 

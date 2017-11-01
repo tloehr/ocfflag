@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.hardware;
+package de.flashheart.ocfflag.hardware.abstraction;
 
 import com.pi4j.io.i2c.I2CFactory;
 import de.flashheart.ocfflag.Main;
@@ -18,6 +18,7 @@ public class Display7Segments4Digits {
     JLabel lblSegment = null;
     SevenSegment segment = null;
     private final Logger logger = Logger.getLogger(getClass());
+    private boolean colon = true;
 
     public Display7Segments4Digits() {
         logger.setLevel(Main.getLogLevel());
@@ -32,7 +33,9 @@ public class Display7Segments4Digits {
     public void setText(String text) throws IOException {
         if (text.length() != 4) throw new IOException("this is display has exactly 4 digits. string has wrong size.");
 
-        if (lblSegment != null) lblSegment.setText(StringUtils.left(text, 2) + ":" + StringUtils.right(text, 2));
+        colon = !colon;
+
+        if (lblSegment != null) lblSegment.setText(StringUtils.left(text, 2) + (colon ? ":" : " ") + StringUtils.right(text, 2));
         if (segment != null) fullDisplay(text.split(""));
     }
 
@@ -46,7 +49,7 @@ public class Display7Segments4Digits {
     }
 
     private void fullDisplay(String[] row) throws IOException {
-
+        segment.setColon(colon);
         segment.writeDigitRaw(0, row[0]);
         segment.writeDigitRaw(1, row[1]);
         segment.writeDigitRaw(3, row[2]);
