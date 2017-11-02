@@ -1,10 +1,5 @@
 package de.flashheart.ocfflag.hardware.pinhandler;
 
-import de.flashheart.ocfflag.hardware.Relay;
-import org.apache.log4j.Logger;
-
-import java.util.ArrayList;
-import java.util.StringTokenizer;
 import java.util.concurrent.Callable;
 
 
@@ -13,7 +8,7 @@ import java.util.concurrent.Callable;
  */
 public class PinBlinkModel implements Callable<String> {
 
-//    Relay pin;
+//    MyPin pin;
 //    private ArrayList<Long> onOffScheme;
 //    int repeat;
 //    boolean currentlyOn;
@@ -69,11 +64,11 @@ public class PinBlinkModel implements Callable<String> {
 //        restart();
 //    }
 //
-////    public PinBlinkModel(Relay pin) {
+////    public PinBlinkModel(MyPin pin) {
 ////        this(pin, -1, -1);
 ////    }
 //
-//    public PinBlinkModel(Relay pin) {
+//    public PinBlinkModel(MyPin pin) {
 //        this.onOffScheme = new ArrayList<>();
 //        this.positionInScheme = -1;
 //        this.pin = pin;
@@ -129,7 +124,7 @@ public class PinBlinkModel implements Callable<String> {
 //        return next;
 //    }
 //
-//    public Relay getPin() {
+//    public MyPin getPin() {
 //        return pin;
 //    }
 

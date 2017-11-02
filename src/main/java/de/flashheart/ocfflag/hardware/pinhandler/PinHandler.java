@@ -1,17 +1,5 @@
 package de.flashheart.ocfflag.hardware.pinhandler;
 
-import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.Relay;
-import org.apache.log4j.Logger;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.locks.ReentrantLock;
-
 /**
  * This handler runs parallel to the main programm and handles all the blinking needs of the specific pins. It knows to handle collision between pins that must not be run at the same time.
  * Dieser Handler läuft parallel zum Hauptprogramm. Er steuert alles Relais und achtet auch auf widersprüchliche Befehle und Kollisionen (falls bestimmte Relais nicht gleichzeitig anziehen dürfen, gibt mittlerweile nicht mehr).
@@ -101,11 +89,11 @@ public class PinHandler {
 //     *
 //     * @param relay
 //     */
-//    public void add(Relay relay) {
+//    public void add(MyPin relay) {
 //        add(0, relay);
 //    }
 //
-////    public void add(int cd, Relay relay) {
+////    public void add(int cd, MyPin relay) {
 ////            add(cd, relay, -1, -1);
 ////        }
 //
@@ -116,7 +104,7 @@ public class PinHandler {
 //     *              Moment nicht. cd == 0 bedeutet, dass dieser Pin machen kann was er will.
 //     * @param relay das betreffende Relais oder Pin.
 //     */
-//    public void add(int cd, Relay relay) {
+//    public void add(int cd, MyPin relay) {
 //        lock.lock();
 //        try {
 //            pinMap.put(relay.getName(), new PinBlinkModel(relay));
@@ -216,7 +204,7 @@ public class PinHandler {
 //        }
 //    }
 //
-//    public Relay getPin(String id){
+//    public MyPin getPin(String id){
 //        return  pinMap.get(id).getPin();
 //    }
 

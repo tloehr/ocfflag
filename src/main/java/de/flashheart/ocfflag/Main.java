@@ -7,7 +7,7 @@ import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
 import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.mechanics.Game;
 import de.flashheart.ocfflag.misc.SortedProperties;
-import de.flashheart.ocfflag.swing.FrameDebug;
+import de.flashheart.ocfflag.gui.FrameDebug;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 

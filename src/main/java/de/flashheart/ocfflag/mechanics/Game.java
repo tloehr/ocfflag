@@ -7,6 +7,7 @@ import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Logger;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +15,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 
+/**
+ * In dieser Klasse befindet sich die Spielmechanik.
+ */
 public class Game implements Runnable {
     private final Logger logger = Logger.getLogger(getClass());
 
@@ -85,10 +89,9 @@ public class Game implements Runnable {
         button_switch_mode.addListener((ItemListener) e -> {
             modeChange(e.getStateChange() == ItemEvent.SELECTED ? MODE_CLOCK_ACTIVE : MODE_CLOCK_STANDBY);
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                logger.debug("mode_active");
-
+                ((JToggleButton) e.getSource()).setText("Active");
             } else {
-                logger.debug("mode_standby");
+                ((JToggleButton) e.getSource()).setText("Standby");
             }
         });
 
@@ -107,6 +110,8 @@ public class Game implements Runnable {
     private void refreshDisplay() {
         try {
             display_white.setText(Tools.formatLongTime(time, "HHmm"));
+            display_blue.setText(Tools.formatLongTime(time_blue, "HHmm"));
+            display_red.setText(Tools.formatLongTime(time_red, "HHmm"));
             logger.debug("time: " + time + " " + Tools.formatLongTime(time, "HH:mm:ss"));
 
         } catch (IOException e) {
@@ -123,8 +128,6 @@ public class Game implements Runnable {
     public void run() {
         while (!thread.isInterrupted()) {
             try {
-                refreshDisplay();
-
                 if (mode_has_just_changed) {
                     mode_has_just_changed = false;
                     lastPIT = System.currentTimeMillis();
@@ -138,6 +141,8 @@ public class Game implements Runnable {
                     time += diff;
                     if (flag == FLAG_STATE_BLUE) time_blue += diff;
                     if (flag == FLAG_STATE_RED) time_red += diff;
+
+                    refreshDisplay();
                 }
                 Thread.sleep(PAUSE_PER_CYCLE);
             } catch (InterruptedException ie) {
