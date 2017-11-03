@@ -8,9 +8,10 @@ import com.pi4j.io.i2c.I2CFactory;
 import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
+import de.flashheart.ocfflag.hardware.abstraction.MyPin;
 import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
+import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
 import de.flashheart.ocfflag.mechanics.Game;
-import de.flashheart.ocfflag.misc.SortedProperties;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -23,7 +24,7 @@ public class Main {
 
     private static GpioController GPIO;
     private static FrameDebug frameDebug;
-    private static SortedProperties config;
+//    private static SortedProperties config;
 
     private static Logger logger;
     private static Level logLevel = Level.DEBUG;
@@ -43,12 +44,25 @@ public class Main {
     private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_15;
     private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_15;
 
+    private static final Pin LED_SECONDS_RED1 = RaspiPin.GPIO_15;
+    private static final Pin LED_SECONDS_RED2 = RaspiPin.GPIO_15;
+    private static final Pin LED_SECONDS_RED3 = RaspiPin.GPIO_15;
+
+    private static final Pin LED_SECONDS_BLUE1 = RaspiPin.GPIO_15;
+    private static final Pin LED_SECONDS_BLUE2 = RaspiPin.GPIO_15;
+    private static final Pin LED_SECONDS_BLUE3 = RaspiPin.GPIO_15;
+
+    private static final Pin LED_SECONDS_WHITE1 = RaspiPin.GPIO_15;
+    private static final Pin LED_SECONDS_WHITE2 = RaspiPin.GPIO_15;
+    private static final Pin LED_SECONDS_WHITE3 = RaspiPin.GPIO_15;
+
     private static Display7Segments4Digits display_blue, display_red, display_white;
     private static MyAbstractButton button_blue, button_red, button_reset, button_switch_mode;
     private static MyRGBLed pole;
 
-//    private static MyPin
+    private static MyPin ledRed1, ledRed2, ledRed3, ledBlue1, ledBlue2, ledBlue3, ledWhite1, ledWhite2, ledWhite3;
 
+    private static PinHandler pinHandler; // One handler, to rule them all...
 
     public static void main(String[] args) throws Exception {
         initBaseSystem();
@@ -56,6 +70,10 @@ public class Main {
         initDebugFrame();
         initRaspi();
         initGameSystem();
+    }
+
+    public static PinHandler getPinHandler() {
+        return pinHandler;
     }
 
     /**
@@ -78,8 +96,31 @@ public class Main {
 
         pole = new MyRGBLed(GPIO, POLE_RGB_RED, POLE_RGB_GREEN, POLE_RGB_BLUE, frameDebug.getLblPole());
 
-        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_switch_mode, pole);
+        ledRed1 = new MyPin(GPIO, LED_SECONDS_RED1, frameDebug.getLedRed1(), "ledRed1");
+        ledRed2 = new MyPin(GPIO, LED_SECONDS_RED2, frameDebug.getLedRed2(), "ledRed2");
+        ledRed3 = new MyPin(GPIO, LED_SECONDS_RED3, frameDebug.getLedRed3(), "ledRed3");
+
+        ledBlue1 = new MyPin(GPIO, LED_SECONDS_BLUE1, frameDebug.getLedBlue1(), "ledBlue1");
+        ledBlue2 = new MyPin(GPIO, LED_SECONDS_BLUE2, frameDebug.getLedBlue2(), "ledBlue2");
+        ledBlue3 = new MyPin(GPIO, LED_SECONDS_BLUE3, frameDebug.getLedBlue3(), "ledBlue3");
+
+        ledWhite1 = new MyPin(GPIO, LED_SECONDS_WHITE1, frameDebug.getLedWhite1(), "ledWhite1");
+        ledWhite2 = new MyPin(GPIO, LED_SECONDS_WHITE2, frameDebug.getLedWhite2(), "ledWhite2");
+        ledWhite3 = new MyPin(GPIO, LED_SECONDS_WHITE3, frameDebug.getLedWhite3(), "ledWhite3");
+
+        pinHandler.add(ledRed1);
+        pinHandler.add(ledRed2);
+        pinHandler.add(ledRed3);
+        pinHandler.add(ledBlue1);
+        pinHandler.add(ledBlue2);
+        pinHandler.add(ledBlue3);
+        pinHandler.add(ledWhite1);
+        pinHandler.add(ledWhite2);
+        pinHandler.add(ledWhite3);
+
+        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_switch_mode, pole, ledRed1, ledRed2, ledRed3, ledBlue1, ledBlue2, ledBlue3, ledWhite1, ledWhite2, ledWhite3);
         game.run();
+
 
     }
 
@@ -120,18 +161,20 @@ public class Main {
         logger = Logger.getLogger("Main");
         logger.setLevel(logLevel);
 
-        config = new SortedProperties();
-        // todo: configreader needed
-        config.put("vibeSensor1", "GPIO 4");
-        config.put("HEALTH_CHANGE_PER_HIT", "-1");
-        config.put("GAME_LENGTH_IN_SECONDS", "60");
-        config.put("DELAY_BEFORE_GAME_STARTS_IN_SECONDS", "5");
-        config.put("MAX_HEALTH", "1000");
-        config.put("DEBOUNCE", "15");
+         pinHandler = new PinHandler();
 
-        config.put("pwmRed", "GPIO 0");
-        config.put("pwmGreen", "GPIO 3");
-        config.put("pwmBlue", "GPIO 5");
+//        config = new SortedProperties();
+//        // todo: configreader needed
+//        config.put("vibeSensor1", "GPIO 4");
+//        config.put("HEALTH_CHANGE_PER_HIT", "-1");
+//        config.put("GAME_LENGTH_IN_SECONDS", "60");
+//        config.put("DELAY_BEFORE_GAME_STARTS_IN_SECONDS", "5");
+//        config.put("MAX_HEALTH", "1000");
+//        config.put("DEBOUNCE", "15");
+//
+//        config.put("pwmRed", "GPIO 0");
+//        config.put("pwmGreen", "GPIO 3");
+//        config.put("pwmBlue", "GPIO 5");
 
 
     }
@@ -150,9 +193,7 @@ public class Main {
         if (!Tools.isArm()) return;
         GPIO = GpioFactory.getInstance();
 
-        Pin pinRed = RaspiPin.getPinByName(config.getProperty("pwmRed"));
-        Pin pinGreen = RaspiPin.getPinByName(config.getProperty("pwmGreen"));
-        Pin pinBlue = RaspiPin.getPinByName(config.getProperty("pwmBlue"));
+
     }
 
     public static Level getLogLevel() {

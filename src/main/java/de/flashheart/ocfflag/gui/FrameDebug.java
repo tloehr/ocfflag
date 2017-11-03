@@ -49,17 +49,23 @@ public class FrameDebug extends JFrame {
         ledBlue1 = new MyLED();
         ledBlue2 = new MyLED();
         ledBlue3 = new MyLED();
+        ledBlue4 = new MyLED();
+        ledBlue5 = new MyLED();
         pnlRedLeds = new JPanel();
         ledRed1 = new MyLED();
         ledRed2 = new MyLED();
         ledRed3 = new MyLED();
+        ledRed4 = new MyLED();
+        ledRed5 = new MyLED();
         lblBlueTime = new JLabel();
         lblRedTime = new JLabel();
         btnBlue = new JButton();
         pnlWhiteLeds = new JPanel();
-        ledRed4 = new MyLED();
-        ledRed5 = new MyLED();
-        ledRed6 = new MyLED();
+        ledWhite1 = new MyLED();
+        ledWhite2 = new MyLED();
+        ledWhite3 = new MyLED();
+        ledWhite4 = new MyLED();
+        ledWhite5 = new MyLED();
         btnRed = new JButton();
         lblWhiteTime = new JLabel();
         btnSwitchMode = new JToggleButton();
@@ -74,7 +80,7 @@ public class FrameDebug extends JFrame {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, $rgap, $lcgap, default:grow, $lcgap, $rgap, $lcgap, default:grow, $lcgap, $rgap, $lcgap, default:grow, $lcgap, $rgap, 2*($lcgap, default)",
+                "default, $lcgap, default:grow, $lcgap, $rgap, $lcgap, default:grow, $lcgap, $rgap, $lcgap, default:grow, $lcgap, $rgap, $lcgap, default:grow, $lcgap, $rgap, $lcgap, default:grow, $lcgap, default",
                 "$rgap, $lgap, fill:22dlu, $ugap, 5*(default, $lgap), default"));
 
             //---- lblPole ----
@@ -101,8 +107,16 @@ public class FrameDebug extends JFrame {
                 //---- ledBlue3 ----
                 ledBlue3.setColor(Color.blue);
                 pnlBlueLeds.add(ledBlue3);
+
+                //---- ledBlue4 ----
+                ledBlue4.setColor(Color.blue);
+                pnlBlueLeds.add(ledBlue4);
+
+                //---- ledBlue5 ----
+                ledBlue5.setColor(Color.blue);
+                pnlBlueLeds.add(ledBlue5);
             }
-            panel1.add(pnlBlueLeds, CC.xy(7, 5));
+            panel1.add(pnlBlueLeds, CC.xy(7, 5, CC.CENTER, CC.DEFAULT));
 
             //======== pnlRedLeds ========
             {
@@ -119,8 +133,16 @@ public class FrameDebug extends JFrame {
                 //---- ledRed3 ----
                 ledRed3.setColor(Color.red);
                 pnlRedLeds.add(ledRed3);
+
+                //---- ledRed4 ----
+                ledRed4.setColor(Color.red);
+                pnlRedLeds.add(ledRed4);
+
+                //---- ledRed5 ----
+                ledRed5.setColor(Color.red);
+                pnlRedLeds.add(ledRed5);
             }
-            panel1.add(pnlRedLeds, CC.xy(15, 5));
+            panel1.add(pnlRedLeds, CC.xy(15, 5, CC.CENTER, CC.DEFAULT));
 
             //---- lblBlueTime ----
             lblBlueTime.setText("00:00");
@@ -142,11 +164,13 @@ public class FrameDebug extends JFrame {
             //======== pnlWhiteLeds ========
             {
                 pnlWhiteLeds.setLayout(new BoxLayout(pnlWhiteLeds, BoxLayout.LINE_AXIS));
-                pnlWhiteLeds.add(ledRed4);
-                pnlWhiteLeds.add(ledRed5);
-                pnlWhiteLeds.add(ledRed6);
+                pnlWhiteLeds.add(ledWhite1);
+                pnlWhiteLeds.add(ledWhite2);
+                pnlWhiteLeds.add(ledWhite3);
+                pnlWhiteLeds.add(ledWhite4);
+                pnlWhiteLeds.add(ledWhite5);
             }
-            panel1.add(pnlWhiteLeds, CC.xy(11, 9));
+            panel1.add(pnlWhiteLeds, CC.xy(11, 9, CC.CENTER, CC.DEFAULT));
 
             //---- btnRed ----
             btnRed.setText("Big Fat Red Button");
@@ -170,7 +194,7 @@ public class FrameDebug extends JFrame {
             panel1.add(btnReset, CC.xy(19, 15));
         }
         contentPane.add(panel1);
-        pack();
+        setSize(910, 290);
         setLocationRelativeTo(null);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -207,6 +231,42 @@ public class FrameDebug extends JFrame {
         return btnSwitchMode;
     }
 
+    public MyLED getLedBlue1() {
+        return ledBlue1;
+    }
+
+    public MyLED getLedBlue2() {
+        return ledBlue2;
+    }
+
+    public MyLED getLedBlue3() {
+        return ledBlue3;
+    }
+
+    public MyLED getLedRed1() {
+        return ledRed1;
+    }
+
+    public MyLED getLedRed2() {
+        return ledRed2;
+    }
+
+    public MyLED getLedRed3() {
+        return ledRed3;
+    }
+
+    public MyLED getLedWhite1() {
+        return ledWhite1;
+    }
+
+    public MyLED getLedWhite2() {
+        return ledWhite2;
+    }
+
+    public MyLED getLedWhite3() {
+        return ledWhite3;
+    }
+
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JPanel panel1;
     private JLabel lblPole;
@@ -214,17 +274,23 @@ public class FrameDebug extends JFrame {
     private MyLED ledBlue1;
     private MyLED ledBlue2;
     private MyLED ledBlue3;
+    private MyLED ledBlue4;
+    private MyLED ledBlue5;
     private JPanel pnlRedLeds;
     private MyLED ledRed1;
     private MyLED ledRed2;
     private MyLED ledRed3;
+    private MyLED ledRed4;
+    private MyLED ledRed5;
     private JLabel lblBlueTime;
     private JLabel lblRedTime;
     private JButton btnBlue;
     private JPanel pnlWhiteLeds;
-    private MyLED ledRed4;
-    private MyLED ledRed5;
-    private MyLED ledRed6;
+    private MyLED ledWhite1;
+    private MyLED ledWhite2;
+    private MyLED ledWhite3;
+    private MyLED ledWhite4;
+    private MyLED ledWhite5;
     private JButton btnRed;
     private JLabel lblWhiteTime;
     private JToggleButton btnSwitchMode;

@@ -3,6 +3,7 @@ package de.flashheart.ocfflag.mechanics;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
+import de.flashheart.ocfflag.hardware.abstraction.MyPin;
 import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Logger;
@@ -24,6 +25,15 @@ public class Game implements Runnable {
     private final int MODE_CLOCK_STANDBY = 0;
     private final int MODE_CLOCK_ACTIVE = 1;
     private final MyRGBLed pole;
+    private final MyPin ledRed1;
+    private final MyPin ledRed2;
+    private final MyPin ledRed3;
+    private final MyPin ledBlue1;
+    private final MyPin ledBlue2;
+    private final MyPin ledBlue3;
+    private final MyPin ledWhite1;
+    private final MyPin ledWhite2;
+    private final MyPin ledWhite3;
     private int mode = MODE_CLOCK_STANDBY;
 
     private final int FLAG_STATE_NEUTRAL = 0;
@@ -46,8 +56,17 @@ public class Game implements Runnable {
 
     private long time, time_blue, time_red, lastPIT;
 
-    public Game(Display7Segments4Digits display_blue, Display7Segments4Digits display_red, Display7Segments4Digits display_white, MyAbstractButton button_blue, MyAbstractButton button_red, MyAbstractButton button_reset, MyAbstractButton button_switch_mode, MyRGBLed pole) {
+    public Game(Display7Segments4Digits display_blue, Display7Segments4Digits display_red, Display7Segments4Digits display_white, MyAbstractButton button_blue, MyAbstractButton button_red, MyAbstractButton button_reset, MyAbstractButton button_switch_mode, MyRGBLed pole, MyPin ledRed1, MyPin ledRed2, MyPin ledRed3, MyPin ledBlue1, MyPin ledBlue2, MyPin ledBlue3, MyPin ledWhite1, MyPin ledWhite2, MyPin ledWhite3) {
         this.pole = pole;
+        this.ledRed1 = ledRed1;
+        this.ledRed2 = ledRed2;
+        this.ledRed3 = ledRed3;
+        this.ledBlue1 = ledBlue1;
+        this.ledBlue2 = ledBlue2;
+        this.ledBlue3 = ledBlue3;
+        this.ledWhite1 = ledWhite1;
+        this.ledWhite2 = ledWhite2;
+        this.ledWhite3 = ledWhite3;
         thread = new Thread(this);
         logger.setLevel(Main.getLogLevel());
         this.display_blue = display_blue;
@@ -96,6 +115,12 @@ public class Game implements Runnable {
         });
 
         reset_timers();
+
+        Main.getPinHandler().setScheme(ledWhite1.getName(), "1000;500,500");
+        Main.getPinHandler().setScheme(ledWhite3.getName(), "1000;500,500");
+        
+
+
     }
 
     private void reset_timers() {
