@@ -43,14 +43,6 @@ new FormModel {
 						name: "ledBlue3"
 						"color": sfield java.awt.Color blue
 					} )
-					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-						name: "ledBlue4"
-						"color": sfield java.awt.Color blue
-					} )
-					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-						name: "ledBlue5"
-						"color": sfield java.awt.Color blue
-					} )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 7
 					"gridY": 5
@@ -70,14 +62,6 @@ new FormModel {
 					} )
 					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
 						name: "ledRed3"
-						"color": sfield java.awt.Color red
-					} )
-					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-						name: "ledRed4"
-						"color": sfield java.awt.Color red
-					} )
-					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-						name: "ledRed5"
 						"color": sfield java.awt.Color red
 					} )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
@@ -112,6 +96,7 @@ new FormModel {
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridY": 9
 					"gridX": 3
+					"gridHeight": 3
 				} )
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
 					"axis": 2
@@ -126,12 +111,6 @@ new FormModel {
 					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
 						name: "ledWhite3"
 					} )
-					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-						name: "ledWhite4"
-					} )
-					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-						name: "ledWhite5"
-					} )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridY": 9
 					"gridX": 11
@@ -144,6 +123,7 @@ new FormModel {
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 19
 					"gridY": 9
+					"gridHeight": 3
 				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
 					name: "lblWhiteTime"
@@ -157,18 +137,38 @@ new FormModel {
 					"gridY": 11
 					"hAlign": sfield com.jgoodies.forms.layout.CellConstraints CENTER
 				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+					"axis": 2
+				} ) {
+					name: "panel2"
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnPresetMinus"
+						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/1leftarrow.png" )
+						"toolTipText": "Zeitvorgabe -"
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnReset"
+						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/1downarrow.png" )
+						"toolTipText": "Reset"
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnPresetPlus"
+						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/1rightarrow.png" )
+						"toolTipText": "Zeitvorgabe -"
+					} )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 11
+					"gridY": 13
+					"hAlign": sfield com.jgoodies.forms.layout.CellConstraints CENTER
+				} )
 				add( new FormComponent( "javax.swing.JToggleButton" ) {
 					name: "btnSwitchMode"
 					"text": "Standby"
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 19
-					"gridY": 13
-				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "btnReset"
-					"text": "Reset"
-				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 19
+					"gridX": 11
 					"gridY": 15
 				} )
 			} )

@@ -38,6 +38,8 @@ public class Main {
     private static final Pin BUTTON_BLUE = RaspiPin.GPIO_15;
     private static final Pin BUTTON_RED = RaspiPin.GPIO_15;
     private static final Pin BUTTON_RESET = RaspiPin.GPIO_15;
+    private static final Pin BUTTON_PRESET_MINUS = RaspiPin.GPIO_15;
+    private static final Pin BUTTON_PRESET_PLUS = RaspiPin.GPIO_15;
     private static final Pin BUTTON_SWITCH_MODE = RaspiPin.GPIO_15;
 
     private static final Pin POLE_RGB_RED = RaspiPin.GPIO_15;
@@ -57,7 +59,7 @@ public class Main {
     private static final Pin LED_SECONDS_WHITE3 = RaspiPin.GPIO_15;
 
     private static Display7Segments4Digits display_blue, display_red, display_white;
-    private static MyAbstractButton button_blue, button_red, button_reset, button_switch_mode;
+    private static MyAbstractButton button_blue, button_red, button_reset, button_switch_mode, button_preset_minus, button_preset_plus;
     private static MyRGBLed pole;
 
     private static MyPin ledRed1, ledRed2, ledRed3, ledBlue1, ledBlue2, ledBlue3, ledWhite1, ledWhite2, ledWhite3;
@@ -92,6 +94,8 @@ public class Main {
         button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue());
         button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed());
         button_reset = new MyAbstractButton(GPIO, BUTTON_RESET, frameDebug.getBtnReset());
+        button_preset_minus = new MyAbstractButton(GPIO, BUTTON_PRESET_MINUS, frameDebug.getBtnPresetMinus());
+        button_preset_plus = new MyAbstractButton(GPIO, BUTTON_PRESET_PLUS, frameDebug.getBtnPresetPlus());
         button_switch_mode = new MyAbstractButton(GPIO, BUTTON_SWITCH_MODE, frameDebug.getBtnSwitchMode());
 
         pole = new MyRGBLed(GPIO, POLE_RGB_RED, POLE_RGB_GREEN, POLE_RGB_BLUE, frameDebug.getLblPole());
@@ -118,7 +122,7 @@ public class Main {
         pinHandler.add(ledWhite2);
         pinHandler.add(ledWhite3);
 
-        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_switch_mode, pole, ledRed1, ledRed2, ledRed3, ledBlue1, ledBlue2, ledBlue3, ledWhite1, ledWhite2, ledWhite3);
+        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_switch_mode, button_preset_minus, button_preset_plus, pole, ledRed1, ledRed2, ledRed3, ledBlue1, ledBlue2, ledBlue3, ledWhite1, ledWhite2, ledWhite3);
         game.run();
 
 

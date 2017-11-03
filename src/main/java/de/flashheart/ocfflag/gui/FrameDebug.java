@@ -49,14 +49,10 @@ public class FrameDebug extends JFrame {
         ledBlue1 = new MyLED();
         ledBlue2 = new MyLED();
         ledBlue3 = new MyLED();
-        ledBlue4 = new MyLED();
-        ledBlue5 = new MyLED();
         pnlRedLeds = new JPanel();
         ledRed1 = new MyLED();
         ledRed2 = new MyLED();
         ledRed3 = new MyLED();
-        ledRed4 = new MyLED();
-        ledRed5 = new MyLED();
         lblBlueTime = new JLabel();
         lblRedTime = new JLabel();
         btnBlue = new JButton();
@@ -64,12 +60,13 @@ public class FrameDebug extends JFrame {
         ledWhite1 = new MyLED();
         ledWhite2 = new MyLED();
         ledWhite3 = new MyLED();
-        ledWhite4 = new MyLED();
-        ledWhite5 = new MyLED();
         btnRed = new JButton();
         lblWhiteTime = new JLabel();
-        btnSwitchMode = new JToggleButton();
+        panel2 = new JPanel();
+        btnPresetMinus = new JButton();
         btnReset = new JButton();
+        btnPresetPlus = new JButton();
+        btnSwitchMode = new JToggleButton();
 
         //======== this ========
         setTitle("OCF Flag Simulator");
@@ -107,14 +104,6 @@ public class FrameDebug extends JFrame {
                 //---- ledBlue3 ----
                 ledBlue3.setColor(Color.blue);
                 pnlBlueLeds.add(ledBlue3);
-
-                //---- ledBlue4 ----
-                ledBlue4.setColor(Color.blue);
-                pnlBlueLeds.add(ledBlue4);
-
-                //---- ledBlue5 ----
-                ledBlue5.setColor(Color.blue);
-                pnlBlueLeds.add(ledBlue5);
             }
             panel1.add(pnlBlueLeds, CC.xy(7, 5, CC.CENTER, CC.DEFAULT));
 
@@ -133,14 +122,6 @@ public class FrameDebug extends JFrame {
                 //---- ledRed3 ----
                 ledRed3.setColor(Color.red);
                 pnlRedLeds.add(ledRed3);
-
-                //---- ledRed4 ----
-                ledRed4.setColor(Color.red);
-                pnlRedLeds.add(ledRed4);
-
-                //---- ledRed5 ----
-                ledRed5.setColor(Color.red);
-                pnlRedLeds.add(ledRed5);
             }
             panel1.add(pnlRedLeds, CC.xy(15, 5, CC.CENTER, CC.DEFAULT));
 
@@ -159,7 +140,7 @@ public class FrameDebug extends JFrame {
             //---- btnBlue ----
             btnBlue.setText("Big Fat Blue Button");
             btnBlue.setForeground(Color.blue);
-            panel1.add(btnBlue, CC.xy(3, 9));
+            panel1.add(btnBlue, CC.xywh(3, 9, 1, 3));
 
             //======== pnlWhiteLeds ========
             {
@@ -167,15 +148,13 @@ public class FrameDebug extends JFrame {
                 pnlWhiteLeds.add(ledWhite1);
                 pnlWhiteLeds.add(ledWhite2);
                 pnlWhiteLeds.add(ledWhite3);
-                pnlWhiteLeds.add(ledWhite4);
-                pnlWhiteLeds.add(ledWhite5);
             }
             panel1.add(pnlWhiteLeds, CC.xy(11, 9, CC.CENTER, CC.DEFAULT));
 
             //---- btnRed ----
             btnRed.setText("Big Fat Red Button");
             btnRed.setForeground(Color.red);
-            panel1.add(btnRed, CC.xy(19, 9));
+            panel1.add(btnRed, CC.xywh(19, 9, 1, 3));
 
             //---- lblWhiteTime ----
             lblWhiteTime.setText("00:00");
@@ -185,13 +164,33 @@ public class FrameDebug extends JFrame {
             lblWhiteTime.setOpaque(true);
             panel1.add(lblWhiteTime, CC.xy(11, 11, CC.CENTER, CC.DEFAULT));
 
+            //======== panel2 ========
+            {
+                panel2.setLayout(new BoxLayout(panel2, BoxLayout.LINE_AXIS));
+
+                //---- btnPresetMinus ----
+                btnPresetMinus.setText(null);
+                btnPresetMinus.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/1leftarrow.png")));
+                btnPresetMinus.setToolTipText("Zeitvorgabe -");
+                panel2.add(btnPresetMinus);
+
+                //---- btnReset ----
+                btnReset.setText(null);
+                btnReset.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/1downarrow.png")));
+                btnReset.setToolTipText("Reset");
+                panel2.add(btnReset);
+
+                //---- btnPresetPlus ----
+                btnPresetPlus.setText(null);
+                btnPresetPlus.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/1rightarrow.png")));
+                btnPresetPlus.setToolTipText("Zeitvorgabe -");
+                panel2.add(btnPresetPlus);
+            }
+            panel1.add(panel2, CC.xy(11, 13, CC.CENTER, CC.DEFAULT));
+
             //---- btnSwitchMode ----
             btnSwitchMode.setText("Standby");
-            panel1.add(btnSwitchMode, CC.xy(19, 13));
-
-            //---- btnReset ----
-            btnReset.setText("Reset");
-            panel1.add(btnReset, CC.xy(19, 15));
+            panel1.add(btnSwitchMode, CC.xy(11, 15));
         }
         contentPane.add(panel1);
         setSize(910, 290);
@@ -267,6 +266,14 @@ public class FrameDebug extends JFrame {
         return ledWhite3;
     }
 
+    public JButton getBtnPresetMinus() {
+        return btnPresetMinus;
+    }
+
+    public JButton getBtnPresetPlus() {
+        return btnPresetPlus;
+    }
+
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JPanel panel1;
     private JLabel lblPole;
@@ -274,14 +281,10 @@ public class FrameDebug extends JFrame {
     private MyLED ledBlue1;
     private MyLED ledBlue2;
     private MyLED ledBlue3;
-    private MyLED ledBlue4;
-    private MyLED ledBlue5;
     private JPanel pnlRedLeds;
     private MyLED ledRed1;
     private MyLED ledRed2;
     private MyLED ledRed3;
-    private MyLED ledRed4;
-    private MyLED ledRed5;
     private JLabel lblBlueTime;
     private JLabel lblRedTime;
     private JButton btnBlue;
@@ -289,11 +292,12 @@ public class FrameDebug extends JFrame {
     private MyLED ledWhite1;
     private MyLED ledWhite2;
     private MyLED ledWhite3;
-    private MyLED ledWhite4;
-    private MyLED ledWhite5;
     private JButton btnRed;
     private JLabel lblWhiteTime;
-    private JToggleButton btnSwitchMode;
+    private JPanel panel2;
+    private JButton btnPresetMinus;
     private JButton btnReset;
+    private JButton btnPresetPlus;
+    private JToggleButton btnSwitchMode;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
