@@ -1,18 +1,20 @@
 package de.flashheart.ocfflag;
 
-import com.pi4j.io.gpio.*;
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioFactory;
+import com.pi4j.io.gpio.Pin;
+import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.i2c.I2CFactory;
+import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
 import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.mechanics.Game;
 import de.flashheart.ocfflag.misc.SortedProperties;
-import de.flashheart.ocfflag.gui.FrameDebug;
+import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import javax.swing.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -26,6 +28,8 @@ public class Main {
     private static Logger logger;
     private static Level logLevel = Level.DEBUG;
 
+
+    // Parameter für die einzelnen PINs am Raspi sowie die I2C Adressen.
     private static final int DISPLAY_BLUE = 0x70;
     private static final int DISPLAY_RED = 0x71;
     private static final int DISPLAY_WHITE = 0x72;
@@ -43,23 +47,29 @@ public class Main {
     private static MyAbstractButton button_blue, button_red, button_reset, button_switch_mode;
     private static MyRGBLed pole;
 
+//    private static MyPin
+
 
     public static void main(String[] args) throws Exception {
-
         initBaseSystem();
         initCommon();
         initDebugFrame();
         initRaspi();
         initGameSystem();
-
-
     }
 
+    /**
+     * in dieser Methode werden alle "Verdrahtungen" zwischen der Hardware und der OnScreen Darstellung vorgenommen.
+     * Anschließen wird die Spielmechanik durch das Erzeugen eines "GAMES" gestartet.
+     *
+     * @throws I2CFactory.UnsupportedBusNumberException
+     * @throws IOException
+     */
     private static void initGameSystem() throws I2CFactory.UnsupportedBusNumberException, IOException {
 
-        display_blue = new Display7Segments4Digits(DISPLAY_BLUE, getFrameDebug().getLblBlue());
-        display_red = new Display7Segments4Digits(DISPLAY_RED, getFrameDebug().getLblRed());
-        display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblWhite());
+        display_blue = new Display7Segments4Digits(DISPLAY_BLUE, getFrameDebug().getLblBlueTime());
+        display_red = new Display7Segments4Digits(DISPLAY_RED, getFrameDebug().getLblRedTime());
+        display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblWhiteTime());
 
         button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue());
         button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed());
@@ -68,14 +78,14 @@ public class Main {
 
         pole = new MyRGBLed(GPIO, POLE_RGB_RED, POLE_RGB_GREEN, POLE_RGB_BLUE, frameDebug.getLblPole());
 
-        Game game = new Game(display_blue,display_red,display_white,button_blue,button_red,button_reset,button_switch_mode, pole);
+        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_switch_mode, pole);
         game.run();
 
     }
 
 
     private static void initBaseSystem() {
-        System.setProperty("logs", getWorkingPath());
+        System.setProperty("logs", Tools.getWorkingPath());
 //        System.setProperty("logs", Tools.getWorkingPath());
         logger = Logger.getLogger("Main");
         logger.setLevel(logLevel);
@@ -132,16 +142,12 @@ public class Main {
      * @throws Exception
      */
     private static void initDebugFrame() throws Exception {
-//        if (isArm()) return;
-
         frameDebug = new FrameDebug();
-        frameDebug.pack();
         frameDebug.setVisible(true);
-        frameDebug.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
     private static void initRaspi() throws Exception {
-        if (!isArm()) return;
+        if (!Tools.isArm()) return;
         GPIO = GpioFactory.getInstance();
 
         Pin pinRed = RaspiPin.getPinByName(config.getProperty("pwmRed"));
@@ -161,15 +167,4 @@ public class Main {
         return frameDebug;
     }
 
-    private static String getWorkingPath() {
-        return (isArm() ? "/home/pi" : System.getProperty("user.home")) + File.separator + "ocfflag";
-    }
-
-    // http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
-    public static boolean isArm() {
-
-        String os = System.getProperty("os.arch").toLowerCase();
-        return (os.indexOf("arm") >= 0);
-
-    }
 }

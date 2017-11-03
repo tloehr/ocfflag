@@ -24,25 +24,27 @@ public class MyLED extends JLabel {
     public final Icon icon22ledYellowOn = new ImageIcon(getClass().getResource("/artwork/22x22/ledyellow.png"));
     public final Icon icon22ledRedOff = new ImageIcon(getClass().getResource("/artwork/22x22/leddarkred.png"));
     public final Icon icon22ledRedOn = new ImageIcon(getClass().getResource("/artwork/22x22/ledred.png"));
-    private MyPin myPin;
+    public final Icon icon22ledWhiteOff = new ImageIcon(getClass().getResource("/artwork/22x22/leddarkwhite.png"));
+    public final Icon icon22ledWhiteOn = new ImageIcon(getClass().getResource("/artwork/22x22/ledwhite.png"));
+
     private Color color;
+    private boolean state;
 
     public MyLED() {
-        this(null, null, Color.RED);
+        this(null, Color.WHITE);
     }
 
-    public MyLED(MyPin myPin, String text, Color color) {
+    public MyLED(String text, Color color) {
         super(text);
-        this.myPin = myPin;
         this.color = color;
         setText(text);
         setColor(color);
-        setOn(false);
+        setState(false);
     }
 
-
-    public MyLED(String text) {
-        this(text, Color.RED);
+    @Override
+    public void setText(String text) {
+        setToolTipText(text); // kein Platz auf dem Bildschirm
     }
 
     public Color getColor() {
@@ -50,6 +52,11 @@ public class MyLED extends JLabel {
     }
 
     public void setColor(Color color) {
+        if (color.equals(Color.WHITE)) {
+            imageOn = icon22ledWhiteOn;
+            imageOff = icon22ledWhiteOff;
+            return;
+        }
         if (color.equals(Color.BLUE)) {
             imageOn = icon22ledBlueOn;
             imageOff = icon22ledBlueOff;
@@ -82,14 +89,15 @@ public class MyLED extends JLabel {
         }
     }
 
-    public void setOn(boolean on) {
+    public void setState(boolean on) {
         SwingUtilities.invokeLater(() -> {
             setIcon(on ? imageOn : imageOff);
             revalidate();
             repaint();
         });
-
     }
 
-
+    public boolean isState() {
+        return state;
+    }
 }

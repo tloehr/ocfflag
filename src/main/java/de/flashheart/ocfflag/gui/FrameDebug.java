@@ -27,9 +27,9 @@ public class FrameDebug extends JFrame {
     }
 
     private void initFrame() {
-        lblBlue.setFont(font.deriveFont(40f));
-        lblRed.setFont(font.deriveFont(40f));
-        lblWhite.setFont(font.deriveFont(40f));
+        lblBlueTime.setFont(font.deriveFont(40f));
+        lblRedTime.setFont(font.deriveFont(40f));
+        lblWhiteTime.setFont(font.deriveFont(40f));
     }
 
     private void initFonts() {
@@ -43,6 +43,7 @@ public class FrameDebug extends JFrame {
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+        panel1 = new JPanel();
         lblPole = new JLabel();
         pnlBlueLeds = new JPanel();
         ledBlue1 = new MyLED();
@@ -65,123 +66,129 @@ public class FrameDebug extends JFrame {
         btnReset = new JButton();
 
         //======== this ========
-        setTitle("OCF Flaggen Simulator");
+        setTitle("OCF Flag Simulator");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         Container contentPane = getContentPane();
-        contentPane.setLayout(new FormLayout(
-            "3*(default, $lcgap), 47dlu, $lcgap, 50dlu, $lcgap, 49dlu, 3*($lcgap, default)",
-            "6dlu, $lgap, fill:22dlu, 7*($lgap, default)"));
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 
-        //---- lblPole ----
-        lblPole.setOpaque(true);
-        lblPole.setBackground(Color.lightGray);
-        lblPole.setText("Flagge");
-        lblPole.setForeground(Color.black);
-        lblPole.setHorizontalAlignment(SwingConstants.CENTER);
-        lblPole.setFont(new Font("Dialog", Font.BOLD, 20));
-        contentPane.add(lblPole, CC.xywh(3, 3, 13, 1));
-
-        //======== pnlBlueLeds ========
+        //======== panel1 ========
         {
-            pnlBlueLeds.setLayout(new BoxLayout(pnlBlueLeds, BoxLayout.LINE_AXIS));
+            panel1.setLayout(new FormLayout(
+                "default, $lcgap, default:grow, $lcgap, $rgap, $lcgap, default:grow, $lcgap, $rgap, $lcgap, default:grow, $lcgap, $rgap, $lcgap, default:grow, $lcgap, $rgap, 2*($lcgap, default)",
+                "$rgap, $lgap, fill:22dlu, $ugap, 5*(default, $lgap), default"));
 
-            //---- ledBlue1 ----
-            ledBlue1.setColor(Color.blue);
-            pnlBlueLeds.add(ledBlue1);
+            //---- lblPole ----
+            lblPole.setOpaque(true);
+            lblPole.setBackground(Color.lightGray);
+            lblPole.setText("Flagge");
+            lblPole.setForeground(Color.black);
+            lblPole.setHorizontalAlignment(SwingConstants.CENTER);
+            lblPole.setFont(new Font("Dialog", Font.BOLD, 20));
+            panel1.add(lblPole, CC.xywh(3, 3, 17, 1));
 
-            //---- ledBlue2 ----
-            ledBlue2.setColor(Color.blue);
-            pnlBlueLeds.add(ledBlue2);
+            //======== pnlBlueLeds ========
+            {
+                pnlBlueLeds.setLayout(new BoxLayout(pnlBlueLeds, BoxLayout.LINE_AXIS));
 
-            //---- ledBlue3 ----
-            ledBlue3.setColor(Color.blue);
-            pnlBlueLeds.add(ledBlue3);
+                //---- ledBlue1 ----
+                ledBlue1.setColor(Color.blue);
+                pnlBlueLeds.add(ledBlue1);
+
+                //---- ledBlue2 ----
+                ledBlue2.setColor(Color.blue);
+                pnlBlueLeds.add(ledBlue2);
+
+                //---- ledBlue3 ----
+                ledBlue3.setColor(Color.blue);
+                pnlBlueLeds.add(ledBlue3);
+            }
+            panel1.add(pnlBlueLeds, CC.xy(7, 5));
+
+            //======== pnlRedLeds ========
+            {
+                pnlRedLeds.setLayout(new BoxLayout(pnlRedLeds, BoxLayout.LINE_AXIS));
+
+                //---- ledRed1 ----
+                ledRed1.setColor(Color.red);
+                pnlRedLeds.add(ledRed1);
+
+                //---- ledRed2 ----
+                ledRed2.setColor(Color.red);
+                pnlRedLeds.add(ledRed2);
+
+                //---- ledRed3 ----
+                ledRed3.setColor(Color.red);
+                pnlRedLeds.add(ledRed3);
+            }
+            panel1.add(pnlRedLeds, CC.xy(15, 5));
+
+            //---- lblBlueTime ----
+            lblBlueTime.setText("00:00");
+            lblBlueTime.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 30));
+            lblBlueTime.setForeground(Color.blue);
+            panel1.add(lblBlueTime, CC.xy(7, 7, CC.CENTER, CC.DEFAULT));
+
+            //---- lblRedTime ----
+            lblRedTime.setText("00:00");
+            lblRedTime.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 30));
+            lblRedTime.setForeground(Color.red);
+            panel1.add(lblRedTime, CC.xy(15, 7, CC.CENTER, CC.DEFAULT));
+
+            //---- btnBlue ----
+            btnBlue.setText("Big Fat Blue Button");
+            btnBlue.setForeground(Color.blue);
+            panel1.add(btnBlue, CC.xy(3, 9));
+
+            //======== pnlWhiteLeds ========
+            {
+                pnlWhiteLeds.setLayout(new BoxLayout(pnlWhiteLeds, BoxLayout.LINE_AXIS));
+                pnlWhiteLeds.add(ledRed4);
+                pnlWhiteLeds.add(ledRed5);
+                pnlWhiteLeds.add(ledRed6);
+            }
+            panel1.add(pnlWhiteLeds, CC.xy(11, 9));
+
+            //---- btnRed ----
+            btnRed.setText("Big Fat Red Button");
+            btnRed.setForeground(Color.red);
+            panel1.add(btnRed, CC.xy(19, 9));
+
+            //---- lblWhiteTime ----
+            lblWhiteTime.setText("00:00");
+            lblWhiteTime.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 30));
+            lblWhiteTime.setForeground(Color.white);
+            lblWhiteTime.setBackground(Color.black);
+            lblWhiteTime.setOpaque(true);
+            panel1.add(lblWhiteTime, CC.xy(11, 11, CC.CENTER, CC.DEFAULT));
+
+            //---- btnSwitchMode ----
+            btnSwitchMode.setText("Standby");
+            panel1.add(btnSwitchMode, CC.xy(19, 13));
+
+            //---- btnReset ----
+            btnReset.setText("Reset");
+            panel1.add(btnReset, CC.xy(19, 15));
         }
-        contentPane.add(pnlBlueLeds, CC.xy(7, 5, CC.CENTER, CC.DEFAULT));
-
-        //======== pnlRedLeds ========
-        {
-            pnlRedLeds.setLayout(new BoxLayout(pnlRedLeds, BoxLayout.LINE_AXIS));
-            pnlRedLeds.add(ledRed1);
-            pnlRedLeds.add(ledRed2);
-            pnlRedLeds.add(ledRed3);
-        }
-        contentPane.add(pnlRedLeds, CC.xy(11, 5, CC.CENTER, CC.DEFAULT));
-
-        //---- lblBlueTime ----
-        lblBlueTime.setText("00:00");
-        lblBlueTime.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 30));
-        lblBlueTime.setForeground(Color.blue);
-        contentPane.add(lblBlueTime, CC.xy(7, 7));
-
-        //---- lblRedTime ----
-        lblRedTime.setText("00:00");
-        lblRedTime.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 30));
-        lblRedTime.setForeground(Color.red);
-        contentPane.add(lblRedTime, CC.xy(11, 7));
-
-        //---- btnBlue ----
-        btnBlue.setText("Big Fat Blue Button");
-        btnBlue.setForeground(Color.blue);
-        contentPane.add(btnBlue, CC.xy(3, 9));
-
-        //======== pnlWhiteLeds ========
-        {
-            pnlWhiteLeds.setLayout(new BoxLayout(pnlWhiteLeds, BoxLayout.LINE_AXIS));
-
-            //---- ledRed4 ----
-            ledRed4.setColor(Color.yellow);
-            pnlWhiteLeds.add(ledRed4);
-
-            //---- ledRed5 ----
-            ledRed5.setColor(Color.yellow);
-            pnlWhiteLeds.add(ledRed5);
-
-            //---- ledRed6 ----
-            ledRed6.setColor(Color.yellow);
-            pnlWhiteLeds.add(ledRed6);
-        }
-        contentPane.add(pnlWhiteLeds, CC.xy(9, 9, CC.CENTER, CC.DEFAULT));
-
-        //---- btnRed ----
-        btnRed.setText("Big Fat Red Button");
-        btnRed.setForeground(Color.red);
-        contentPane.add(btnRed, CC.xy(15, 9));
-
-        //---- lblWhiteTime ----
-        lblWhiteTime.setText("00:00");
-        lblWhiteTime.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 30));
-        lblWhiteTime.setForeground(Color.white);
-        lblWhiteTime.setBackground(Color.black);
-        lblWhiteTime.setOpaque(true);
-        contentPane.add(lblWhiteTime, CC.xy(9, 11));
-
-        //---- btnSwitchMode ----
-        btnSwitchMode.setText("Standby");
-        contentPane.add(btnSwitchMode, CC.xy(15, 13));
-
-        //---- btnReset ----
-        btnReset.setText("Reset");
-        contentPane.add(btnReset, CC.xy(15, 15));
+        contentPane.add(panel1);
         pack();
-        setLocationRelativeTo(getOwner());
+        setLocationRelativeTo(null);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
-    public JLabel getLblBlue() {
-        return lblBlue;
+    public JLabel getLblBlueTime() {
+        return lblBlueTime;
     }
 
     public JLabel getLblPole() {
         return lblPole;
     }
 
-    public JLabel getLblRed() {
-        return lblRed;
+    public JLabel getLblRedTime() {
+        return lblRedTime;
     }
 
-    public JLabel getLblWhite() {
-        return lblWhite;
+    public JLabel getLblWhiteTime() {
+        return lblWhiteTime;
     }
 
     public JButton getBtnBlue() {
@@ -201,6 +208,7 @@ public class FrameDebug extends JFrame {
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+    private JPanel panel1;
     private JLabel lblPole;
     private JPanel pnlBlueLeds;
     private MyLED ledBlue1;

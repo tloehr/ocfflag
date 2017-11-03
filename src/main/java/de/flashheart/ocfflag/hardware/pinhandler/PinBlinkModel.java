@@ -22,7 +22,7 @@ public class PinBlinkModel implements Callable<String> {
 ////        System.out.println(new DateTime().toString() + " call() to:" + pin.getName() + " [" + pin.getText() + "]");
 //        if (repeat == 0) {
 //            restart();
-//            pin.setOn(false);
+//            pin.setState(false);
 //        } else {
 ////            System.out.println(new DateTime().toString() + " working on:" + pin.getName() + " [" + pin.getText() + "]");
 //            for (int turn = 0; turn < repeat; turn++) {
@@ -32,7 +32,7 @@ public class PinBlinkModel implements Callable<String> {
 //                    long time = 0;
 //
 //                    if (Thread.currentThread().isInterrupted()) {
-//                        pin.setOn(false);
+//                        pin.setState(false);
 //
 //                        return null;
 //                    }
@@ -43,12 +43,12 @@ public class PinBlinkModel implements Callable<String> {
 //                    // currentlyOn nur verwenden, wenn die zeit über 0 ist. ansonsten blitzen die
 //                    // die LEDs kurz auf, obwohl sie aus bleiben sollen.
 //                    // abschalten geht auch immer
-//                    if (time > 0 || !currentlyOn) pin.setOn(currentlyOn);
+//                    if (time > 0 || !currentlyOn) pin.setState(currentlyOn);
 //
 //                    try {
 //                        if (time > 0) Thread.sleep(time);
 //                    } catch (InterruptedException exc) {
-//                        pin.setOn(false);
+//                        pin.setState(false);
 //                        return null;
 //                    }
 //

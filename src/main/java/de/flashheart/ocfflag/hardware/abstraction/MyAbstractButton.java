@@ -17,44 +17,44 @@ import java.awt.event.ItemListener;
  */
 public class MyAbstractButton {
 
-    private final GpioPinDigitalInput gpio;
-    private final JButton btn;
-    private final JToggleButton toggleButton;
+    private final GpioPinDigitalInput hardwareButton;
+    private final JButton guiButton;
+    private final JToggleButton guiToggleButton;
 
-    public MyAbstractButton(GpioController gpio, Pin pin, JButton btn) {
-        this.gpio = gpio == null ? null : gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
-        this.btn = btn;
-        toggleButton = null;
+    public MyAbstractButton(GpioController hardwareButton, Pin pin, JButton guiButton) {
+        this.hardwareButton = hardwareButton == null ? null : hardwareButton.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
+        this.guiButton = guiButton;
+        guiToggleButton = null;
     }
 
-    public MyAbstractButton(GpioController gpio, Pin pin, JToggleButton toggleButton) {
-        this.gpio = gpio == null ? null : gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
-        this.btn = null;
-        this.toggleButton = toggleButton;
+    public MyAbstractButton(GpioController hardwareButton, Pin pin, JToggleButton guiToggleButton) {
+        this.hardwareButton = hardwareButton == null ? null : hardwareButton.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
+        this.guiButton = null;
+        this.guiToggleButton = guiToggleButton;
 
     }
 
     public void addListener(GpioPinListener var1) {
-        if (gpio == null) return;
-        gpio.addListener(var1);
+        if (hardwareButton == null) return;
+        hardwareButton.addListener(var1);
     }
 
     public void addListener(ActionListener var1) {
-        if (btn == null) return;
-        btn.addActionListener(var1);
+        if (guiButton == null) return;
+        guiButton.addActionListener(var1);
     }
 
     public void addListener(ItemListener var1) {
-        if (toggleButton == null) return;
-        toggleButton.addItemListener(var1);
+        if (guiToggleButton == null) return;
+        guiToggleButton.addItemListener(var1);
     }
 
     public boolean isLow() {
-        return gpio != null ? gpio.isLow() : false;
+        return hardwareButton != null ? hardwareButton.isLow() : false;
     }
 
     public boolean isHigh() {
-        return gpio != null ? gpio.isHigh() : false;
+        return hardwareButton != null ? hardwareButton.isHigh() : false;
     }
 
 }

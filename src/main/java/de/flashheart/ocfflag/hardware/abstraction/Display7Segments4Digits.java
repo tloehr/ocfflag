@@ -4,6 +4,7 @@ import com.pi4j.io.i2c.I2CFactory;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.sevensegdisplay.SevenSegment;
 
+import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -27,7 +28,7 @@ public class Display7Segments4Digits {
     public Display7Segments4Digits(int addr, JLabel lblSegment) throws I2CFactory.UnsupportedBusNumberException {
         this();
         this.lblSegment = lblSegment;
-        if (Main.isArm()) segment = new SevenSegment(addr, true);
+        if (Tools.isArm()) segment = new SevenSegment(addr, true);
     }
 
     public void setText(String text) throws IOException {
