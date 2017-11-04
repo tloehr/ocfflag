@@ -45,28 +45,19 @@ public class FrameDebug extends JFrame {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         panel1 = new JPanel();
         lblPole = new JLabel();
-        pnlBlueLeds = new JPanel();
-        ledBlue1 = new MyLED();
-        ledBlue2 = new MyLED();
-        ledBlue3 = new MyLED();
-        pnlRedLeds = new JPanel();
-        ledRed1 = new MyLED();
-        ledRed2 = new MyLED();
-        ledRed3 = new MyLED();
         lblBlueTime = new JLabel();
         lblRedTime = new JLabel();
         btnBlue = new JButton();
-        pnlWhiteLeds = new JPanel();
-        ledWhite1 = new MyLED();
-        ledWhite2 = new MyLED();
-        ledWhite3 = new MyLED();
         btnRed = new JButton();
         lblWhiteTime = new JLabel();
+        ledBlueButton = new MyLED();
         panel2 = new JPanel();
         btnPresetMinus = new JButton();
         btnReset = new JButton();
         btnPresetPlus = new JButton();
+        ledRedButton = new MyLED();
         btnSwitchMode = new JToggleButton();
+        ledStandbyButton = new MyLED();
 
         //======== this ========
         setTitle("OCF Flag Simulator");
@@ -82,87 +73,45 @@ public class FrameDebug extends JFrame {
 
             //---- lblPole ----
             lblPole.setOpaque(true);
-            lblPole.setBackground(Color.lightGray);
+            lblPole.setBackground(Color.white);
             lblPole.setText("Flagge");
             lblPole.setForeground(Color.black);
             lblPole.setHorizontalAlignment(SwingConstants.CENTER);
             lblPole.setFont(new Font("Dialog", Font.BOLD, 20));
             panel1.add(lblPole, CC.xywh(3, 3, 17, 1));
 
-            //======== pnlBlueLeds ========
-            {
-                pnlBlueLeds.setLayout(new BoxLayout(pnlBlueLeds, BoxLayout.LINE_AXIS));
-
-                //---- ledBlue1 ----
-                ledBlue1.setColor(Color.blue);
-                pnlBlueLeds.add(ledBlue1);
-
-                //---- ledBlue2 ----
-                ledBlue2.setColor(Color.blue);
-                pnlBlueLeds.add(ledBlue2);
-
-                //---- ledBlue3 ----
-                ledBlue3.setColor(Color.blue);
-                pnlBlueLeds.add(ledBlue3);
-            }
-            panel1.add(pnlBlueLeds, CC.xy(7, 5, CC.CENTER, CC.DEFAULT));
-
-            //======== pnlRedLeds ========
-            {
-                pnlRedLeds.setLayout(new BoxLayout(pnlRedLeds, BoxLayout.LINE_AXIS));
-
-                //---- ledRed1 ----
-                ledRed1.setColor(Color.red);
-                pnlRedLeds.add(ledRed1);
-
-                //---- ledRed2 ----
-                ledRed2.setColor(Color.red);
-                pnlRedLeds.add(ledRed2);
-
-                //---- ledRed3 ----
-                ledRed3.setColor(Color.red);
-                pnlRedLeds.add(ledRed3);
-            }
-            panel1.add(pnlRedLeds, CC.xy(15, 5, CC.CENTER, CC.DEFAULT));
-
             //---- lblBlueTime ----
-            lblBlueTime.setText("00:00");
-            lblBlueTime.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 30));
+            lblBlueTime.setText("0.0.:0.0.");
+            lblBlueTime.setFont(new Font("DSEG7 Classic", Font.BOLD, 40));
             lblBlueTime.setForeground(Color.blue);
-            panel1.add(lblBlueTime, CC.xy(7, 7, CC.CENTER, CC.DEFAULT));
+            panel1.add(lblBlueTime, CC.xy(7, 5));
 
             //---- lblRedTime ----
-            lblRedTime.setText("00:00");
-            lblRedTime.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 30));
+            lblRedTime.setText("0.0.:0.0.");
+            lblRedTime.setFont(new Font("DSEG7 Classic", Font.BOLD, 40));
             lblRedTime.setForeground(Color.red);
-            panel1.add(lblRedTime, CC.xy(15, 7, CC.CENTER, CC.DEFAULT));
+            panel1.add(lblRedTime, CC.xy(15, 5));
 
             //---- btnBlue ----
             btnBlue.setText("Big Fat Blue Button");
             btnBlue.setForeground(Color.blue);
-            panel1.add(btnBlue, CC.xywh(3, 9, 1, 3));
-
-            //======== pnlWhiteLeds ========
-            {
-                pnlWhiteLeds.setLayout(new BoxLayout(pnlWhiteLeds, BoxLayout.LINE_AXIS));
-                pnlWhiteLeds.add(ledWhite1);
-                pnlWhiteLeds.add(ledWhite2);
-                pnlWhiteLeds.add(ledWhite3);
-            }
-            panel1.add(pnlWhiteLeds, CC.xy(11, 9, CC.CENTER, CC.DEFAULT));
+            panel1.add(btnBlue, CC.xywh(3, 7, 1, 3));
 
             //---- btnRed ----
             btnRed.setText("Big Fat Red Button");
             btnRed.setForeground(Color.red);
-            panel1.add(btnRed, CC.xywh(19, 9, 1, 3));
+            panel1.add(btnRed, CC.xywh(19, 7, 1, 3));
 
             //---- lblWhiteTime ----
-            lblWhiteTime.setText("00:00");
-            lblWhiteTime.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 30));
-            lblWhiteTime.setForeground(Color.white);
-            lblWhiteTime.setBackground(Color.black);
+            lblWhiteTime.setText("0.0.:0.0.");
+            lblWhiteTime.setFont(new Font("DSEG7 Classic", Font.BOLD, 40));
+            lblWhiteTime.setForeground(Color.black);
             lblWhiteTime.setOpaque(true);
-            panel1.add(lblWhiteTime, CC.xy(11, 11, CC.CENTER, CC.DEFAULT));
+            panel1.add(lblWhiteTime, CC.xy(11, 9));
+
+            //---- ledBlueButton ----
+            ledBlueButton.setColor(Color.blue);
+            panel1.add(ledBlueButton, CC.xy(3, 11, CC.CENTER, CC.DEFAULT));
 
             //======== panel2 ========
             {
@@ -186,14 +135,22 @@ public class FrameDebug extends JFrame {
                 btnPresetPlus.setToolTipText("Zeitvorgabe -");
                 panel2.add(btnPresetPlus);
             }
-            panel1.add(panel2, CC.xy(11, 13, CC.CENTER, CC.DEFAULT));
+            panel1.add(panel2, CC.xy(11, 11, CC.CENTER, CC.DEFAULT));
+
+            //---- ledRedButton ----
+            ledRedButton.setColor(Color.red);
+            panel1.add(ledRedButton, CC.xy(19, 11, CC.CENTER, CC.DEFAULT));
 
             //---- btnSwitchMode ----
             btnSwitchMode.setText("Standby");
-            panel1.add(btnSwitchMode, CC.xy(11, 15));
+            panel1.add(btnSwitchMode, CC.xy(11, 13));
+
+            //---- ledStandbyButton ----
+            ledStandbyButton.setColor(Color.red);
+            panel1.add(ledStandbyButton, CC.xy(11, 15, CC.CENTER, CC.DEFAULT));
         }
         contentPane.add(panel1);
-        setSize(910, 290);
+        setSize(910, 355);
         setLocationRelativeTo(null);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -230,40 +187,16 @@ public class FrameDebug extends JFrame {
         return btnSwitchMode;
     }
 
-    public MyLED getLedBlue1() {
-        return ledBlue1;
+    public MyLED getLedBlueButton() {
+        return ledBlueButton;
     }
 
-    public MyLED getLedBlue2() {
-        return ledBlue2;
+    public MyLED getLedRedButton() {
+        return ledRedButton;
     }
 
-    public MyLED getLedBlue3() {
-        return ledBlue3;
-    }
-
-    public MyLED getLedRed1() {
-        return ledRed1;
-    }
-
-    public MyLED getLedRed2() {
-        return ledRed2;
-    }
-
-    public MyLED getLedRed3() {
-        return ledRed3;
-    }
-
-    public MyLED getLedWhite1() {
-        return ledWhite1;
-    }
-
-    public MyLED getLedWhite2() {
-        return ledWhite2;
-    }
-
-    public MyLED getLedWhite3() {
-        return ledWhite3;
+    public MyLED getLedStandbyButton() {
+        return ledStandbyButton;
     }
 
     public JButton getBtnPresetMinus() {
@@ -277,27 +210,18 @@ public class FrameDebug extends JFrame {
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JPanel panel1;
     private JLabel lblPole;
-    private JPanel pnlBlueLeds;
-    private MyLED ledBlue1;
-    private MyLED ledBlue2;
-    private MyLED ledBlue3;
-    private JPanel pnlRedLeds;
-    private MyLED ledRed1;
-    private MyLED ledRed2;
-    private MyLED ledRed3;
     private JLabel lblBlueTime;
     private JLabel lblRedTime;
     private JButton btnBlue;
-    private JPanel pnlWhiteLeds;
-    private MyLED ledWhite1;
-    private MyLED ledWhite2;
-    private MyLED ledWhite3;
     private JButton btnRed;
     private JLabel lblWhiteTime;
+    private MyLED ledBlueButton;
     private JPanel panel2;
     private JButton btnPresetMinus;
     private JButton btnReset;
     private JButton btnPresetPlus;
+    private MyLED ledRedButton;
     private JToggleButton btnSwitchMode;
+    private MyLED ledStandbyButton;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

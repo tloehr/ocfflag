@@ -57,6 +57,10 @@ public class SevenSegment
     //  0x76, 0x6e, 0x5b, 0x39, 0x80, 0x0F, 0x80, 0x08  /* x y z { | } ~    */
 
 
+    public LEDBackPack getDisplay() {
+        return display;
+    }
+
     static
     { // FYI, 0x80 is the dot, displayed instead of "undisplayable" characters.
         ALL_CHARS.put(" ",  (byte)0x00);

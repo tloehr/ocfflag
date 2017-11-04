@@ -94,7 +94,7 @@ public class LEDBackPack {
     /*
      * Sets the blink rate
      */
-    private void setBlinkRate(int blinkRate) throws IOException {
+    public void setBlinkRate(int blinkRate) throws IOException {
         if (blinkRate > HT16K33_BLINKRATE_HALFHZ)
             blinkRate = HT16K33_BLINKRATE_OFF;
         ledBackpack.write(HT16K33_REGISTER_DISPLAY_SETUP | 0x01 | (blinkRate << 1), (byte) 0x00);

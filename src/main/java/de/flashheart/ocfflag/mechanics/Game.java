@@ -5,12 +5,11 @@ import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
 import de.flashheart.ocfflag.hardware.abstraction.MyPin;
 import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
-import de.flashheart.ocfflag.misc.Tools;
+import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -24,18 +23,13 @@ public class Game implements Runnable {
 
     private final int MODE_CLOCK_STANDBY = 0;
     private final int MODE_CLOCK_ACTIVE = 1;
+    private final int MODE_CLOCK_GAMEOVER = 2; // Dieser Zustand wird NUR automatisch erreicht. Beim Rücksetzen in den Standby ist der Modus wieder beendet.
     private final MyAbstractButton button_preset_minus;
     private final MyAbstractButton button_preset_plus;
     private final MyRGBLed pole;
-    private final MyPin ledRed1;
-    private final MyPin ledRed2;
-    private final MyPin ledRed3;
-    private final MyPin ledBlue1;
-    private final MyPin ledBlue2;
-    private final MyPin ledBlue3;
-    private final MyPin ledWhite1;
-    private final MyPin ledWhite2;
-    private final MyPin ledWhite3;
+    private final MyPin ledRedButton;
+    private final MyPin ledBlueButton;
+    private final MyPin ledStandbyButton;
     private int mode = MODE_CLOCK_STANDBY;
 
     private final int FLAG_STATE_NEUTRAL = 0;
@@ -60,20 +54,14 @@ public class Game implements Runnable {
 
     // das sind die standard spieldauern in millis.
     // In Minuten: 30, 60, 90, 120, 150, 180, 210, 240, 270, 300
-    private Long[] preset_times = new Long[]{1800000l, 3600000l, 5400000l, 7200000l, 9000000l, 10800000l, 12600000l, 14400000l, 16200000l, 18000000l};
-    private int preset_position = 0;
+    private Long[] preset_times = new Long[]{1800000l, 3600000l, 5400000l, 7200000l, 9000000l, 10800000l, 12600000l, 14400000l, 16200000l, 18000000l - 1000l};
+    private int preset_position = 3;
 
-    public Game(Display7Segments4Digits display_blue, Display7Segments4Digits display_red, Display7Segments4Digits display_white, MyAbstractButton button_blue, MyAbstractButton button_red, MyAbstractButton button_reset, MyAbstractButton button_switch_mode, MyAbstractButton button_preset_minus, MyAbstractButton button_preset_plus, MyRGBLed pole, MyPin ledRed1, MyPin ledRed2, MyPin ledRed3, MyPin ledBlue1, MyPin ledBlue2, MyPin ledBlue3, MyPin ledWhite1, MyPin ledWhite2, MyPin ledWhite3) {
+    public Game(Display7Segments4Digits display_blue, Display7Segments4Digits display_red, Display7Segments4Digits display_white, MyAbstractButton button_blue, MyAbstractButton button_red, MyAbstractButton button_reset, MyAbstractButton button_switch_mode, MyAbstractButton button_preset_minus, MyAbstractButton button_preset_plus, MyRGBLed pole, MyPin ledRedButton, MyPin ledBlueButton, MyPin ledStandbyButton) {
         this.pole = pole;
-        this.ledRed1 = ledRed1;
-        this.ledRed2 = ledRed2;
-        this.ledRed3 = ledRed3;
-        this.ledBlue1 = ledBlue1;
-        this.ledBlue2 = ledBlue2;
-        this.ledBlue3 = ledBlue3;
-        this.ledWhite1 = ledWhite1;
-        this.ledWhite2 = ledWhite2;
-        this.ledWhite3 = ledWhite3;
+        this.ledRedButton = ledRedButton;
+        this.ledBlueButton = ledBlueButton;
+        this.ledStandbyButton = ledStandbyButton;
         thread = new Thread(this);
         logger.setLevel(Main.getLogLevel());
         this.display_blue = display_blue;
@@ -112,6 +100,7 @@ public class Game implements Runnable {
             logger.debug("button_reset");
             if (mode == MODE_CLOCK_STANDBY) {
                 reset_timers();
+
             } else {
                 logger.debug("NOT IN STANDBY: IGNORED");
             }
@@ -151,18 +140,20 @@ public class Game implements Runnable {
 
         reset_timers();
 
-        Main.getPinHandler().setScheme(ledWhite1.getName(), "1000;500,500");
-        Main.getPinHandler().setScheme(ledWhite3.getName(), "1000;500,500");
+//        Main.getPinHandler().setScheme(ledWhite1.getName(), "1000;500,500");
+//        Main.getPinHandler().setScheme(ledWhite3.getName(), "1000;500,500");
 
 
     }
 
     private void reset_timers() {
         flag = FLAG_STATE_NEUTRAL;
-        time = preset_times[preset_position]; // aktuelle Wahl
+        pole.setRGB(Color.white.getRed(), Color.white.getGreen(), Color.white.getBlue());
+        time = preset_times[preset_position]; // aktuelle Wahl minus 1 Sekunde. Dann wird aus 5 Stunden -> 04:59:59
         time_blue = 0l;
         time_red = 0l;
         lastPIT = System.currentTimeMillis();
+
         refreshDisplay();
     }
 
@@ -171,6 +162,11 @@ public class Game implements Runnable {
             display_white.setTime(time);
             display_blue.setTime(time_blue);
             display_red.setTime(time_red);
+
+            display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+            display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+            display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+
         } catch (IOException e) {
             logger.fatal(e);
             System.exit(1);
@@ -195,15 +191,35 @@ public class Game implements Runnable {
                     long diff = now - lastPIT;
                     lastPIT = System.currentTimeMillis();
 
-                    time += diff;
-                    if (flag == FLAG_STATE_BLUE) time_blue += diff;
-                    if (flag == FLAG_STATE_RED) time_red += diff;
+                    time = time - diff;
+                    time = Math.max(time, 0);
+                    display_white.setTime(time);
 
-                    refreshDisplay();
+                    if (flag == FLAG_STATE_BLUE) {
+                        time_blue += diff;
+                        display_blue.setTime(time_blue);
+                    }
+                    if (flag == FLAG_STATE_RED){
+                        time_red += diff;
+                        display_red.setTime(time_red);
+                    }
+
+//                    refreshDisplay();
+
+                    if (time == 0) {
+                        mode = MODE_CLOCK_GAMEOVER;
+                        display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_1HZ);
+                        display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_1HZ);
+                        display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_1HZ);
+                    }
                 }
+
                 Thread.sleep(PAUSE_PER_CYCLE);
             } catch (InterruptedException ie) {
                 logger.debug(this + " interrupted!");
+            } catch (Exception e) {
+                logger.error(e);
+                System.exit(1);
             }
         }
     }
