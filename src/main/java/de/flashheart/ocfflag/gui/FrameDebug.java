@@ -18,6 +18,9 @@ import org.apache.log4j.Logger;
 public class FrameDebug extends JFrame {
     private final Logger logger = Logger.getLogger(getClass());
     private Font font;
+    public final Icon iconPlay = new ImageIcon(getClass().getResource("/artwork/player_play.png"));
+    public final Icon iconPause = new ImageIcon(getClass().getResource("/artwork/player_pause.png"));
+
 
     public FrameDebug() {
         logger.setLevel(Main.getLogLevel());
@@ -111,6 +114,7 @@ public class FrameDebug extends JFrame {
 
             //---- ledBlueButton ----
             ledBlueButton.setColor(Color.blue);
+            ledBlueButton.setToolTipText("Blue LED in Button");
             panel1.add(ledBlueButton, CC.xy(3, 11, CC.CENTER, CC.DEFAULT));
 
             //======== panel2 ========
@@ -119,34 +123,39 @@ public class FrameDebug extends JFrame {
 
                 //---- btnPresetMinus ----
                 btnPresetMinus.setText(null);
-                btnPresetMinus.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/1leftarrow.png")));
-                btnPresetMinus.setToolTipText("Zeitvorgabe -");
+                btnPresetMinus.setIcon(new ImageIcon(getClass().getResource("/artwork/player_start.png")));
+                btnPresetMinus.setToolTipText("Previous Preset Time");
                 panel2.add(btnPresetMinus);
 
                 //---- btnReset ----
                 btnReset.setText(null);
-                btnReset.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/1downarrow.png")));
+                btnReset.setIcon(new ImageIcon(getClass().getResource("/artwork/player_eject.png")));
                 btnReset.setToolTipText("Reset");
                 panel2.add(btnReset);
 
                 //---- btnPresetPlus ----
                 btnPresetPlus.setText(null);
-                btnPresetPlus.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/1rightarrow.png")));
-                btnPresetPlus.setToolTipText("Zeitvorgabe -");
+                btnPresetPlus.setIcon(new ImageIcon(getClass().getResource("/artwork/player_end1.png")));
+                btnPresetPlus.setToolTipText("Next Preset Time");
                 panel2.add(btnPresetPlus);
             }
             panel1.add(panel2, CC.xy(11, 11, CC.CENTER, CC.DEFAULT));
 
             //---- ledRedButton ----
             ledRedButton.setColor(Color.red);
+            ledRedButton.setToolTipText("Red LED in Button");
             panel1.add(ledRedButton, CC.xy(19, 11, CC.CENTER, CC.DEFAULT));
 
             //---- btnSwitchMode ----
-            btnSwitchMode.setText("Standby");
+            btnSwitchMode.setText(null);
+            btnSwitchMode.setIcon(new ImageIcon(getClass().getResource("/artwork/player_play.png")));
+            btnSwitchMode.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/player_pause.png")));
+            btnSwitchMode.setToolTipText("Standby / Active");
             panel1.add(btnSwitchMode, CC.xy(11, 13));
 
             //---- ledStandbyButton ----
             ledStandbyButton.setColor(Color.red);
+            ledStandbyButton.setToolTipText("Red LED in Button");
             panel1.add(ledStandbyButton, CC.xy(11, 15, CC.CENTER, CC.DEFAULT));
         }
         contentPane.add(panel1);

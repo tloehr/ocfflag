@@ -76,6 +76,7 @@ new FormModel {
 				add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
 					name: "ledBlueButton"
 					"color": sfield java.awt.Color blue
+					"toolTipText": "Blue LED in Button"
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 3
 					"gridY": 11
@@ -88,20 +89,20 @@ new FormModel {
 					add( new FormComponent( "javax.swing.JButton" ) {
 						name: "btnPresetMinus"
 						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/1leftarrow.png" )
-						"toolTipText": "Zeitvorgabe -"
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/player_start.png" )
+						"toolTipText": "Previous Preset Time"
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
 						name: "btnReset"
 						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/1downarrow.png" )
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/player_eject.png" )
 						"toolTipText": "Reset"
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
 						name: "btnPresetPlus"
 						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/1rightarrow.png" )
-						"toolTipText": "Zeitvorgabe -"
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/player_end1.png" )
+						"toolTipText": "Next Preset Time"
 					} )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 11
@@ -111,6 +112,7 @@ new FormModel {
 				add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
 					name: "ledRedButton"
 					"color": sfield java.awt.Color red
+					"toolTipText": "Red LED in Button"
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 19
 					"gridY": 11
@@ -118,7 +120,10 @@ new FormModel {
 				} )
 				add( new FormComponent( "javax.swing.JToggleButton" ) {
 					name: "btnSwitchMode"
-					"text": "Standby"
+					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/player_play.png" )
+					"selectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/player_pause.png" )
+					"toolTipText": "Standby / Active"
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 11
 					"gridY": 13
@@ -126,6 +131,7 @@ new FormModel {
 				add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
 					name: "ledStandbyButton"
 					"color": sfield java.awt.Color red
+					"toolTipText": "Red LED in Button"
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 11
 					"gridY": 15

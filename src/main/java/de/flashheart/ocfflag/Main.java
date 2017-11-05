@@ -104,7 +104,6 @@ public class Main {
         ledBlueButton = new MyPin(GPIO, LED_SECONDS_RED2, frameDebug.getLedBlueButton(), "ledRed2");
         ledStandbyButton = new MyPin(GPIO, LED_SECONDS_RED3, frameDebug.getLedStandbyButton(), "ledRed3");
 
-
         pinHandler.add(ledRedButton);
         pinHandler.add(ledBlueButton);
         pinHandler.add(ledStandbyButton);

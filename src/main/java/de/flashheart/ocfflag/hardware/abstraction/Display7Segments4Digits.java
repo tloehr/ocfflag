@@ -73,7 +73,7 @@ public class Display7Segments4Digits {
             fullDisplay(timeDigits, dots);
         }
         colon = !colon;
-        logger.debug("segment: " + name + " " + Tools.formatLongTime(time, "HH:mm:ss"));
+//        logger.debug("segment: " + name + " " + Tools.formatLongTime(time, "HH:mm:ss"));
     }
 
     public void setBlinkRate(int rate) throws IOException {

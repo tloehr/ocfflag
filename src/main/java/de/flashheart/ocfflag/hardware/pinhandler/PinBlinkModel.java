@@ -98,7 +98,8 @@ public class PinBlinkModel implements Callable<String> {
         String[] splitScheme = scheme.trim().split(";");
 
         String textScheme = "";
-        this.repeat = Integer.parseInt(splitScheme[0]);
+        String repeatString = splitScheme[0];
+        this.repeat = repeatString.equals("∞") ? Integer.MAX_VALUE : Integer.parseInt(repeatString);
         textScheme = (this.repeat == Integer.MAX_VALUE ? infinity : Integer.toString(this.repeat));
 
         if (repeat > 0) {
