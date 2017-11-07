@@ -1,5 +1,8 @@
 package de.flashheart.ocfflag.mechanics;
 
+import com.pi4j.io.gpio.PinState;
+import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
+import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
@@ -10,7 +13,6 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -105,6 +107,18 @@ public class Game implements Runnable {
                 logger.debug("NOT IN STANDBY: IGNORED");
             }
         });
+        button_blue.addListener(new GpioPinListenerDigital() {
+            @Override
+            public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+                logger.debug("hardware_button_blue");
+                if (mode == MODE_CLOCK_ACTIVE) {
+                    flag = FLAG_STATE_BLUE;
+                    refreshDisplay();
+                } else {
+                    logger.debug("NOT IN STANDBY: IGNORED");
+                }
+            }
+        });
         button_red.addListener((ActionListener) e -> {
             logger.debug("button_red");
             if (mode == MODE_CLOCK_ACTIVE) {
@@ -154,6 +168,20 @@ public class Game implements Runnable {
             if (e.getStateChange() != ItemEvent.SELECTED) {
                 if (previousMode == MODE_CLOCK_GAMEOVER) { // nach einem abgeschlossenen Spiel, werden die Timer zurück gesetzt.
                     reset_timers();
+                }
+            }
+        });
+        button_switch_mode.addListener(new GpioPinListenerDigital() {
+            @Override
+            public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+                logger.debug("hardware_button_switch_mode");
+                logger.debug(event.toString());
+                int previousMode = mode;
+                modeChange(event.getState() == PinState.HIGH ? MODE_CLOCK_ACTIVE : MODE_CLOCK_STANDBY);
+                if (event.getState() != PinState.HIGH) {
+                    if (previousMode == MODE_CLOCK_GAMEOVER) { // nach einem abgeschlossenen Spiel, werden die Timer zurück gesetzt.
+                        reset_timers();
+                    }
                 }
             }
         });

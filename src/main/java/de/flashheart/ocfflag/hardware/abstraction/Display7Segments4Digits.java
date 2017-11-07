@@ -10,7 +10,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.swing.*;
-import javax.swing.text.Segment;
 import java.io.IOException;
 
 /**
@@ -69,8 +68,9 @@ public class Display7Segments4Digits {
             int seconds = dateTime.getSecondOfMinute();
             boolean[] dots = new boolean[]{hours >= 1, hours >= 2, hours >= 3, hours == 4};
             int[] timeDigits = new int[]{minutes % 100, minutes % 10, seconds % 100, seconds % 10};
+            String[] timeString = dateTime.toString("mmss").split("");
 
-            fullDisplay(timeDigits, dots);
+            fullDisplay(timeString);
         }
         colon = !colon;
 //        logger.debug("segment: " + name + " " + Tools.formatLongTime(time, "HH:mm:ss"));

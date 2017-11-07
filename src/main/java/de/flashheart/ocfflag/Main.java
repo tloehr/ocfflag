@@ -31,32 +31,25 @@ public class Main {
 
 
     // Parameter für die einzelnen PINs am Raspi sowie die I2C Adressen.
-    private static final int DISPLAY_BLUE = 0x70;
-    private static final int DISPLAY_RED = 0x71;
-    private static final int DISPLAY_WHITE = 0x72;
+    private static final int DISPLAY_BLUE = 0x71;
+    private static final int DISPLAY_RED = 0x72;
+    private static final int DISPLAY_WHITE = 0x70;
 
-    private static final Pin BUTTON_BLUE = RaspiPin.GPIO_15;
-    private static final Pin BUTTON_RED = RaspiPin.GPIO_15;
-    private static final Pin BUTTON_RESET = RaspiPin.GPIO_15;
-    private static final Pin BUTTON_PRESET_MINUS = RaspiPin.GPIO_15;
-    private static final Pin BUTTON_PRESET_PLUS = RaspiPin.GPIO_15;
-    private static final Pin BUTTON_SWITCH_MODE = RaspiPin.GPIO_15;
+    private static final Pin BUTTON_BLUE = RaspiPin.GPIO_00;
+    private static final Pin BUTTON_RED = RaspiPin.GPIO_02;
+    private static final Pin BUTTON_PRESET_MINUS = RaspiPin.GPIO_03;
+    private static final Pin BUTTON_RESET = RaspiPin.GPIO_01;
+    private static final Pin BUTTON_PRESET_PLUS = RaspiPin.GPIO_04;
+    
+    private static final Pin BUTTON_SWITCH_MODE = RaspiPin.GPIO_06;
 
-    private static final Pin POLE_RGB_RED = RaspiPin.GPIO_15;
-    private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_15;
-    private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_15;
+    private static final Pin POLE_RGB_RED = RaspiPin.GPIO_21;
+    private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_22;
+    private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_23;
 
-    private static final Pin LED_SECONDS_RED1 = RaspiPin.GPIO_15;
-    private static final Pin LED_SECONDS_RED2 = RaspiPin.GPIO_15;
-    private static final Pin LED_SECONDS_RED3 = RaspiPin.GPIO_15;
-
-    private static final Pin LED_SECONDS_BLUE1 = RaspiPin.GPIO_15;
-    private static final Pin LED_SECONDS_BLUE2 = RaspiPin.GPIO_15;
-    private static final Pin LED_SECONDS_BLUE3 = RaspiPin.GPIO_15;
-
-    private static final Pin LED_SECONDS_WHITE1 = RaspiPin.GPIO_15;
-    private static final Pin LED_SECONDS_WHITE2 = RaspiPin.GPIO_15;
-    private static final Pin LED_SECONDS_WHITE3 = RaspiPin.GPIO_15;
+    private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_12;
+    private static final Pin LED_RED_BUTTON = RaspiPin.GPIO_13;
+    private static final Pin LED_STANDBY_BUTTON = RaspiPin.GPIO_14;
 
     private static Display7Segments4Digits display_blue, display_red, display_white;
     private static MyAbstractButton button_blue, button_red, button_reset, button_switch_mode, button_preset_minus, button_preset_plus;
@@ -100,9 +93,9 @@ public class Main {
 
         pole = new MyRGBLed(GPIO, POLE_RGB_RED, POLE_RGB_GREEN, POLE_RGB_BLUE, frameDebug.getLblPole());
 
-        ledRedButton = new MyPin(GPIO, LED_SECONDS_RED1, frameDebug.getLedRedButton(), "ledRed1");
-        ledBlueButton = new MyPin(GPIO, LED_SECONDS_RED2, frameDebug.getLedBlueButton(), "ledRed2");
-        ledStandbyButton = new MyPin(GPIO, LED_SECONDS_RED3, frameDebug.getLedStandbyButton(), "ledRed3");
+        ledBlueButton = new MyPin(GPIO, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), "ledBlueButton");
+        ledRedButton = new MyPin(GPIO, LED_RED_BUTTON, frameDebug.getLedRedButton(), "ledRedButton");
+        ledStandbyButton = new MyPin(GPIO, LED_STANDBY_BUTTON, frameDebug.getLedStandbyButton(), "ledStandbyButton");
 
         pinHandler.add(ledRedButton);
         pinHandler.add(ledBlueButton);
