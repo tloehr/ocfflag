@@ -18,8 +18,8 @@ import org.apache.log4j.Logger;
 public class FrameDebug extends JFrame {
     private final Logger logger = Logger.getLogger(getClass());
     private Font font;
-    public final Icon iconPlay = new ImageIcon(getClass().getResource("/artwork/player_play.png"));
-    public final Icon iconPause = new ImageIcon(getClass().getResource("/artwork/player_pause.png"));
+    public static final Icon IconPlay = new ImageIcon(FrameDebug.class.getResource("/artwork/player_play.png"));
+    public static final Icon IconPause = new ImageIcon(FrameDebug.class.getResource("/artwork/player_pause.png"));
 
 
     public FrameDebug() {
@@ -59,8 +59,10 @@ public class FrameDebug extends JFrame {
         btnReset = new JButton();
         btnPresetPlus = new JButton();
         ledRedButton = new MyLED();
-        btnSwitchMode = new JToggleButton();
-        ledStandbyButton = new MyLED();
+        btnSwitchMode = new JButton();
+        panel3 = new JPanel();
+        ledStandby = new MyLED();
+        ledActive = new MyLED();
 
         //======== this ========
         setTitle("OCF Flag Simulator");
@@ -153,10 +155,21 @@ public class FrameDebug extends JFrame {
             btnSwitchMode.setToolTipText("Standby / Active");
             panel1.add(btnSwitchMode, CC.xy(11, 13));
 
-            //---- ledStandbyButton ----
-            ledStandbyButton.setColor(Color.red);
-            ledStandbyButton.setToolTipText("Red LED in Button");
-            panel1.add(ledStandbyButton, CC.xy(11, 15, CC.CENTER, CC.DEFAULT));
+            //======== panel3 ========
+            {
+                panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
+
+                //---- ledStandby ----
+                ledStandby.setColor(Color.yellow);
+                ledStandby.setToolTipText("Red LED in Button");
+                panel3.add(ledStandby);
+
+                //---- ledActive ----
+                ledActive.setColor(Color.green);
+                ledActive.setToolTipText("Red LED in Button");
+                panel3.add(ledActive);
+            }
+            panel1.add(panel3, CC.xy(11, 15, CC.CENTER, CC.DEFAULT));
         }
         contentPane.add(panel1);
         setSize(910, 355);
@@ -192,7 +205,7 @@ public class FrameDebug extends JFrame {
         return btnReset;
     }
 
-    public JToggleButton getBtnSwitchMode() {
+    public JButton getBtnSwitchMode() {
         return btnSwitchMode;
     }
 
@@ -204,8 +217,12 @@ public class FrameDebug extends JFrame {
         return ledRedButton;
     }
 
-    public MyLED getLedStandbyButton() {
-        return ledStandbyButton;
+    public MyLED getLedStandby() {
+        return ledStandby;
+    }
+
+    public MyLED getLedActive() {
+        return ledActive;
     }
 
     public JButton getBtnPresetMinus() {
@@ -230,7 +247,9 @@ public class FrameDebug extends JFrame {
     private JButton btnReset;
     private JButton btnPresetPlus;
     private MyLED ledRedButton;
-    private JToggleButton btnSwitchMode;
-    private MyLED ledStandbyButton;
+    private JButton btnSwitchMode;
+    private JPanel panel3;
+    private MyLED ledStandby;
+    private MyLED ledActive;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -1,9 +1,9 @@
 package de.flashheart.ocfflag.mechanics;
 
-import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
 import de.flashheart.ocfflag.hardware.abstraction.MyPin;
@@ -15,8 +15,6 @@ import org.joda.time.DateTimeZone;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.IOException;
 
 /**
@@ -33,7 +31,8 @@ public class Game implements Runnable {
     private final MyRGBLed pole;
     private final MyPin ledRedButton;
     private final MyPin ledBlueButton;
-    private final MyPin ledStandbyButton;
+    private final MyPin ledStandby;
+    private final MyPin ledActive;
     private int mode = MODE_CLOCK_STANDBY;
 
     private final int FLAG_STATE_NEUTRAL = 0;
@@ -76,13 +75,14 @@ public class Game implements Runnable {
     };
     private int preset_position = 0; // todo: per configdatei setzen. Zuletzt gewählt.
 
-    public Game(Display7Segments4Digits display_blue, Display7Segments4Digits display_red, Display7Segments4Digits display_white, MyAbstractButton button_blue, MyAbstractButton button_red, MyAbstractButton button_reset, MyAbstractButton button_switch_mode, MyAbstractButton button_preset_minus, MyAbstractButton button_preset_plus, MyRGBLed pole, MyPin ledRedButton, MyPin ledBlueButton, MyPin ledStandbyButton) {
+    public Game(Display7Segments4Digits display_blue, Display7Segments4Digits display_red, Display7Segments4Digits display_white, MyAbstractButton button_blue, MyAbstractButton button_red, MyAbstractButton button_reset, MyAbstractButton button_switch_mode, MyAbstractButton button_preset_minus, MyAbstractButton button_preset_plus, MyRGBLed pole, MyPin ledRedButton, MyPin ledBlueButton, MyPin ledStandby, MyPin ledActive) {
+        this.ledActive = ledActive;
         thread = new Thread(this);
         logger.setLevel(Main.getLogLevel());
         this.pole = pole;
         this.ledRedButton = ledRedButton;
         this.ledBlueButton = ledBlueButton;
-        this.ledStandbyButton = ledStandbyButton;
+        this.ledStandby = ledStandby;
         this.display_blue = display_blue;
         this.display_red = display_red;
         this.display_white = display_white;
@@ -162,32 +162,29 @@ public class Game implements Runnable {
                 logger.debug("NOT IN STANDBY: IGNORED");
             }
         });
-        button_switch_mode.addListener((ItemListener) e -> {
-            int previousMode = mode;
-            modeChange(e.getStateChange() == ItemEvent.SELECTED ? MODE_CLOCK_ACTIVE : MODE_CLOCK_STANDBY);
-            if (e.getStateChange() != ItemEvent.SELECTED) {
-                if (previousMode == MODE_CLOCK_GAMEOVER) { // nach einem abgeschlossenen Spiel, werden die Timer zurück gesetzt.
-                    reset_timers();
-                }
-            }
+        button_switch_mode.addListener((ActionListener) e -> {
+            logger.debug("GUI_button_switch_mode");
+            buttonSwitchModePressed();
         });
-        button_switch_mode.addListener(new GpioPinListenerDigital() {
-            @Override
-            public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
-                logger.debug("hardware_button_switch_mode");
-                logger.debug(event.toString());
-                int previousMode = mode;
-                modeChange(event.getState() == PinState.HIGH ? MODE_CLOCK_ACTIVE : MODE_CLOCK_STANDBY);
-                if (event.getState() != PinState.HIGH) {
-                    if (previousMode == MODE_CLOCK_GAMEOVER) { // nach einem abgeschlossenen Spiel, werden die Timer zurück gesetzt.
-                        reset_timers();
-                    }
-                }
-            }
+        button_switch_mode.addListener((GpioPinListenerDigital) event -> {
+            logger.debug("GPIO_button_switch_mode");
+            buttonSwitchModePressed();
         });
 
         reset_timers();
 
+    }
+
+    private void buttonSwitchModePressed() {
+        int previousMode = mode;
+        mode = (mode == MODE_CLOCK_ACTIVE || mode == MODE_CLOCK_GAMEOVER ? MODE_CLOCK_STANDBY : MODE_CLOCK_ACTIVE);
+        lastPIT = System.currentTimeMillis();
+
+        if (previousMode == MODE_CLOCK_GAMEOVER) { // nach einem abgeschlossenen Spiel, werden die Timer zurück gesetzt.
+            reset_timers();
+        } else {
+            refreshDisplay();
+        }
     }
 
     private void reset_timers() {
@@ -215,25 +212,58 @@ public class Game implements Runnable {
             Main.getPinHandler().off(ledBlueButton.getName());
 
             if (mode == MODE_CLOCK_STANDBY) {
-                Main.getPinHandler().setScheme(ledRedButton.getName(), "∞;500,500");
-                Main.getPinHandler().setScheme(ledBlueButton.getName(), "∞;500,500");
-                Main.getPinHandler().on(ledStandbyButton.getName());
+                logger.debug("\n" +
+                        "  ____  _                  _ ____        \n" +
+                        " / ___|| |_ __ _ _ __   __| | __ ) _   _ \n" +
+                        " \\___ \\| __/ _` | '_ \\ / _` |  _ \\| | | |\n" +
+                        "  ___) | || (_| | | | | (_| | |_) | |_| |\n" +
+                        " |____/ \\__\\__,_|_| |_|\\__,_|____/ \\__, |\n" +
+                        "                                   |___/ ");
+                button_switch_mode.setIcon(FrameDebug.IconPlay);
+                Main.getPinHandler().off(ledRedButton.getName());
+                Main.getPinHandler().off(ledBlueButton.getName());
+                Main.getPinHandler().off(ledActive.getName());
+                Main.getPinHandler().setScheme(ledStandby.getName(), "∞;1000,1000");
             }
 
             if (mode == MODE_CLOCK_ACTIVE) {
-                Main.getPinHandler().setScheme(ledStandbyButton.getName(), "∞;500,500");
+                button_switch_mode.setIcon(FrameDebug.IconPause);
+                Main.getPinHandler().off(ledStandby.getName());
+                Main.getPinHandler().setScheme(ledActive.getName(), "∞;1000,1000");
+
                 if (flag == FLAG_STATE_NEUTRAL) {
+                    logger.debug("\n" +
+                            "     _        _   _                     _   _            _             _ \n" +
+                            "    / \\   ___| |_(_)_   _____          | \\ | | ___ _   _| |_ _ __ __ _| |\n" +
+                            "   / _ \\ / __| __| \\ \\ / / _ \\  _____  |  \\| |/ _ \\ | | | __| '__/ _` | |\n" +
+                            "  / ___ \\ (__| |_| |\\ V /  __/ |_____| | |\\  |  __/ |_| | |_| | | (_| | |\n" +
+                            " /_/   \\_\\___|\\__|_| \\_/ \\___|         |_| \\_|\\___|\\__,_|\\__|_|  \\__,_|_|\n" +
+                            "                                                                         ");
                     Main.getPinHandler().setScheme(ledRedButton.getName(), "∞;500,500");
                     Main.getPinHandler().setScheme(ledBlueButton.getName(), "∞;500,500");
                     pole.setRGB(Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
                     pole.setText("NEUTRAL");
                 }
                 if (flag == FLAG_STATE_RED) {
+                    logger.debug("\n" +
+                            "  _____ _               _       ____  _____ ____                        \n" +
+                            " |  ___| | __ _  __ _  (_)___  |  _ \\| ____|  _ \\   _ __   _____      __\n" +
+                            " | |_  | |/ _` |/ _` | | / __| | |_) |  _| | | | | | '_ \\ / _ \\ \\ /\\ / /\n" +
+                            " |  _| | | (_| | (_| | | \\__ \\ |  _ <| |___| |_| | | | | | (_) \\ V  V / \n" +
+                            " |_|   |_|\\__,_|\\__, | |_|___/ |_| \\_\\_____|____/  |_| |_|\\___/ \\_/\\_/  \n" +
+                            "                |___/                                                   ");
                     Main.getPinHandler().setScheme(ledBlueButton.getName(), "∞;500,500");
                     pole.setRGB(Color.red.getRed(), Color.red.getGreen(), Color.red.getBlue());
                     pole.setText("RED ACTIVATED");
                 }
                 if (flag == FLAG_STATE_BLUE) {
+                    logger.debug("\n" +
+                            "  _____ _               _       ____  _    _   _ _____                       \n" +
+                            " |  ___| | __ _  __ _  (_)___  | __ )| |  | | | | ____|  _ __   _____      __\n" +
+                            " | |_  | |/ _` |/ _` | | / __| |  _ \\| |  | | | |  _|   | '_ \\ / _ \\ \\ /\\ / /\n" +
+                            " |  _| | | (_| | (_| | | \\__ \\ | |_) | |__| |_| | |___  | | | | (_) \\ V  V / \n" +
+                            " |_|   |_|\\__,_|\\__, | |_|___/ |____/|_____\\___/|_____| |_| |_|\\___/ \\_/\\_/  \n" +
+                            "                |___/                                                        ");
                     Main.getPinHandler().setScheme(ledRedButton.getName(), "∞;500,500");
                     pole.setRGB(Color.blue.getRed(), Color.blue.getGreen(), Color.blue.getBlue());
                     pole.setText("BLUE ACTIVATED");
@@ -241,14 +271,14 @@ public class Game implements Runnable {
             }
 
             if (mode == MODE_CLOCK_GAMEOVER) {
-
                 // das hier mache ich, damit die Zeiten nur auf Sekunden Ebene verglichen werden.
                 DateTime dateTime_red = new DateTime(time_red, DateTimeZone.UTC);
                 DateTime dateTime_blue = new DateTime(time_blue, DateTimeZone.UTC);
 
 
                 if (dateTime_red.getSecondOfDay() > dateTime_blue.getSecondOfDay()) {
-                    logger.debug("  ____  _____ ____   __        _____  _   _ \n" +
+                    logger.debug("\n" +
+                            "  ____  _____ ____   __        _____  _   _ \n" +
                             " |  _ \\| ____|  _ \\  \\ \\      / / _ \\| \\ | |\n" +
                             " | |_) |  _| | | | |  \\ \\ /\\ / / | | |  \\| |\n" +
                             " |  _ <| |___| |_| |   \\ V  V /| |_| | |\\  |\n" +
@@ -259,7 +289,8 @@ public class Game implements Runnable {
                     pole.setText("RED TEAM WON");
                 }
                 if (dateTime_red.getSecondOfDay() < dateTime_blue.getSecondOfDay()) {
-                    logger.debug("  ____  _    _   _ _____  __        _____  _   _ \n" +
+                    logger.debug("\n" +
+                            "  ____  _    _   _ _____  __        _____  _   _ \n" +
                             " | __ )| |  | | | | ____| \\ \\      / / _ \\| \\ | |\n" +
                             " |  _ \\| |  | | | |  _|    \\ \\ /\\ / / | | |  \\| |\n" +
                             " | |_) | |__| |_| | |___    \\ V  V /| |_| | |\\  |\n" +
@@ -270,7 +301,8 @@ public class Game implements Runnable {
                     pole.setText("BLUE TEAM WON");
                 }
                 if (dateTime_red.getSecondOfDay() == dateTime_blue.getSecondOfDay()) {
-                    logger.debug("  ____  ____      ___        __   ____    _    __  __ _____ \n" +
+                    logger.debug("\n" +
+                            "  ____  ____      ___        __   ____    _    __  __ _____ \n" +
                             " |  _ \\|  _ \\    / \\ \\      / /  / ___|  / \\  |  \\/  | ____|\n" +
                             " | | | | |_) |  / _ \\ \\ /\\ / /  | |  _  / _ \\ | |\\/| |  _|  \n" +
                             " | |_| |  _ <  / ___ \\ V  V /   | |_| |/ ___ \\| |  | | |___ \n" +
@@ -288,12 +320,6 @@ public class Game implements Runnable {
         }
     }
 
-    private void modeChange(int mode) {
-        this.mode = mode;
-        refreshDisplay();
-        lastPIT = System.currentTimeMillis();
-//        mode_has_just_changed = true;
-    }
 
     public void run() {
         while (!thread.isInterrupted()) {
@@ -319,7 +345,8 @@ public class Game implements Runnable {
                     }
 
                     if (time == 0) {
-                        logger.debug("   ____    _    __  __ _____    _____     _______ ____  \n" +
+                        logger.debug("\n" +
+                                "   ____    _    __  __ _____    _____     _______ ____  \n" +
                                 "  / ___|  / \\  |  \\/  | ____|  / _ \\ \\   / / ____|  _ \\ \n" +
                                 " | |  _  / _ \\ | |\\/| |  _|   | | | \\ \\ / /|  _| | |_) |\n" +
                                 " | |_| |/ ___ \\| |  | | |___  | |_| |\\ V / | |___|  _ < \n" +

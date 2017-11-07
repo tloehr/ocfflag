@@ -118,7 +118,7 @@ new FormModel {
 					"gridY": 11
 					"hAlign": sfield com.jgoodies.forms.layout.CellConstraints CENTER
 				} )
-				add( new FormComponent( "javax.swing.JToggleButton" ) {
+				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "btnSwitchMode"
 					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/player_play.png" )
@@ -128,10 +128,18 @@ new FormModel {
 					"gridX": 11
 					"gridY": 13
 				} )
-				add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-					name: "ledStandbyButton"
-					"color": sfield java.awt.Color red
-					"toolTipText": "Red LED in Button"
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
+					name: "panel3"
+					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
+						name: "ledStandby"
+						"color": sfield java.awt.Color yellow
+						"toolTipText": "Red LED in Button"
+					} )
+					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
+						name: "ledActive"
+						"color": sfield java.awt.Color green
+						"toolTipText": "Red LED in Button"
+					} )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 11
 					"gridY": 15

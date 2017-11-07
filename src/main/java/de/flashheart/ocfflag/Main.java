@@ -50,14 +50,17 @@ public class Main {
     private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_12;
     private static final Pin LED_RED_BUTTON = RaspiPin.GPIO_13;
     private static final Pin LED_STANDBY_BUTTON = RaspiPin.GPIO_14;
+    private static final Pin LED_ACTIVE_BUTTON = RaspiPin.GPIO_15;
 
     private static Display7Segments4Digits display_blue, display_red, display_white;
     private static MyAbstractButton button_blue, button_red, button_reset, button_switch_mode, button_preset_minus, button_preset_plus;
     private static MyRGBLed pole;
 
-    private static MyPin ledRedButton, ledBlueButton, ledStandbyButton;
+    private static MyPin ledRedButton, ledBlueButton, ledStandby, ledActive;
 
     private static PinHandler pinHandler; // One handler, to rule them all...
+
+
 
     public static void main(String[] args) throws Exception {
         initBaseSystem();
@@ -95,13 +98,15 @@ public class Main {
 
         ledBlueButton = new MyPin(GPIO, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), "ledBlueButton");
         ledRedButton = new MyPin(GPIO, LED_RED_BUTTON, frameDebug.getLedRedButton(), "ledRedButton");
-        ledStandbyButton = new MyPin(GPIO, LED_STANDBY_BUTTON, frameDebug.getLedStandbyButton(), "ledStandbyButton");
+        ledStandby = new MyPin(GPIO, LED_STANDBY_BUTTON, frameDebug.getLedStandby(), "ledStandby");
+        ledActive = new MyPin(GPIO, LED_ACTIVE_BUTTON, frameDebug.getLedActive(), "ledActive");
 
         pinHandler.add(ledRedButton);
         pinHandler.add(ledBlueButton);
-        pinHandler.add(ledStandbyButton);
+        pinHandler.add(ledStandby);
+        pinHandler.add(ledActive);
 
-        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_switch_mode, button_preset_minus, button_preset_plus, pole, ledRedButton, ledBlueButton, ledStandbyButton);
+        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_switch_mode, button_preset_minus, button_preset_plus, pole, ledRedButton, ledBlueButton, ledStandby, ledActive);
         game.run();
 
 

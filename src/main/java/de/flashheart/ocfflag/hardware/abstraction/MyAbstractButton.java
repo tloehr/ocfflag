@@ -19,19 +19,15 @@ public class MyAbstractButton {
 
     private final GpioPinDigitalInput hardwareButton;
     private final JButton guiButton;
-    private final JToggleButton guiToggleButton;
 
     public MyAbstractButton(GpioController hardwareButton, Pin pin, JButton guiButton) {
         this.hardwareButton = hardwareButton == null ? null : hardwareButton.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
         this.guiButton = guiButton;
-        guiToggleButton = null;
     }
 
-    public MyAbstractButton(GpioController hardwareButton, Pin pin, JToggleButton guiToggleButton) {
-        this.hardwareButton = hardwareButton == null ? null : hardwareButton.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
-        this.guiButton = null;
-        this.guiToggleButton = guiToggleButton;
 
+    public void setIcon(Icon icon){
+        if (guiButton != null) guiButton.setIcon(icon);
     }
 
     public void addListener(GpioPinListener var1) {
@@ -42,11 +38,6 @@ public class MyAbstractButton {
     public void addListener(ActionListener var1) {
         if (guiButton == null) return;
         guiButton.addActionListener(var1);
-    }
-
-    public void addListener(ItemListener var1) {
-        if (guiToggleButton == null) return;
-        guiToggleButton.addItemListener(var1);
     }
 
     public boolean isLow() {
