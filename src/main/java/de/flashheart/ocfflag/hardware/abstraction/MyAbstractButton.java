@@ -14,6 +14,7 @@ import java.awt.event.ItemListener;
  * Created by tloehr on 15.03.16.
  * <p>
  * //todo: kann man das hier nicht vereinfachen, so dass nur ein Listener für alle Fälle gebraucht wird ?
+ * // todo: das geht bestimmt über ein Callback. Und ein Button Name für die Debugausgaben. Button auf GND sind Aktiv im Pin_State_LOW
  */
 public class MyAbstractButton {
 

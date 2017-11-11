@@ -1,8 +1,7 @@
 package de.flashheart.ocfflag.hardware.abstraction;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioPinPwmOutput;
 import com.pi4j.io.gpio.Pin;
+import com.pi4j.wiringpi.SoftPwm;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Logger;
@@ -12,7 +11,7 @@ import java.awt.*;
 
 public class MyRGBLed {
     private final Logger logger = Logger.getLogger(getClass());
-//    private final GpioPinPwmOutput pwmRed;
+    //    private final GpioPinPwmOutput pwmRed;
 //    private final GpioPinPwmOutput pwmGreen;
 //    private final GpioPinPwmOutput pwmBlue;
     private final JLabel lbl;
@@ -20,7 +19,7 @@ public class MyRGBLed {
     private final Pin pinGreen;
     private final Pin pinBlue;
 
-    public MyRGBLed(GpioController gpio, Pin pinRed, Pin pinGreen, Pin pinBlue, JLabel lbl) {
+    public MyRGBLed(Pin pinRed, Pin pinGreen, Pin pinBlue, JLabel lbl) {
         this.lbl = lbl;
 
         this.pinRed = pinRed;
@@ -28,9 +27,6 @@ public class MyRGBLed {
         this.pinBlue = pinBlue;
         logger.setLevel(Main.getLogLevel());
 
-//        pwmRed = gpio == null ? null : gpio.provisionSoftPwmOutputPin(pinRed);
-//        pwmGreen = gpio == null ? null : gpio.provisionSoftPwmOutputPin(pinGreen);
-//        pwmBlue = gpio == null ? null : gpio.provisionSoftPwmOutputPin(pinBlue);
         //todo: versuche das hier mit einem PinHandler zu machen. Zum Blinken lassen.
     }
 
@@ -45,9 +41,11 @@ public class MyRGBLed {
             lbl.setBackground(color);
             lbl.setForeground(Tools.getContrastColor(color));
         }
-//        if (pwmRed == null) return; // eine Abfrage reicht. Ist pwmRed == null, dann sind es auch die anderen.
-//        pwmRed.setPwm(red);
-//        pwmGreen.setPwm(green);
-//        pwmBlue.setPwm(blue);
+
+        if (pinRed != null) {
+            SoftPwm.softPwmWrite(pinRed.getAddress(), red);
+            SoftPwm.softPwmWrite(pinGreen.getAddress(), green);
+            SoftPwm.softPwmWrite(pinBlue.getAddress(), blue);
+        }
     }
 }

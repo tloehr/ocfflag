@@ -25,11 +25,12 @@ public class Display7Segments4Digits {
     private boolean colon = true;
 
 
-    public Display7Segments4Digits(int addr, JLabel lblSegment, String name) throws I2CFactory.UnsupportedBusNumberException {
+    public Display7Segments4Digits(int addr, JLabel lblSegment, String name) throws I2CFactory.UnsupportedBusNumberException, IOException {
         this.name = name;
         logger.setLevel(Main.getLogLevel());
         this.lblSegment = lblSegment;
         if (Tools.isArm()) segment = new SevenSegment(addr, true);
+        if (segment != null) segment.setBrightness(10);
     }
 
     /**
@@ -66,11 +67,13 @@ public class Display7Segments4Digits {
         if (segment != null) {
             int minutes = dateTime.getMinuteOfHour();
             int seconds = dateTime.getSecondOfMinute();
-            boolean[] dots = new boolean[]{hours >= 1, hours >= 2, hours >= 3, hours == 4};
-            int[] timeDigits = new int[]{minutes % 100, minutes % 10, seconds % 100, seconds % 10};
-            String[] timeString = dateTime.toString("mmss").split("");
+            boolean[] dots = new boolean[]{hours == 4, hours >= 3, hours >= 2, hours >= 1,};
+            int[] timeDigits = new int[]{minutes / 10, minutes % 10, seconds / 10, seconds % 10};
+//            String[] timeString = .split("");
+            logger.debug("Setting Gametime to: " + dateTime.toString("mmss"));
 
-            fullDisplay(timeString);
+
+            fullDisplay(timeDigits, dots);
         }
         colon = !colon;
 //        logger.debug("segment: " + name + " " + Tools.formatLongTime(time, "HH:mm:ss"));

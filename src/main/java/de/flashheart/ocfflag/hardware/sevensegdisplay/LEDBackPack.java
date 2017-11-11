@@ -85,7 +85,7 @@ public class LEDBackPack {
     /*
      * Sets the brightness level from 0..15
      */
-    private void setBrightness(int brightness) throws IOException {
+    public void setBrightness(int brightness) throws IOException {
         if (brightness > 15)
             brightness = 15;
         ledBackpack.write(HT16K33_REGISTER_DIMMING | brightness, (byte) 0x00);

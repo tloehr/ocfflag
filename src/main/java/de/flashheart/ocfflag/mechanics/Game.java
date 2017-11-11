@@ -1,6 +1,6 @@
 package de.flashheart.ocfflag.mechanics;
 
-import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
+import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.FrameDebug;
@@ -14,7 +14,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 
 /**
@@ -98,81 +97,117 @@ public class Game implements Runnable {
     private void initGame() {
         logger.setLevel(Main.getLogLevel());
 
-        button_blue.addListener((ActionListener) e -> {
-            logger.debug("button_blue");
-            if (mode == MODE_CLOCK_ACTIVE) {
-                flag = FLAG_STATE_BLUE;
-                refreshDisplay();
-            } else {
-                logger.debug("NOT IN STANDBY: IGNORED");
-            }
+        button_blue.addListener(e -> {
+            logger.debug("GUI_button_blue");
+            button_blue_pressed();
         });
-        button_blue.addListener(new GpioPinListenerDigital() {
-            @Override
-            public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
-                logger.debug("hardware_button_blue");
-                if (mode == MODE_CLOCK_ACTIVE) {
-                    flag = FLAG_STATE_BLUE;
-                    refreshDisplay();
-                } else {
-                    logger.debug("NOT IN STANDBY: IGNORED");
-                }
-            }
+        button_blue.addListener((GpioPinListenerDigital) event -> {
+            if (event.getState() != PinState.LOW) return;
+            logger.debug("GPIO__button_blue");
+            button_blue_pressed();
         });
-        button_red.addListener((ActionListener) e -> {
-            logger.debug("button_red");
-            if (mode == MODE_CLOCK_ACTIVE) {
-                if (mode == MODE_CLOCK_ACTIVE) {
-                    flag = FLAG_STATE_RED;
-                    refreshDisplay();
-                }
-            } else {
-                logger.debug("NOT IN STANDBY: IGNORED");
-            }
+        button_red.addListener(e -> {
+            logger.debug("GUI_button_red");
+            button_red_pressed();
         });
-        button_reset.addListener((ActionListener) e -> {
-            logger.debug("button_reset");
-            if (mode == MODE_CLOCK_STANDBY) {
-                reset_timers();
-            } else {
-                logger.debug("NOT IN STANDBY: IGNORED");
-            }
+        button_red.addListener((GpioPinListenerDigital) event -> {
+            if (event.getState() != PinState.LOW) return;
+            logger.debug("GPIO_button_blue");
+            button_red_pressed();
         });
-        button_preset_minus.addListener((ActionListener) e -> {
-            logger.debug("button_preset_minus");
-            if (mode == MODE_CLOCK_STANDBY) {
-
-                preset_position--;
-                if (preset_position < 0) preset_position = preset_times.length - 1;
-
-                reset_timers();
-            } else {
-                logger.debug("NOT IN STANDBY: IGNORED");
-            }
+        button_reset.addListener(e -> {
+            logger.debug("GUI_button_reset");
+            button_reset_pressed();
         });
-        button_preset_plus.addListener((ActionListener) e -> {
-            logger.debug("button_preset_plus");
-            if (mode == MODE_CLOCK_STANDBY) {
-
-                preset_position++;
-                if (preset_position > preset_times.length - 1) preset_position = 0;
-
-                reset_timers();
-            } else {
-                logger.debug("NOT IN STANDBY: IGNORED");
-            }
+        button_reset.addListener((GpioPinListenerDigital) event -> {
+            if (event.getState() != PinState.LOW) return;
+            logger.debug("GPIO_button_reset");
+            button_reset_pressed();
         });
-        button_switch_mode.addListener((ActionListener) e -> {
+        button_preset_minus.addListener(e -> {
+            logger.debug("GUI_button_preset_minus");
+            button_preset_minus_pressed();
+        });
+        button_preset_minus.addListener((GpioPinListenerDigital) event -> {
+            if (event.getState() != PinState.LOW) return;
+            logger.debug("GPIO_button_preset_minus");
+            button_preset_minus_pressed();
+        });
+        button_preset_plus.addListener(e -> {
+            logger.debug("GUI_button_preset_plus");
+            button_preset_plus_pressed();
+        });
+        button_preset_plus.addListener((GpioPinListenerDigital) event -> {
+            if (event.getState() != PinState.LOW) return;
+            logger.debug("GPIO_button_preset_plus");
+            button_preset_plus_pressed();
+        });
+        button_switch_mode.addListener(e -> {
             logger.debug("GUI_button_switch_mode");
             buttonSwitchModePressed();
         });
         button_switch_mode.addListener((GpioPinListenerDigital) event -> {
+            if (event.getState() != PinState.LOW) return;
             logger.debug("GPIO_button_switch_mode");
             buttonSwitchModePressed();
         });
 
         reset_timers();
 
+    }
+
+    private void button_blue_pressed() {
+        if (mode == MODE_CLOCK_ACTIVE) {
+            if (flag != FLAG_STATE_BLUE) {
+                flag = FLAG_STATE_BLUE;
+                refreshDisplay();
+            }
+        } else {
+            logger.debug("IN STANDBY: IGNORED");
+        }
+    }
+
+    private void button_red_pressed() {
+        if (mode == MODE_CLOCK_ACTIVE) {
+            if (mode == MODE_CLOCK_ACTIVE) {
+                if (flag != FLAG_STATE_RED) {
+                    flag = FLAG_STATE_RED;
+                    refreshDisplay();
+                }
+            }
+        } else {
+            logger.debug("IN STANDBY: IGNORED");
+        }
+    }
+
+    private void button_reset_pressed() {
+        if (mode == MODE_CLOCK_STANDBY) {
+            reset_timers();
+        } else {
+            logger.debug("NOT IN STANDBY: IGNORED");
+        }
+    }
+
+    private void button_preset_minus_pressed() {
+        if (mode == MODE_CLOCK_STANDBY) {
+            preset_position--;
+            if (preset_position < 0) preset_position = preset_times.length - 1;
+            reset_timers();
+        } else {
+            logger.debug("NOT IN STANDBY: IGNORED");
+        }
+    }
+
+    private void button_preset_plus_pressed() {
+        if (mode == MODE_CLOCK_STANDBY) {
+
+            preset_position++;
+            if (preset_position > preset_times.length - 1) preset_position = 0;
+
+            reset_timers();
+        } else {
+            logger.debug("NOT IN STANDBY: IGNORED");
+        }
     }
 
     private void buttonSwitchModePressed() {
@@ -285,6 +320,7 @@ public class Game implements Runnable {
                             " |_| \\_\\_____|____/     \\_/\\_/  \\___/|_| \\_|\n" +
                             "                                            ");
                     display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_1HZ);
+                    Main.getPinHandler().setScheme(ledRedButton.getName(), "∞;100,100");
                     pole.setRGB(255, 0, 0);
                     pole.setText("RED TEAM WON");
                 }
@@ -297,6 +333,7 @@ public class Game implements Runnable {
                             " |____/|_____\\___/|_____|    \\_/\\_/  \\___/|_| \\_|\n" +
                             "                                                 ");
                     display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_1HZ);
+                    Main.getPinHandler().setScheme(ledBlueButton.getName(), "∞;100,100");
                     pole.setRGB(0, 0, 255);
                     pole.setText("BLUE TEAM WON");
                 }
@@ -310,6 +347,8 @@ public class Game implements Runnable {
                             "                                                            ");
                     display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_1HZ);
                     display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_1HZ);
+                    Main.getPinHandler().setScheme(ledBlueButton.getName(), "∞;100,100");
+                    Main.getPinHandler().setScheme(ledRedButton.getName(), "∞;100,100");
                     pole.setRGB(255, 255, 255);
                     pole.setText("DRAW GAME");
                 }

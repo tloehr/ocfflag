@@ -234,5 +234,9 @@ public class SevenSegment
         this.display.clear();
     }
 
+    public void setBrightness(int brightness) throws IOException {
+        this.display.setBrightness(brightness);
+    }
+
 
 }

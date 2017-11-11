@@ -5,6 +5,7 @@ import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.i2c.I2CFactory;
+import com.pi4j.wiringpi.SoftPwm;
 import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
@@ -40,17 +41,17 @@ public class Main {
     private static final Pin BUTTON_PRESET_MINUS = RaspiPin.GPIO_03;
     private static final Pin BUTTON_RESET = RaspiPin.GPIO_01;
     private static final Pin BUTTON_PRESET_PLUS = RaspiPin.GPIO_04;
-    
+
     private static final Pin BUTTON_SWITCH_MODE = RaspiPin.GPIO_06;
 
     private static final Pin POLE_RGB_RED = RaspiPin.GPIO_21;
     private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_22;
     private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_23;
 
-    private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_12;
-    private static final Pin LED_RED_BUTTON = RaspiPin.GPIO_13;
-    private static final Pin LED_STANDBY_BUTTON = RaspiPin.GPIO_14;
-    private static final Pin LED_ACTIVE_BUTTON = RaspiPin.GPIO_15;
+    private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_26;
+    private static final Pin LED_RED_BUTTON = RaspiPin.GPIO_27;
+    private static final Pin LED_STANDBY_BUTTON = RaspiPin.GPIO_28;
+    private static final Pin LED_ACTIVE_BUTTON = RaspiPin.GPIO_29;
 
     private static Display7Segments4Digits display_blue, display_red, display_white;
     private static MyAbstractButton button_blue, button_red, button_reset, button_switch_mode, button_preset_minus, button_preset_plus;
@@ -59,7 +60,6 @@ public class Main {
     private static MyPin ledRedButton, ledBlueButton, ledStandby, ledActive;
 
     private static PinHandler pinHandler; // One handler, to rule them all...
-
 
 
     public static void main(String[] args) throws Exception {
@@ -94,7 +94,7 @@ public class Main {
         button_preset_plus = new MyAbstractButton(GPIO, BUTTON_PRESET_PLUS, frameDebug.getBtnPresetPlus());
         button_switch_mode = new MyAbstractButton(GPIO, BUTTON_SWITCH_MODE, frameDebug.getBtnSwitchMode());
 
-        pole = new MyRGBLed(GPIO, POLE_RGB_RED, POLE_RGB_GREEN, POLE_RGB_BLUE, frameDebug.getLblPole());
+        pole = new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole());
 
         ledBlueButton = new MyPin(GPIO, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), "ledBlueButton");
         ledRedButton = new MyPin(GPIO, LED_RED_BUTTON, frameDebug.getLedRedButton(), "ledRedButton");
@@ -113,7 +113,7 @@ public class Main {
     }
 
 
-    private static void initBaseSystem() {
+    private static void initBaseSystem() throws InterruptedException {
         System.setProperty("logs", Tools.getWorkingPath());
 //        System.setProperty("logs", Tools.getWorkingPath());
         logger = Logger.getLogger("Main");
@@ -121,6 +121,13 @@ public class Main {
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             public void run() {
+
+                pinHandler.off();
+                if (GPIO != null){
+                    SoftPwm.softPwmStop(POLE_RGB_RED.getAddress());
+                    SoftPwm.softPwmStop(POLE_RGB_GREEN.getAddress());
+                    SoftPwm.softPwmStop(POLE_RGB_BLUE.getAddress());
+                }
 
             }
         }));
@@ -134,7 +141,39 @@ public class Main {
             logger.fatal(sw);
         });
 
-
+//        GPIO = GpioFactory.getInstance();
+//        com.pi4j.wiringpi.Gpio.wiringPiSetup();
+//
+//        SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
+//        SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
+//        SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);
+//
+//        SoftPwm.softPwmWrite(POLE_RGB_RED.getAddress(), Color.red.getRed());
+//        SoftPwm.softPwmWrite(POLE_RGB_GREEN.getAddress(), Color.red.getGreen());
+//        SoftPwm.softPwmWrite(POLE_RGB_BLUE.getAddress(), Color.red.getBlue());
+//
+//
+//        Thread.sleep(1000);
+//
+//        SoftPwm.softPwmWrite(POLE_RGB_RED.getAddress(), Color.blue.getRed());
+//        SoftPwm.softPwmWrite(POLE_RGB_GREEN.getAddress(), Color.blue.getGreen());
+//        SoftPwm.softPwmWrite(POLE_RGB_BLUE.getAddress(), Color.blue.getBlue());
+//
+//        Thread.sleep(1000);
+//
+//        SoftPwm.softPwmWrite(POLE_RGB_RED.getAddress(), Color.green.getRed());
+//        SoftPwm.softPwmWrite(POLE_RGB_GREEN.getAddress(), Color.green.getGreen());
+//        SoftPwm.softPwmWrite(POLE_RGB_BLUE.getAddress(), Color.green.getBlue());
+//
+//        Thread.sleep(1000);
+//
+//        SoftPwm.softPwmWrite(POLE_RGB_RED.getAddress(), Color.orange.getRed());
+//        SoftPwm.softPwmWrite(POLE_RGB_GREEN.getAddress(), Color.orange.getGreen());
+//        SoftPwm.softPwmWrite(POLE_RGB_BLUE.getAddress(), Color.orange.getBlue());
+//
+//        Thread.sleep(1000);
+//
+//        System.exit(0);
     }
 
 
@@ -149,7 +188,7 @@ public class Main {
         logger = Logger.getLogger("Main");
         logger.setLevel(logLevel);
 
-         pinHandler = new PinHandler();
+        pinHandler = new PinHandler();
 
 //        config = new SortedProperties();
 //        // todo: configreader needed
@@ -180,8 +219,10 @@ public class Main {
     private static void initRaspi() throws Exception {
         if (!Tools.isArm()) return;
         GPIO = GpioFactory.getInstance();
-
-
+//        com.pi4j.wiringpi.Gpio.wiringPiSetup();
+        SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
+        SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
+        SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);
     }
 
     public static Level getLogLevel() {
