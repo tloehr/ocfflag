@@ -54,13 +54,15 @@ public class Display7Segments4Digits {
         // Bildschirm Darstellung
         if (lblSegment != null) {
             String textTime = dateTime.toString("mmss");
-            String text = textTime.charAt(0) + (hours == 4 ? "." : " ")
-                    + textTime.charAt(1) + (hours >= 3 ? "." : " ")
-                    + textTime.charAt(2) + (hours >= 2 ? "." : " ")
-                    + textTime.charAt(3) + (hours >= 1 ? "." : " ");
+            String minutes = textTime.charAt(0) + (hours == 4 ? "." : "")
+                    + textTime.charAt(1) + (hours >= 3 ? "." : "");
+            String seconds = textTime.charAt(2) + (hours >= 2 ? "." : "")
+                    + textTime.charAt(3) + (hours >= 1 ? "." : "");
 
             lblSegment.setToolTipText(dateTime.toString("HH:mm:ss"));
-            lblSegment.setText(StringUtils.left(text, text.length() / 2) + (colon ? ":" : " ") + StringUtils.right(text, text.length() / 2));
+            String t = minutes + (colon ? ":" : " ") + seconds;
+            logger.debug(t);
+            lblSegment.setText(t);
         }
 
         // Hardware 7Segment
@@ -92,6 +94,10 @@ public class Display7Segments4Digits {
         if (lblSegment != null)
             lblSegment.setText(StringUtils.left(text, 2) + (colon ? ":" : " ") + StringUtils.right(text, 2));
         if (segment != null) fullDisplay(text.split(""));
+    }
+
+    public void clear() throws IOException {
+        segment.clear();
     }
 
     private String[] scrollLeft(String[] row, String c) {

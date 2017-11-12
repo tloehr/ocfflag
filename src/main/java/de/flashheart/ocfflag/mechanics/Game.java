@@ -9,6 +9,7 @@ import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
 import de.flashheart.ocfflag.hardware.abstraction.MyPin;
 import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
+import de.flashheart.ocfflag.misc.Configs;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -30,8 +31,9 @@ public class Game implements Runnable {
     private final MyRGBLed pole;
     private final MyPin ledRedButton;
     private final MyPin ledBlueButton;
-    private final MyPin ledStandby;
-    private final MyPin ledActive;
+    private final MyPin ledStatsSent;
+    private final MyPin ledStandbyActive;
+    private final MyAbstractButton button_quit;
     private int mode = MODE_CLOCK_STANDBY;
 
     private final int FLAG_STATE_NEUTRAL = 0;
@@ -47,17 +49,17 @@ public class Game implements Runnable {
     private final MyAbstractButton button_reset;
     private final MyAbstractButton button_switch_mode;
 
-
     private final Thread thread;
     private final long PAUSE_PER_CYCLE = 500;
-//    private boolean mode_has_just_changed = false;
 
-    private long time, time_blue, time_red, lastPIT;
+    private Statistics statistics;
+
+    private long time, time_blue, time_red, lastPIT, lastStatsSent, min_stat_sent_time;
 
     // das sind die standard spieldauern in millis.
     // In Minuten: 30, 60, 90, 120, 150, 180, 210, 240, 270, 300
     private Long[] preset_times = new Long[]{
-            20000l, // 00:00:20
+//            20000l, // 00:00:20
             600000l, // 00:10:00
             900000l, // 00:15:00
             1200000l, // 00:20:00
@@ -72,16 +74,30 @@ public class Game implements Runnable {
             16200000l, // 01:30:00
             18000000l - 1000l // 04:59:59
     };
-    private int preset_position = 0; // todo: per configdatei setzen. Zuletzt gewählt.
+    private int preset_position = 0;
 
-    public Game(Display7Segments4Digits display_blue, Display7Segments4Digits display_red, Display7Segments4Digits display_white, MyAbstractButton button_blue, MyAbstractButton button_red, MyAbstractButton button_reset, MyAbstractButton button_switch_mode, MyAbstractButton button_preset_minus, MyAbstractButton button_preset_plus, MyRGBLed pole, MyPin ledRedButton, MyPin ledBlueButton, MyPin ledStandby, MyPin ledActive) {
-        this.ledActive = ledActive;
+    public Game(Display7Segments4Digits display_blue,
+                Display7Segments4Digits display_red,
+                Display7Segments4Digits display_white,
+                MyAbstractButton button_blue,
+                MyAbstractButton button_red,
+                MyAbstractButton button_reset,
+                MyAbstractButton button_switch_mode,
+                MyAbstractButton button_preset_minus,
+                MyAbstractButton button_preset_plus,
+                MyAbstractButton button_quit,
+                MyRGBLed pole, MyPin ledRedButton,
+                MyPin ledBlueButton,
+                MyPin ledStandbyActive,
+                MyPin ledStatsSent) {
+        this.button_quit = button_quit;
         thread = new Thread(this);
         logger.setLevel(Main.getLogLevel());
         this.pole = pole;
         this.ledRedButton = ledRedButton;
         this.ledBlueButton = ledBlueButton;
-        this.ledStandby = ledStandby;
+        this.ledStandbyActive = ledStandbyActive;
+        this.ledStatsSent = ledStatsSent;
         this.display_blue = display_blue;
         this.display_red = display_red;
         this.display_white = display_white;
@@ -91,6 +107,10 @@ public class Game implements Runnable {
         this.button_switch_mode = button_switch_mode;
         this.button_preset_minus = button_preset_minus;
         this.button_preset_plus = button_preset_plus;
+
+        min_stat_sent_time = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
+        statistics = new Statistics();
+        preset_position = Integer.parseInt(Main.getConfigs().get(Configs.GAMETIME));
         initGame();
     }
 
@@ -151,7 +171,10 @@ public class Game implements Runnable {
             logger.debug("GPIO_button_switch_mode");
             buttonSwitchModePressed();
         });
-
+        button_quit.addListener(e -> {
+            if (mode != MODE_CLOCK_STANDBY) return;
+            System.exit(0);
+        });
         reset_timers();
 
     }
@@ -160,6 +183,7 @@ public class Game implements Runnable {
         if (mode == MODE_CLOCK_ACTIVE) {
             if (flag != FLAG_STATE_BLUE) {
                 flag = FLAG_STATE_BLUE;
+                statistics.addEvent(Statistics.EVENT_BLUE_ACTIVATED);
                 refreshDisplay();
             }
         } else {
@@ -172,6 +196,7 @@ public class Game implements Runnable {
             if (mode == MODE_CLOCK_ACTIVE) {
                 if (flag != FLAG_STATE_RED) {
                     flag = FLAG_STATE_RED;
+                    statistics.addEvent(Statistics.EVENT_RED_ACTIVATED);
                     refreshDisplay();
                 }
             }
@@ -192,6 +217,7 @@ public class Game implements Runnable {
         if (mode == MODE_CLOCK_STANDBY) {
             preset_position--;
             if (preset_position < 0) preset_position = preset_times.length - 1;
+            Main.getConfigs().put(Configs.GAMETIME, preset_position);
             reset_timers();
         } else {
             logger.debug("NOT IN STANDBY: IGNORED");
@@ -200,10 +226,9 @@ public class Game implements Runnable {
 
     private void button_preset_plus_pressed() {
         if (mode == MODE_CLOCK_STANDBY) {
-
             preset_position++;
             if (preset_position > preset_times.length - 1) preset_position = 0;
-
+            Main.getConfigs().put(Configs.GAMETIME, preset_position);
             reset_timers();
         } else {
             logger.debug("NOT IN STANDBY: IGNORED");
@@ -215,6 +240,13 @@ public class Game implements Runnable {
         mode = (mode == MODE_CLOCK_ACTIVE || mode == MODE_CLOCK_GAMEOVER ? MODE_CLOCK_STANDBY : MODE_CLOCK_ACTIVE);
         lastPIT = System.currentTimeMillis();
 
+        if (mode == MODE_CLOCK_ACTIVE) {
+            statistics.addEvent(Statistics.EVENT_GAME_ACTIVATED);
+        } else if (mode == MODE_CLOCK_STANDBY) {
+            statistics.addEvent(Statistics.EVENT_GAME_PAUSED);
+        }
+
+
         if (previousMode == MODE_CLOCK_GAMEOVER) { // nach einem abgeschlossenen Spiel, werden die Timer zurück gesetzt.
             reset_timers();
         } else {
@@ -225,11 +257,12 @@ public class Game implements Runnable {
     private void reset_timers() {
         flag = FLAG_STATE_NEUTRAL;
         pole.setRGB(Color.white.getRed(), Color.white.getGreen(), Color.white.getBlue());
-        pole.setText("FLAG POLE");
+        pole.setText("Flagge");
         time = preset_times[preset_position]; // aktuelle Wahl minus 1 Sekunde. Dann wird aus 5 Stunden -> 04:59:59
         time_blue = 0l;
         time_red = 0l;
-
+        lastStatsSent = 0l;
+        statistics.resetStats();
         refreshDisplay();
     }
 
@@ -257,14 +290,12 @@ public class Game implements Runnable {
                 button_switch_mode.setIcon(FrameDebug.IconPlay);
                 Main.getPinHandler().off(ledRedButton.getName());
                 Main.getPinHandler().off(ledBlueButton.getName());
-                Main.getPinHandler().off(ledActive.getName());
-                Main.getPinHandler().setScheme(ledStandby.getName(), "∞;1000,1000");
+                Main.getPinHandler().setScheme(ledStandbyActive.getName(), "∞;1000,1000");
             }
 
             if (mode == MODE_CLOCK_ACTIVE) {
                 button_switch_mode.setIcon(FrameDebug.IconPause);
-                Main.getPinHandler().off(ledStandby.getName());
-                Main.getPinHandler().setScheme(ledActive.getName(), "∞;1000,1000");
+                Main.getPinHandler().setScheme(ledStandbyActive.getName(), "∞;250,250");
 
                 if (flag == FLAG_STATE_NEUTRAL) {
                     logger.debug("\n" +
@@ -364,7 +395,6 @@ public class Game implements Runnable {
         while (!thread.isInterrupted()) {
             try {
 
-
                 if (mode == MODE_CLOCK_ACTIVE) {
                     long now = System.currentTimeMillis();
                     long diff = now - lastPIT;
@@ -373,6 +403,10 @@ public class Game implements Runnable {
                     time = time - diff;
                     time = Math.max(time, 0);
                     display_white.setTime(time);
+
+                    if (now - lastStatsSent > min_stat_sent_time) {
+                        statistics.sendStats();
+                    }
 
                     if (flag == FLAG_STATE_BLUE) {
                         time_blue += diff;
@@ -392,6 +426,7 @@ public class Game implements Runnable {
                                 "  \\____/_/   \\_\\_|  |_|_____|  \\___/  \\_/  |_____|_| \\_\\\n" +
                                 "                                                        ");
                         mode = MODE_CLOCK_GAMEOVER;
+                        statistics.addEvent(Statistics.EVENT_GAME_OVER);
                         refreshDisplay();
                     }
 

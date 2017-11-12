@@ -121,7 +121,7 @@ public class PinHandler {
      * @param scheme
      */
     public void setScheme(String name, String scheme) {
-        logger.debug(name + "-" + scheme);
+//        logger.debug(name + "-" + scheme);
         lock.lock();
         try {
             PinBlinkModel pinBlinkModel = pinMap.get(name);

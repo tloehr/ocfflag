@@ -25,12 +25,12 @@ public class PinBlinkModel implements Callable<String> {
 
     @Override
     public String call() throws Exception {
-        logger.debug(new DateTime().toString() + " call() to:" + pin.getName() + " [" + pin.getText() + "]");
+//        logger.debug(new DateTime().toString() + " call() to:" + pin.getName() + " [" + pin.getText() + "]");
         if (repeat == 0) {
             restart();
             pin.setState(false);
         } else {
-            logger.debug(new DateTime().toString() + " working on:" + pin.getName() + " [" + pin.getText() + "]");
+//            logger.debug(new DateTime().toString() + " working on:" + pin.getName() + " [" + pin.getText() + "]");
             for (int turn = 0; turn < repeat; turn++) {
                 restart();
 

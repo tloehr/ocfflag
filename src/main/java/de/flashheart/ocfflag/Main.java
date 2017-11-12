@@ -13,6 +13,7 @@ import de.flashheart.ocfflag.hardware.abstraction.MyPin;
 import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
 import de.flashheart.ocfflag.mechanics.Game;
+import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -41,30 +42,33 @@ public class Main {
     private static final Pin BUTTON_PRESET_MINUS = RaspiPin.GPIO_03;
     private static final Pin BUTTON_RESET = RaspiPin.GPIO_01;
     private static final Pin BUTTON_PRESET_PLUS = RaspiPin.GPIO_04;
-
     private static final Pin BUTTON_SWITCH_MODE = RaspiPin.GPIO_06;
 
     private static final Pin POLE_RGB_RED = RaspiPin.GPIO_21;
     private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_22;
     private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_23;
 
+    // für später
+    private static final Pin SIREN_AIR = RaspiPin.GPIO_12;
+    private static final Pin SIREN_COLOR_CHANGE = RaspiPin.GPIO_13;
+
     private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_26;
     private static final Pin LED_RED_BUTTON = RaspiPin.GPIO_27;
-    private static final Pin LED_STANDBY_BUTTON = RaspiPin.GPIO_28;
-    private static final Pin LED_ACTIVE_BUTTON = RaspiPin.GPIO_29;
+    private static final Pin LED_STANDBY_ACTIVE_BUTTON = RaspiPin.GPIO_28;
+    private static final Pin LED_STATS_SENT = RaspiPin.GPIO_29;
 
     private static Display7Segments4Digits display_blue, display_red, display_white;
-    private static MyAbstractButton button_blue, button_red, button_reset, button_switch_mode, button_preset_minus, button_preset_plus;
+    private static MyAbstractButton button_blue, button_red, button_reset, button_switch_mode, button_preset_minus, button_preset_plus, button_quit;
     private static MyRGBLed pole;
 
-    private static MyPin ledRedButton, ledBlueButton, ledStandby, ledActive;
+    private static MyPin ledRedButton, ledBlueButton, ledStandbyActive, ledStatsSent;
 
     private static PinHandler pinHandler; // One handler, to rule them all...
+    private static Configs configs;
 
 
     public static void main(String[] args) throws Exception {
         initBaseSystem();
-        initCommon();
         initDebugFrame();
         initRaspi();
         initGameSystem();
@@ -93,43 +97,59 @@ public class Main {
         button_preset_minus = new MyAbstractButton(GPIO, BUTTON_PRESET_MINUS, frameDebug.getBtnPresetMinus());
         button_preset_plus = new MyAbstractButton(GPIO, BUTTON_PRESET_PLUS, frameDebug.getBtnPresetPlus());
         button_switch_mode = new MyAbstractButton(GPIO, BUTTON_SWITCH_MODE, frameDebug.getBtnSwitchMode());
+        button_quit = new MyAbstractButton(GPIO, null, frameDebug.getBtnQuit());
 
         pole = new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole());
 
         ledBlueButton = new MyPin(GPIO, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), "ledBlueButton");
         ledRedButton = new MyPin(GPIO, LED_RED_BUTTON, frameDebug.getLedRedButton(), "ledRedButton");
-        ledStandby = new MyPin(GPIO, LED_STANDBY_BUTTON, frameDebug.getLedStandby(), "ledStandby");
-        ledActive = new MyPin(GPIO, LED_ACTIVE_BUTTON, frameDebug.getLedActive(), "ledActive");
+        ledStandbyActive = new MyPin(GPIO, LED_STANDBY_ACTIVE_BUTTON, frameDebug.getLedStandbyActive(), "ledStandbyActive");
+        ledStatsSent = new MyPin(GPIO, LED_STATS_SENT, frameDebug.getLedStatsSent(), "ledStatsSent");
+
+        // später
+//        MyPin siren1 = new MyPin(GPIO, SIREN_AIR, null, "sirenAir");
+//        MyPin siren2 = new MyPin(GPIO, SIREN_COLOR_CHANGE, null, "sirenColorChange");
+//        pinHandler.add(siren1);
+//        pinHandler.add(siren2);
 
         pinHandler.add(ledRedButton);
         pinHandler.add(ledBlueButton);
-        pinHandler.add(ledStandby);
-        pinHandler.add(ledActive);
+        pinHandler.add(ledStandbyActive);
+        pinHandler.add(ledStatsSent);
 
-        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_switch_mode, button_preset_minus, button_preset_plus, pole, ledRedButton, ledBlueButton, ledStandby, ledActive);
+        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_switch_mode, button_preset_minus, button_preset_plus, button_quit, pole, ledRedButton, ledBlueButton, ledStandbyActive, ledStatsSent);
         game.run();
 
 
     }
 
+    /**
+     * Diese Methode enthält alles was initialisiert werden muss, gleich ob wir das Programm auf einem Raspi ausführen oder einem anderen Computer.
+     *
+     * @throws InterruptedException
+     */
 
-    private static void initBaseSystem() throws InterruptedException {
+    private static void initBaseSystem() throws InterruptedException, IOException {
         System.setProperty("logs", Tools.getWorkingPath());
-//        System.setProperty("logs", Tools.getWorkingPath());
         logger = Logger.getLogger("Main");
         logger.setLevel(logLevel);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            public void run() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 
-                pinHandler.off();
-                if (GPIO != null){
-                    SoftPwm.softPwmStop(POLE_RGB_RED.getAddress());
-                    SoftPwm.softPwmStop(POLE_RGB_GREEN.getAddress());
-                    SoftPwm.softPwmStop(POLE_RGB_BLUE.getAddress());
+            pinHandler.off();
+            if (GPIO != null){
+                SoftPwm.softPwmStop(POLE_RGB_RED.getAddress());
+                SoftPwm.softPwmStop(POLE_RGB_GREEN.getAddress());
+                SoftPwm.softPwmStop(POLE_RGB_BLUE.getAddress());
+                try {
+                    display_white.clear();
+                    display_blue.clear();
+                    display_red.clear();
+                } catch (IOException e) {
+                    logger.error(e);
                 }
-
             }
+
         }));
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
@@ -141,70 +161,11 @@ public class Main {
             logger.fatal(sw);
         });
 
-//        GPIO = GpioFactory.getInstance();
-//        com.pi4j.wiringpi.Gpio.wiringPiSetup();
-//
-//        SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
-//        SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
-//        SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);
-//
-//        SoftPwm.softPwmWrite(POLE_RGB_RED.getAddress(), Color.red.getRed());
-//        SoftPwm.softPwmWrite(POLE_RGB_GREEN.getAddress(), Color.red.getGreen());
-//        SoftPwm.softPwmWrite(POLE_RGB_BLUE.getAddress(), Color.red.getBlue());
-//
-//
-//        Thread.sleep(1000);
-//
-//        SoftPwm.softPwmWrite(POLE_RGB_RED.getAddress(), Color.blue.getRed());
-//        SoftPwm.softPwmWrite(POLE_RGB_GREEN.getAddress(), Color.blue.getGreen());
-//        SoftPwm.softPwmWrite(POLE_RGB_BLUE.getAddress(), Color.blue.getBlue());
-//
-//        Thread.sleep(1000);
-//
-//        SoftPwm.softPwmWrite(POLE_RGB_RED.getAddress(), Color.green.getRed());
-//        SoftPwm.softPwmWrite(POLE_RGB_GREEN.getAddress(), Color.green.getGreen());
-//        SoftPwm.softPwmWrite(POLE_RGB_BLUE.getAddress(), Color.green.getBlue());
-//
-//        Thread.sleep(1000);
-//
-//        SoftPwm.softPwmWrite(POLE_RGB_RED.getAddress(), Color.orange.getRed());
-//        SoftPwm.softPwmWrite(POLE_RGB_GREEN.getAddress(), Color.orange.getGreen());
-//        SoftPwm.softPwmWrite(POLE_RGB_BLUE.getAddress(), Color.orange.getBlue());
-//
-//        Thread.sleep(1000);
-//
-//        System.exit(0);
-    }
-
-
-    /**
-     * Diese Method enthält alles was initialisiert werden muss, gleich ob wir das Programm auf einem Raspi ausführen oder einem anderen Computer.
-     *
-     * @throws Exception
-     */
-    private static void initCommon() throws Exception {
-
-
-        logger = Logger.getLogger("Main");
-        logger.setLevel(logLevel);
-
         pinHandler = new PinHandler();
-
-//        config = new SortedProperties();
-//        // todo: configreader needed
-//        config.put("vibeSensor1", "GPIO 4");
-//        config.put("HEALTH_CHANGE_PER_HIT", "-1");
-//        config.put("GAME_LENGTH_IN_SECONDS", "60");
-//        config.put("DELAY_BEFORE_GAME_STARTS_IN_SECONDS", "5");
-//        config.put("MAX_HEALTH", "1000");
-//        config.put("DEBOUNCE", "15");
-//
-//        config.put("pwmRed", "GPIO 0");
-//        config.put("pwmGreen", "GPIO 3");
-//        config.put("pwmBlue", "GPIO 5");
-
-
+        configs = new Configs();
     }
+
+
 
     /**
      * Dieses Init wird nur ausgeführt, wenn das Programm NICHT auf einem Raspi läuft.
@@ -237,4 +198,7 @@ public class Main {
         return frameDebug;
     }
 
+    public static Configs getConfigs() {
+        return configs;
+    }
 }

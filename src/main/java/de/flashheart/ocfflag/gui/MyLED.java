@@ -1,7 +1,5 @@
 package de.flashheart.ocfflag.gui;
 
-import de.flashheart.ocfflag.hardware.abstraction.MyPin;
-
 import javax.swing.*;
 import java.awt.*;
 
