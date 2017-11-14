@@ -35,6 +35,7 @@ public class Game implements Runnable {
     private final MyPin ledStandbyActive;
     private final MyAbstractButton button_quit;
     private int mode = MODE_CLOCK_STANDBY;
+    private int running_match_id = 0;
 
     private final int FLAG_STATE_NEUTRAL = 0;
     private final int FLAG_STATE_BLUE = 1;
@@ -59,7 +60,7 @@ public class Game implements Runnable {
     // das sind die standard spieldauern in millis.
     // In Minuten: 30, 60, 90, 120, 150, 180, 210, 240, 270, 300
     private Long[] preset_times = new Long[]{
-//            20000l, // 00:00:20
+            20000l, // 00:00:20
             600000l, // 00:10:00
             900000l, // 00:15:00
             1200000l, // 00:20:00
@@ -183,7 +184,7 @@ public class Game implements Runnable {
         if (mode == MODE_CLOCK_ACTIVE) {
             if (flag != FLAG_STATE_BLUE) {
                 flag = FLAG_STATE_BLUE;
-                statistics.addEvent(Statistics.EVENT_BLUE_ACTIVATED);
+                if (min_stat_sent_time > 0) statistics.addEvent(Statistics.EVENT_BLUE_ACTIVATED);
                 refreshDisplay();
             }
         } else {
@@ -196,7 +197,7 @@ public class Game implements Runnable {
             if (mode == MODE_CLOCK_ACTIVE) {
                 if (flag != FLAG_STATE_RED) {
                     flag = FLAG_STATE_RED;
-                    statistics.addEvent(Statistics.EVENT_RED_ACTIVATED);
+                    if (min_stat_sent_time > 0) statistics.addEvent(Statistics.EVENT_RED_ACTIVATED);
                     refreshDisplay();
                 }
             }
@@ -240,18 +241,18 @@ public class Game implements Runnable {
         mode = (mode == MODE_CLOCK_ACTIVE || mode == MODE_CLOCK_GAMEOVER ? MODE_CLOCK_STANDBY : MODE_CLOCK_ACTIVE);
         lastPIT = System.currentTimeMillis();
 
-        if (mode == MODE_CLOCK_ACTIVE) {
-            statistics.addEvent(Statistics.EVENT_GAME_ACTIVATED);
-        } else if (mode == MODE_CLOCK_STANDBY) {
-            statistics.addEvent(Statistics.EVENT_GAME_PAUSED);
+        // wenn der Modus nun Aktiv ist, aber noch kein Spiel läuft, dann erstellen wir eine neue MATCHID.
+        if (mode == MODE_CLOCK_ACTIVE && running_match_id == 0) {
+            running_match_id = Integer.parseInt(Main.getConfigs().get(Configs.MATCHID)) + 1;
+            Main.getConfigs().put(Configs.MATCHID, Integer.toString(running_match_id));
         }
-
 
         if (previousMode == MODE_CLOCK_GAMEOVER) { // nach einem abgeschlossenen Spiel, werden die Timer zurück gesetzt.
             reset_timers();
         } else {
             refreshDisplay();
         }
+
     }
 
     private void reset_timers() {
@@ -261,16 +262,20 @@ public class Game implements Runnable {
         time = preset_times[preset_position]; // aktuelle Wahl minus 1 Sekunde. Dann wird aus 5 Stunden -> 04:59:59
         time_blue = 0l;
         time_red = 0l;
+        running_match_id = 0;
         lastStatsSent = 0l;
-        statistics.resetStats();
+        statistics.reset();
         refreshDisplay();
     }
+
 
     private void refreshDisplay() {
         try {
             display_white.setTime(time);
             display_blue.setTime(time_blue);
             display_red.setTime(time_red);
+
+            if (min_stat_sent_time > 0 && running_match_id > 0) statistics.setTimes(running_match_id, time, time_blue, time_red);
 
             display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
             display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
@@ -404,7 +409,7 @@ public class Game implements Runnable {
                     time = Math.max(time, 0);
                     display_white.setTime(time);
 
-                    if (now - lastStatsSent > min_stat_sent_time) {
+                    if (min_stat_sent_time > 0 && now - lastStatsSent > min_stat_sent_time) {
                         statistics.sendStats();
                     }
 
@@ -426,7 +431,7 @@ public class Game implements Runnable {
                                 "  \\____/_/   \\_\\_|  |_|_____|  \\___/  \\_/  |_____|_| \\_\\\n" +
                                 "                                                        ");
                         mode = MODE_CLOCK_GAMEOVER;
-                        statistics.addEvent(Statistics.EVENT_GAME_OVER);
+                        if (min_stat_sent_time > 0) statistics.addEvent(Statistics.EVENT_GAME_OVER);
                         refreshDisplay();
                     }
 

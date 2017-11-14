@@ -21,8 +21,8 @@ public class MyAbstractButton {
     private final GpioPinDigitalInput hardwareButton;
     private final JButton guiButton;
 
-    public MyAbstractButton(GpioController hardwareButton, Pin pin, JButton guiButton) {
-        this.hardwareButton = hardwareButton == null ? null : hardwareButton.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
+    public MyAbstractButton(GpioController gpio, Pin pin, JButton guiButton) {
+        this.hardwareButton = gpio == null ? null : gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
         this.guiButton = guiButton;
     }
 
