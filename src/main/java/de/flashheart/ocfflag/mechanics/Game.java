@@ -23,9 +23,12 @@ import java.io.IOException;
 public class Game implements Runnable {
     private final Logger logger = Logger.getLogger(getClass());
 
-    private final int MODE_CLOCK_STANDBY = 0;
-    private final int MODE_CLOCK_ACTIVE = 1;
-    private final int MODE_CLOCK_GAMEOVER = 2; // Dieser Zustand wird NUR automatisch erreicht. Beim Rücksetzen in den Standby ist der Modus wieder beendet.
+    private final int MODE_CLOCK_PREGAME = 0;
+    private final int MODE_CLOCK_GAME_RUNNING = 1;
+    private final int MODE_CLOCK_GAME_PAUSED = 2;
+    private final int MODE_CLOCK_GAME_OVER = 3;
+    private final int MODE_CLOCK_GAME_ABORTED = 4;
+
     private final MyAbstractButton button_preset_minus;
     private final MyAbstractButton button_preset_plus;
     private final MyRGBLed pole;
@@ -34,7 +37,7 @@ public class Game implements Runnable {
     private final MyPin ledStatsSent;
     private final MyPin ledStandbyActive;
     private final MyAbstractButton button_quit;
-    private int mode = MODE_CLOCK_STANDBY;
+    private int mode = MODE_CLOCK_PREGAME;
     private int running_match_id = 0;
 
     private final int FLAG_STATE_NEUTRAL = 0;
@@ -165,15 +168,16 @@ public class Game implements Runnable {
         });
         button_switch_mode.addListener(e -> {
             logger.debug("GUI_button_switch_mode");
-            buttonSwitchModePressed();
+            buttonStandbyActivePressed();
         });
         button_switch_mode.addListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) return;
             logger.debug("GPIO_button_switch_mode");
-            buttonSwitchModePressed();
+            buttonStandbyActivePressed();
         });
         button_quit.addListener(e -> {
-            if (mode != MODE_CLOCK_STANDBY) return;
+            if (mode == MODE_CLOCK_GAME_RUNNING) return;
+            reset_timers();
             System.exit(0);
         });
         reset_timers();
@@ -181,82 +185,89 @@ public class Game implements Runnable {
     }
 
     private void button_blue_pressed() {
-        if (mode == MODE_CLOCK_ACTIVE) {
+        if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != FLAG_STATE_BLUE) {
                 flag = FLAG_STATE_BLUE;
                 if (min_stat_sent_time > 0) statistics.addEvent(Statistics.EVENT_BLUE_ACTIVATED);
                 refreshDisplay();
             }
         } else {
-            logger.debug("IN STANDBY: IGNORED");
+            logger.debug("NOT RUNNING: IGNORED");
         }
     }
 
     private void button_red_pressed() {
-        if (mode == MODE_CLOCK_ACTIVE) {
-            if (mode == MODE_CLOCK_ACTIVE) {
-                if (flag != FLAG_STATE_RED) {
-                    flag = FLAG_STATE_RED;
-                    if (min_stat_sent_time > 0) statistics.addEvent(Statistics.EVENT_RED_ACTIVATED);
-                    refreshDisplay();
-                }
+        if (mode == MODE_CLOCK_GAME_RUNNING) {
+            if (flag != FLAG_STATE_RED) {
+                flag = FLAG_STATE_RED;
+                if (min_stat_sent_time > 0) statistics.addEvent(Statistics.EVENT_RED_ACTIVATED);
+                refreshDisplay();
             }
+
         } else {
-            logger.debug("IN STANDBY: IGNORED");
+            logger.debug("NOT RUNNING: IGNORED");
         }
     }
 
     private void button_reset_pressed() {
-        if (mode == MODE_CLOCK_STANDBY) {
+        if (mode != MODE_CLOCK_GAME_RUNNING) {
+            if (running_match_id > 0) {
+                if (min_stat_sent_time > 0) statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
+            }
             reset_timers();
         } else {
-            logger.debug("NOT IN STANDBY: IGNORED");
+            logger.debug("RUNNING: IGNORED");
         }
     }
 
     private void button_preset_minus_pressed() {
-        if (mode == MODE_CLOCK_STANDBY) {
+        if (mode == MODE_CLOCK_PREGAME) {
             preset_position--;
             if (preset_position < 0) preset_position = preset_times.length - 1;
             Main.getConfigs().put(Configs.GAMETIME, preset_position);
             reset_timers();
         } else {
-            logger.debug("NOT IN STANDBY: IGNORED");
+            logger.debug("NOT IN PREGAME: IGNORED");
         }
     }
 
     private void button_preset_plus_pressed() {
-        if (mode == MODE_CLOCK_STANDBY) {
+        if (mode == MODE_CLOCK_PREGAME) {
             preset_position++;
             if (preset_position > preset_times.length - 1) preset_position = 0;
             Main.getConfigs().put(Configs.GAMETIME, preset_position);
             reset_timers();
         } else {
-            logger.debug("NOT IN STANDBY: IGNORED");
+            logger.debug("NOT IN PREGAME: IGNORED");
         }
     }
 
-    private void buttonSwitchModePressed() {
-        int previousMode = mode;
-        mode = (mode == MODE_CLOCK_ACTIVE || mode == MODE_CLOCK_GAMEOVER ? MODE_CLOCK_STANDBY : MODE_CLOCK_ACTIVE);
-        lastPIT = System.currentTimeMillis();
-
-        // wenn der Modus nun Aktiv ist, aber noch kein Spiel läuft, dann erstellen wir eine neue MATCHID.
-        if (mode == MODE_CLOCK_ACTIVE && running_match_id == 0) {
-            running_match_id = Integer.parseInt(Main.getConfigs().get(Configs.MATCHID)) + 1;
-            Main.getConfigs().put(Configs.MATCHID, Integer.toString(running_match_id));
-        }
-
-        if (previousMode == MODE_CLOCK_GAMEOVER) { // nach einem abgeschlossenen Spiel, werden die Timer zurück gesetzt.
+    private void buttonStandbyActivePressed() {
+        if (mode == MODE_CLOCK_GAME_RUNNING) {
+            mode = MODE_CLOCK_GAME_PAUSED;
+            if (min_stat_sent_time > 0) statistics.addEvent(Statistics.EVENT_PAUSE);
+            refreshDisplay();
+        } else if (mode == MODE_CLOCK_GAME_PAUSED) {
+            mode = MODE_CLOCK_GAME_RUNNING;
+            if (min_stat_sent_time > 0) statistics.addEvent(Statistics.EVENT_RESUME);
+            refreshDisplay();
+        } else if (mode == MODE_CLOCK_GAME_OVER) {
             reset_timers();
-        } else {
+        } else if (mode == MODE_CLOCK_PREGAME) {
+            if (running_match_id == 0) {
+                running_match_id = Integer.parseInt(Main.getConfigs().get(Configs.MATCHID)) + 1;
+                Main.getConfigs().put(Configs.MATCHID, Integer.toString(running_match_id));
+            }
+            if (min_stat_sent_time > 0) statistics.addEvent(Statistics.EVENT_START_GAME);
+            mode = MODE_CLOCK_GAME_RUNNING;
             refreshDisplay();
         }
-
+        lastPIT = System.currentTimeMillis();
     }
 
     private void reset_timers() {
         flag = FLAG_STATE_NEUTRAL;
+        mode = MODE_CLOCK_PREGAME;
         pole.setRGB(Color.white.getRed(), Color.white.getGreen(), Color.white.getBlue());
         pole.setText("Flagge");
         time = preset_times[preset_position]; // aktuelle Wahl minus 1 Sekunde. Dann wird aus 5 Stunden -> 04:59:59
@@ -275,7 +286,8 @@ public class Game implements Runnable {
             display_blue.setTime(time_blue);
             display_red.setTime(time_red);
 
-            if (min_stat_sent_time > 0 && running_match_id > 0) statistics.setTimes(running_match_id, time, time_blue, time_red);
+            if (min_stat_sent_time > 0 && running_match_id > 0)
+                statistics.setTimes(running_match_id, time, time_blue, time_red);
 
             display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
             display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
@@ -284,23 +296,22 @@ public class Game implements Runnable {
             Main.getPinHandler().off(ledRedButton.getName());
             Main.getPinHandler().off(ledBlueButton.getName());
 
-            if (mode == MODE_CLOCK_STANDBY) {
-                logger.debug("\n" +
-                        "  ____  _                  _ ____        \n" +
-                        " / ___|| |_ __ _ _ __   __| | __ ) _   _ \n" +
-                        " \\___ \\| __/ _` | '_ \\ / _` |  _ \\| | | |\n" +
-                        "  ___) | || (_| | | | | (_| | |_) | |_| |\n" +
-                        " |____/ \\__\\__,_|_| |_|\\__,_|____/ \\__, |\n" +
-                        "                                   |___/ ");
+            if (mode == MODE_CLOCK_PREGAME || mode == MODE_CLOCK_GAME_PAUSED) {
+                logger.debug("PREGAME");
                 button_switch_mode.setIcon(FrameDebug.IconPlay);
                 Main.getPinHandler().off(ledRedButton.getName());
                 Main.getPinHandler().off(ledBlueButton.getName());
                 Main.getPinHandler().setScheme(ledStandbyActive.getName(), "∞;1000,1000");
             }
 
-            if (mode == MODE_CLOCK_ACTIVE) {
+            if (mode == MODE_CLOCK_GAME_PAUSED) {
+                display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+            }
+
+            if (mode == MODE_CLOCK_GAME_RUNNING) {
                 button_switch_mode.setIcon(FrameDebug.IconPause);
                 Main.getPinHandler().setScheme(ledStandbyActive.getName(), "∞;250,250");
+                display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
 
                 if (flag == FLAG_STATE_NEUTRAL) {
                     logger.debug("\n" +
@@ -341,7 +352,7 @@ public class Game implements Runnable {
                 }
             }
 
-            if (mode == MODE_CLOCK_GAMEOVER) {
+            if (mode == MODE_CLOCK_GAME_OVER) {
                 // das hier mache ich, damit die Zeiten nur auf Sekunden Ebene verglichen werden.
                 DateTime dateTime_red = new DateTime(time_red, DateTimeZone.UTC);
                 DateTime dateTime_blue = new DateTime(time_blue, DateTimeZone.UTC);
@@ -400,7 +411,7 @@ public class Game implements Runnable {
         while (!thread.isInterrupted()) {
             try {
 
-                if (mode == MODE_CLOCK_ACTIVE) {
+                if (mode == MODE_CLOCK_GAME_RUNNING) {
                     long now = System.currentTimeMillis();
                     long diff = now - lastPIT;
                     lastPIT = now;
@@ -409,8 +420,13 @@ public class Game implements Runnable {
                     time = Math.max(time, 0);
                     display_white.setTime(time);
 
-                    if (min_stat_sent_time > 0 && now - lastStatsSent > min_stat_sent_time) {
-                        statistics.sendStats();
+                    // Statistiken, wenn gewünscht
+                    if (min_stat_sent_time > 0) {
+                        statistics.setTimes(running_match_id, time, time_blue, time_red);
+                        if (now - lastStatsSent > min_stat_sent_time) {
+                            statistics.sendStats();
+                            lastStatsSent = now;
+                        }
                     }
 
                     if (flag == FLAG_STATE_BLUE) {
@@ -430,7 +446,7 @@ public class Game implements Runnable {
                                 " | |_| |/ ___ \\| |  | | |___  | |_| |\\ V / | |___|  _ < \n" +
                                 "  \\____/_/   \\_\\_|  |_|_____|  \\___/  \\_/  |_____|_| \\_\\\n" +
                                 "                                                        ");
-                        mode = MODE_CLOCK_GAMEOVER;
+                        mode = MODE_CLOCK_GAME_OVER;
                         if (min_stat_sent_time > 0) statistics.addEvent(Statistics.EVENT_GAME_OVER);
                         refreshDisplay();
                     }

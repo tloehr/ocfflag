@@ -61,7 +61,7 @@ public class Display7Segments4Digits {
 
             lblSegment.setToolTipText(dateTime.toString("HH:mm:ss"));
             String t = minutes + (colon ? ":" : " ") + seconds;
-            logger.debug(t);
+//            logger.debug(t);
             lblSegment.setText(t);
         }
 
@@ -72,7 +72,7 @@ public class Display7Segments4Digits {
             boolean[] dots = new boolean[]{hours == 4, hours >= 3, hours >= 2, hours >= 1,};
             int[] timeDigits = new int[]{minutes / 10, minutes % 10, seconds / 10, seconds % 10};
 //            String[] timeString = .split("");
-            logger.debug("Setting Gametime to: " + dateTime.toString("mmss"));
+//            logger.debug("Setting Gametime to: " + dateTime.toString("mmss"));
 
 
             fullDisplay(timeDigits, dots);
