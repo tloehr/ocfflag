@@ -36,31 +36,36 @@ public class Main {
     private static final int DISPLAY_RED = 0x72;
     private static final int DISPLAY_WHITE = 0x70;
 
-    // Rechte Seite des JP8 Header
-    private static final Pin BUTTON_STANDBY_ACTIVE = RaspiPin.GPIO_06; // 01
-    private static final Pin BUTTON_PRESET_PREV = RaspiPin.GPIO_03; // 04
-    private static final Pin BUTTON_PRESET_NEXT = RaspiPin.GPIO_04; // 05
-    private static final Pin BUTTON_RESET = RaspiPin.GPIO_01; // 06
-    private static final Pin BUTTON_RED = RaspiPin.GPIO_02; // 10
-    private static final Pin BUTTON_BLUE = RaspiPin.GPIO_00; // 11
-
-    // RGB Flagge
-    private static final Pin POLE_RGB_RED = RaspiPin.GPIO_21;
-    private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_22;
-    private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_23;
-
-    // LEDs in den Tasten
-    private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_26;
-    private static final Pin LED_RED_BUTTON = RaspiPin.GPIO_27;
-
     // Linke Seite des JP8 Header
     // Sirenen
-    private static final Pin SIREN_AIR = RaspiPin.GPIO_12; // 00
-    private static final Pin SIREN_COLOR_CHANGE = RaspiPin.GPIO_13; // 02
+    // Relais Screw Header
+    private static final Pin SIREN_AIR = RaspiPin.GPIO_00; // 12
+    private static final Pin SIREN_COLOR_CHANGE = RaspiPin.GPIO_02; //13
+
+    // Klemmleiste
+    private static final Pin BUTTON_STANDBY_ACTIVE = RaspiPin.GPIO_03; // 06
+    private static final Pin BUTTON_PRESET_PREV = RaspiPin.GPIO_12; // 03
+    private static final Pin BUTTON_PRESET_NEXT = RaspiPin.GPIO_13; // 04
+    private static final Pin BUTTON_RESET = RaspiPin.GPIO_14; // 01
+    private static final Pin BUTTON_RED = RaspiPin.GPIO_21; // 02
+    private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22; // 00
+
+    // LEDs in den Tasten
+    private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_23; // 26
+    private static final Pin LED_RED_BUTTON = RaspiPin.GPIO_24; // 27
 
     // LEDs
-    private static final Pin LED_STANDBY_ACTIVE_BUTTON = RaspiPin.GPIO_10; // 03
-    private static final Pin LED_STATS_SENT = RaspiPin.GPIO_11; // 12
+    private static final Pin LED_STANDBY_ACTIVE_BUTTON = RaspiPin.GPIO_25; // 10
+    private static final Pin LED_STATS_SENT = RaspiPin.GPIO_27; // 11
+
+
+    // RGB Flagge
+    // RJ45
+    private static final Pin POLE_RGB_RED = RaspiPin.GPIO_01; // 21
+    private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_04; // 22
+    private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_05; // 23
+
+
 
 
 
@@ -149,7 +154,7 @@ public class Main {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 
             pinHandler.off();
-            if (GPIO != null){
+            if (GPIO != null) {
                 SoftPwm.softPwmStop(POLE_RGB_RED.getAddress());
                 SoftPwm.softPwmStop(POLE_RGB_GREEN.getAddress());
                 SoftPwm.softPwmStop(POLE_RGB_BLUE.getAddress());
@@ -176,7 +181,6 @@ public class Main {
         pinHandler = new PinHandler();
         configs = new Configs();
     }
-
 
 
     /**
