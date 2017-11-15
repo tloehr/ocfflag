@@ -1,12 +1,14 @@
 package de.flashheart.ocfflag.mechanics;
 
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
+import java.util.Date;
+import java.util.Locale;
 import java.util.Stack;
 
 public class Statistics {
@@ -26,6 +28,7 @@ public class Statistics {
     public static final int EVENT_RESULT_RED_WON = 7; // wenn das spiel vorzeitig beendet wird
     public static final int EVENT_RESULT_BLUE_WON = 8; // wenn das spiel vorzeitig beendet wird
     public static final int EVENT_RESULT_DRAW = 9; // wenn das spiel vorzeitig beendet wird
+
 
     public static final String[] EVENTS = new String[]{"EVENT_PAUSE", "EVENT_RESUME", "EVENT_START_GAME",
             "EVENT_BLUE_ACTIVATED", "EVENT_RED_ACTIVATED", "EVENT_GAME_OVER", "EVENT_GAME_ABORTED",
@@ -58,22 +61,22 @@ public class Statistics {
         this.time = time;
         this.time_blue = time_blue;
         this.time_red = time_red;
-        logger.debug(String.format("MatchID: %s | Time: %s | Blue: %s | Red: %s",
-                matchid,
-                Tools.formatLongTime(time),
-                Tools.formatLongTime(time_blue),
-                Tools.formatLongTime(time_red))
-        );
+//        logger.debug(String.format("MatchID: %s | Time: %s | Blue: %s | Red: %s",
+//                matchid,
+//                Tools.formatLongTime(time),
+//                Tools.formatLongTime(time_blue),
+//                Tools.formatLongTime(time_red))
+//        );
     }
 
     public void sendStats() {
-        logger.debug(String.format("MatchID: %s | Time: %s | Blue: %s | Red: %s",
-                matchid,
-                Tools.formatLongTime(time),
-                Tools.formatLongTime(time_blue),
-                Tools.formatLongTime(time_red))
-        );
-        logger.debug(StringUtils.join(stackEvents));
+//        logger.debug(String.format("MatchID: %s | Time: %s | Blue: %s | Red: %s",
+//                matchid,
+//                Tools.formatLongTime(time),
+//                Tools.formatLongTime(time_blue),
+//                Tools.formatLongTime(time_red))
+//        );
+        logger.debug(toPHP());
     }
 
     public void addEvent(int event) {
@@ -109,21 +112,24 @@ public class Statistics {
         }
 
         public String toPHPArray() {
-            return "$event('pit' = '" + pit.toString(DateTimeFormat.mediumDateTime()) + "','event' = '" + EVENTS[event] + "')";
+            return "   array('pit' => '" + pit.toString("HH:mm:ss") + "','event' => '" + EVENTS[event] + "'),\n";
         }
     }
 
     private String toPHP() {
         String php = "<?php\n";
 
-        php += "$game['matchid'] = " + matchid + "\n";
-        php += "$game['time'] = " + Tools.formatLongTime(time) + "\n";
-        php += "$game['time_blue'] = " + Tools.formatLongTime(time_blue) + "\n";
-        php += "$game['time_red'] = " + Tools.formatLongTime(time_red) + "\n";
+        php += "$game['flagname'] = '" + Main.getConfigs().get(Configs.FLAGNAME) + "';\n";
+        php += "$game['uuid'] = '" + Main.getConfigs().get(Configs.MYUUID) + "';\n";
+        php += "$game['matchid'] = '" + matchid + "';\n";
+        php += "$game['timestamp'] = '" + DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(new DateTime()) + "';\n";
+        php += "$game['time'] = '" + Tools.formatLongTime(time, "HH:mm:ss") + "';\n";
+        php += "$game['time_blue'] = '" + Tools.formatLongTime(time_blue, "HH:mm:ss") + "';\n";
+        php += "$game['time_red'] = '" + Tools.formatLongTime(time_red, "HH:mm:ss") + "';\n";
 
         php += "$game['events'] = array(\n";
         for (GameEvent event : stackEvents) {
-            php += event.toPHPArray() + ",";
+            php += event.toPHPArray();
         }
 
         php += ");\n";
