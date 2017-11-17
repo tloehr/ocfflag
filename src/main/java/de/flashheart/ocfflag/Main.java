@@ -55,8 +55,10 @@ public class Main {
     private static final Pin LED_RED_BUTTON = RaspiPin.GPIO_24; // 27
 
     // LEDs
-    private static final Pin LED_STANDBY_ACTIVE_BUTTON = RaspiPin.GPIO_25; // 10
-    private static final Pin LED_STATS_SENT = RaspiPin.GPIO_27; // 11
+    private static final Pin LED_GREEN = RaspiPin.GPIO_25; // 10
+    private static final Pin LED_WHITE = RaspiPin.GPIO_27; // 11
+
+
 
 
     // RGB Flagge
@@ -73,7 +75,7 @@ public class Main {
     private static MyAbstractButton button_blue, button_red, button_reset, button_standby_active, button_preset_minus, button_preset_plus, button_quit;
     private static MyRGBLed pole;
 
-    private static MyPin ledRedButton, ledBlueButton, ledStandbyActive, ledStatsSent;
+    private static MyPin ledRedButton, ledBlueButton, ledGreen, ledWhite;
 
     private static PinHandler pinHandler; // One handler, to rule them all...
     private static Configs configs;
@@ -115,8 +117,8 @@ public class Main {
 
         ledBlueButton = new MyPin(GPIO, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), "ledBlueButton");
         ledRedButton = new MyPin(GPIO, LED_RED_BUTTON, frameDebug.getLedRedButton(), "ledRedButton");
-        ledStandbyActive = new MyPin(GPIO, LED_STANDBY_ACTIVE_BUTTON, frameDebug.getLedStandbyActive(), "ledStandbyActive");
-        ledStatsSent = new MyPin(GPIO, LED_STATS_SENT, frameDebug.getLedStatsSent(), "ledStatsSent");
+        ledGreen = new MyPin(GPIO, LED_GREEN, frameDebug.getLedStandbyActive(), "ledGreen");
+        ledWhite = new MyPin(GPIO, LED_WHITE, frameDebug.getLedStatsSent(), "ledWhite");
 
         // später
         MyPin siren1 = new MyPin(GPIO, SIREN_AIR, null, "sirenAir");
@@ -128,13 +130,10 @@ public class Main {
 
         pinHandler.add(ledRedButton);
         pinHandler.add(ledBlueButton);
-        pinHandler.add(ledStandbyActive);
-        pinHandler.add(ledStatsSent);
+        pinHandler.add(ledGreen);
+        pinHandler.add(ledWhite);
 
-        pinHandler.setScheme(ledStatsSent.getName(), "∞;500,500");
-
-
-        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_standby_active, button_preset_minus, button_preset_plus, button_quit, pole, ledRedButton, ledBlueButton, ledStandbyActive, ledStatsSent);
+        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_standby_active, button_preset_minus, button_preset_plus, button_quit, pole, ledRedButton, ledBlueButton, ledGreen, ledWhite);
         game.run();
 
 
@@ -213,6 +212,7 @@ public class Main {
     public static FrameDebug getFrameDebug() {
         return frameDebug;
     }
+
 
     public static Configs getConfigs() {
         return configs;

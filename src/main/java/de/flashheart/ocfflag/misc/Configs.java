@@ -21,6 +21,8 @@ public class Configs {
     public static final String FTPPORT = "ftpport";
     public static final String FTPUSER = "ftpuser";
     public static final String FTPPWD = "ftppwd";
+    public static final String FTPS = "ftps";
+    public static final String FTPREMOTEPATH = "ftpremotepath";
     public static final String MIN_STAT_SEND_TIME = "sendstats";
     public static final String FLAGNAME = "flagname";
     public static final String GAMETIME = "gametime";
@@ -68,8 +70,13 @@ public class Configs {
         saveConfigs();
     }
 
+    public boolean isFTPComplete() {
+        return configs.containsKey(FTPUSER) && configs.containsKey(FTPHOST) && configs.containsKey(FTPPORT) && configs.containsKey(FTPPWD) && configs.containsKey(FTPS) && configs.containsKey(FTPREMOTEPATH);
+    }
+
+
     public String get(Object key) {
-        return configs.get(key).toString();
+        return configs.containsKey(key) ? configs.get(key).toString() : "null";
     }
 
     private void saveConfigs() {

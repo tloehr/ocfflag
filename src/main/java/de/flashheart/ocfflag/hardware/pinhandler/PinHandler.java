@@ -112,7 +112,7 @@ public class PinHandler {
     }
 
     /**
-     * Setzt ein Blink Schema für dieses Relais. Die Syntax ist wie folgt:
+     * Setzt ein Blink Schema für diesen Pin. Die Syntax ist wie folgt:
      * "<anzahl_wiederholung/>;(millis-on;millis-off)*", wobei ()* bedeutet, dass diese Sequenz so oft wie
      * gewünscht wiederholt werden kann. Danach wird die Gesamtheit <anzahl_wiederholungen/> mal wiederholt
      * wird. Unendliche Wiederholungen werden einfach durch Long.MAX_VALUE
@@ -126,6 +126,8 @@ public class PinHandler {
         try {
             PinBlinkModel pinBlinkModel = pinMap.get(name);
             if (pinBlinkModel != null) {
+
+
 
                 if (futures.containsKey(name) && !futures.get(name).isDone()) { // but only if it runs
                     logger.debug("terminating: " + name);

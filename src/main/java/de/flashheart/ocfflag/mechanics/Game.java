@@ -10,6 +10,8 @@ import de.flashheart.ocfflag.hardware.abstraction.MyPin;
 import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
 import de.flashheart.ocfflag.misc.Configs;
+import de.flashheart.ocfflag.misc.Observable;
+import de.flashheart.ocfflag.misc.Observer;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -34,8 +36,8 @@ public class Game implements Runnable {
     private final MyRGBLed pole;
     private final MyPin ledRedButton;
     private final MyPin ledBlueButton;
-    private final MyPin ledStatsSent;
-    private final MyPin ledStandbyActive;
+    private final MyPin ledWhite1;
+    private final MyPin ledGreen;
     private final MyAbstractButton button_quit;
     private int mode = MODE_CLOCK_PREGAME;
     private int running_match_id = 0;
@@ -93,15 +95,15 @@ public class Game implements Runnable {
                 MyRGBLed pole, MyPin ledRedButton,
                 MyPin ledBlueButton,
                 MyPin ledStandbyActive,
-                MyPin ledStatsSent) {
+                MyPin ledWhite) {
         this.button_quit = button_quit;
         thread = new Thread(this);
         logger.setLevel(Main.getLogLevel());
         this.pole = pole;
         this.ledRedButton = ledRedButton;
         this.ledBlueButton = ledBlueButton;
-        this.ledStandbyActive = ledStandbyActive;
-        this.ledStatsSent = ledStatsSent;
+        this.ledGreen = ledStandbyActive;
+        this.ledWhite1 = ledWhite;
         this.display_blue = display_blue;
         this.display_red = display_red;
         this.display_white = display_white;
@@ -114,6 +116,15 @@ public class Game implements Runnable {
 
         min_stat_sent_time = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
         statistics = new Statistics();
+        statistics.addObserver(new Observer<Boolean>() {
+            @Override
+            public void update(Observable<Boolean> object, Boolean success) {
+                if (success)
+                    Main.getPinHandler().setScheme(ledWhite1.getName(), "∞;100,1000");
+                else
+                    Main.getPinHandler().off();
+            }
+        });
         preset_position = Integer.parseInt(Main.getConfigs().get(Configs.GAMETIME));
         initGame();
     }
@@ -299,7 +310,7 @@ public class Game implements Runnable {
                 button_switch_mode.setIcon(FrameDebug.IconPlay);
                 Main.getPinHandler().off(ledRedButton.getName());
                 Main.getPinHandler().off(ledBlueButton.getName());
-                Main.getPinHandler().setScheme(ledStandbyActive.getName(), "∞;1000,1000");
+                Main.getPinHandler().setScheme(ledGreen.getName(), "∞;1000,1000");
             }
 
             if (mode == MODE_CLOCK_GAME_PAUSED) {
@@ -308,7 +319,7 @@ public class Game implements Runnable {
 
             if (mode == MODE_CLOCK_GAME_RUNNING) {
                 button_switch_mode.setIcon(FrameDebug.IconPause);
-                Main.getPinHandler().setScheme(ledStandbyActive.getName(), "∞;250,250");
+                Main.getPinHandler().setScheme(ledGreen.getName(), "∞;250,250");
                 display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
 
                 if (flag == FLAG_STATE_NEUTRAL) {

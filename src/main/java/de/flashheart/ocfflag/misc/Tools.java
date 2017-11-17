@@ -1,6 +1,5 @@
 package de.flashheart.ocfflag.misc;
 
-import com.sun.istack.internal.Nullable;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -90,7 +89,7 @@ public class Tools {
         * @param message
         * @return replaced message or the original message if there is no appropriate language key.
         */
-       public static String xx(String message, @Nullable Object... args) {
+       public static String xx(String message, Object... args) {
            if (message == null || message.isEmpty()) return "";
 
            return message;
