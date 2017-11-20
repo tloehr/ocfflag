@@ -92,14 +92,14 @@ public class FrameDebug extends JFrame {
                 }
             });
             panel1.setLayout(new FormLayout(
-                "$rgap, $lcgap, pref:grow, $lcgap, $rgap, $lcgap, 62dlu:grow, $lcgap, $rgap, $lcgap, pref:grow, $lcgap, $rgap",
-                "$rgap, $lgap, fill:22dlu, $ugap, default:grow, 2*($lgap, default)"));
+                "$rgap, $lcgap, pref:grow, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow, $lcgap, $rgap",
+                "$rgap, $lgap, fill:22dlu:grow, $rgap, default:grow, $lgap, fill:default:grow, $lgap, default"));
 
             //---- btnBlue ----
             btnBlue.setText("Blue");
             btnBlue.setForeground(Color.blue);
             btnBlue.setFont(btnBlue.getFont().deriveFont(btnBlue.getFont().getStyle() | Font.ITALIC, 12f));
-            panel1.add(btnBlue, CC.xy(3, 3));
+            panel1.add(btnBlue, CC.xy(3, 3, CC.FILL, CC.DEFAULT));
 
             //---- lblPole ----
             lblPole.setOpaque(true);
@@ -114,7 +114,7 @@ public class FrameDebug extends JFrame {
             btnRed.setText("Red");
             btnRed.setForeground(Color.red);
             btnRed.setFont(btnRed.getFont().deriveFont(btnRed.getFont().getStyle() | Font.ITALIC, 12f));
-            panel1.add(btnRed, CC.xy(11, 3));
+            panel1.add(btnRed, CC.xy(11, 3, CC.FILL, CC.DEFAULT));
 
             //======== panel4 ========
             {
@@ -162,40 +162,40 @@ public class FrameDebug extends JFrame {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                    "3*(default)",
-                    "default:grow, $lgap, default"));
+                    "3*(default:grow)",
+                    "fill:default:grow, $lgap, fill:default:grow"));
 
                 //---- btnPresetMinus ----
                 btnPresetMinus.setText(null);
                 btnPresetMinus.setIcon(new ImageIcon(getClass().getResource("/artwork/player_start.png")));
                 btnPresetMinus.setToolTipText("Previous Preset Time");
-                panel2.add(btnPresetMinus, CC.xy(1, 1));
+                panel2.add(btnPresetMinus, CC.xy(1, 1, CC.FILL, CC.FILL));
 
                 //---- btnReset ----
                 btnReset.setText(null);
                 btnReset.setIcon(new ImageIcon(getClass().getResource("/artwork/player_eject.png")));
                 btnReset.setToolTipText("Reset");
-                panel2.add(btnReset, CC.xy(2, 1));
+                panel2.add(btnReset, CC.xy(2, 1, CC.FILL, CC.FILL));
 
                 //---- btnPresetPlus ----
                 btnPresetPlus.setText(null);
                 btnPresetPlus.setIcon(new ImageIcon(getClass().getResource("/artwork/player_end1.png")));
                 btnPresetPlus.setToolTipText("Next Preset Time");
-                panel2.add(btnPresetPlus, CC.xy(3, 1));
+                panel2.add(btnPresetPlus, CC.xy(3, 1, CC.FILL, CC.FILL));
 
                 //---- btnSwitchMode ----
                 btnSwitchMode.setText(null);
                 btnSwitchMode.setIcon(new ImageIcon(getClass().getResource("/artwork/player_play.png")));
                 btnSwitchMode.setToolTipText("Standby / Active");
-                panel2.add(btnSwitchMode, CC.xywh(1, 3, 3, 1));
+                panel2.add(btnSwitchMode, CC.xywh(1, 3, 3, 1, CC.FILL, CC.FILL));
             }
-            panel1.add(panel2, CC.xy(7, 7, CC.CENTER, CC.DEFAULT));
+            panel1.add(panel2, CC.xy(7, 7, CC.FILL, CC.FILL));
 
             //---- btnQuit ----
             btnQuit.setText(null);
             btnQuit.setIcon(new ImageIcon(getClass().getResource("/artwork/exit32.png")));
             btnQuit.setToolTipText("Programm beenden");
-            panel1.add(btnQuit, CC.xywh(3, 7, 3, 1, CC.LEFT, CC.DEFAULT));
+            panel1.add(btnQuit, CC.xy(3, 7, CC.FILL, CC.DEFAULT));
 
             //======== panel3 ========
             {

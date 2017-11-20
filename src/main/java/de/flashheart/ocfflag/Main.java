@@ -39,27 +39,24 @@ public class Main {
     // Linke Seite des JP8 Header
     // Sirenen
     // Relais Screw Header
-    private static final Pin SIREN_AIR = RaspiPin.GPIO_00; // 12
-    private static final Pin SIREN_COLOR_CHANGE = RaspiPin.GPIO_02; //13
+    private static final Pin SIREN_AIR = RaspiPin.GPIO_00;
+    private static final Pin SIREN_COLOR_CHANGE = RaspiPin.GPIO_02;
 
     // Klemmleiste
-    private static final Pin BUTTON_STANDBY_ACTIVE = RaspiPin.GPIO_03; // 06
-    private static final Pin BUTTON_PRESET_PREV = RaspiPin.GPIO_12; // 03
-    private static final Pin BUTTON_PRESET_NEXT = RaspiPin.GPIO_13; // 04
-    private static final Pin BUTTON_RESET = RaspiPin.GPIO_14; // 01
-    private static final Pin BUTTON_RED = RaspiPin.GPIO_21; // 02
-    private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22; // 00
+    private static final Pin BUTTON_STANDBY_ACTIVE = RaspiPin.GPIO_03;
+    private static final Pin BUTTON_PRESET_PREV = RaspiPin.GPIO_12;
+    private static final Pin BUTTON_PRESET_NEXT = RaspiPin.GPIO_13;
+    private static final Pin BUTTON_RESET = RaspiPin.GPIO_14; 
+    private static final Pin BUTTON_RED = RaspiPin.GPIO_21;
+    private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
 
     // LEDs in den Tasten
-    private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_23; // 26
-    private static final Pin LED_RED_BUTTON = RaspiPin.GPIO_24; // 27
+    private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_23;
+    private static final Pin LED_RED_BUTTON = RaspiPin.GPIO_24;
 
     // LEDs
-    private static final Pin LED_GREEN = RaspiPin.GPIO_25; // 10
-    private static final Pin LED_WHITE = RaspiPin.GPIO_27; // 11
-
-
-
+    private static final Pin LED_GREEN = RaspiPin.GPIO_25;
+    private static final Pin LED_WHITE = RaspiPin.GPIO_27;
 
     // RGB Flagge
     // RJ45

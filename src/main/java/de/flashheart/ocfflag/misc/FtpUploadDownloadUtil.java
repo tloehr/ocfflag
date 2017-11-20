@@ -1,7 +1,10 @@
 package de.flashheart.ocfflag.misc;
 
+import de.flashheart.ocfflag.Main;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -42,24 +45,25 @@ public class FtpUploadDownloadUtil {
         FTPClient ftpClient = new FTPClient();
         FileOutputStream fos = null;
         boolean resultOk = true;
-
+        Logger logger = Logger.getLogger(FtpUploadDownloadUtil.class);
+        logger.setLevel(Main.getLogLevel());
         try {
             ftpClient.connect(host, port);
             if (showMessages) {
-                System.out.println(ftpClient.getReplyString());
+                logger.debug(ftpClient.getReplyString());
             }
             resultOk &= ftpClient.login(usr, pwd);
             if (showMessages) {
-                System.out.println(ftpClient.getReplyString());
+                logger.debug(ftpClient.getReplyString());
             }
             fos = new FileOutputStream(localResultFile);
             resultOk &= ftpClient.retrieveFile(remoteSourceFile, fos);
             if (showMessages) {
-                System.out.println(ftpClient.getReplyString());
+                logger.debug(ftpClient.getReplyString());
             }
             resultOk &= ftpClient.logout();
             if (showMessages) {
-                System.out.println(ftpClient.getReplyString());
+                logger.debug(ftpClient.getReplyString());
             }
         } finally {
             try {
@@ -84,30 +88,26 @@ public class FtpUploadDownloadUtil {
         FTPClient ftpClient = new FTPClient();
         FileInputStream fis = null;
         boolean resultOk = true;
-
+        Logger logger = Logger.getLogger(FtpUploadDownloadUtil.class);
+        logger.setLevel(Main.getLogLevel());
         try {
             ftpClient.connect(host, port);
             if (showMessages) {
-                System.out.println(ftpClient.getReplyString());
+                logger.debug(ftpClient.getReplyString());
             }
             resultOk &= ftpClient.login(usr, pwd);
             if (showMessages) {
-                System.out.println(ftpClient.getReplyString());
+                logger.debug(ftpClient.getReplyString());
             }
-
-            // archive Verzeichnis erstellen, wenn nötig
-            ftpClient.makeDirectory(remotePath + "/archive");
-            // todo: das muss in eine art FTP Init Methode. Wo auch die MOVES gemacht werden.
-
 
             fis = new FileInputStream(localSourceFile);
             resultOk &= ftpClient.storeFile(remotePath + "/" + remoteResultFile, fis);
             if (showMessages) {
-                System.out.println(ftpClient.getReplyString());
+                logger.debug(ftpClient.getReplyString());
             }
             resultOk &= ftpClient.logout();
             if (showMessages) {
-                System.out.println(ftpClient.getReplyString());
+                logger.debug(ftpClient.getReplyString());
             }
         } finally {
             try {
@@ -122,41 +122,60 @@ public class FtpUploadDownloadUtil {
     }
 
     /**
-     * FTP-Client-Upload.
+     * Richtet das FTP Verzeichnis ein.
+     * Verschiebt evtl. kaputte PHP Statistiken in das Archivverzeichnis.
+     * Dabei benennt es die Datei um.
      *
      * @return true falls ok
      */
-    public static boolean mkd(String pathname,
-                              String host, int port, String usr, String pwd, boolean showMessages) throws IOException {
+    public static boolean initFTPDir(String host, int port, String usr, String pwd) throws IOException {
         FTPClient ftpClient = new FTPClient();
-        FileInputStream fis = null;
-        boolean resultOk = true;
 
+        boolean resultOk = true;
+        Logger logger = Logger.getLogger(FtpUploadDownloadUtil.class);
+        logger.setLevel(Main.getLogLevel());
         try {
             ftpClient.connect(host, port);
-            if (showMessages) {
-                System.out.println(ftpClient.getReplyString());
-            }
+
+            logger.debug(ftpClient.getReplyString());
+
             resultOk &= ftpClient.login(usr, pwd);
-            if (showMessages) {
-                System.out.println(ftpClient.getReplyString());
-            }
 
+            logger.debug(ftpClient.getReplyString());
 
-            System.err.println(ftpClient.mkd(pathname));
-            if (showMessages) {
-                System.out.println(ftpClient.getReplyString());
-            }
-            resultOk &= ftpClient.logout();
-            if (showMessages) {
-                System.out.println(ftpClient.getReplyString());
+            if (resultOk) {
+                String uuid = Main.getConfigs().get(Configs.MYUUID);
+                String remotepath = Main.getConfigs().get(Configs.FTPREMOTEPATH);
+                String remoteFile = remotepath + "/" + uuid + ".php";
+                String localFile = Tools.getWorkingPath() + File.separator + uuid + ".php";
+                String archivepath = remotepath + "/archive";
+
+                // archive Verzeichnis erstellen, wenn nötig
+                resultOk &= ftpClient.makeDirectory(archivepath);
+
+                // Gibts noch eine aktive Statistik Datei ?
+                FileOutputStream fos = new FileOutputStream(localFile);
+                boolean remoteFileFixed = ftpClient.retrieveFile(remoteFile, fos);
+
+                if (remoteFileFixed) {
+                    String modificationTime = ftpClient.getModificationTime(remoteFile);
+                    fos.close();
+
+                    ftpClient.deleteFile(remoteFile);
+
+                    FileInputStream fis = new FileInputStream(localFile);
+
+                    hier gehts weiter
+                    resultOk &= ftpClient.storeFile(archivepath + "/" + uuid + ".php", fis);
+
+                    logger.debug(ftpClient.getReplyString());
+
+                    resultOk &= ftpClient.logout();
+                    logger.debug(ftpClient.getReplyString());
+                }
             }
         } finally {
-            try {
-                if (fis != null) {
-                    fis.close();
-                }
-            } catch (IOException e) {/* nothing to do */}
+
             ftpClient.disconnect();
         }
 

@@ -35,7 +35,7 @@ public class Configs {
         // defaults
         configs.put(MATCHID, "1");
         configs.put(LOGLEVEL, "debug");
-        configs.put(FLAGNAME, "Eine brandneue OCF Flagge");
+        configs.put(FLAGNAME, "OCF Flagge #" + new java.util.Random().nextInt());
         configs.put(GAMETIME, "0");
         configs.put(BRIGHTNESS_WHITE, "10");
         configs.put(BRIGHTNESS_BLUE, "10");

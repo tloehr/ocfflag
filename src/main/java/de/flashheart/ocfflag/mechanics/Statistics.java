@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
+import java.util.Random;
 import java.util.Stack;
 
 public class Statistics extends Observable<Boolean> {
@@ -25,7 +26,7 @@ public class Statistics extends Observable<Boolean> {
     private long time, time_blue, time_red;
 
     private final Logger logger = Logger.getLogger(getClass());
-
+    private Random random;
 
     public static final int EVENT_PAUSE = 0;
     public static final int EVENT_RESUME = 1;
@@ -59,6 +60,7 @@ public class Statistics extends Observable<Boolean> {
     }
 
     public Statistics() {
+        random = new Random();
         logger.setLevel(Main.getLogLevel());
         stackEvents = new Stack<>();
         min_stat_sent_time = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
@@ -68,11 +70,15 @@ public class Statistics extends Observable<Boolean> {
     private boolean ftpUpload() throws IOException {
         if (!Main.getConfigs().isFTPComplete()) return false;
 
-        File tempPHPFile = File.createTempFile("ocfflag", "php");
+        File tempPHPFile = File.createTempFile("ocfflag", ".php");
         tempPHPFile.deleteOnExit();
         FileUtils.writeStringToFile(tempPHPFile, toPHP(), "UTF-8");
 
         String remoteFile = stackEvents.get(0).getPit().getMillis()+"-" + Main.getConfigs().get(Configs.MYUUID) + ".php";
+
+        // Das hier war um die Folgen eines Netzwerkabbruchs zu testen.
+//        String host = random.nextBoolean() ? Main.getConfigs().get(Configs.FTPHOST) : "wronghost.flashheart.de";
+//        logger.debug("RANDOM HOST: "+host);
 
         boolean success = FtpUploadDownloadUtil.upload(tempPHPFile.getAbsolutePath(), Main.getConfigs().get(Configs.FTPREMOTEPATH) + "/", remoteFile,
                 Main.getConfigs().get(Configs.FTPHOST),
@@ -127,6 +133,8 @@ public class Statistics extends Observable<Boolean> {
                         success = false;
                     }
 
+                    if (!success) logger.info("FTP Upload failed");
+
                     return success;
                 }
 
@@ -143,10 +151,10 @@ public class Statistics extends Observable<Boolean> {
         }
     }
 
-    public void addEvent(int event) {
-        if (min_stat_sent_time == 0) return;
-        logger.debug(EVENTS[event]);
+    public long addEvent(int event) {
         DateTime now = new DateTime();
+        if (min_stat_sent_time == 0) return now.getMillis();
+        logger.debug(EVENTS[event]);
         stackEvents.push(new GameEvent(now, event));
 
         if (event == EVENT_GAME_ABORTED || event == EVENT_GAME_OVER) {
@@ -161,6 +169,7 @@ public class Statistics extends Observable<Boolean> {
         if (event == EVENT_BLUE_ACTIVATED) flagcolor = "blue";
 
         sendStats(); // jedes Ereignis wird gesendet.
+        return now.getMillis();
     }
 
     private class GameEvent {

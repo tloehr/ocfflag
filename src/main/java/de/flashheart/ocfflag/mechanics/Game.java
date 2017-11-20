@@ -199,7 +199,7 @@ public class Game implements Runnable {
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != FLAG_STATE_BLUE) {
                 flag = FLAG_STATE_BLUE;
-                statistics.addEvent(Statistics.EVENT_BLUE_ACTIVATED);
+                lastStatsSent = statistics.addEvent(Statistics.EVENT_BLUE_ACTIVATED);
                 refreshDisplay();
             }
         } else {
@@ -211,7 +211,7 @@ public class Game implements Runnable {
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != FLAG_STATE_RED) {
                 flag = FLAG_STATE_RED;
-                statistics.addEvent(Statistics.EVENT_RED_ACTIVATED);
+                lastStatsSent = statistics.addEvent(Statistics.EVENT_RED_ACTIVATED);
                 refreshDisplay();
             }
 
@@ -222,7 +222,7 @@ public class Game implements Runnable {
 
     private void button_reset_pressed() {
         if (mode != MODE_CLOCK_GAME_RUNNING) {
-            statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
+            lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
             reset_timers();
         } else {
             logger.debug("RUNNING: IGNORED");
@@ -254,11 +254,11 @@ public class Game implements Runnable {
     private void buttonStandbyActivePressed() {
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             mode = MODE_CLOCK_GAME_PAUSED;
-            statistics.addEvent(Statistics.EVENT_PAUSE);
+            lastStatsSent = statistics.addEvent(Statistics.EVENT_PAUSE);
             refreshDisplay();
         } else if (mode == MODE_CLOCK_GAME_PAUSED) {
             mode = MODE_CLOCK_GAME_RUNNING;
-            statistics.addEvent(Statistics.EVENT_RESUME);
+            lastStatsSent = statistics.addEvent(Statistics.EVENT_RESUME);
             refreshDisplay();
         } else if (mode == MODE_CLOCK_GAME_OVER) {
             reset_timers();
@@ -267,7 +267,7 @@ public class Game implements Runnable {
                 running_match_id = Integer.parseInt(Main.getConfigs().get(Configs.MATCHID)) + 1;
                 Main.getConfigs().put(Configs.MATCHID, Integer.toString(running_match_id));
             }
-            statistics.addEvent(Statistics.EVENT_START_GAME);
+            lastStatsSent = statistics.addEvent(Statistics.EVENT_START_GAME);
             mode = MODE_CLOCK_GAME_RUNNING;
             refreshDisplay();
         }
@@ -456,7 +456,7 @@ public class Game implements Runnable {
                                 "  \\____/_/   \\_\\_|  |_|_____|  \\___/  \\_/  |_____|_| \\_\\\n" +
                                 "                                                        ");
                         mode = MODE_CLOCK_GAME_OVER;
-                        statistics.addEvent(Statistics.EVENT_GAME_OVER);
+                        lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_OVER);
                         refreshDisplay();
                     }
 
