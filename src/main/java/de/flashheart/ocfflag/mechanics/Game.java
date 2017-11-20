@@ -10,6 +10,7 @@ import de.flashheart.ocfflag.hardware.abstraction.MyPin;
 import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
 import de.flashheart.ocfflag.misc.Configs;
+import de.flashheart.ocfflag.misc.FTPWrapper;
 import de.flashheart.ocfflag.misc.Observable;
 import de.flashheart.ocfflag.misc.Observer;
 import org.apache.log4j.Logger;
@@ -39,6 +40,8 @@ public class Game implements Runnable {
     private final MyPin ledWhite1;
     private final MyPin ledGreen;
     private final MyAbstractButton button_quit;
+    private final MyAbstractButton button_config;
+    private final MyAbstractButton button_back2game;
     private int mode = MODE_CLOCK_PREGAME;
     private int running_match_id = 0;
 
@@ -65,7 +68,7 @@ public class Game implements Runnable {
     // das sind die standard spieldauern in millis.
     // In Minuten: 30, 60, 90, 120, 150, 180, 210, 240, 270, 300
     private Long[] preset_times = new Long[]{
-            20000l, // 00:00:20
+            60000l, // 00:01:00
             600000l, // 00:10:00
             900000l, // 00:15:00
             1200000l, // 00:20:00
@@ -92,11 +95,16 @@ public class Game implements Runnable {
                 MyAbstractButton button_preset_minus,
                 MyAbstractButton button_preset_plus,
                 MyAbstractButton button_quit,
-                MyRGBLed pole, MyPin ledRedButton,
+                MyAbstractButton button_config,
+                MyAbstractButton button_back2game,
+                MyRGBLed pole,
+                MyPin ledRedButton,
                 MyPin ledBlueButton,
                 MyPin ledStandbyActive,
                 MyPin ledWhite) {
         this.button_quit = button_quit;
+        this.button_config = button_config;
+        this.button_back2game = button_back2game;
         thread = new Thread(this);
         logger.setLevel(Main.getLogLevel());
         this.pole = pole;
@@ -126,6 +134,7 @@ public class Game implements Runnable {
             }
         });
         preset_position = Integer.parseInt(Main.getConfigs().get(Configs.GAMETIME));
+
         initGame();
     }
 
@@ -191,8 +200,21 @@ public class Game implements Runnable {
             reset_timers();
             System.exit(0);
         });
-        reset_timers();
+        button_config.addListener(e -> {
+                    if (mode == MODE_CLOCK_GAME_RUNNING) return;
+                    reset_timers();
+                    Main.getFrameDebug().setView("configView");
+                });
 
+
+        try {
+            FTPWrapper.initFTPDir();
+        } catch (IOException e) {
+            logger.error(e);
+        }
+
+        mode = MODE_CLOCK_PREGAME;
+        reset_timers();
     }
 
     private void button_blue_pressed() {
@@ -222,7 +244,11 @@ public class Game implements Runnable {
 
     private void button_reset_pressed() {
         if (mode != MODE_CLOCK_GAME_RUNNING) {
-            lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
+
+            if (mode == MODE_CLOCK_GAME_PAUSED) {
+                lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
+            }
+
             reset_timers();
         } else {
             logger.debug("RUNNING: IGNORED");
@@ -275,6 +301,15 @@ public class Game implements Runnable {
     }
 
     private void reset_timers() {
+
+        if (mode != MODE_CLOCK_PREGAME) {
+            try {
+                FTPWrapper.initFTPDir();
+            } catch (IOException e) {
+                logger.error(e);
+            }
+        }
+
         flag = FLAG_STATE_NEUTRAL;
         mode = MODE_CLOCK_PREGAME;
         pole.setRGB(Color.white.getRed(), Color.white.getGreen(), Color.white.getBlue());
@@ -366,7 +401,6 @@ public class Game implements Runnable {
                 DateTime dateTime_red = new DateTime(time_red, DateTimeZone.UTC);
                 DateTime dateTime_blue = new DateTime(time_blue, DateTimeZone.UTC);
 
-
                 if (dateTime_red.getSecondOfDay() > dateTime_blue.getSecondOfDay()) {
                     logger.debug("\n" +
                             "  ____  _____ ____   __        _____  _   _ \n" +
@@ -379,6 +413,7 @@ public class Game implements Runnable {
                     Main.getPinHandler().setScheme(ledRedButton.getName(), "∞;100,100");
                     pole.setRGB(255, 0, 0);
                     pole.setText("RED TEAM WON");
+                    lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_RED_WON);
                 }
                 if (dateTime_red.getSecondOfDay() < dateTime_blue.getSecondOfDay()) {
                     logger.debug("\n" +
@@ -392,6 +427,7 @@ public class Game implements Runnable {
                     Main.getPinHandler().setScheme(ledBlueButton.getName(), "∞;100,100");
                     pole.setRGB(0, 0, 255);
                     pole.setText("BLUE TEAM WON");
+                    lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_BLUE_WON);
                 }
                 if (dateTime_red.getSecondOfDay() == dateTime_blue.getSecondOfDay()) {
                     logger.debug("\n" +
@@ -407,6 +443,7 @@ public class Game implements Runnable {
                     Main.getPinHandler().setScheme(ledRedButton.getName(), "∞;100,100");
                     pole.setRGB(255, 255, 255);
                     pole.setText("DRAW GAME");
+                    lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_DRAW);
                 }
             }
         } catch (IOException e) {
@@ -467,6 +504,7 @@ public class Game implements Runnable {
                 logger.debug(this + " interrupted!");
             } catch (Exception e) {
                 logger.error(e);
+                e.printStackTrace();
                 System.exit(1);
             }
         }

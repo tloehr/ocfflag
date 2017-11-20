@@ -2,31 +2,21 @@ package de.flashheart.ocfflag.mechanics;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.FtpUploadDownloadUtil;
 import de.flashheart.ocfflag.misc.Observable;
 import de.flashheart.ocfflag.misc.Tools;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.net.ftp.FTPClient;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Locale;
-import java.util.Random;
 import java.util.Stack;
 
 public class Statistics extends Observable<Boolean> {
 
-    private long min_stat_sent_time = 0l;
     private long time, time_blue, time_red;
 
     private final Logger logger = Logger.getLogger(getClass());
-    private Random random;
 
     public static final int EVENT_PAUSE = 0;
     public static final int EVENT_RESUME = 1;
@@ -48,56 +38,17 @@ public class Statistics extends Observable<Boolean> {
     private int matchid;
     private DateTime endOfGame = null;
     private String winningTeam = "";
+    private SwingWorker<Boolean, Boolean> worker;
 
-    static FTPClient ftp = null;
     private String flagcolor;
 
-    public static void uploadFile(String localFileFullName, String fileName, String hostDir)
-            throws Exception {
-        try (InputStream input = new FileInputStream(new File(localFileFullName))) {
-            ftp.storeFile(hostDir + fileName, input);
-        }
-    }
-
     public Statistics() {
-        random = new Random();
         logger.setLevel(Main.getLogLevel());
         stackEvents = new Stack<>();
-        min_stat_sent_time = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
         reset();
     }
 
-    private boolean ftpUpload() throws IOException {
-        if (!Main.getConfigs().isFTPComplete()) return false;
-
-        File tempPHPFile = File.createTempFile("ocfflag", ".php");
-        tempPHPFile.deleteOnExit();
-        FileUtils.writeStringToFile(tempPHPFile, toPHP(), "UTF-8");
-
-        String remoteFile = stackEvents.get(0).getPit().getMillis()+"-" + Main.getConfigs().get(Configs.MYUUID) + ".php";
-
-        // Das hier war um die Folgen eines Netzwerkabbruchs zu testen.
-//        String host = random.nextBoolean() ? Main.getConfigs().get(Configs.FTPHOST) : "wronghost.flashheart.de";
-//        logger.debug("RANDOM HOST: "+host);
-
-        boolean success = FtpUploadDownloadUtil.upload(tempPHPFile.getAbsolutePath(), Main.getConfigs().get(Configs.FTPREMOTEPATH) + "/", remoteFile,
-                Main.getConfigs().get(Configs.FTPHOST),
-                Integer.parseInt(Main.getConfigs().get(Configs.FTPPORT)),
-                Main.getConfigs().get(Configs.FTPUSER),
-                Main.getConfigs().get(Configs.FTPPWD), true);
-
-        return success;
-    }
-
-    public void moveActiveToArchive(){
-
-    }
-
     public void reset() {
-        if (!stackEvents.isEmpty()) {
-            logger.debug("CLOSE AND SEND Statistics list");
-            // move active file to archive on FTP Server
-        }
         endOfGame = null;
         flagcolor = "neutral";
         winningTeam = "not_yet";
@@ -120,51 +71,25 @@ public class Statistics extends Observable<Boolean> {
      */
     public void sendStats() {
         logger.debug(toPHP());
-        if (min_stat_sent_time > 0 && Main.getConfigs().isFTPComplete()) {
-            SwingWorker<Boolean, Boolean> worker = new SwingWorker<Boolean, Boolean>() {
-                boolean success = false;
-
-                @Override
-                protected Boolean doInBackground() throws Exception {
-                    try {
-                        success = ftpUpload();
-                    } catch (IOException e) {
-                        logger.info(e);
-                        success = false;
-                    }
-
-                    if (!success) logger.info("FTP Upload failed");
-
-                    return success;
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        notifyObservers(get());
-                    } catch (Exception e) {
-                        logger.debug(e);
-                    }
-                }
-            };
-            worker.execute();
-        }
+        Main.pushMessage(toPHP());
     }
 
     public long addEvent(int event) {
         DateTime now = new DateTime();
-        if (min_stat_sent_time == 0) return now.getMillis();
-        logger.debug(EVENTS[event]);
+//        if (Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME)) > 0) return now.getMillis();
+
         stackEvents.push(new GameEvent(now, event));
 
-        if (event == EVENT_GAME_ABORTED || event == EVENT_GAME_OVER) {
-            endOfGame = now;
-        } else {
-            endOfGame = null;
+
+        if (endOfGame == null) {
+            if (event == EVENT_GAME_ABORTED || event == EVENT_GAME_OVER) {
+                endOfGame = now;
+            }
         }
 
         if (event == EVENT_RESULT_RED_WON) winningTeam = "red";
         if (event == EVENT_RESULT_BLUE_WON) winningTeam = "blue";
+        if (event == EVENT_RESULT_DRAW) winningTeam = "draw";
         if (event == EVENT_RED_ACTIVATED) flagcolor = "red";
         if (event == EVENT_BLUE_ACTIVATED) flagcolor = "blue";
 
@@ -179,10 +104,6 @@ public class Statistics extends Observable<Boolean> {
         public GameEvent(DateTime pit, int event) {
             this.pit = pit;
             this.event = event;
-        }
-
-        public int getEvent() {
-            return event;
         }
 
         public DateTime getPit() {

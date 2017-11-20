@@ -5,8 +5,26 @@ import org.joda.time.DateTimeZone;
 
 import java.awt.*;
 import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.jar.Manifest;
 
 public class Tools {
+
+    public static Manifest getManifest(Class<?> clz) {
+      String resource = "/" + clz.getName().replace(".", "/") + ".class";
+      String fullPath = clz.getResource(resource).toString();
+      String archivePath = fullPath.substring(0, fullPath.length() - resource.length());
+      if (archivePath.endsWith("\\WEB-INF\\classes") || archivePath.endsWith("/WEB-INF/classes")) {
+        archivePath = archivePath.substring(0, archivePath.length() - "/WEB-INF/classes".length()); // Required for wars
+      }
+
+      try (InputStream input = new URL(archivePath + "/META-INF/MANIFEST.MF").openStream()) {
+        return new Manifest(input);
+      } catch (Exception e) {
+        throw new RuntimeException("Loading MANIFEST for class " + clz + " failed!", e);
+      }
+    }
 
     public static String formatLongTime(long time, String pattern) {
         return time < 0l ? "--" : new DateTime(time, DateTimeZone.UTC).toString(pattern);

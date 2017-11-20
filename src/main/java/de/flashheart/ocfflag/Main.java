@@ -14,10 +14,13 @@ import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
 import de.flashheart.ocfflag.mechanics.Game;
 import de.flashheart.ocfflag.misc.Configs;
+import de.flashheart.ocfflag.misc.FTPWrapper;
+import de.flashheart.ocfflag.misc.MessageProcessor;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -46,7 +49,7 @@ public class Main {
     private static final Pin BUTTON_STANDBY_ACTIVE = RaspiPin.GPIO_03;
     private static final Pin BUTTON_PRESET_PREV = RaspiPin.GPIO_12;
     private static final Pin BUTTON_PRESET_NEXT = RaspiPin.GPIO_13;
-    private static final Pin BUTTON_RESET = RaspiPin.GPIO_14; 
+    private static final Pin BUTTON_RESET = RaspiPin.GPIO_14;
     private static final Pin BUTTON_RED = RaspiPin.GPIO_21;
     private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
 
@@ -65,17 +68,17 @@ public class Main {
     private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_05; // 23
 
 
-
-
-
     private static Display7Segments4Digits display_blue, display_red, display_white;
-    private static MyAbstractButton button_blue, button_red, button_reset, button_standby_active, button_preset_minus, button_preset_plus, button_quit;
+    private static MyAbstractButton button_blue, button_red, button_reset, button_standby_active, button_preset_minus, button_preset_plus, button_quit, button_config, button_back2game;
     private static MyRGBLed pole;
 
     private static MyPin ledRedButton, ledBlueButton, ledGreen, ledWhite;
 
     private static PinHandler pinHandler; // One handler, to rule them all...
     private static Configs configs;
+
+    private static MessageProcessor messageProcessor;
+
 
 
     public static void main(String[] args) throws Exception {
@@ -109,6 +112,8 @@ public class Main {
         button_preset_plus = new MyAbstractButton(GPIO, BUTTON_PRESET_NEXT, frameDebug.getBtnPresetPlus());
         button_standby_active = new MyAbstractButton(GPIO, BUTTON_STANDBY_ACTIVE, frameDebug.getBtnSwitchMode());
         button_quit = new MyAbstractButton(null, null, frameDebug.getBtnQuit());
+        button_config = new MyAbstractButton(null, null, frameDebug.getBtnConfig());
+        button_back2game = new MyAbstractButton(null, null, frameDebug.getBtnPlay());
 
         pole = new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole());
 
@@ -130,7 +135,7 @@ public class Main {
         pinHandler.add(ledGreen);
         pinHandler.add(ledWhite);
 
-        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_standby_active, button_preset_minus, button_preset_plus, button_quit, pole, ledRedButton, ledBlueButton, ledGreen, ledWhite);
+        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_standby_active, button_preset_minus, button_preset_plus, button_quit, button_config, button_back2game, pole, ledRedButton, ledBlueButton, ledGreen, ledWhite);
         game.run();
 
 
@@ -148,7 +153,6 @@ public class Main {
         logger.setLevel(logLevel);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-
             pinHandler.off();
             if (GPIO != null) {
                 SoftPwm.softPwmStop(POLE_RGB_RED.getAddress());
@@ -158,11 +162,15 @@ public class Main {
                     display_white.clear();
                     display_blue.clear();
                     display_red.clear();
+
+                    if (messageProcessor != null) messageProcessor.interrupt();
+
+                    FTPWrapper.initFTPDir();
+
                 } catch (IOException e) {
                     logger.error(e);
                 }
             }
-
         }));
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
@@ -174,10 +182,22 @@ public class Main {
             logger.fatal(sw);
         });
 
+
         pinHandler = new PinHandler();
         configs = new Configs();
+
+        if (Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME)) > 0 && Main.getConfigs().isFTPComplete()) {
+            messageProcessor = new MessageProcessor();
+            messageProcessor.start();
+        }
+
     }
 
+
+    public static void pushMessage(String message) {
+        if (messageProcessor == null) return;
+        messageProcessor.pushMessage(message);
+    }
 
     /**
      * Dieses Init wird nur ausgeführt, wenn das Programm NICHT auf einem Raspi läuft.
@@ -185,6 +205,8 @@ public class Main {
      * @throws Exception
      */
     private static void initDebugFrame() throws Exception {
+        UIManager.setLookAndFeel(
+                UIManager.getCrossPlatformLookAndFeelClassName());
         frameDebug = new FrameDebug();
         frameDebug.setVisible(true);
     }
