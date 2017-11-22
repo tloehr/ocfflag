@@ -201,11 +201,14 @@ public class Game implements Runnable {
             System.exit(0);
         });
         button_config.addListener(e -> {
-                    if (mode == MODE_CLOCK_GAME_RUNNING) return;
-                    reset_timers();
-                    Main.getFrameDebug().setView("configView");
-                });
-
+            if (mode == MODE_CLOCK_GAME_RUNNING) return;
+            reset_timers();
+            Main.getFrameDebug().setTab(1);
+        });
+        button_back2game.addListener(e -> {
+            reset_timers();
+            Main.getFrameDebug().setTab(0);
+        });
 
         try {
             FTPWrapper.initFTPDir();

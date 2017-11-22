@@ -37,6 +37,7 @@ public class Configs {
         configs.put(LOGLEVEL, "debug");
         configs.put(FLAGNAME, "OCF Flagge #" + new java.util.Random().nextInt());
         configs.put(GAMETIME, "0");
+        configs.put(FTPS, "false");
         configs.put(BRIGHTNESS_WHITE, "10");
         configs.put(BRIGHTNESS_BLUE, "10");
         configs.put(BRIGHTNESS_RED, "10");

@@ -97,7 +97,7 @@ public class FTPWrapper {
         String remotepath = Main.getConfigs().get(Configs.FTPREMOTEPATH);
         String uuid = Main.getConfigs().get(Configs.MYUUID);
 
-        String remoteFile = remotepath + "/" + uuid + ".php";
+        String remoteFile = remotepath + "/active/" + uuid + ".php";
 
         boolean resultOk = true;
         Logger logger = Logger.getLogger(FTPWrapper.class);
@@ -174,7 +174,7 @@ public class FTPWrapper {
                 DateTime now = new DateTime();
                 String uuid = Main.getConfigs().get(Configs.MYUUID);
                 String remotepath = Main.getConfigs().get(Configs.FTPREMOTEPATH);
-                String remoteFile = remotepath + "/" + uuid + ".php";
+                String remoteFile = remotepath + "/active/" + uuid + ".php";
                 String localFile = Tools.getWorkingPath() + File.separator + uuid + ".php";
                 String archivepath = remotepath + "/archive";
                 String archivefile = archivepath + "/" + now.toString("yyyyMMddHHmmss") + "-" + uuid + ".php";

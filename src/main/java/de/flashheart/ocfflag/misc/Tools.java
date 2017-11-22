@@ -3,6 +3,7 @@ package de.flashheart.ocfflag.misc;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.InputStream;
@@ -122,4 +123,26 @@ public class Tools {
 //           }
 //           return title;
        }
+
+    /**
+     * läuft rekursiv durch alle Kinder eines Containers und setzt deren Enabled Status auf
+     * enabled.
+     */
+    public static void setXEnabled(JComponent container, boolean enabled) {
+        // Bei einer Combobox muss die Rekursion ebenfalls enden.
+        // Sie besteht aus weiteren Unterkomponenten
+        // "disabled" wird sie aber bereits hier.
+        if (container.getComponentCount() == 0 || container instanceof JComboBox) {
+            // Rekursionsanker
+            container.setEnabled(enabled);
+        } else {
+            Component[] c = container.getComponents();
+            for (int i = 0; i < c.length; i++) {
+                if (c[i] instanceof JComponent) {
+                    JComponent jc = (JComponent) c[i];
+                    setXEnabled(jc, enabled);
+                }
+            }
+        }
+    }
 }
