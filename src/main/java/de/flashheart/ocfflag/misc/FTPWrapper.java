@@ -3,13 +3,13 @@ package de.flashheart.ocfflag.misc;
 import de.flashheart.ocfflag.Main;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import javax.swing.*;
+import java.io.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * FTP-Utility, basierend auf Apache FTPClient:
@@ -206,4 +206,99 @@ public class FTPWrapper {
 
         return resultOk;
     }
+
+    public static boolean testFTP(JTextArea outputArea, JButton buttonToDisable) {
+
+        if (!Main.getConfigs().isFTPComplete()) {
+            outputArea.append("FTP Verbindungsdaten unvollständig\n");
+            return false;
+        }
+
+        buttonToDisable.setEnabled(false);
+
+        // das funktioniert noch nicht
+        boolean ftps = false;//(Main.getConfigs().get(Configs.FTPS).equalsIgnoreCase("true"));
+        FTPClient ftpClient = new FTPClient(); //ftps ? new FTPSClient() : new FTPClient();
+
+        String host = Main.getConfigs().get(Configs.FTPHOST);
+        int port = Integer.parseInt(Main.getConfigs().get(Configs.FTPPORT));
+        String usr = Main.getConfigs().get(Configs.FTPUSER);
+        String pwd = Main.getConfigs().get(Configs.FTPPWD);
+        String uuid = Main.getConfigs().get(Configs.MYUUID);
+        Logger logger = Logger.getLogger(FTPWrapper.class);
+        logger.setLevel(Main.getLogLevel());
+        boolean success = false;
+
+        SwingWorker<Boolean, Boolean> worker = new SwingWorker<Boolean, Boolean>() {
+            @Override
+            protected Boolean doInBackground() throws IOException {
+                boolean resultOk = true;
+                String line = "";
+
+                try {
+                    ftpClient.connect(host, port);
+
+                    line = ftpClient.getReplyString();
+                    logger.debug(line);
+                    outputArea.append(line);
+
+                    resultOk &= ftpClient.login(usr, pwd);
+                    line = ftpClient.getReplyString();
+                    logger.debug(line);
+                    outputArea.append(line);
+
+                    // creating a testfile for the ftp test
+                    File file = File.createTempFile("ocfflag", ".txt");
+                    file.createNewFile();
+                    FileWriter writer = new FileWriter(file);
+
+                    for (int length = 0; length <= 1e+7 / 10; length += 39) {
+                        writer.write("abcdefghijkl");
+                        writer.write("\n");
+                        writer.write("abcdefghijkl");
+                        writer.write("\n");
+                        writer.write("abcdefghijkl");
+                        writer.write("\n");
+                    }
+                    writer.flush();
+                    writer.close();
+                    file.deleteOnExit();
+
+                    // upload
+                    FileInputStream fis = new FileInputStream(file);
+                    resultOk &= ftpClient.storeFile("ocfflagtest-" + uuid, fis);
+                    line = ftpClient.getReplyString();
+                    logger.debug(line);
+                    outputArea.append(line);
+
+                    ftpClient.deleteFile("ocfflagtest-" + uuid);
+
+
+                } catch (Exception ftpEx) {
+                    logger.error(ftpEx);
+                    outputArea.append(ftpEx.toString()+"\n");
+                    resultOk = false;
+                } finally {
+                    ftpClient.disconnect();
+                }
+                return resultOk;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    buttonToDisable.setEnabled(true);
+                    outputArea.append(get() ? "FTP funktioniert\n" : "FEHLER IN FTP\n");
+                } catch (InterruptedException e) {
+                    logger.debug(e);
+                } catch (ExecutionException e) {
+                    logger.fatal(logger, e);
+                }
+            }
+        };
+
+        worker.execute();
+        return true;
+    }
+
 }

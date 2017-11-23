@@ -4,24 +4,20 @@
 
 package de.flashheart.ocfflag.gui;
 
-import java.awt.event.*;
-import javax.swing.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Configs;
+import de.flashheart.ocfflag.misc.FTPWrapper;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.ChangeEvent;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 /**
  * @author Torsten Löhr
@@ -31,7 +27,7 @@ public class FrameDebug extends JFrame {
     private Font font;
     public static final Icon IconPlay = new ImageIcon(FrameDebug.class.getResource("/artwork/128x128/player_play.png"));
     public static final Icon IconPause = new ImageIcon(FrameDebug.class.getResource("/artwork/128x128/player_pause.png"));
-     private YesNoToggleButton tbFTPs;
+    private YesNoToggleButton tbFTPs;
 
 
     public FrameDebug() {
@@ -43,7 +39,9 @@ public class FrameDebug extends JFrame {
 
     private void initFrame() {
         tbFTPs = new YesNoToggleButton();
-        configView.add(tbFTPs, CC.xy(5, 15));
+        tbFTPs.setEnabled(false);
+        tbFTPs.setToolTipText("Hab ich noch nicht hinbekommen");
+        configView.add(tbFTPs, CC.xy(7, 15));
         lblFlagname.setText(Main.getConfigs().get(Configs.FLAGNAME));
         lblBlueTime.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
         lblRedTime.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
@@ -60,7 +58,7 @@ public class FrameDebug extends JFrame {
         }
     }
 
-    public void setTab(int tab){
+    public void setTab(int tab) {
         mainPanel.setSelectedIndex(tab);
     }
 
@@ -77,24 +75,62 @@ public class FrameDebug extends JFrame {
     }
 
     private void mainPanelStateChanged(ChangeEvent e) {
-        if (mainPanel.getSelectedIndex() == 1){
+        if (mainPanel.getSelectedIndex() == 1) {
             setConfigsToScreen();
         }
     }
 
-    private void setConfigsToScreen(){
+    private void setConfigsToScreen() {
         txtFlagName.setText(Main.getConfigs().get(Configs.FLAGNAME));
         txtFTPHost.setText(Main.getConfigs().get(Configs.FTPHOST));
         txtFTPPort.setText(Main.getConfigs().get(Configs.FTPPORT));
         txtFTPUser.setText(Main.getConfigs().get(Configs.FTPUSER));
         txtFTPPassword.setText(Main.getConfigs().get(Configs.FTPPWD));
         txtFTPRemotePath.setText(Main.getConfigs().get(Configs.FTPREMOTEPATH));
-        txtSendStats.setText(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
         tbFTPs.setSelected(Main.getConfigs().get(Configs.FTPS).equals("true"));
+        txtSendStats.setText(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
     }
 
     private void txtFlagNameFocusLost(FocusEvent e) {
         Main.getConfigs().put(Configs.FLAGNAME, txtFlagName.getText().trim());
+    }
+
+    private void btnTestFTPActionPerformed(ActionEvent e) {
+        FTPWrapper.testFTP(txtFTPlog, btnTestFTP);
+    }
+
+    private void txtFTPHostFocusLost(FocusEvent e) {
+        Main.getConfigs().put(Configs.FTPHOST, txtFTPHost.getText().trim());
+    }
+
+    private void txtFTPPortFocusLost(FocusEvent e) {
+        try {
+            Integer.parseInt(txtFTPPort.getText().trim());
+            Main.getConfigs().put(Configs.FTPPORT, txtFTPPort.getText().trim());
+        } catch (NumberFormatException nfe) {
+            txtFTPPort.setText(Main.getConfigs().get(Configs.FTPPORT));
+        }
+    }
+
+    private void txtFTPUserFocusLost(FocusEvent e) {
+        Main.getConfigs().put(Configs.FTPUSER, txtFTPUser.getText().trim());
+    }
+
+    private void txtFTPPasswordFocusLost(FocusEvent e) {
+        Main.getConfigs().put(Configs.FTPPWD, txtFTPPassword.getText().trim());
+    }
+
+    private void txtFTPRemotePathFocusLost(FocusEvent e) {
+        Main.getConfigs().put(Configs.FTPREMOTEPATH, txtFTPRemotePath.getText().trim());
+    }
+
+    private void txtSendStatsFocusLost(FocusEvent e) {
+        try {
+            Integer.parseInt(txtSendStats.getText().trim());
+            Main.getConfigs().put(Configs.MIN_STAT_SEND_TIME, txtSendStats.getText().trim());
+        } catch (NumberFormatException nfe) {
+            txtSendStats.setText(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
+        }
     }
 
     private void initComponents() {
@@ -145,7 +181,7 @@ public class FrameDebug extends JFrame {
         txtUUID = new JTextField();
         btnPlay = new JButton();
         scrollPane1 = new JScrollPane();
-        textArea1 = new JTextArea();
+        txtFTPlog = new JTextArea();
 
         //======== this ========
         setTitle("OCF-Flag 1.0.0.0");
@@ -161,7 +197,7 @@ public class FrameDebug extends JFrame {
             //======== mainView ========
             {
                 mainView.setLayout(new FormLayout(
-                    "$rgap, $lcgap, pref:grow, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow, $lcgap, $rgap",
+                    "$rgap, $lcgap, pref, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow, $lcgap, $rgap",
                     "$rgap, $lgap, fill:22dlu:grow, $rgap, default:grow, $lgap, fill:default:grow, $lgap, $rgap"));
 
                 //======== panel1 ========
@@ -217,7 +253,8 @@ public class FrameDebug extends JFrame {
                     lblBlueTime.setForeground(Color.blue);
                     lblBlueTime.setBorder(new EtchedBorder());
                     lblBlueTime.setPreferredSize(new Dimension(130, 45));
-                    panel4.add(lblBlueTime, CC.xy(2, 3, CC.CENTER, CC.DEFAULT));
+                    lblBlueTime.setHorizontalTextPosition(SwingConstants.LEADING);
+                    panel4.add(lblBlueTime, CC.xy(2, 3));
 
                     //---- lblWhiteTime ----
                     lblWhiteTime.setText("0.0.:0.0.");
@@ -226,7 +263,7 @@ public class FrameDebug extends JFrame {
                     lblWhiteTime.setOpaque(true);
                     lblWhiteTime.setBorder(new EtchedBorder());
                     lblWhiteTime.setPreferredSize(new Dimension(130, 45));
-                    panel4.add(lblWhiteTime, CC.xy(4, 3, CC.CENTER, CC.DEFAULT));
+                    panel4.add(lblWhiteTime, CC.xy(4, 3, CC.FILL, CC.DEFAULT));
 
                     //---- lblRedTime ----
                     lblRedTime.setText("0.0.:0.0.");
@@ -234,7 +271,7 @@ public class FrameDebug extends JFrame {
                     lblRedTime.setForeground(Color.red);
                     lblRedTime.setBorder(new EtchedBorder());
                     lblRedTime.setPreferredSize(new Dimension(130, 45));
-                    panel4.add(lblRedTime, CC.xy(6, 3, CC.CENTER, CC.DEFAULT));
+                    panel4.add(lblRedTime, CC.xy(6, 3, CC.FILL, CC.DEFAULT));
 
                     //---- ledRedButton ----
                     ledRedButton.setColor(Color.red);
@@ -246,7 +283,7 @@ public class FrameDebug extends JFrame {
                 //======== panel5 ========
                 {
                     panel5.setLayout(new FormLayout(
-                        "default:grow",
+                        "pref",
                         "default, $lgap, fill:default:grow, $ugap, default"));
 
                     //---- btnConfig ----
@@ -316,7 +353,7 @@ public class FrameDebug extends JFrame {
             {
                 configView.setLayout(new FormLayout(
                     "$ugap, $lcgap, pref, $lcgap, $rgap, $lcgap, default:grow, $lcgap, $ugap",
-                    "2*(default, $ugap), 6*(default, $lgap), default, $rgap, default, $ugap, default, $lgap, default:grow, 2*($lgap, default)"));
+                    "2*(default, $ugap), 6*(default, $lgap), default, $rgap, default, $ugap, default, $lgap, default:grow, $lgap, 85dlu, $lgap, default"));
 
                 //---- lblConfigTitle ----
                 lblConfigTitle.setOpaque(true);
@@ -349,6 +386,12 @@ public class FrameDebug extends JFrame {
 
                 //---- txtFTPHost ----
                 txtFTPHost.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtFTPHost.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtFTPHostFocusLost(e);
+                    }
+                });
                 configView.add(txtFTPHost, CC.xy(7, 5));
 
                 //---- label3 ----
@@ -358,6 +401,12 @@ public class FrameDebug extends JFrame {
 
                 //---- txtFTPPort ----
                 txtFTPPort.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtFTPPort.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtFTPPortFocusLost(e);
+                    }
+                });
                 configView.add(txtFTPPort, CC.xy(7, 7));
 
                 //---- label4 ----
@@ -367,6 +416,12 @@ public class FrameDebug extends JFrame {
 
                 //---- txtFTPUser ----
                 txtFTPUser.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtFTPUser.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtFTPUserFocusLost(e);
+                    }
+                });
                 configView.add(txtFTPUser, CC.xy(7, 9));
 
                 //---- label5 ----
@@ -376,6 +431,12 @@ public class FrameDebug extends JFrame {
 
                 //---- txtFTPPassword ----
                 txtFTPPassword.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtFTPPassword.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtFTPPasswordFocusLost(e);
+                    }
+                });
                 configView.add(txtFTPPassword, CC.xy(7, 11));
 
                 //---- label6 ----
@@ -385,6 +446,12 @@ public class FrameDebug extends JFrame {
 
                 //---- txtFTPRemotePath ----
                 txtFTPRemotePath.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtFTPRemotePath.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtFTPRemotePathFocusLost(e);
+                    }
+                });
                 configView.add(txtFTPRemotePath, CC.xy(7, 13));
 
                 //---- label7 ----
@@ -399,11 +466,18 @@ public class FrameDebug extends JFrame {
 
                 //---- txtSendStats ----
                 txtSendStats.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtSendStats.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtSendStatsFocusLost(e);
+                    }
+                });
                 configView.add(txtSendStats, CC.xy(7, 17));
 
                 //---- btnTestFTP ----
                 btnTestFTP.setText("Test FTP Server");
                 btnTestFTP.setFont(new Font("Dialog", Font.PLAIN, 20));
+                btnTestFTP.addActionListener(e -> btnTestFTPActionPerformed(e));
                 configView.add(btnTestFTP, CC.xywh(3, 19, 5, 1));
 
                 //---- label9 ----
@@ -425,10 +499,10 @@ public class FrameDebug extends JFrame {
                 //======== scrollPane1 ========
                 {
 
-                    //---- textArea1 ----
-                    textArea1.setBackground(Color.black);
-                    textArea1.setForeground(new Color(0, 255, 51));
-                    scrollPane1.setViewportView(textArea1);
+                    //---- txtFTPlog ----
+                    txtFTPlog.setBackground(Color.black);
+                    txtFTPlog.setForeground(new Color(0, 255, 51));
+                    scrollPane1.setViewportView(txtFTPlog);
                 }
                 configView.add(scrollPane1, CC.xy(7, 25, CC.DEFAULT, CC.FILL));
             }
@@ -543,6 +617,6 @@ public class FrameDebug extends JFrame {
     private JTextField txtUUID;
     private JButton btnPlay;
     private JScrollPane scrollPane1;
-    private JTextArea textArea1;
+    private JTextArea txtFTPlog;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

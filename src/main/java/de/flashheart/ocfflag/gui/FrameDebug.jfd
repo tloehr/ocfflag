@@ -14,7 +14,7 @@ new FormModel {
 				"enabled": false
 				addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "mainPanelStateChanged", true ) )
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-					"$columnSpecs": "relgap, labelcompgap, pref:grow, labelcompgap, unrelgap, labelcompgap, 62dlu:grow, labelcompgap, unrelgap, labelcompgap, pref:grow, labelcompgap, relgap"
+					"$columnSpecs": "relgap, labelcompgap, pref, labelcompgap, unrelgap, labelcompgap, 62dlu:grow, labelcompgap, unrelgap, labelcompgap, pref:grow, labelcompgap, relgap"
 					"$rowSpecs": "relgap, linegap, fill:22dlu:grow, relgap, default:grow, linegap, fill:default:grow, linegap, relgap"
 				} ) {
 					name: "mainView"
@@ -86,10 +86,10 @@ new FormModel {
 							"foreground": sfield java.awt.Color blue
 							"border": &EtchedBorder0 new javax.swing.border.EtchedBorder( 1, null, null )
 							"preferredSize": new java.awt.Dimension( 130, 45 )
+							"horizontalTextPosition": 10
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 							"gridX": 2
 							"gridY": 3
-							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints CENTER
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "lblWhiteTime"
@@ -102,7 +102,7 @@ new FormModel {
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 							"gridX": 4
 							"gridY": 3
-							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints CENTER
+							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "lblRedTime"
@@ -114,7 +114,7 @@ new FormModel {
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 							"gridX": 6
 							"gridY": 3
-							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints CENTER
+							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 						} )
 						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
 							name: "ledRedButton"
@@ -131,7 +131,7 @@ new FormModel {
 						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					} )
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-						"$columnSpecs": "default:grow"
+						"$columnSpecs": "pref"
 						"$rowSpecs": "default, linegap, fill:default:grow, unrelgap, default"
 					} ) {
 						name: "panel5"
@@ -232,7 +232,7 @@ new FormModel {
 				} )
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 					"$columnSpecs": "unrelgap, labelcompgap, pref, labelcompgap, relgap, labelcompgap, default:grow, labelcompgap, unrelgap"
-					"$rowSpecs": "default, unrelgap, default, unrelgap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, relgap, default, unrelgap, default, linegap, default:grow, linegap, default, linegap, default"
+					"$rowSpecs": "default, unrelgap, default, unrelgap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, relgap, default, unrelgap, default, linegap, default:grow, linegap, 85dlu, linegap, default"
 				} ) {
 					name: "configView"
 					add( new FormComponent( "javax.swing.JLabel" ) {
@@ -274,6 +274,7 @@ new FormModel {
 					add( new FormComponent( "javax.swing.JTextField" ) {
 						name: "txtFTPHost"
 						"font": #Font1
+						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtFTPHostFocusLost", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
 						"gridY": 5
@@ -289,6 +290,7 @@ new FormModel {
 					add( new FormComponent( "javax.swing.JTextField" ) {
 						name: "txtFTPPort"
 						"font": #Font1
+						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtFTPPortFocusLost", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
 						"gridY": 7
@@ -304,6 +306,7 @@ new FormModel {
 					add( new FormComponent( "javax.swing.JTextField" ) {
 						name: "txtFTPUser"
 						"font": #Font1
+						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtFTPUserFocusLost", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
 						"gridY": 9
@@ -319,6 +322,7 @@ new FormModel {
 					add( new FormComponent( "javax.swing.JTextField" ) {
 						name: "txtFTPPassword"
 						"font": #Font1
+						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtFTPPasswordFocusLost", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
 						"gridY": 11
@@ -334,6 +338,7 @@ new FormModel {
 					add( new FormComponent( "javax.swing.JTextField" ) {
 						name: "txtFTPRemotePath"
 						"font": #Font1
+						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtFTPRemotePathFocusLost", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
 						"gridY": 13
@@ -357,6 +362,7 @@ new FormModel {
 					add( new FormComponent( "javax.swing.JTextField" ) {
 						name: "txtSendStats"
 						"font": #Font1
+						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtSendStatsFocusLost", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
 						"gridY": 17
@@ -365,6 +371,7 @@ new FormModel {
 						name: "btnTestFTP"
 						"text": "Test FTP Server"
 						"font": new java.awt.Font( "Dialog", 0, 20 )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnTestFTPActionPerformed", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 3
 						"gridY": 19
@@ -399,7 +406,7 @@ new FormModel {
 					add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 						name: "scrollPane1"
 						add( new FormComponent( "javax.swing.JTextArea" ) {
-							name: "textArea1"
+							name: "txtFTPlog"
 							"background": sfield java.awt.Color black
 							"foreground": new java.awt.Color( 0, 255, 51, 255 )
 						} )
