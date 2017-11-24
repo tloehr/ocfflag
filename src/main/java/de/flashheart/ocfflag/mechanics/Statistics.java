@@ -2,7 +2,6 @@ package de.flashheart.ocfflag.mechanics;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.Observable;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -12,7 +11,7 @@ import javax.swing.*;
 import java.util.Locale;
 import java.util.Stack;
 
-public class Statistics extends Observable<Boolean> {
+public class Statistics {
 
     private long time, time_blue, time_red;
 
@@ -71,7 +70,7 @@ public class Statistics extends Observable<Boolean> {
      */
     public void sendStats() {
         logger.debug(toPHP());
-        Main.pushMessage(toPHP());
+        if (Main.getMessageProcessor() != null) Main.getMessageProcessor().pushMessage(toPHP());
     }
 
     public long addEvent(int event) {
@@ -79,7 +78,6 @@ public class Statistics extends Observable<Boolean> {
 //        if (Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME)) > 0) return now.getMillis();
 
         stackEvents.push(new GameEvent(now, event));
-
 
         if (endOfGame == null) {
             if (event == EVENT_GAME_ABORTED || event == EVENT_GAME_OVER) {
@@ -110,6 +108,10 @@ public class Statistics extends Observable<Boolean> {
             return pit;
         }
 
+        public int getEvent() {
+            return event;
+        }
+
         @Override
         public String toString() {
             return "GameEvent{" +
@@ -132,6 +134,7 @@ public class Statistics extends Observable<Boolean> {
         php += "$game['matchid'] = '" + matchid + "';\n";
         php += "$game['timestamp'] = '" + DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(new DateTime()) + "';\n";
         php += "$game['ts_game_started'] = '" + DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(stackEvents.get(0).getPit()) + "';\n";
+        php += "$game['ts_game_paused'] = '" + (stackEvents.peek().getEvent() == EVENT_PAUSE ? DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(stackEvents.peek().getPit()) : "null") + "';\n";
         php += "$game['ts_game_ended'] = '" + (endOfGame == null ? "null" : DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(endOfGame)) + "';\n";
         php += "$game['winning_team'] = '" + winningTeam + "';\n";
         php += "$game['time'] = '" + Tools.formatLongTime(time, "HH:mm:ss") + "';\n";

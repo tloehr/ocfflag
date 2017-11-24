@@ -4,6 +4,8 @@ import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.FrameDebug;
+import de.flashheart.ocfflag.gui.events.StatsSentEvent;
+import de.flashheart.ocfflag.gui.events.StatsSentListener;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
 import de.flashheart.ocfflag.hardware.abstraction.MyPin;
@@ -11,8 +13,6 @@ import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.FTPWrapper;
-import de.flashheart.ocfflag.misc.Observable;
-import de.flashheart.ocfflag.misc.Observer;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -23,7 +23,7 @@ import java.io.IOException;
 /**
  * In dieser Klasse befindet sich die Spielmechanik.
  */
-public class Game implements Runnable {
+public class Game implements Runnable, StatsSentListener {
     private final Logger logger = Logger.getLogger(getClass());
 
     private final int MODE_CLOCK_PREGAME = 0;
@@ -124,15 +124,7 @@ public class Game implements Runnable {
 
         min_stat_sent_time = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
         statistics = new Statistics();
-        statistics.addObserver(new Observer<Boolean>() {
-            @Override
-            public void update(Observable<Boolean> object, Boolean success) {
-                if (success)
-                    Main.getPinHandler().setScheme(ledWhite1.getName(), "∞;100,1000");
-                else
-                    Main.getPinHandler().off();
-            }
-        });
+
         preset_position = Integer.parseInt(Main.getConfigs().get(Configs.GAMETIME));
 
         initGame();
@@ -140,6 +132,9 @@ public class Game implements Runnable {
 
     private void initGame() {
         logger.setLevel(Main.getLogLevel());
+        if (Main.getMessageProcessor() != null){
+            Main.getMessageProcessor().addListener(this);
+        }
 
         button_blue.addListener(e -> {
             logger.debug("GUI_button_blue");
@@ -511,5 +506,13 @@ public class Game implements Runnable {
                 System.exit(1);
             }
         }
+    }
+
+    @Override
+    public void statsSentEventReceived(StatsSentEvent statsSentEvent) {
+        if (statsSentEvent.isSuccessful())
+            Main.getPinHandler().setScheme(ledWhite1.getName(), "∞;100,1000");
+        else
+            Main.getPinHandler().off();
     }
 }

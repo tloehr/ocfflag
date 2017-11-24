@@ -79,7 +79,9 @@ public class Main {
 
     private static MessageProcessor messageProcessor;
 
-
+    public static MessageProcessor getMessageProcessor() {
+        return messageProcessor;
+    }
 
     public static void main(String[] args) throws Exception {
         initBaseSystem();
@@ -190,14 +192,8 @@ public class Main {
             messageProcessor = new MessageProcessor();
             messageProcessor.start();
         }
-
     }
 
-
-    public static void pushMessage(String message) {
-        if (messageProcessor == null) return;
-        messageProcessor.pushMessage(message);
-    }
 
     /**
      * Dieses Init wird nur ausgeführt, wenn das Programm NICHT auf einem Raspi läuft.
