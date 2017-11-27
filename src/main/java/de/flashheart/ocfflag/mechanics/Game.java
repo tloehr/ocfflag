@@ -347,7 +347,7 @@ public class Game implements Runnable, StatsSentListener {
             }
 
             if (mode == MODE_CLOCK_GAME_PAUSED) {
-                display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
             }
 
             if (mode == MODE_CLOCK_GAME_RUNNING) {
@@ -377,6 +377,7 @@ public class Game implements Runnable, StatsSentListener {
                             " |_|   |_|\\__,_|\\__, | |_|___/ |_| \\_\\_____|____/  |_| |_|\\___/ \\_/\\_/  \n" +
                             "                |___/                                                   ");
                     Main.getPinHandler().setScheme(ledBlueButton.getName(), "∞;500,500");
+                    display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
                     pole.setRGB(Color.red.getRed(), Color.red.getGreen(), Color.red.getBlue());
                     pole.setText("RED ACTIVATED");
                 }
@@ -389,6 +390,7 @@ public class Game implements Runnable, StatsSentListener {
                             " |_|   |_|\\__,_|\\__, | |_|___/ |____/|_____\\___/|_____| |_| |_|\\___/ \\_/\\_/  \n" +
                             "                |___/                                                        ");
                     Main.getPinHandler().setScheme(ledRedButton.getName(), "∞;500,500");
+                    display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
                     pole.setRGB(Color.blue.getRed(), Color.blue.getGreen(), Color.blue.getBlue());
                     pole.setText("BLUE ACTIVATED");
                 }
