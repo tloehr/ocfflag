@@ -3,17 +3,15 @@ package de.flashheart.ocfflag.hardware.pinhandler;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.abstraction.MyPin;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-import java.util.concurrent.Callable;
 
 
 /**
  * Created by tloehr on 14.07.16.
  */
-public class PinBlinkModel implements Callable<String> {
+public class PinBlinkModel implements GenericBlinkModel {
 
     MyPin pin;
     private ArrayList<Long> onOffScheme;
@@ -23,14 +21,24 @@ public class PinBlinkModel implements Callable<String> {
     private final Logger logger = Logger.getLogger(getClass());
     String infinity = "\u221E";
 
+
+    public PinBlinkModel(MyPin pin) {
+        logger.setLevel(Main.getLogLevel());
+        this.onOffScheme = new ArrayList<>();
+        this.positionInScheme = -1;
+        this.pin = pin;
+        this.currentlyOn = false;
+        this.repeat = Integer.MAX_VALUE;
+    }
+
     @Override
     public String call() throws Exception {
-//        logger.debug(new DateTime().toString() + " call() to:" + pin.getName() + " [" + pin.getText() + "]");
+//        logger.debug(new DateTime().toString() + " call() to:" + pin.setText() + " [" + pin.getText() + "]");
         if (repeat == 0) {
             restart();
-            pin.setState(false);
+            off();
         } else {
-//            logger.debug(new DateTime().toString() + " working on:" + pin.getName() + " [" + pin.getText() + "]");
+//            logger.debug(new DateTime().toString() + " working on:" + pin.setText() + " [" + pin.getText() + "]");
             for (int turn = 0; turn < repeat; turn++) {
                 restart();
 
@@ -54,34 +62,22 @@ public class PinBlinkModel implements Callable<String> {
                     try {
                         if (time > 0) Thread.sleep(time);
                     } catch (InterruptedException exc) {
-                        pin.setState(false);
+                        off();
                         return null;
                     }
 
                 }
             }
         }
-        pin.setText("");
+        setText("");
         return null;
     }
 
-    public void clear() {
-        onOffScheme.clear();
-        restart();
+    @Override
+    public void setText(String text) {
+        pin.setText(text);
     }
 
-//    public PinBlinkModel(MyPin pin) {
-//        this(pin, -1, -1);
-//    }
-
-    public PinBlinkModel(MyPin pin) {
-        logger.setLevel(Main.getLogLevel());
-        this.onOffScheme = new ArrayList<>();
-        this.positionInScheme = -1;
-        this.pin = pin;
-        this.currentlyOn = false;
-        this.repeat = Integer.MAX_VALUE;
-    }
 
     /**
      * accepts a blinking scheme as a String formed like this: "repeat;ontimeINms;offtimeINms".
@@ -90,10 +86,11 @@ public class PinBlinkModel implements Callable<String> {
      *
      * @param scheme
      */
+    @Override
     public void setScheme(String scheme) {
         onOffScheme.clear();
 
-//        logger.debug("new scheme for pin: " + pin.getName() + " : " + scheme);
+//        logger.debug("new scheme for pin: " + pin.setText() + " : " + scheme);
 
         String[] splitScheme = scheme.trim().split(";");
 
@@ -112,7 +109,7 @@ public class PinBlinkModel implements Callable<String> {
             }
         }
 
-        pin.setText(textScheme);
+        pin.setToolTipText(textScheme);
     }
 
 
@@ -132,8 +129,10 @@ public class PinBlinkModel implements Callable<String> {
         return next;
     }
 
-    public MyPin getPin() {
-        return pin;
+    public void off(){
+        onOffScheme.clear();
+        repeat = 0;
+        pin.setState(false);
     }
 
 }

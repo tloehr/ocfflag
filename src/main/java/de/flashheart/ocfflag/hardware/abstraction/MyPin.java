@@ -37,6 +37,10 @@ public class MyPin {
         return guiControlLED != null ? guiControlLED.getToolTipText() : "";
     }
 
+    public void setToolTipText(String text){
+            if (guiControlLED != null) guiControlLED.setToolTipText(text);
+        }
+
     public void setState(boolean on) {
         if (outputPin != null) outputPin.setState(on ? PinState.HIGH : PinState.LOW);
         if (guiControlLED != null) guiControlLED.setState(on);

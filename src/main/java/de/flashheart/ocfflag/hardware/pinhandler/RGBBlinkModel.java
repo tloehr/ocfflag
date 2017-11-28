@@ -1,141 +1,111 @@
 package de.flashheart.ocfflag.hardware.pinhandler;
 
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.abstraction.MyPin;
 import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 
 import java.util.ArrayList;
-import java.util.StringTokenizer;
-import java.util.concurrent.Callable;
 
 
 /**
  * Created by tloehr on 14.07.16.
  */
-public class RGBBlinkModel implements Callable<String> {
+public class RGBBlinkModel implements GenericBlinkModel {
 
     private final MyRGBLed myRGBLed;
-    MyRGBLed rgbLed;
-    private ArrayList<Long> onOffScheme;
+    private final ArrayList<RGBScheduleElement> blinkAndColorSchemes;
     int repeat;
-    boolean currentlyOn;
+
+
     int positionInScheme;
     private final Logger logger = Logger.getLogger(getClass());
     String infinity = "\u221E";
 
-    @Override
-    public String call() throws Exception {
-//        logger.debug(new DateTime().toString() + " call() to:" + pin.getName() + " [" + pin.getText() + "]");
-        if (repeat == 0) {
-            restart();
-            rgbLed.setRGB(0,0,0);
-        } else {
-//            logger.debug(new DateTime().toString() + " working on:" + pin.getName() + " [" + pin.getText() + "]");
-            for (int turn = 0; turn < repeat; turn++) {
-                restart();
-
-                while (hasNext()) {
-                    long time = 0;
-
-                    if (Thread.currentThread().isInterrupted()) {
-                        rgbLed.setRGB(0,0,0);
-
-                        return null;
-                    }
-
-                    time = next();
-
-
-                    // currentlyOn nur verwenden, wenn die zeit über 0 ist. ansonsten blitzen die
-                    // die LEDs kurz auf, obwohl sie aus bleiben sollen.
-                    // abschalten geht auch immer
-                    if (time > 0 || !currentlyOn) pin.setState(currentlyOn);
-
-                    try {
-                        if (time > 0) Thread.sleep(time);
-                    } catch (InterruptedException exc) {
-                        pin.setState(false);
-                        return null;
-                    }
-
-                }
-            }
-        }
-        pin.setText("");
-        return null;
-    }
-
-    public void clear() {
-        onOffScheme.clear();
-        restart();
-    }
-
-//    public PinBlinkModel(MyPin pin) {
-//        this(pin, -1, -1);
-//    }
 
     public RGBBlinkModel(MyRGBLed myRGBLed) {
         this.myRGBLed = myRGBLed;
         logger.setLevel(Main.getLogLevel());
-        this.onOffScheme = new ArrayList<>();
+        this.blinkAndColorSchemes = new ArrayList<>();
         this.positionInScheme = -1;
-        
-        this.currentlyOn = false;
         this.repeat = Integer.MAX_VALUE;
     }
 
+    @Override
+    public String call() throws Exception {
+        logger.debug(new DateTime().toString() + " call() to:" + myRGBLed.getName() + " [" + myRGBLed.getText() + "]");
+
+        if (repeat == 0) {
+            off();
+            return null;
+        }
+
+        for (int turn = 0; turn < repeat; turn++) {
+            for (RGBScheduleElement scheme : blinkAndColorSchemes) {
+
+                if (Thread.currentThread().isInterrupted()) {
+                    off();
+                    return null;
+                }
+
+                myRGBLed.setRGB(scheme.getRed(), scheme.getGreen(), scheme.getBlue());
+
+                try {
+                    Thread.sleep(scheme.getDuration());
+                } catch (InterruptedException exc) {
+                    off();
+                    return null;
+                }
+
+
+            }
+        }
+
+        myRGBLed.setText("");
+        return null;
+    }
+
     /**
-     * accepts a blinking scheme as a String formed like this: "repeat;[r,g,b,duration]*".
+     * accepts a blinking scheme as a String formed like this: "repeat:r,g,b,duration;r,g,b,duration".
      * if repeat is 0 then a previous blinking process is stopped and the pin is set to OFF.
      * There is no "BLINK FOREVER" really. But You could always put Integer.MAX_VALUE as REPEAT instead into the String.
      *
      * @param scheme
      */
-    public void setScheme(String scheme) {
-        onOffScheme.clear();
+    @Override
+    public void setScheme(String scheme) throws NumberFormatException {
+        logger.debug(myRGBLed.getName() + ": " + scheme);
+        blinkAndColorSchemes.clear();
 
-//        logger.debug("new scheme for pin: " + pin.getName() + " : " + scheme);
+        // zuerst wiederholungen vom muster trennen
+        String[] splitFirstTurn = scheme.trim().split(":");
+        String repeatString = splitFirstTurn[0];
+        repeat = repeatString.equals("∞") ? Integer.MAX_VALUE : Integer.parseInt(repeatString);
 
-        String[] splitScheme = scheme.trim().split(";");
-
-        String textScheme = "";
-        String repeatString = splitScheme[0];
-        this.repeat = repeatString.equals("∞") ? Integer.MAX_VALUE : Integer.parseInt(repeatString);
+        String textScheme = ""; // was als Text ausgeben wird.
         textScheme = (this.repeat == Integer.MAX_VALUE ? infinity : Integer.toString(this.repeat));
 
         if (repeat > 0) {
-            StringTokenizer st = new StringTokenizer(splitScheme[1], ",");
-            textScheme += ";";
-            while (st.hasMoreElements()) {
-                long myLong = Long.parseLong(st.nextToken());
-                textScheme += (myLong == Long.MAX_VALUE ? infinity : myLong) + (st.hasMoreElements() ? "," : "");
-                this.onOffScheme.add(myLong);
+            // Hier trennen wir die einzelnen muster voneinander
+            String[] splitSecondTurn = splitFirstTurn[1].trim().split(";");
+
+            for (String pattern : splitSecondTurn) {
+                String[] splitThirdTurn = pattern.trim().split(",");
+                blinkAndColorSchemes.add(new RGBScheduleElement(splitThirdTurn[0], splitThirdTurn[1], splitThirdTurn[2], splitThirdTurn[3]));
             }
         }
 
-        pin.setText(textScheme);
+        myRGBLed.setToolTipText(textScheme);
     }
 
-
-    private void restart() {
-        currentlyOn = false;
-        positionInScheme = 0;
+    @Override
+    public void setText(String text) {
+        myRGBLed.setText(text);
     }
 
-    private boolean hasNext() {
-        return positionInScheme + 1 <= onOffScheme.size();
-    }
+    @Override
+    public void off() {
 
-    private long next() {
-        long next = onOffScheme.get(positionInScheme);
-        currentlyOn = !currentlyOn;
-        positionInScheme++;
-        return next;
+        myRGBLed.off();
     }
-
-    public MyPin getPin() {
-        return pin;
-    }
-
 }

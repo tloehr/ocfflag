@@ -34,6 +34,12 @@ public class Main {
     private static Logger logger;
     private static Level logLevel = Level.DEBUG;
 
+    public static final String PH_POLE = "flagPole";
+    public static final String PH_LED_RED_BTN = "ledRedButton";
+    public static final String PH_LED_BLUE_BTN = "ledBlueButton";
+    public static final String PH_LED_GREEN = "ledGreen";
+    public static final String PH_LED_WHITE = "ledWhite";
+
     // Parameter für die einzelnen PINs am Raspi sowie die I2C Adressen.
     private static final int DISPLAY_BLUE = 0x71;
     private static final int DISPLAY_RED = 0x72;
@@ -50,8 +56,8 @@ public class Main {
     private static final Pin BUTTON_PRESET_PREV = RaspiPin.GPIO_12;
     private static final Pin BUTTON_PRESET_NEXT = RaspiPin.GPIO_13;
     private static final Pin BUTTON_RESET = RaspiPin.GPIO_14;
-    private static final Pin BUTTON_RED = RaspiPin.GPIO_21;
-    private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
+    private static final Pin BUTTON_RED = RaspiPin.GPIO_22;
+    private static final Pin BUTTON_BLUE = RaspiPin.GPIO_21;
 
     // LEDs in den Tasten
     private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_23;
@@ -117,27 +123,26 @@ public class Main {
         button_config = new MyAbstractButton(null, null, frameDebug.getBtnConfig());
         button_back2game = new MyAbstractButton(null, null, frameDebug.getBtnPlay());
 
-        pole = new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole());
+        pole = new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), PH_POLE);
 
-        ledBlueButton = new MyPin(GPIO, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), "ledBlueButton");
-        ledRedButton = new MyPin(GPIO, LED_RED_BUTTON, frameDebug.getLedRedButton(), "ledRedButton");
-        ledGreen = new MyPin(GPIO, LED_GREEN, frameDebug.getLedStandbyActive(), "ledGreen");
-        ledWhite = new MyPin(GPIO, LED_WHITE, frameDebug.getLedStatsSent(), "ledWhite");
+        ledBlueButton = new MyPin(GPIO, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), PH_LED_BLUE_BTN);
+        ledRedButton = new MyPin(GPIO, LED_RED_BUTTON, frameDebug.getLedRedButton(), PH_LED_RED_BTN);
+        ledGreen = new MyPin(GPIO, LED_GREEN, frameDebug.getLedStandbyActive(), PH_LED_GREEN);
+        ledWhite = new MyPin(GPIO, LED_WHITE, frameDebug.getLedStatsSent(), PH_LED_WHITE);
 
         // später
         MyPin siren1 = new MyPin(GPIO, SIREN_AIR, null, "sirenAir");
         MyPin siren2 = new MyPin(GPIO, SIREN_COLOR_CHANGE, null, "sirenColorChange");
         pinHandler.add(siren1);
         pinHandler.add(siren2);
-        pinHandler.setScheme(siren1.getName(), "∞;1000,10000");
-        pinHandler.setScheme(siren2.getName(), "∞;500,10000");
 
+        pinHandler.add(pole);
         pinHandler.add(ledRedButton);
         pinHandler.add(ledBlueButton);
         pinHandler.add(ledGreen);
         pinHandler.add(ledWhite);
 
-        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_standby_active, button_preset_minus, button_preset_plus, button_quit, button_config, button_back2game, pole, ledRedButton, ledBlueButton, ledGreen, ledWhite);
+        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_standby_active, button_preset_minus, button_preset_plus, button_quit, button_config, button_back2game);
         game.run();
 
 
@@ -210,7 +215,6 @@ public class Main {
     private static void initRaspi() throws Exception {
         if (!Tools.isArm()) return;
         GPIO = GpioFactory.getInstance();
-//        com.pi4j.wiringpi.Gpio.wiringPiSetup();
         SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
         SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
         SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);

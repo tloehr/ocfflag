@@ -2,6 +2,7 @@ package de.flashheart.ocfflag.hardware.pinhandler;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.abstraction.MyPin;
+import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -16,10 +17,11 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 
 public class PinHandler {
+    public static final String FOREVER = "∞";
 
     final Logger logger;
     final ReentrantLock lock;
-    final HashMap<String, PinBlinkModel> pinMap;
+    final HashMap<String, GenericBlinkModel> pinMap;
     final HashMap<String, Future<String>> futures;
     final HashMap<String, String> schemes;
     private ExecutorService executorService;
@@ -31,52 +33,15 @@ public class PinHandler {
         schemes = new HashMap<>();
         logger = Logger.getLogger(getClass());
         logger.setLevel(Main.getLogLevel());
-        resume();
-    }
 
-    /**
-     * Pause bedeutet, dass alle noch Pins die nicht mehr laufen
-     * aus der schemes Map gelöscht werden. Die brauchen wir nicht mehr.
-     * Danach wird der Executor umgehend beendet und alle Einträge gelöscht.
-     */
-    public void pause() {
-        lock.lock();
-        try {
-            // save pause state
-            for (String name : futures.keySet()) {
-                if (!futures.get(name).isDone()) { // but only if it runs
-                    futures.get(name).cancel(true);
-                } else {
-                    schemes.remove(name);
-                }
-            }
-            // es gibt kein Pause bei einem Executor
-            executorService.shutdownNow();
-        } finally {
-            lock.unlock();
+        executorService = Executors.newFixedThreadPool(20);
+
+        for (String name : schemes.keySet()) {
+            GenericBlinkModel pinGenericBlinkModel = pinMap.get(name);
+            pinGenericBlinkModel.setScheme(schemes.get(name));
+            futures.put(name, executorService.submit(pinGenericBlinkModel));
         }
-    }
 
-    /**
-     * Resume erstellt einen NEUEN, LEEREN Executor und füllt diesen mit
-     * allen Pins, die in der scheme Map stehen. Zu Beginn ist diese Map sowieso
-     * leer. Ansonsten werden alle Pins "wiederbelebt", die zum Zeitpunkt der Pause noch
-     * aktiv waren. Das Blink-Muster beginnt zwar von vorne, aber damit müssen wir jetzt leben.
-     */
-    public void resume() {
-        // und auch kein Resume.
-        lock.lock();
-        try {
-            executorService = Executors.newFixedThreadPool(20);
-
-            for (String name : schemes.keySet()) {
-                PinBlinkModel pinBlinkModel = pinMap.get(name);
-                pinBlinkModel.setScheme(schemes.get(name));
-                futures.put(name, executorService.submit(pinBlinkModel));
-            }
-        } finally {
-            lock.unlock();
-        }
     }
 
     /**
@@ -94,22 +59,36 @@ public class PinHandler {
     }
 
     /**
-     * Das Relais wird abgeschaltet.
+     * adds a a relay to the handler.
      *
-     * @param name
+     * @param myRGB der betreffende Pin
      */
-    public void off(String name) {
-        setScheme(name, "0;");
+    public void add(MyRGBLed myRGB) {
+        lock.lock();
+        try {
+            pinMap.put(myRGB.getName(), new RGBBlinkModel(myRGB));
+        } finally {
+            lock.unlock();
+        }
     }
 
-    /**
-     * schaltet das Relais ein und lässt es an.
-     *
-     * @param name
-     */
-    public void on(String name) {
-        setScheme(name, "1;" + Long.MAX_VALUE + ",0");
-    }
+//    /**
+//     * Das Relais wird abgeschaltet.
+//     *
+//     * @param name
+//     */
+//    public void off(String name) {
+//        setScheme(name, null, "0;");
+//    }
+//
+//    /**
+//     * schaltet das Relais ein und lässt es an.
+//     *
+//     * @param name
+//     */
+//    public void on(String name) {
+//        setScheme(name, null, "1;" + Long.MAX_VALUE + ",0");
+//    }
 
     /**
      * Setzt ein Blink Schema für diesen Pin. Die Syntax ist wie folgt:
@@ -120,13 +99,13 @@ public class PinHandler {
      * @param name
      * @param scheme
      */
-    public void setScheme(String name, String scheme) {
+    public void setScheme(String name, String text, String scheme) {
 //        logger.debug(name + "-" + scheme);
         lock.lock();
         try {
-            PinBlinkModel pinBlinkModel = pinMap.get(name);
-            if (pinBlinkModel != null) {
-
+            GenericBlinkModel genericBlinkModel = pinMap.get(name);
+            genericBlinkModel.setText(text);
+            if (genericBlinkModel != null) {
 
 
                 if (futures.containsKey(name) && !futures.get(name).isDone()) { // but only if it runs
@@ -136,10 +115,10 @@ public class PinHandler {
 
                 schemes.put(name, scheme); // aufbewahren für die Wiederherstellung nach der Pause
 
-                pinBlinkModel.setScheme(scheme);
-                futures.put(name, executorService.submit(pinBlinkModel));
+                genericBlinkModel.setScheme(scheme);
+                futures.put(name, executorService.submit(genericBlinkModel));
             } else {
-                logger.error("Pin not found in handler");
+                logger.error("Element not found in handler");
             }
         } catch (Exception e) {
             logger.trace(e);
@@ -150,14 +129,19 @@ public class PinHandler {
         }
     }
 
+    public void setScheme(String name, String scheme) {
+        setScheme(name, null, scheme);
+    }
+
+    public void off(String name) {
+        pinMap.get(name).off();
+    }
+
     public void off() {
         for (String name : pinMap.keySet()) {
             off(name);
         }
     }
 
-    public MyPin getPin(String id) {
-        return pinMap.get(id).getPin();
-    }
 
 }
