@@ -23,6 +23,7 @@ public class Display7Segments4Digits {
     SevenSegment segment = null;
     private final Logger logger = Logger.getLogger(getClass());
     private boolean colon = true;
+    private long lastTimeSet = 0;
 
 
     public Display7Segments4Digits(int addr, JLabel lblSegment, String name) throws I2CFactory.UnsupportedBusNumberException, IOException {
@@ -31,6 +32,15 @@ public class Display7Segments4Digits {
         this.lblSegment = lblSegment;
         if (Tools.isArm()) segment = new SevenSegment(addr, true);
         if (segment != null) segment.setBrightness(10);
+    }
+
+    public void setColon(boolean colon) {
+        this.colon = colon;
+        try {
+            setTime(lastTimeSet);
+        } catch (IOException e) {
+            logger.error(e);
+        }
     }
 
     /**
@@ -45,11 +55,11 @@ public class Display7Segments4Digits {
         if (time < 0 || time > 18000000l)
             throw new IllegalArgumentException("time is out of range. can't display more than 5 hours");
 
+        lastTimeSet = time;
 
         DateTime dateTime = new DateTime(time, DateTimeZone.UTC);
 
         int hours = dateTime.getHourOfDay();
-
 
         // Bildschirm Darstellung
         if (lblSegment != null) {
@@ -71,14 +81,10 @@ public class Display7Segments4Digits {
             int seconds = dateTime.getSecondOfMinute();
             boolean[] dots = new boolean[]{hours == 4, hours >= 3, hours >= 2, hours >= 1,};
             int[] timeDigits = new int[]{minutes / 10, minutes % 10, seconds / 10, seconds % 10};
-//            String[] timeString = .split("");
-//            logger.debug("Setting Gametime to: " + dateTime.toString("mmss"));
-
-
             fullDisplay(timeDigits, dots);
         }
         colon = !colon;
-//        logger.debug("segment: " + name + " " + Tools.formatLongTime(time, "HH:mm:ss"));
+
     }
 
     public void setBlinkRate(int rate) throws IOException {

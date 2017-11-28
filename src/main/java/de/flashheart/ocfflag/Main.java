@@ -172,7 +172,7 @@ public class Main {
 
                     if (messageProcessor != null) messageProcessor.interrupt();
 
-                    FTPWrapper.initFTPDir();
+//                    FTPWrapper.initFTPDir();
 
                 } catch (IOException e) {
                     logger.error(e);
