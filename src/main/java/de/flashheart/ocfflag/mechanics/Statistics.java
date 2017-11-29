@@ -3,6 +3,7 @@ package de.flashheart.ocfflag.mechanics;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -128,7 +129,13 @@ public class Statistics {
     private String toPHP() {
         String php = "<?php\n";
 
-        php += "$game['flagname'] = '" + Main.getConfigs().get(Configs.FLAGNAME) + "';\n";
+        String flagname = Main.getConfigs().get(Configs.FLAGNAME);
+
+        flagname = StringUtils.replace(flagname, "'", "\\'");
+        flagname =  StringUtils.replace(flagname, "\"", "\\\"");
+
+
+        php += "$game['flagname'] = '" + flagname + "';\n";
         php += "$game['flagcolor'] = '" + flagcolor + "';\n";
         php += "$game['uuid'] = '" + Main.getConfigs().get(Configs.MYUUID) + "';\n";
         php += "$game['matchid'] = '" + matchid + "';\n";

@@ -212,6 +212,9 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void button_blue_pressed() {
+
+
+
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != FLAG_STATE_BLUE) {
                 flag = FLAG_STATE_BLUE;
@@ -241,7 +244,6 @@ public class Game implements Runnable, StatsSentListener {
             if (mode == MODE_CLOCK_GAME_PAUSED) {
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
             }
-
             reset_timers();
         } else {
             logger.debug("RUNNING: IGNORED");
@@ -304,7 +306,7 @@ public class Game implements Runnable, StatsSentListener {
 
         flag = FLAG_STATE_NEUTRAL;
         mode = MODE_CLOCK_PREGAME;
-        Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", "1:" + new RGBScheduleElement(Color.WHITE));
+
         time = preset_times[preset_position]; // aktuelle Wahl minus 1 Sekunde. Dann wird aus 5 Stunden -> 04:59:59
         time_blue = 0l;
         time_red = 0l;
@@ -334,7 +336,8 @@ public class Game implements Runnable, StatsSentListener {
             if (mode == MODE_CLOCK_PREGAME || mode == MODE_CLOCK_GAME_PAUSED) {
                 logger.debug("PREGAME");
                 button_switch_mode.setIcon(FrameDebug.IconPlay);
-                Main.getPinHandler().setScheme(Main.PH_LED_GREEN, "∞;1000,4000");
+                Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", "1:" + new RGBScheduleElement(Color.WHITE));
+                Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null,"∞:on,100;off,100");
             }
 
             if (mode == MODE_CLOCK_GAME_PAUSED) {
@@ -354,10 +357,9 @@ public class Game implements Runnable, StatsSentListener {
                             "  / ___ \\ (__| |_| |\\ V /  __/ |_____| | |\\  |  __/ |_| | |_| | | (_| | |\n" +
                             " /_/   \\_\\___|\\__|_| \\_/ \\___|         |_| \\_|\\___|\\__,_|\\__|_|  \\__,_|_|\n" +
                             "                                                                         ");
-                    Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞;500,500");
-                    Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞;500,500");
+                    Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
+                    Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,500;off,500");
                     Main.getPinHandler().setScheme(Main.PH_POLE, "NEUTRAL", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
-//                    Main.getPinHandler().setScheme(Main.PH_POLE, "NEUTRAL", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE));
                 }
                 if (flag == FLAG_STATE_RED) {
                     logger.debug("\n" +
@@ -367,9 +369,9 @@ public class Game implements Runnable, StatsSentListener {
                             " |  _| | | (_| | (_| | | \\__ \\ |  _ <| |___| |_| | | | | | (_) \\ V  V / \n" +
                             " |_|   |_|\\__,_|\\__, | |_|___/ |_| \\_\\_____|____/  |_| |_|\\___/ \\_/\\_/  \n" +
                             "                |___/                                                   ");
-                    Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞;500,500");
+                    Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,500;off,500");
                     display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
-                    Main.getPinHandler().setScheme(Main.PH_POLE, "RED ACTIVATED", "1:" + new RGBScheduleElement(Color.RED));
+                    Main.getPinHandler().setScheme(Main.PH_POLE, "RED ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.RED, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
                 if (flag == FLAG_STATE_BLUE) {
                     logger.debug("\n" +
@@ -379,9 +381,9 @@ public class Game implements Runnable, StatsSentListener {
                             " |  _| | | (_| | (_| | | \\__ \\ | |_) | |__| |_| | |___  | | | | (_) \\ V  V / \n" +
                             " |_|   |_|\\__,_|\\__, | |_|___/ |____/|_____\\___/|_____| |_| |_|\\___/ \\_/\\_/  \n" +
                             "                |___/                                                        ");
-                    Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞;500,500");
+                    Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
                     display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
-                    Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE ACTIVATED", "1:" + new RGBScheduleElement(Color.BLUE));
+                    Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.BLUE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
             }
 
@@ -399,8 +401,8 @@ public class Game implements Runnable, StatsSentListener {
                             " |_| \\_\\_____|____/     \\_/\\_/  \\___/|_| \\_|\n" +
                             "                                            ");
                     display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                    Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞;100,100");
-                    Main.getPinHandler().setScheme(Main.PH_POLE, "RED TEAM WON", "1:" + new RGBScheduleElement(Color.RED));
+                    Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,100;off,100");
+                    Main.getPinHandler().setScheme(Main.PH_POLE, "RED TEAM WON", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.RED, 250) + ";" + new RGBScheduleElement(Color.BLACK, 250));
                     lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_RED_WON);
                 }
                 if (dateTime_red.getSecondOfDay() < dateTime_blue.getSecondOfDay()) {
@@ -412,8 +414,8 @@ public class Game implements Runnable, StatsSentListener {
                             " |____/|_____\\___/|_____|    \\_/\\_/  \\___/|_| \\_|\n" +
                             "                                                 ");
                     display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                    Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞;100,100");
-                    Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE TEAM WON", "1:" + new RGBScheduleElement(Color.BLUE));
+                    Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,100;off,100");
+                    Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE TEAM WON", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.BLUE, 250) + ";" + new RGBScheduleElement(Color.BLACK, 250));
                     lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_BLUE_WON);
                 }
                 if (dateTime_red.getSecondOfDay() == dateTime_blue.getSecondOfDay()) {
@@ -426,9 +428,9 @@ public class Game implements Runnable, StatsSentListener {
                             "                                                            ");
                     display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
                     display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
-                    Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞;100,100");
-                    Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞;100,100");
-                    Main.getPinHandler().setScheme(Main.PH_POLE, "DRAW GAME", "1:" + new RGBScheduleElement(Color.WHITE));
+                    Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,100;off,100");
+                    Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,100;off,100");
+                    Main.getPinHandler().setScheme(Main.PH_POLE, "DRAW GAME", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                     lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_DRAW);
                 }
             }
@@ -501,7 +503,7 @@ public class Game implements Runnable, StatsSentListener {
     @Override
     public void statsSentEventReceived(StatsSentEvent statsSentEvent) {
         if (statsSentEvent.isSuccessful())
-            Main.getPinHandler().setScheme(Main.PH_LED_WHITE, "∞;100," + min_stat_sent_time / 10);
+            Main.getPinHandler().setScheme(Main.PH_LED_WHITE, "∞:on,100;off," + min_stat_sent_time / 10);
         else
             Main.getPinHandler().off();
     }

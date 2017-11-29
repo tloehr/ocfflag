@@ -9,6 +9,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.FTPWrapper;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
@@ -96,7 +97,8 @@ public class FrameDebug extends JFrame {
     }
 
     private void txtFlagNameFocusLost(FocusEvent e) {
-        Main.getConfigs().put(Configs.FLAGNAME, txtFlagName.getText().trim());
+        String flagname = txtFlagName.getText().trim();
+        Main.getConfigs().put(Configs.FLAGNAME, flagname);
     }
 
     private void btnTestFTPActionPerformed(ActionEvent e) {

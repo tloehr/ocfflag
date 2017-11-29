@@ -23,24 +23,16 @@ public class PinHandler {
     final ReentrantLock lock;
     final HashMap<String, GenericBlinkModel> pinMap;
     final HashMap<String, Future<String>> futures;
-    final HashMap<String, String> schemes;
     private ExecutorService executorService;
 
     public PinHandler() {
         lock = new ReentrantLock();
         pinMap = new HashMap<>();
         futures = new HashMap<>();
-        schemes = new HashMap<>();
         logger = Logger.getLogger(getClass());
         logger.setLevel(Main.getLogLevel());
 
         executorService = Executors.newFixedThreadPool(20);
-
-        for (String name : schemes.keySet()) {
-            GenericBlinkModel pinGenericBlinkModel = pinMap.get(name);
-            pinGenericBlinkModel.setScheme(schemes.get(name));
-            futures.put(name, executorService.submit(pinGenericBlinkModel));
-        }
 
     }
 
@@ -72,24 +64,6 @@ public class PinHandler {
         }
     }
 
-//    /**
-//     * Das Relais wird abgeschaltet.
-//     *
-//     * @param name
-//     */
-//    public void off(String name) {
-//        setScheme(name, null, "0;");
-//    }
-//
-//    /**
-//     * schaltet das Relais ein und lässt es an.
-//     *
-//     * @param name
-//     */
-//    public void on(String name) {
-//        setScheme(name, null, "1;" + Long.MAX_VALUE + ",0");
-//    }
-
     /**
      * Setzt ein Blink Schema für diesen Pin. Die Syntax ist wie folgt:
      * "<anzahl_wiederholung/>;(millis-on;millis-off)*", wobei ()* bedeutet, dass diese Sequenz so oft wie
@@ -110,9 +84,7 @@ public class PinHandler {
                     logger.debug("terminating: " + name);
                     futures.get(name).cancel(true);
                 }
-
-                schemes.put(name, scheme); // aufbewahren für die Wiederherstellung nach der Pause
-
+                logger.debug("set Scheme: " + name);
                 genericBlinkModel.setScheme(scheme);
                 futures.put(name, executorService.submit(genericBlinkModel));
             } else {
@@ -132,7 +104,7 @@ public class PinHandler {
     }
 
     public void off(String name) {
-        pinMap.get(name).off();
+        setScheme(name, "0:");
     }
 
     public void off() {

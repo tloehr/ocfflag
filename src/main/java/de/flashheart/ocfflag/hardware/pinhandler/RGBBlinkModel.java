@@ -36,7 +36,7 @@ public class RGBBlinkModel implements GenericBlinkModel {
         logger.debug(new DateTime().toString() + " call() to:" + myRGBLed.getName() + " [" + myRGBLed.getText() + "]");
 
         if (repeat == 0) {
-            off();
+            myRGBLed.off();
             return null;
         }
 
@@ -44,7 +44,7 @@ public class RGBBlinkModel implements GenericBlinkModel {
             for (RGBScheduleElement scheme : blinkAndColorSchemes) {
 
                 if (Thread.currentThread().isInterrupted()) {
-                    off();
+                    myRGBLed.off();
                     return null;
                 }
 
@@ -53,7 +53,7 @@ public class RGBBlinkModel implements GenericBlinkModel {
                 try {
                     Thread.sleep(scheme.getDuration());
                 } catch (InterruptedException exc) {
-                    off();
+                    myRGBLed.off();
                     return null;
                 }
 
@@ -103,9 +103,5 @@ public class RGBBlinkModel implements GenericBlinkModel {
         myRGBLed.setText(text);
     }
 
-    @Override
-    public void off() {
 
-        myRGBLed.off();
-    }
 }
