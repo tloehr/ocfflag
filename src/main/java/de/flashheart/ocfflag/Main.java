@@ -56,8 +56,8 @@ public class Main {
     private static final Pin BUTTON_PRESET_PREV = RaspiPin.GPIO_12;
     private static final Pin BUTTON_PRESET_NEXT = RaspiPin.GPIO_13;
     private static final Pin BUTTON_RESET = RaspiPin.GPIO_14;
-    private static final Pin BUTTON_RED = RaspiPin.GPIO_22;
-    private static final Pin BUTTON_BLUE = RaspiPin.GPIO_21;
+    private static final Pin BUTTON_RED = RaspiPin.GPIO_21;
+    private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
 
     // LEDs in den Tasten
     private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_23;

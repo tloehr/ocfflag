@@ -77,6 +77,9 @@ public class FrameDebug extends JFrame {
     private void mainPanelStateChanged(ChangeEvent e) {
         if (mainPanel.getSelectedIndex() == 1) {
             setConfigsToScreen();
+        } else {
+            btnSwitchMode.requestFocus(); // nur damit die FocusLost ziehen von der Configseite. Ansonsten sinnlos.
+            lblFlagname.setText(Main.getConfigs().get(Configs.FLAGNAME)); // falls der sich geändert hat
         }
     }
 
@@ -89,6 +92,7 @@ public class FrameDebug extends JFrame {
         txtFTPRemotePath.setText(Main.getConfigs().get(Configs.FTPREMOTEPATH));
         tbFTPs.setSelected(Main.getConfigs().get(Configs.FTPS).equals("true"));
         txtSendStats.setText(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
+        txtUUID.setText(Main.getConfigs().get(Configs.MYUUID));
     }
 
     private void txtFlagNameFocusLost(FocusEvent e) {

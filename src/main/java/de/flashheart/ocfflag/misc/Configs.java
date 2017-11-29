@@ -39,18 +39,6 @@ public class Configs {
         configs.put(GAMETIME, "0");
         configs.put(FTPS, "false");
         configs.put(FTPPORT, "21");
-
-
-
-
-
-
-
-
-
-
-
-
         configs.put(BRIGHTNESS_WHITE, "10");
         configs.put(BRIGHTNESS_BLUE, "10");
         configs.put(BRIGHTNESS_RED, "10");
