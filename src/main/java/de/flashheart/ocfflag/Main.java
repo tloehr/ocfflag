@@ -60,8 +60,8 @@ public class Main {
     private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
 
     // LEDs in den Tasten
-    private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_23;
-    private static final Pin LED_RED_BUTTON = RaspiPin.GPIO_24;
+    private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_24;
+    private static final Pin LED_RED_BUTTON = RaspiPin.GPIO_23;
 
     // LEDs
     private static final Pin LED_GREEN = RaspiPin.GPIO_25;
