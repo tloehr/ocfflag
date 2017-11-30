@@ -93,6 +93,7 @@ public class Statistics {
         if (event == EVENT_BLUE_ACTIVATED) flagcolor = "blue";
 
         sendStats(); // jedes Ereignis wird gesendet.
+
         return now.getMillis();
     }
 

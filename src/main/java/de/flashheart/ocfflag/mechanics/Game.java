@@ -22,6 +22,12 @@ import java.io.IOException;
 
 /**
  * In dieser Klasse befindet sich die Spielmechanik.
+ * <p>
+ * Wann wird die Statistik Datei auf dem Server ins Archiv geschoben ?
+ * FTPWrapper.initFTPDir();
+ * * Bei Start der Box
+ * * Bei QUIT oder RESET, wenn das Spiel im Pause Modus war
+ * * Bei Rückkehr in den PREGAME Modus, wenn das Spiel normal beendet ist.
  */
 public class Game implements Runnable, StatsSentListener {
     private final Logger logger = Logger.getLogger(getClass());
@@ -33,11 +39,7 @@ public class Game implements Runnable, StatsSentListener {
 
     private final MyAbstractButton button_preset_minus;
     private final MyAbstractButton button_preset_plus;
-    //    private final MyRGBLed pole;
-//    private final MyPin ledRedButton;
-//    private final MyPin ledBlueButton;
-//    private final MyPin ledWhite1;
-//    private final MyPin ledGreen;
+
     private final MyAbstractButton button_quit;
     private final MyAbstractButton button_config;
     private final MyAbstractButton button_back2game;
@@ -112,7 +114,7 @@ public class Game implements Runnable, StatsSentListener {
         this.button_preset_minus = button_preset_minus;
         this.button_preset_plus = button_preset_plus;
 
-        min_stat_sent_time = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
+
         statistics = new Statistics();
 
         preset_position = Integer.parseInt(Main.getConfigs().get(Configs.GAMETIME));
@@ -181,24 +183,16 @@ public class Game implements Runnable, StatsSentListener {
             buttonStandbyActivePressed();
         });
         button_quit.addListener(e -> {
-            if (mode == MODE_CLOCK_GAME_RUNNING) return;
-            lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
-            try {
-                FTPWrapper.initFTPDir();
-            } catch (IOException ioe) {
-                logger.error(e);
-            }
-            reset_timers();
-            System.exit(0);
+            logger.debug("GUI_button_quit");
+            button_quit_pressed();
         });
         button_config.addListener(e -> {
-            if (mode == MODE_CLOCK_GAME_RUNNING) return;
-            reset_timers();
-            Main.getFrameDebug().setTab(1);
+            logger.debug("GUI_button_config");
+            button_config_pressed();
         });
         button_back2game.addListener(e -> {
-            reset_timers();
-            Main.getFrameDebug().setTab(0);
+            logger.debug("GUI_button_back2game");
+            button_back2game_pressed();
         });
 
         try {
@@ -211,10 +205,26 @@ public class Game implements Runnable, StatsSentListener {
         reset_timers();
     }
 
+    private void button_back2game_pressed() {
+        reset_timers();
+        Main.getFrameDebug().setTab(0);
+    }
+
+    private void button_config_pressed() {
+        if (mode != MODE_CLOCK_GAME_RUNNING) {
+            reset_timers();
+            Main.getFrameDebug().setTab(1);
+        } else {
+            logger.debug("GAME RUNNING: IGNORED");
+        }
+    }
+
+    private void button_quit_pressed() {
+        button_reset_pressed();
+        System.exit(0);
+    }
+
     private void button_blue_pressed() {
-
-
-
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != FLAG_STATE_BLUE) {
                 flag = FLAG_STATE_BLUE;
@@ -244,6 +254,13 @@ public class Game implements Runnable, StatsSentListener {
             if (mode == MODE_CLOCK_GAME_PAUSED) {
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
             }
+            // Das führt zu Konflikten.
+            // todo: addEvent muss auf aborted auch direkt die Datei abschließen.
+//            try {
+//                FTPWrapper.initFTPDir();
+//            } catch (IOException e) {
+//                logger.error(e);
+//            }
             reset_timers();
         } else {
             logger.debug("RUNNING: IGNORED");
@@ -282,6 +299,11 @@ public class Game implements Runnable, StatsSentListener {
             lastStatsSent = statistics.addEvent(Statistics.EVENT_RESUME);
             refreshDisplay();
         } else if (mode == MODE_CLOCK_GAME_OVER) {
+            try {
+                FTPWrapper.initFTPDir();
+            } catch (IOException e) {
+                logger.error(e);
+            }
             reset_timers();
         } else if (mode == MODE_CLOCK_PREGAME) {
             if (running_match_id == 0) {
@@ -296,16 +318,9 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void reset_timers() {
-        if (mode != MODE_CLOCK_PREGAME) {
-            try {
-                FTPWrapper.initFTPDir();
-            } catch (IOException e) {
-                logger.error(e);
-            }
-        }
-
         flag = FLAG_STATE_NEUTRAL;
         mode = MODE_CLOCK_PREGAME;
+        min_stat_sent_time = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
 
         time = preset_times[preset_position]; // aktuelle Wahl minus 1 Sekunde. Dann wird aus 5 Stunden -> 04:59:59
         time_blue = 0l;
@@ -315,8 +330,7 @@ public class Game implements Runnable, StatsSentListener {
         statistics.reset();
         refreshDisplay();
     }
-
-
+    
     private void refreshDisplay() {
         try {
             display_white.setTime(time);
@@ -337,7 +351,8 @@ public class Game implements Runnable, StatsSentListener {
                 logger.debug("PREGAME");
                 button_switch_mode.setIcon(FrameDebug.IconPlay);
                 Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", "1:" + new RGBScheduleElement(Color.WHITE));
-                Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null,"∞:on,100;off,100");
+                Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,1000;off,2000");
+                Main.getPinHandler().off(Main.PH_LED_WHITE);
             }
 
             if (mode == MODE_CLOCK_GAME_PAUSED) {
@@ -452,7 +467,6 @@ public class Game implements Runnable, StatsSentListener {
 
                     time = time - diff;
                     time = Math.max(time, 0);
-                    display_white.setTime(time);
 
                     // Statistiken, wenn gewünscht
                     if (min_stat_sent_time > 0) {
@@ -463,16 +477,17 @@ public class Game implements Runnable, StatsSentListener {
                         }
                     }
 
+                    // Zeit zum entpsrechenden Team addieren.
                     if (flag == FLAG_STATE_BLUE) {
                         time_blue += diff;
-                        display_blue.setTime(time_blue);
-                        display_red.setColon(true); // damit der doppelpunkt sichtbar bleibt, auf wenn die blaue/rote gerade nicht geändert wird.
                     }
                     if (flag == FLAG_STATE_RED) {
                         time_red += diff;
-                        display_red.setTime(time_red);
-                        display_blue.setColon(true); // damit der doppelpunkt sichtbar bleibt, auf wenn die blaue/rote gerade nicht geändert wird.
                     }
+
+                    display_white.setTime(time);
+                    display_blue.setTime(time_blue);
+                    display_red.setTime(time_red);
 
                     if (time == 0) {
                         logger.debug("\n" +

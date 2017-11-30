@@ -3,6 +3,7 @@ package de.flashheart.ocfflag.misc;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.events.StatsSentEvent;
 import de.flashheart.ocfflag.gui.events.StatsSentListener;
+import de.flashheart.ocfflag.mechanics.Statistics;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -20,7 +21,7 @@ public class MessageProcessor extends Thread {
     private ReentrantLock lock;
     private boolean interrupted;
     private final Logger logger = Logger.getLogger(getClass());
-    private final Stack<String> messageQ;
+    private final Stack<PHPMessage> messageQ;
 
     private final CopyOnWriteArrayList<StatsSentListener> listeners;
 
@@ -52,7 +53,7 @@ public class MessageProcessor extends Thread {
         interrupted = false;
     }
 
-    public void pushMessage(String message) {
+    public void pushMessage(PHPMessage message) {
         lock.lock();
         try {
             messageQ.push(message);
@@ -67,7 +68,8 @@ public class MessageProcessor extends Thread {
                 lock.lock();
                 try {
                     if (!messageQ.isEmpty()) {
-                        boolean successful = FTPWrapper.upload(messageQ.pop());
+                        PHPMessage myMessage = messageQ.pop();
+                        boolean successful = FTPWrapper.upload(myMessage.getPhp(), myMessage.getEvent() == Statistics.EVENT_GAME_ABORTED);
                         messageQ.clear(); // nur die letzte Nachricht ist wichtig
                         fireChangeEvent(successful); // sorge dafür, dass die weiße LED den erfolgreichen Versand anzeigt
                     }

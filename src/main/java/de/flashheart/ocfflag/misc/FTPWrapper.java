@@ -3,7 +3,6 @@ package de.flashheart.ocfflag.misc;
 import de.flashheart.ocfflag.Main;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
@@ -84,7 +83,7 @@ public class FTPWrapper {
      *
      * @return true falls ok
      */
-    public static boolean upload(String content) throws IOException {
+    public static boolean upload(String content, boolean move2archive) throws IOException {
 
         FTPClient ftpClient = new FTPClient();
 
@@ -97,7 +96,7 @@ public class FTPWrapper {
         String remotepath = Main.getConfigs().get(Configs.FTPREMOTEPATH);
         String uuid = Main.getConfigs().get(Configs.MYUUID);
 
-        String remoteFile = remotepath + "/active/" + uuid + ".php";
+        String activeFile = remotepath + "/active/" + uuid + ".php";
 
         boolean resultOk = true;
         Logger logger = Logger.getLogger(FTPWrapper.class);
@@ -120,7 +119,15 @@ public class FTPWrapper {
             logger.debug(ftpClient.getReplyString());
 
             fis = new FileInputStream(tempPHPFile);
-            resultOk &= ftpClient.storeFile(remoteFile, fis);
+
+            if (move2archive) {
+                DateTime now = new DateTime();
+                String archivefile = remotepath + "/archive/" + now.toString("yyyyMMddHHmmss") + "-" + uuid + ".php";
+                resultOk &= ftpClient.storeFile(archivefile, fis);
+                ftpClient.deleteFile(activeFile); // egal ob es eine gab oder nicht
+            } else {
+                resultOk &= ftpClient.storeFile(activeFile, fis);
+            }
 
             logger.debug(ftpClient.getReplyString());
 
@@ -276,7 +283,7 @@ public class FTPWrapper {
 
                 } catch (Exception ftpEx) {
                     logger.error(ftpEx);
-                    outputArea.append(ftpEx.toString()+"\n");
+                    outputArea.append(ftpEx.toString() + "\n");
                     resultOk = false;
                 } finally {
                     ftpClient.disconnect();
