@@ -385,7 +385,7 @@ public class Game implements Runnable, StatsSentListener {
                             " |_|   |_|\\__,_|\\__, | |_|___/ |_| \\_\\_____|____/  |_| |_|\\___/ \\_/\\_/  \n" +
                             "                |___/                                                   ");
                     Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,500;off,500");
-                    display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
+                    display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_1HZ);
                     Main.getPinHandler().setScheme(Main.PH_POLE, "RED ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.RED, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
                 if (flag == FLAG_STATE_BLUE) {
@@ -397,7 +397,7 @@ public class Game implements Runnable, StatsSentListener {
                             " |_|   |_|\\__,_|\\__, | |_|___/ |____/|_____\\___/|_____| |_| |_|\\___/ \\_/\\_/  \n" +
                             "                |___/                                                        ");
                     Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
-                    display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
+                    display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_1HZ);
                     Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.BLUE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
             }
@@ -415,7 +415,7 @@ public class Game implements Runnable, StatsSentListener {
                             " |  _ <| |___| |_| |   \\ V  V /| |_| | |\\  |\n" +
                             " |_| \\_\\_____|____/     \\_/\\_/  \\___/|_| \\_|\n" +
                             "                                            ");
-                    display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                    display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
                     Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,100;off,100");
                     Main.getPinHandler().setScheme(Main.PH_POLE, "RED TEAM WON", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.RED, 250) + ";" + new RGBScheduleElement(Color.BLACK, 250));
                     lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_RED_WON);
@@ -428,7 +428,7 @@ public class Game implements Runnable, StatsSentListener {
                             " | |_) | |__| |_| | |___    \\ V  V /| |_| | |\\  |\n" +
                             " |____/|_____\\___/|_____|    \\_/\\_/  \\___/|_| \\_|\n" +
                             "                                                 ");
-                    display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                    display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
                     Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,100;off,100");
                     Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE TEAM WON", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.BLUE, 250) + ";" + new RGBScheduleElement(Color.BLACK, 250));
                     lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_BLUE_WON);

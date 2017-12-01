@@ -2,6 +2,7 @@ package de.flashheart.ocfflag.mechanics;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Configs;
+import de.flashheart.ocfflag.misc.PHPMessage;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -71,7 +72,7 @@ public class Statistics {
      */
     public void sendStats() {
         logger.debug(toPHP());
-        if (Main.getMessageProcessor() != null) Main.getMessageProcessor().pushMessage(toPHP());
+        if (Main.getMessageProcessor() != null) Main.getMessageProcessor().pushMessage(new PHPMessage(toPHP(), stackEvents.peek().getEvent()));
     }
 
     public long addEvent(int event) {
