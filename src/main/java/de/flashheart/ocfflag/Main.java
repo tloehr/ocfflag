@@ -27,6 +27,8 @@ import java.io.StringWriter;
 
 public class Main {
 
+
+
     private static GpioController GPIO;
     private static FrameDebug frameDebug;
 //    private static SortedProperties config;
@@ -85,9 +87,13 @@ public class Main {
 
     private static MessageProcessor messageProcessor;
 
+    public static final int DEBOUNCE = 200; //ms
+
     public static MessageProcessor getMessageProcessor() {
         return messageProcessor;
     }
+
+
 
     public static void main(String[] args) throws Exception {
         initBaseSystem();
@@ -112,7 +118,7 @@ public class Main {
         display_blue = new Display7Segments4Digits(DISPLAY_BLUE, getFrameDebug().getLblBlueTime(), "display_blue");
         display_red = new Display7Segments4Digits(DISPLAY_RED, getFrameDebug().getLblRedTime(), "display_red");
         display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblWhiteTime(), "display_white");
-
+                 
         button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue());
         button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed());
         button_reset = new MyAbstractButton(GPIO, BUTTON_RESET, frameDebug.getBtnReset());
