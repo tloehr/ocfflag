@@ -48,6 +48,7 @@ public class FrameDebug extends JFrame {
         lblRedTime.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
         lblWhiteTime.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
         setTab(0);
+        setExtendedState(MAXIMIZED_BOTH);
     }
 
     private void initFonts() {

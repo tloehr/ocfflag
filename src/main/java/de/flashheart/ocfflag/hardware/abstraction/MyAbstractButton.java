@@ -25,7 +25,7 @@ public class MyAbstractButton {
 
     public MyAbstractButton(GpioController gpio, Pin pin, JButton guiButton) {
         hardwareButton = gpio == null ? null : gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
-        hardwareButton.setDebounce(Main.DEBOUNCE);
+        if (hardwareButton != null) hardwareButton.setDebounce(Main.DEBOUNCE);
         this.guiButton = guiButton;
     }
 
