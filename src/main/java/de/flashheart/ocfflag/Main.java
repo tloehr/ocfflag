@@ -14,7 +14,6 @@ import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
 import de.flashheart.ocfflag.mechanics.Game;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.FTPWrapper;
 import de.flashheart.ocfflag.misc.MessageProcessor;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Level;
@@ -28,7 +27,6 @@ import java.io.StringWriter;
 public class Main {
 
 
-
     private static GpioController GPIO;
     private static FrameDebug frameDebug;
 //    private static SortedProperties config;
@@ -39,6 +37,8 @@ public class Main {
     public static final String PH_POLE = "flagPole";
     public static final String PH_LED_RED_BTN = "ledRedButton";
     public static final String PH_LED_BLUE_BTN = "ledBlueButton";
+    public static final String PH_LED_GREEN_BTN = "ledGreenButton";
+    public static final String PH_LED_YELLOW_BTN = "ledYellowButton";
     public static final String PH_LED_GREEN = "ledGreen";
     public static final String PH_LED_WHITE = "ledWhite";
 
@@ -55,29 +55,37 @@ public class Main {
 
     // Klemmleiste
     private static final Pin BUTTON_STANDBY_ACTIVE = RaspiPin.GPIO_03;
-    private static final Pin BUTTON_PRESET_PREV = RaspiPin.GPIO_12;
-    private static final Pin BUTTON_PRESET_NEXT = RaspiPin.GPIO_13;
+    private static final Pin BUTTON_PRESET_NUM_TEAMS = RaspiPin.GPIO_12;
+    private static final Pin BUTTON_PRESET_GAMETIME = RaspiPin.GPIO_13;
     private static final Pin BUTTON_RESET = RaspiPin.GPIO_14;
     private static final Pin BUTTON_RED = RaspiPin.GPIO_21;
     private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
+    private static final Pin BUTTON_GREEN = RaspiPin.GPIO_07;
+    private static final Pin BUTTON_YELLOW = RaspiPin.GPIO_29;
 
-    // LEDs in den Tasten
-    private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_24;
     private static final Pin LED_RED_BUTTON = RaspiPin.GPIO_23;
+    private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_24;
 
-    // LEDs
     private static final Pin LED_GREEN = RaspiPin.GPIO_25;
-    private static final Pin LED_WHITE = RaspiPin.GPIO_27;
 
+
+    // Rechte Seite des JP8 Headers
     // RGB Flagge
     // RJ45
-    private static final Pin POLE_RGB_RED = RaspiPin.GPIO_01; // 21
-    private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_04; // 22
-    private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_05; // 23
+    private static final Pin POLE_RGB_RED = RaspiPin.GPIO_01;
+    private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_04;
+    private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_05;
+
+
+    private static final Pin LED_GREEN_BUTTON = RaspiPin.GPIO_26;
+    private static final Pin LED_YELLOW_BUTTON = RaspiPin.GPIO_28;
+
+
+    private static final Pin LED_WHITE = RaspiPin.GPIO_27;
 
 
     private static Display7Segments4Digits display_blue, display_red, display_white;
-    private static MyAbstractButton button_blue, button_red, button_reset, button_standby_active, button_preset_minus, button_preset_plus, button_quit, button_config, button_back2game;
+    private static MyAbstractButton button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game;
     private static MyRGBLed pole;
 
     private static MyPin ledRedButton, ledBlueButton, ledGreen, ledWhite;
@@ -92,8 +100,6 @@ public class Main {
     public static MessageProcessor getMessageProcessor() {
         return messageProcessor;
     }
-
-
 
     public static void main(String[] args) throws Exception {
         initBaseSystem();
@@ -118,12 +124,14 @@ public class Main {
         display_blue = new Display7Segments4Digits(DISPLAY_BLUE, getFrameDebug().getLblBlueTime(), "display_blue");
         display_red = new Display7Segments4Digits(DISPLAY_RED, getFrameDebug().getLblRedTime(), "display_red");
         display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblWhiteTime(), "display_white");
-                 
+
         button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue());
         button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed());
+        button_green = new MyAbstractButton(GPIO, BUTTON_GREEN, frameDebug.getBtnBlue());
+        button_yellow = new MyAbstractButton(GPIO, BUTTON_YELLOW, frameDebug.getBtnRed());
         button_reset = new MyAbstractButton(GPIO, BUTTON_RESET, frameDebug.getBtnReset());
-        button_preset_minus = new MyAbstractButton(GPIO, BUTTON_PRESET_PREV, frameDebug.getBtnPresetMinus());
-        button_preset_plus = new MyAbstractButton(GPIO, BUTTON_PRESET_NEXT, frameDebug.getBtnPresetPlus());
+        button_preset_num_teams = new MyAbstractButton(GPIO, BUTTON_PRESET_NUM_TEAMS, frameDebug.getBtnPresetMinus());
+        button_preset_gametime = new MyAbstractButton(GPIO, BUTTON_PRESET_GAMETIME, frameDebug.getBtnPresetPlus());
         button_standby_active = new MyAbstractButton(GPIO, BUTTON_STANDBY_ACTIVE, frameDebug.getBtnSwitchMode());
         button_quit = new MyAbstractButton(null, null, frameDebug.getBtnQuit());
         button_config = new MyAbstractButton(null, null, frameDebug.getBtnConfig());
@@ -148,7 +156,7 @@ public class Main {
         pinHandler.add(ledGreen);
         pinHandler.add(ledWhite);
 
-        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_reset, button_standby_active, button_preset_minus, button_preset_plus, button_quit, button_config, button_back2game);
+        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game);
         game.run();
 
 
@@ -162,8 +170,8 @@ public class Main {
 
     private static void initBaseSystem() throws InterruptedException, IOException {
         System.setProperty("logs", Tools.getWorkingPath());
+        Logger.getRootLogger().setLevel(logLevel);
         logger = Logger.getLogger("Main");
-        logger.setLevel(logLevel);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             pinHandler.off();

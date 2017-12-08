@@ -18,8 +18,8 @@ public class MyLED extends JLabel {
     public final Icon icon22ledBlueOn = new ImageIcon(getClass().getResource("/artwork/48x48/led-blue-on.png"));
     public final Icon icon22ledGreenOff = new ImageIcon(getClass().getResource("/artwork/48x48/led-green-off.png"));
     public final Icon icon22ledGreenOn = new ImageIcon(getClass().getResource("/artwork/48x48/led-green-on.png"));
-    public final Icon icon22ledYellowOff = new ImageIcon(getClass().getResource("/artwork/22x22/leddarkyellow.png"));
-    public final Icon icon22ledYellowOn = new ImageIcon(getClass().getResource("/artwork/22x22/ledyellow.png"));
+    public final Icon icon22ledYellowOff = new ImageIcon(getClass().getResource("/artwork/48x48/led-yellow-off.png"));
+    public final Icon icon22ledYellowOn = new ImageIcon(getClass().getResource("/artwork/48x48/led-yellow-on.png"));
     public final Icon icon22ledRedOff = new ImageIcon(getClass().getResource("/artwork/48x48/led-red-off.png"));
     public final Icon icon22ledRedOn = new ImageIcon(getClass().getResource("/artwork/48x48/led-red-on.png"));
     public final Icon icon22ledWhiteOff = new ImageIcon(getClass().getResource("/artwork/48x48/led-white-off.png"));

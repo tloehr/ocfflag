@@ -37,8 +37,8 @@ public class Game implements Runnable, StatsSentListener {
     private final int MODE_CLOCK_GAME_PAUSED = 2;
     private final int MODE_CLOCK_GAME_OVER = 3;
 
-    private final MyAbstractButton button_preset_minus;
-    private final MyAbstractButton button_preset_plus;
+    private final MyAbstractButton button_preset_num_teams;
+    private final MyAbstractButton button_preset_gametime;
 
     private final MyAbstractButton button_quit;
     private final MyAbstractButton button_config;
@@ -56,6 +56,8 @@ public class Game implements Runnable, StatsSentListener {
     private final Display7Segments4Digits display_white;
     private final MyAbstractButton button_blue;
     private final MyAbstractButton button_red;
+    private final MyAbstractButton button_green;
+    private final MyAbstractButton button_yellow;
     private final MyAbstractButton button_reset;
     private final MyAbstractButton button_switch_mode;
 
@@ -91,14 +93,20 @@ public class Game implements Runnable, StatsSentListener {
                 Display7Segments4Digits display_white,
                 MyAbstractButton button_blue,
                 MyAbstractButton button_red,
+                MyAbstractButton button_green,
+                MyAbstractButton button_yellow,
                 MyAbstractButton button_reset,
                 MyAbstractButton button_switch_mode,
-                MyAbstractButton button_preset_minus,
-                MyAbstractButton button_preset_plus,
+                MyAbstractButton button_preset_num_teams,
+                MyAbstractButton button_preset_gametime,
                 MyAbstractButton button_quit,
                 MyAbstractButton button_config,
                 MyAbstractButton button_back2game
     ) {
+        this.button_green = button_green;
+        this.button_yellow = button_yellow;
+        this.button_preset_num_teams = button_preset_num_teams;
+        this.button_preset_gametime = button_preset_gametime;
         this.button_quit = button_quit;
         this.button_config = button_config;
         this.button_back2game = button_back2game;
@@ -111,8 +119,6 @@ public class Game implements Runnable, StatsSentListener {
         this.button_red = button_red;
         this.button_reset = button_reset;
         this.button_switch_mode = button_switch_mode;
-        this.button_preset_minus = button_preset_minus;
-        this.button_preset_plus = button_preset_plus;
 
 
         statistics = new Statistics();
@@ -155,22 +161,22 @@ public class Game implements Runnable, StatsSentListener {
             logger.debug("GPIO_button_reset");
             button_reset_pressed();
         });
-        button_preset_minus.addListener(e -> {
-            logger.debug("GUI_button_preset_minus");
+        button_preset_num_teams.addListener(e -> {
+            logger.debug("GUI_button_preset_num_teams");
             button_preset_minus_pressed();
         });
-        button_preset_minus.addListener((GpioPinListenerDigital) event -> {
+        button_preset_num_teams.addListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) return;
-            logger.debug("GPIO_button_preset_minus");
+            logger.debug("GPIO_button_preset_num_teams");
             button_preset_minus_pressed();
         });
-        button_preset_plus.addListener(e -> {
-            logger.debug("GUI_button_preset_plus");
+        button_preset_gametime.addListener(e -> {
+            logger.debug("GUI_button_preset_gametime");
             button_preset_plus_pressed();
         });
-        button_preset_plus.addListener((GpioPinListenerDigital) event -> {
+        button_preset_gametime.addListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) return;
-            logger.debug("GPIO_button_preset_plus");
+            logger.debug("GPIO_button_preset_gametime");
             button_preset_plus_pressed();
         });
         button_switch_mode.addListener(e -> {
@@ -330,7 +336,7 @@ public class Game implements Runnable, StatsSentListener {
         statistics.reset();
         refreshDisplay();
     }
-    
+
     private void refreshDisplay() {
         try {
             display_white.setTime(time);

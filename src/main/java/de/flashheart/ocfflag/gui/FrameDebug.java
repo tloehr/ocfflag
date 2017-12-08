@@ -148,13 +148,18 @@ public class FrameDebug extends JFrame {
         btnBlue = new JButton();
         lblPole = new JLabel();
         btnRed = new JButton();
+        btnYellow = new JButton();
+        btnGreen = new JButton();
         panel4 = new JPanel();
-        lblFlagname = new JLabel();
         ledBlueButton = new MyLED();
         lblBlueTime = new JLabel();
         lblWhiteTime = new JLabel();
         lblRedTime = new JLabel();
         ledRedButton = new MyLED();
+        ledYellowButton = new MyLED();
+        lblBlueTime2 = new JLabel();
+        lblRedTime2 = new JLabel();
+        ledGreenButton = new MyLED();
         panel5 = new JPanel();
         btnConfig = new JButton();
         btnQuit = new JButton();
@@ -162,9 +167,9 @@ public class FrameDebug extends JFrame {
         ledStandbyActive = new MyLED();
         ledStatsSent = new MyLED();
         panel2 = new JPanel();
-        btnPresetMinus = new JButton();
+        btnPresetNumTeams = new JButton();
         btnReset = new JButton();
-        btnPresetPlus = new JButton();
+        btnPresetGametime = new JButton();
         btnSwitchMode = new JButton();
         configView = new JPanel();
         lblConfigTitle = new JLabel();
@@ -205,13 +210,13 @@ public class FrameDebug extends JFrame {
             {
                 mainView.setLayout(new FormLayout(
                     "$rgap, $lcgap, pref, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow, $lcgap, $rgap",
-                    "$rgap, $lgap, fill:22dlu:grow, $rgap, default:grow, $lgap, fill:default:grow, $lgap, $rgap"));
+                    "$rgap, $lgap, fill:55dlu:grow, $rgap, 2*(fill:default:grow, $lgap), $rgap"));
 
                 //======== panel1 ========
                 {
                     panel1.setLayout(new FormLayout(
                         "pref:grow, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow",
-                        "fill:22dlu:grow"));
+                        "fill:22dlu:grow, $lgap, default"));
 
                     //---- btnBlue ----
                     btnBlue.setText("Blue");
@@ -227,7 +232,7 @@ public class FrameDebug extends JFrame {
                     lblPole.setForeground(Color.black);
                     lblPole.setHorizontalAlignment(SwingConstants.CENTER);
                     lblPole.setFont(lblPole.getFont().deriveFont(lblPole.getFont().getStyle() | Font.ITALIC, 24f));
-                    panel1.add(lblPole, CC.xy(5, 1));
+                    panel1.add(lblPole, CC.xywh(5, 1, 1, 3));
 
                     //---- btnRed ----
                     btnRed.setText("Red");
@@ -235,6 +240,20 @@ public class FrameDebug extends JFrame {
                     btnRed.setFont(btnRed.getFont().deriveFont(btnRed.getFont().getStyle() | Font.ITALIC, 24f));
                     btnRed.setBackground(new Color(255, 0, 51));
                     panel1.add(btnRed, CC.xy(9, 1, CC.FILL, CC.DEFAULT));
+
+                    //---- btnYellow ----
+                    btnYellow.setText("Yellow");
+                    btnYellow.setForeground(Color.black);
+                    btnYellow.setFont(btnYellow.getFont().deriveFont(btnYellow.getFont().getStyle() | Font.ITALIC, 24f));
+                    btnYellow.setBackground(Color.yellow);
+                    panel1.add(btnYellow, CC.xy(1, 3, CC.FILL, CC.DEFAULT));
+
+                    //---- btnGreen ----
+                    btnGreen.setText("Green");
+                    btnGreen.setForeground(Color.black);
+                    btnGreen.setFont(btnGreen.getFont().deriveFont(btnGreen.getFont().getStyle() | Font.ITALIC, 24f));
+                    btnGreen.setBackground(Color.green);
+                    panel1.add(btnGreen, CC.xy(9, 3, CC.FILL, CC.FILL));
                 }
                 mainView.add(panel1, CC.xywh(3, 3, 9, 1));
 
@@ -242,26 +261,23 @@ public class FrameDebug extends JFrame {
                 {
                     panel4.setLayout(new FormLayout(
                         "3*(default, default:grow), default",
-                        "default, $ugap, fill:default:grow"));
-
-                    //---- lblFlagname ----
-                    lblFlagname.setText("text");
-                    lblFlagname.setFont(new Font("Dialog", Font.BOLD, 26));
-                    panel4.add(lblFlagname, CC.xywh(1, 1, 7, 1, CC.CENTER, CC.DEFAULT));
+                        "fill:default:grow, $lgap, default"));
 
                     //---- ledBlueButton ----
                     ledBlueButton.setColor(Color.blue);
                     ledBlueButton.setToolTipText("Blue LED in Button");
-                    panel4.add(ledBlueButton, CC.xy(1, 3));
+                    panel4.add(ledBlueButton, CC.xy(1, 1));
 
                     //---- lblBlueTime ----
                     lblBlueTime.setText("0.0.:0.0.");
                     lblBlueTime.setFont(new Font("DSEG7 Classic", Font.BOLD, 36));
-                    lblBlueTime.setForeground(Color.blue);
+                    lblBlueTime.setForeground(Color.yellow);
                     lblBlueTime.setBorder(new EtchedBorder());
                     lblBlueTime.setPreferredSize(new Dimension(130, 45));
                     lblBlueTime.setHorizontalTextPosition(SwingConstants.LEADING);
-                    panel4.add(lblBlueTime, CC.xy(2, 3));
+                    lblBlueTime.setBackground(Color.blue);
+                    lblBlueTime.setOpaque(true);
+                    panel4.add(lblBlueTime, CC.xy(2, 1));
 
                     //---- lblWhiteTime ----
                     lblWhiteTime.setText("0.0.:0.0.");
@@ -270,20 +286,53 @@ public class FrameDebug extends JFrame {
                     lblWhiteTime.setOpaque(true);
                     lblWhiteTime.setBorder(new EtchedBorder());
                     lblWhiteTime.setPreferredSize(new Dimension(130, 45));
-                    panel4.add(lblWhiteTime, CC.xy(4, 3, CC.FILL, CC.DEFAULT));
+                    panel4.add(lblWhiteTime, CC.xywh(4, 1, 1, 3, CC.FILL, CC.DEFAULT));
 
                     //---- lblRedTime ----
                     lblRedTime.setText("0.0.:0.0.");
                     lblRedTime.setFont(new Font("DSEG7 Classic", Font.BOLD, 36));
-                    lblRedTime.setForeground(Color.red);
+                    lblRedTime.setForeground(Color.yellow);
                     lblRedTime.setBorder(new EtchedBorder());
                     lblRedTime.setPreferredSize(new Dimension(130, 45));
-                    panel4.add(lblRedTime, CC.xy(6, 3, CC.FILL, CC.DEFAULT));
+                    lblRedTime.setOpaque(true);
+                    lblRedTime.setBackground(Color.red);
+                    panel4.add(lblRedTime, CC.xy(6, 1, CC.FILL, CC.DEFAULT));
 
                     //---- ledRedButton ----
                     ledRedButton.setColor(Color.red);
                     ledRedButton.setToolTipText("Red LED in Button");
-                    panel4.add(ledRedButton, CC.xy(7, 3));
+                    panel4.add(ledRedButton, CC.xy(7, 1));
+
+                    //---- ledYellowButton ----
+                    ledYellowButton.setColor(Color.yellow);
+                    ledYellowButton.setToolTipText("Yellow LED in Button");
+                    panel4.add(ledYellowButton, CC.xy(1, 3));
+
+                    //---- lblBlueTime2 ----
+                    lblBlueTime2.setText("0.0.:0.0.");
+                    lblBlueTime2.setFont(new Font("DSEG7 Classic", Font.BOLD, 36));
+                    lblBlueTime2.setForeground(Color.black);
+                    lblBlueTime2.setBorder(new EtchedBorder());
+                    lblBlueTime2.setPreferredSize(new Dimension(130, 45));
+                    lblBlueTime2.setHorizontalTextPosition(SwingConstants.LEADING);
+                    lblBlueTime2.setBackground(Color.yellow);
+                    lblBlueTime2.setOpaque(true);
+                    panel4.add(lblBlueTime2, CC.xy(2, 3));
+
+                    //---- lblRedTime2 ----
+                    lblRedTime2.setText("0.0.:0.0.");
+                    lblRedTime2.setFont(new Font("DSEG7 Classic", Font.BOLD, 36));
+                    lblRedTime2.setForeground(Color.black);
+                    lblRedTime2.setBorder(new EtchedBorder());
+                    lblRedTime2.setPreferredSize(new Dimension(130, 45));
+                    lblRedTime2.setOpaque(true);
+                    lblRedTime2.setBackground(Color.green);
+                    panel4.add(lblRedTime2, CC.xy(6, 3, CC.FILL, CC.DEFAULT));
+
+                    //---- ledGreenButton ----
+                    ledGreenButton.setColor(Color.green);
+                    ledGreenButton.setToolTipText("Red LED in Button");
+                    panel4.add(ledGreenButton, CC.xy(7, 3));
                 }
                 mainView.add(panel4, CC.xywh(3, 5, 9, 1, CC.FILL, CC.DEFAULT));
 
@@ -328,11 +377,11 @@ public class FrameDebug extends JFrame {
                         "3*(default:grow)",
                         "fill:default:grow, $lgap, fill:default:grow"));
 
-                    //---- btnPresetMinus ----
-                    btnPresetMinus.setText(null);
-                    btnPresetMinus.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/player_start.png")));
-                    btnPresetMinus.setToolTipText("Previous Preset Time");
-                    panel2.add(btnPresetMinus, CC.xy(1, 1, CC.FILL, CC.FILL));
+                    //---- btnPresetNumTeams ----
+                    btnPresetNumTeams.setText(null);
+                    btnPresetNumTeams.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/player_start.png")));
+                    btnPresetNumTeams.setToolTipText("Previous Preset Time");
+                    panel2.add(btnPresetNumTeams, CC.xy(1, 1, CC.FILL, CC.FILL));
 
                     //---- btnReset ----
                     btnReset.setText(null);
@@ -340,11 +389,11 @@ public class FrameDebug extends JFrame {
                     btnReset.setToolTipText("Reset");
                     panel2.add(btnReset, CC.xy(2, 1, CC.FILL, CC.FILL));
 
-                    //---- btnPresetPlus ----
-                    btnPresetPlus.setText(null);
-                    btnPresetPlus.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/player_end1.png")));
-                    btnPresetPlus.setToolTipText("Next Preset Time");
-                    panel2.add(btnPresetPlus, CC.xy(3, 1, CC.FILL, CC.FILL));
+                    //---- btnPresetGametime ----
+                    btnPresetGametime.setText(null);
+                    btnPresetGametime.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/player_end1.png")));
+                    btnPresetGametime.setToolTipText("Next Preset Time");
+                    panel2.add(btnPresetGametime, CC.xy(3, 1, CC.FILL, CC.FILL));
 
                     //---- btnSwitchMode ----
                     btnSwitchMode.setText(null);
@@ -584,13 +633,18 @@ public class FrameDebug extends JFrame {
     private JButton btnBlue;
     private JLabel lblPole;
     private JButton btnRed;
+    private JButton btnYellow;
+    private JButton btnGreen;
     private JPanel panel4;
-    private JLabel lblFlagname;
     private MyLED ledBlueButton;
     private JLabel lblBlueTime;
     private JLabel lblWhiteTime;
     private JLabel lblRedTime;
     private MyLED ledRedButton;
+    private MyLED ledYellowButton;
+    private JLabel lblBlueTime2;
+    private JLabel lblRedTime2;
+    private MyLED ledGreenButton;
     private JPanel panel5;
     private JButton btnConfig;
     private JButton btnQuit;
@@ -598,9 +652,9 @@ public class FrameDebug extends JFrame {
     private MyLED ledStandbyActive;
     private MyLED ledStatsSent;
     private JPanel panel2;
-    private JButton btnPresetMinus;
+    private JButton btnPresetNumTeams;
     private JButton btnReset;
-    private JButton btnPresetPlus;
+    private JButton btnPresetGametime;
     private JButton btnSwitchMode;
     private JPanel configView;
     private JLabel lblConfigTitle;

@@ -29,11 +29,15 @@ public class Configs {
     public static final String BRIGHTNESS_WHITE = "brightness_white";
     public static final String BRIGHTNESS_BLUE = "brightness_blue";
     public static final String BRIGHTNESS_RED = "brightness_red";
+    public static final String BRIGHTNESS_YELLOW = "brightness_yellow";
+    public static final String BRIGHTNESS_GREEN = "brightness_green";
+    public static final String NUMBER_OF_TEAMS = "num_teams";
 
     public Configs() throws IOException {
         configs = new SortedProperties();
         // defaults
         configs.put(MATCHID, "1");
+        configs.put(NUMBER_OF_TEAMS, "2");
         configs.put(LOGLEVEL, "debug");
         configs.put(FLAGNAME, "OCF Flagge #" + new java.util.Random().nextInt());
         configs.put(GAMETIME, "0");

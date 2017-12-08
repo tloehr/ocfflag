@@ -20,6 +20,7 @@ import java.awt.event.ItemListener;
  */
 public class MyAbstractButton {
 
+    
     private final GpioPinDigitalInput hardwareButton;
     private final JButton guiButton;
 
