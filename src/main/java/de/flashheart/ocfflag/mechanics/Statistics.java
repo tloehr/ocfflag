@@ -24,6 +24,8 @@ public class Statistics {
     public static final int EVENT_START_GAME = 2; // von Standby nach Active
     public static final int EVENT_BLUE_ACTIVATED = 3;
     public static final int EVENT_RED_ACTIVATED = 4;
+    public static final int EVENT_YELLOW_ACTIVATED = 30;
+    public static final int EVENT_GREEN_ACTIVATED = 40;
     public static final int EVENT_GAME_OVER = 5; // wenn die Spielzeit abgelaufen ist
     public static final int EVENT_GAME_ABORTED = 6; // wenn die Spielzeit abgelaufen ist
     public static final int EVENT_RESULT_RED_WON = 7; // wenn das spiel vorzeitig beendet wird
@@ -72,7 +74,8 @@ public class Statistics {
      */
     public void sendStats() {
         logger.debug(toPHP());
-        if (Main.getMessageProcessor() != null) Main.getMessageProcessor().pushMessage(new PHPMessage(toPHP(), stackEvents.peek().getEvent()));
+        if (Main.getMessageProcessor() != null)
+            Main.getMessageProcessor().pushMessage(new PHPMessage(toPHP(), stackEvents.peek().getEvent()));
     }
 
     public long addEvent(int event) {
@@ -134,7 +137,7 @@ public class Statistics {
         String flagname = Main.getConfigs().get(Configs.FLAGNAME);
 
         flagname = StringUtils.replace(flagname, "'", "\\'");
-        flagname =  StringUtils.replace(flagname, "\"", "\\\"");
+        flagname = StringUtils.replace(flagname, "\"", "\\\"");
 
 
         php += "$game['flagname'] = '" + flagname + "';\n";

@@ -46,6 +46,8 @@ public class Main {
     private static final int DISPLAY_BLUE = 0x71;
     private static final int DISPLAY_RED = 0x72;
     private static final int DISPLAY_WHITE = 0x70;
+    private static final int DISPLAY_YELLOW = 0x73;
+    private static final int DISPLAY_GREEN = 0x74;
 
     // Linke Seite des JP8 Header
     // Sirenen
@@ -84,7 +86,7 @@ public class Main {
     private static final Pin LED_WHITE = RaspiPin.GPIO_27;
 
 
-    private static Display7Segments4Digits display_blue, display_red, display_white;
+    private static Display7Segments4Digits display_blue, display_red, display_white, display_green, display_yellow;
     private static MyAbstractButton button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game;
     private static MyRGBLed pole;
 
@@ -124,6 +126,8 @@ public class Main {
         display_blue = new Display7Segments4Digits(DISPLAY_BLUE, getFrameDebug().getLblBlueTime(), "display_blue");
         display_red = new Display7Segments4Digits(DISPLAY_RED, getFrameDebug().getLblRedTime(), "display_red");
         display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblWhiteTime(), "display_white");
+        display_green = new Display7Segments4Digits(DISPLAY_GREEN, getFrameDebug().getLblWhiteTime(), "display_green");
+        display_yellow = new Display7Segments4Digits(DISPLAY_YELLOW, getFrameDebug().getLblWhiteTime(), "display_yellow");
 
         button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue());
         button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed());
@@ -156,7 +160,7 @@ public class Main {
         pinHandler.add(ledGreen);
         pinHandler.add(ledWhite);
 
-        Game game = new Game(display_blue, display_red, display_white, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game);
+        Game game = new Game(display_blue, display_red, display_white, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game);
         game.run();
 
 
@@ -183,11 +187,10 @@ public class Main {
                     display_white.clear();
                     display_blue.clear();
                     display_red.clear();
+                    display_green.clear();
+                    display_yellow.clear();
 
                     if (messageProcessor != null) messageProcessor.interrupt();
-
-//                    FTPWrapper.initFTPDir();
-
                 } catch (IOException e) {
                     logger.error(e);
                 }

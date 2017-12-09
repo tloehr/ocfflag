@@ -37,23 +37,30 @@ public class Game implements Runnable, StatsSentListener {
     private final int MODE_CLOCK_GAME_PAUSED = 2;
     private final int MODE_CLOCK_GAME_OVER = 3;
 
-    private final MyAbstractButton button_preset_num_teams;
-    private final MyAbstractButton button_preset_gametime;
 
-    private final MyAbstractButton button_quit;
-    private final MyAbstractButton button_config;
-    private final MyAbstractButton button_back2game;
+
     private int mode = MODE_CLOCK_PREGAME;
     private int running_match_id = 0;
 
     private final int FLAG_STATE_NEUTRAL = 0;
     private final int FLAG_STATE_BLUE = 1;
-    private final int FLAG_STATE_RED = 20;
+    private final int FLAG_STATE_RED = 2;
+    private final int FLAG_STATE_YELLOW = 3;
+    private final int FLAG_STATE_GREEN = 4;
+
     private int flag = FLAG_STATE_NEUTRAL;
 
     private final Display7Segments4Digits display_blue;
     private final Display7Segments4Digits display_red;
     private final Display7Segments4Digits display_white;
+    private final Display7Segments4Digits display_green;
+    private final Display7Segments4Digits display_yellow;
+
+    private final MyAbstractButton button_quit;
+    private final MyAbstractButton button_config;
+    private final MyAbstractButton button_back2game;
+    private final MyAbstractButton button_preset_num_teams;
+    private final MyAbstractButton button_preset_gametime;
     private final MyAbstractButton button_blue;
     private final MyAbstractButton button_red;
     private final MyAbstractButton button_green;
@@ -66,7 +73,7 @@ public class Game implements Runnable, StatsSentListener {
 
     private Statistics statistics;
 
-    private long time, time_blue, time_red, lastPIT, lastStatsSent, min_stat_sent_time;
+    private long time, time_blue, time_red, time_yellow, time_green, lastPIT, lastStatsSent, min_stat_sent_time;
 
     // das sind die standard spieldauern in millis.
     // In Minuten: 30, 60, 90, 120, 150, 180, 210, 240, 270, 300
@@ -87,10 +94,13 @@ public class Game implements Runnable, StatsSentListener {
             18000000l - 1000l // 04:59:59
     };
     private int preset_position = 0;
+    private  int preset_num_teams = 2;
 
     public Game(Display7Segments4Digits display_blue,
                 Display7Segments4Digits display_red,
                 Display7Segments4Digits display_white,
+                Display7Segments4Digits display_green,
+                Display7Segments4Digits display_yellow,
                 MyAbstractButton button_blue,
                 MyAbstractButton button_red,
                 MyAbstractButton button_green,
@@ -103,6 +113,8 @@ public class Game implements Runnable, StatsSentListener {
                 MyAbstractButton button_config,
                 MyAbstractButton button_back2game
     ) {
+        this.display_green = display_green;
+        this.display_yellow = display_yellow;
         this.button_green = button_green;
         this.button_yellow = button_yellow;
         this.button_preset_num_teams = button_preset_num_teams;
@@ -124,6 +136,7 @@ public class Game implements Runnable, StatsSentListener {
         statistics = new Statistics();
 
         preset_position = Integer.parseInt(Main.getConfigs().get(Configs.GAMETIME));
+        preset_num_teams = Integer.parseInt(Main.getConfigs().get(Configs.NUMBER_OF_TEAMS));
 
         initGame();
     }
@@ -143,6 +156,7 @@ public class Game implements Runnable, StatsSentListener {
             logger.debug("GPIO__button_blue");
             button_blue_pressed();
         });
+
         button_red.addListener(e -> {
             logger.debug("GUI_button_red");
             button_red_pressed();
@@ -152,6 +166,28 @@ public class Game implements Runnable, StatsSentListener {
             logger.debug("GPIO_button_blue");
             button_red_pressed();
         });
+
+        button_yellow.addListener(e -> {
+            logger.debug("GUI_button_yellow");
+            button_yellow_pressed();
+        });
+        button_yellow.addListener((GpioPinListenerDigital) event -> {
+            if (event.getState() != PinState.LOW) return;
+            logger.debug("GPIO__button_yellow");
+            button_yellow_pressed();
+        });
+
+        button_green.addListener(e -> {
+            logger.debug("GUI_button_green");
+            button_green_pressed();
+        });
+        button_green.addListener((GpioPinListenerDigital) event -> {
+            if (event.getState() != PinState.LOW) return;
+            logger.debug("GPIO_button_green");
+            button_green_pressed();
+        });
+
+
         button_reset.addListener(e -> {
             logger.debug("GUI_button_reset");
             button_reset_pressed();
@@ -255,24 +291,43 @@ public class Game implements Runnable, StatsSentListener {
         }
     }
 
+    private void button_green_pressed() {
+        if (mode == MODE_CLOCK_GAME_RUNNING) {
+            if (flag != FLAG_STATE_GREEN) {
+                flag = FLAG_STATE_GREEN;
+                lastStatsSent = statistics.addEvent(Statistics.EVENT_GREEN_ACTIVATED);
+                refreshDisplay();
+            }
+
+        } else {
+            logger.debug("NOT RUNNING: IGNORED");
+        }
+    }
+
+    private void button_yellow_pressed() {
+        if (mode == MODE_CLOCK_GAME_RUNNING) {
+            if (flag != FLAG_STATE_YELLOW) {
+                flag = FLAG_STATE_YELLOW;
+                lastStatsSent = statistics.addEvent(Statistics.EVENT_YELLOW_ACTIVATED);
+                refreshDisplay();
+            }
+        } else {
+            logger.debug("NOT RUNNING: IGNORED");
+        }
+    }
+
     private void button_reset_pressed() {
         if (mode != MODE_CLOCK_GAME_RUNNING) {
             if (mode == MODE_CLOCK_GAME_PAUSED) {
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
             }
-            // Das führt zu Konflikten.
-            // todo: addEvent muss auf aborted auch direkt die Datei abschließen.
-//            try {
-//                FTPWrapper.initFTPDir();
-//            } catch (IOException e) {
-//                logger.error(e);
-//            }
             reset_timers();
         } else {
             logger.debug("RUNNING: IGNORED");
         }
     }
 
+    // todo: hier gehts weiter
     private void button_preset_minus_pressed() {
         if (mode == MODE_CLOCK_PREGAME) {
             preset_position--;
@@ -342,6 +397,8 @@ public class Game implements Runnable, StatsSentListener {
             display_white.setTime(time);
             display_blue.setTime(time_blue);
             display_red.setTime(time_red);
+            display_yellow.setTime(time_yellow);
+            display_green.setTime(time_green);
 
             if (min_stat_sent_time > 0 && running_match_id > 0)
                 statistics.setTimes(running_match_id, time, time_blue, time_red);
