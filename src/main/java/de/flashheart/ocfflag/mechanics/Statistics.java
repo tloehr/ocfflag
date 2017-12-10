@@ -15,7 +15,8 @@ import java.util.Stack;
 
 public class Statistics {
 
-    private long time, time_blue, time_red;
+    private final int numTeams;
+    private long time, time_red, time_blue, time_green, time_yellow;
 
     private final Logger logger = Logger.getLogger(getClass());
 
@@ -24,18 +25,21 @@ public class Statistics {
     public static final int EVENT_START_GAME = 2; // von Standby nach Active
     public static final int EVENT_BLUE_ACTIVATED = 3;
     public static final int EVENT_RED_ACTIVATED = 4;
-    public static final int EVENT_YELLOW_ACTIVATED = 30;
-    public static final int EVENT_GREEN_ACTIVATED = 40;
     public static final int EVENT_GAME_OVER = 5; // wenn die Spielzeit abgelaufen ist
     public static final int EVENT_GAME_ABORTED = 6; // wenn die Spielzeit abgelaufen ist
     public static final int EVENT_RESULT_RED_WON = 7; // wenn das spiel vorzeitig beendet wird
     public static final int EVENT_RESULT_BLUE_WON = 8; // wenn das spiel vorzeitig beendet wird
     public static final int EVENT_RESULT_DRAW = 9; // wenn das spiel vorzeitig beendet wird
+    public static final int EVENT_YELLOW_ACTIVATED = 10;
+    public static final int EVENT_GREEN_ACTIVATED = 11;
+    public static final int EVENT_RESULT_GREEN_WON = 12; // wenn das spiel vorzeitig beendet wird
+    public static final int EVENT_RESULT_YELLOW_WON = 13; // wenn das spiel vorzeitig beendet wird
 
 
     public static final String[] EVENTS = new String[]{"EVENT_PAUSE", "EVENT_RESUME", "EVENT_START_GAME",
             "EVENT_BLUE_ACTIVATED", "EVENT_RED_ACTIVATED", "EVENT_GAME_OVER", "EVENT_GAME_ABORTED",
-            "EVENT_RESULT_RED_WON", "EVENT_RESULT_BLUE_WON", "EVENT_RESULT_DRAW"};
+            "EVENT_RESULT_RED_WON", "EVENT_RESULT_BLUE_WON", "EVENT_RESULT_DRAW", "EVENT_YELLOW_ACTIVATED",
+            "EVENT_GREEN_ACTIVATED", "EVENT_RESULT_GREEN_WON", "EVENT_RESULT_YELLOW_WON"};
 
     public Stack<GameEvent> stackEvents;
     private int matchid;
@@ -45,8 +49,8 @@ public class Statistics {
 
     private String flagcolor;
 
-    public Statistics() {
-        logger.setLevel(Main.getLogLevel());
+    public Statistics(int numTeams) {
+        this.numTeams = numTeams;
         stackEvents = new Stack<>();
         reset();
     }
@@ -56,17 +60,21 @@ public class Statistics {
         flagcolor = "neutral";
         winningTeam = "not_yet";
         time = 0l;
-        time_blue = 0l;
         time_red = 0l;
+        time_blue = 0l;
+        time_green = 0l;
+        time_yellow = 0l;
         matchid = 0;
         stackEvents.clear();
     }
 
-    public void setTimes(int matchid, long time, long time_blue, long time_red) {
+    public void setTimes(int matchid, long time, long time_red, long time_blue, long time_green, long time_yellow) {
         this.matchid = matchid;
         this.time = time;
         this.time_blue = time_blue;
         this.time_red = time_red;
+        this.time_green = time_green;
+        this.time_yellow = time_yellow;
     }
 
     /**
@@ -92,9 +100,13 @@ public class Statistics {
 
         if (event == EVENT_RESULT_RED_WON) winningTeam = "red";
         if (event == EVENT_RESULT_BLUE_WON) winningTeam = "blue";
+        if (event == EVENT_RESULT_GREEN_WON) winningTeam = "green";
+        if (event == EVENT_RESULT_YELLOW_WON) winningTeam = "yellow";
         if (event == EVENT_RESULT_DRAW) winningTeam = "draw";
         if (event == EVENT_RED_ACTIVATED) flagcolor = "red";
         if (event == EVENT_BLUE_ACTIVATED) flagcolor = "blue";
+        if (event == EVENT_GREEN_ACTIVATED) flagcolor = "green";
+        if (event == EVENT_YELLOW_ACTIVATED) flagcolor = "yellow";
 
         sendStats(); // jedes Ereignis wird gesendet.
 
@@ -152,6 +164,8 @@ public class Statistics {
         php += "$game['time'] = '" + Tools.formatLongTime(time, "HH:mm:ss") + "';\n";
         php += "$game['time_blue'] = '" + Tools.formatLongTime(time_blue, "HH:mm:ss") + "';\n";
         php += "$game['time_red'] = '" + Tools.formatLongTime(time_red, "HH:mm:ss") + "';\n";
+        php += "$game['time_green'] = '" + Tools.formatLongTime(time_green, "HH:mm:ss") + "';\n";
+        php += "$game['time_yellow'] = '" + Tools.formatLongTime(time_yellow, "HH:mm:ss") + "';\n";
 
         php += "$game['events'] = array(\n";
         for (GameEvent event : stackEvents) {

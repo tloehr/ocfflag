@@ -90,7 +90,7 @@ public class Main {
     private static MyAbstractButton button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game;
     private static MyRGBLed pole;
 
-    private static MyPin ledRedButton, ledBlueButton, ledGreen, ledWhite;
+    private static MyPin ledRedButton, ledBlueButton, ledGreenButton, ledYellowButton, ledGreen, ledWhite;
 
     private static PinHandler pinHandler; // One handler, to rule them all...
     private static Configs configs;
@@ -123,19 +123,20 @@ public class Main {
      */
     private static void initGameSystem() throws I2CFactory.UnsupportedBusNumberException, IOException {
 
-        display_blue = new Display7Segments4Digits(DISPLAY_BLUE, getFrameDebug().getLblBlueTime(), "display_blue");
-        display_red = new Display7Segments4Digits(DISPLAY_RED, getFrameDebug().getLblRedTime(), "display_red");
         display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblWhiteTime(), "display_white");
-        display_green = new Display7Segments4Digits(DISPLAY_GREEN, getFrameDebug().getLblWhiteTime(), "display_green");
-        display_yellow = new Display7Segments4Digits(DISPLAY_YELLOW, getFrameDebug().getLblWhiteTime(), "display_yellow");
 
-        button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue());
+        display_red = new Display7Segments4Digits(DISPLAY_RED, getFrameDebug().getBtnRed(), "display_red");
+        display_blue = new Display7Segments4Digits(DISPLAY_BLUE, getFrameDebug().getBtnBlue(), "display_blue");
+        display_green = new Display7Segments4Digits(DISPLAY_GREEN, getFrameDebug().getBtnGreen(), "display_green");
+        display_yellow = new Display7Segments4Digits(DISPLAY_YELLOW, getFrameDebug().getBtnYellow(), "display_yellow");
+
         button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed());
-        button_green = new MyAbstractButton(GPIO, BUTTON_GREEN, frameDebug.getBtnBlue());
-        button_yellow = new MyAbstractButton(GPIO, BUTTON_YELLOW, frameDebug.getBtnRed());
+        button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue());
+        button_green = new MyAbstractButton(GPIO, BUTTON_GREEN, frameDebug.getBtnGreen());
+        button_yellow = new MyAbstractButton(GPIO, BUTTON_YELLOW, frameDebug.getBtnYellow());
         button_reset = new MyAbstractButton(GPIO, BUTTON_RESET, frameDebug.getBtnReset());
-        button_preset_num_teams = new MyAbstractButton(GPIO, BUTTON_PRESET_NUM_TEAMS, frameDebug.getBtnPresetMinus());
-        button_preset_gametime = new MyAbstractButton(GPIO, BUTTON_PRESET_GAMETIME, frameDebug.getBtnPresetPlus());
+        button_preset_num_teams = new MyAbstractButton(GPIO, BUTTON_PRESET_NUM_TEAMS, frameDebug.getBtnPresetNumTeams());
+        button_preset_gametime = new MyAbstractButton(GPIO, BUTTON_PRESET_GAMETIME, frameDebug.getBtnPresetGametime());
         button_standby_active = new MyAbstractButton(GPIO, BUTTON_STANDBY_ACTIVE, frameDebug.getBtnSwitchMode());
         button_quit = new MyAbstractButton(null, null, frameDebug.getBtnQuit());
         button_config = new MyAbstractButton(null, null, frameDebug.getBtnConfig());
@@ -143,8 +144,11 @@ public class Main {
 
         pole = new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), PH_POLE);
 
-        ledBlueButton = new MyPin(GPIO, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), PH_LED_BLUE_BTN);
         ledRedButton = new MyPin(GPIO, LED_RED_BUTTON, frameDebug.getLedRedButton(), PH_LED_RED_BTN);
+        ledBlueButton = new MyPin(GPIO, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), PH_LED_BLUE_BTN);
+        ledGreenButton = new MyPin(GPIO, LED_GREEN_BUTTON, frameDebug.getLedGreenButton(), PH_LED_GREEN_BTN);
+        ledYellowButton = new MyPin(GPIO, LED_YELLOW_BUTTON, frameDebug.getLedYellowButton(), PH_LED_YELLOW_BTN);
+
         ledGreen = new MyPin(GPIO, LED_GREEN, frameDebug.getLedStandbyActive(), PH_LED_GREEN);
         ledWhite = new MyPin(GPIO, LED_WHITE, frameDebug.getLedStatsSent(), PH_LED_WHITE);
 
@@ -157,6 +161,9 @@ public class Main {
         pinHandler.add(pole);
         pinHandler.add(ledRedButton);
         pinHandler.add(ledBlueButton);
+        pinHandler.add(ledGreenButton);
+        pinHandler.add(ledYellowButton);
+        
         pinHandler.add(ledGreen);
         pinHandler.add(ledWhite);
 

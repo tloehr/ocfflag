@@ -19,6 +19,7 @@ import java.io.IOException;
  */
 public class Display7Segments4Digits {
     private final String name;
+    JButton btnSegment = null;
     JLabel lblSegment = null;
     SevenSegment segment = null;
     private final Logger logger = Logger.getLogger(getClass());
@@ -26,11 +27,39 @@ public class Display7Segments4Digits {
     private long lastTimeSet = 0;
 
 
-    public Display7Segments4Digits(int addr, JLabel lblSegment, String name) throws I2CFactory.UnsupportedBusNumberException, IOException {
+    public Display7Segments4Digits(int addr, JLabel lblSegment, String name) throws IOException {
         this.name = name;
         logger.setLevel(Main.getLogLevel());
         this.lblSegment = lblSegment;
-        if (Tools.isArm()) segment = new SevenSegment(addr, true);
+        btnSegment = null;
+
+        if (Tools.isArm()) {
+            try {
+                segment = new SevenSegment(addr, true);
+            } catch (I2CFactory.UnsupportedBusNumberException e) {
+                logger.error(e);
+                segment = null;
+            }
+        }
+
+        if (segment != null) segment.setBrightness(10);
+    }
+
+    public Display7Segments4Digits(int addr, JButton btnSegment, String name) throws IOException {
+        this.name = name;
+        logger.setLevel(Main.getLogLevel());
+        this.btnSegment = btnSegment;
+        lblSegment = null;
+
+        if (Tools.isArm()) {
+            try {
+                segment = new SevenSegment(addr, true);
+            } catch (I2CFactory.UnsupportedBusNumberException e) {
+                logger.error(e);
+                segment = null;
+            }
+        }
+
         if (segment != null) segment.setBrightness(10);
     }
 
@@ -61,18 +90,24 @@ public class Display7Segments4Digits {
 
         int hours = dateTime.getHourOfDay();
 
+
+        String textTime = dateTime.toString("mmss");
+        String strMinutes = textTime.charAt(0) + (hours == 4 ? "." : "")
+                + textTime.charAt(1) + (hours >= 3 ? "." : "");
+        String strSeconds = textTime.charAt(2) + (hours >= 2 ? "." : "")
+                + textTime.charAt(3) + (hours >= 1 ? "." : "");
+
         // Bildschirm Darstellung
         if (lblSegment != null) {
-            String textTime = dateTime.toString("mmss");
-            String minutes = textTime.charAt(0) + (hours == 4 ? "." : "")
-                    + textTime.charAt(1) + (hours >= 3 ? "." : "");
-            String seconds = textTime.charAt(2) + (hours >= 2 ? "." : "")
-                    + textTime.charAt(3) + (hours >= 1 ? "." : "");
-
             lblSegment.setToolTipText(dateTime.toString("HH:mm:ss"));
-            String t = minutes + (colon ? ":" : " ") + seconds;
-//            logger.debug(t);
+            String t = strMinutes + (colon ? ":" : " ") + strSeconds;
             lblSegment.setText(t);
+        }
+
+        if (btnSegment != null) {
+            btnSegment.setToolTipText(dateTime.toString("HH:mm:ss"));
+            String t = strMinutes + (colon ? ":" : " ") + strSeconds;
+            btnSegment.setText(t);
         }
 
         // Hardware 7Segment
@@ -103,6 +138,11 @@ public class Display7Segments4Digits {
     }
 
     public void clear() throws IOException {
+        if (lblSegment != null)
+            lblSegment.setText(null);
+        if (btnSegment != null)
+            btnSegment.setText(null);
+        if (segment == null) return;
         segment.clear();
     }
 

@@ -19,6 +19,9 @@ import org.joda.time.DateTimeZone;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 /**
  * In dieser Klasse befindet sich die Spielmechanik.
@@ -37,6 +40,8 @@ public class Game implements Runnable, StatsSentListener {
     private final int MODE_CLOCK_GAME_PAUSED = 2;
     private final int MODE_CLOCK_GAME_OVER = 3;
 
+    private final int MAX_TEAMS = 4;
+    private final int MIN_TEAMS = 2;
 
 
     private int mode = MODE_CLOCK_PREGAME;
@@ -93,8 +98,8 @@ public class Game implements Runnable, StatsSentListener {
             16200000l, // 01:30:00
             18000000l - 1000l // 04:59:59
     };
-    private int preset_position = 0;
-    private  int preset_num_teams = 2;
+    private int preset_gametime_position = 0;
+    private int preset_num_teams = 2; // Reihenfolge: red, blue, green, yellow
 
     public Game(Display7Segments4Digits display_blue,
                 Display7Segments4Digits display_red,
@@ -132,11 +137,10 @@ public class Game implements Runnable, StatsSentListener {
         this.button_reset = button_reset;
         this.button_switch_mode = button_switch_mode;
 
-
-        statistics = new Statistics();
-
-        preset_position = Integer.parseInt(Main.getConfigs().get(Configs.GAMETIME));
+        preset_gametime_position = Integer.parseInt(Main.getConfigs().get(Configs.GAMETIME));
         preset_num_teams = Integer.parseInt(Main.getConfigs().get(Configs.NUMBER_OF_TEAMS));
+
+        statistics = new Statistics(preset_num_teams);
 
         initGame();
     }
@@ -199,12 +203,12 @@ public class Game implements Runnable, StatsSentListener {
         });
         button_preset_num_teams.addListener(e -> {
             logger.debug("GUI_button_preset_num_teams");
-            button_preset_minus_pressed();
+            button_preset_num_teams();
         });
         button_preset_num_teams.addListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) return;
             logger.debug("GPIO_button_preset_num_teams");
-            button_preset_minus_pressed();
+            button_preset_num_teams();
         });
         button_preset_gametime.addListener(e -> {
             logger.debug("GUI_button_preset_gametime");
@@ -266,18 +270,6 @@ public class Game implements Runnable, StatsSentListener {
         System.exit(0);
     }
 
-    private void button_blue_pressed() {
-        if (mode == MODE_CLOCK_GAME_RUNNING) {
-            if (flag != FLAG_STATE_BLUE) {
-                flag = FLAG_STATE_BLUE;
-                lastStatsSent = statistics.addEvent(Statistics.EVENT_BLUE_ACTIVATED);
-                refreshDisplay();
-            }
-        } else {
-            logger.debug("NOT RUNNING: IGNORED");
-        }
-    }
-
     private void button_red_pressed() {
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != FLAG_STATE_RED) {
@@ -291,7 +283,23 @@ public class Game implements Runnable, StatsSentListener {
         }
     }
 
+    private void button_blue_pressed() {
+        if (mode == MODE_CLOCK_GAME_RUNNING) {
+            if (flag != FLAG_STATE_BLUE) {
+                flag = FLAG_STATE_BLUE;
+                lastStatsSent = statistics.addEvent(Statistics.EVENT_BLUE_ACTIVATED);
+                refreshDisplay();
+            }
+        } else {
+            logger.debug("NOT RUNNING: IGNORED");
+        }
+    }
+
     private void button_green_pressed() {
+        if (preset_num_teams < 3) {
+            logger.debug("NO GREEN TEAM: ignoring");
+            return;
+        }
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != FLAG_STATE_GREEN) {
                 flag = FLAG_STATE_GREEN;
@@ -305,6 +313,10 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void button_yellow_pressed() {
+        if (preset_num_teams < 4) {
+            logger.debug("NO YELLOW TEAM: ignoring");
+            return;
+        }
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != FLAG_STATE_YELLOW) {
                 flag = FLAG_STATE_YELLOW;
@@ -327,12 +339,13 @@ public class Game implements Runnable, StatsSentListener {
         }
     }
 
-    // todo: hier gehts weiter
-    private void button_preset_minus_pressed() {
+    private void button_preset_num_teams() {
+        if (MAX_TEAMS == 2) return;
         if (mode == MODE_CLOCK_PREGAME) {
-            preset_position--;
-            if (preset_position < 0) preset_position = preset_times.length - 1;
-            Main.getConfigs().put(Configs.GAMETIME, preset_position);
+            preset_num_teams++;
+            if (preset_num_teams >= MAX_TEAMS) preset_num_teams = MIN_TEAMS;
+            statistics = new Statistics(preset_num_teams);
+            Main.getConfigs().put(Configs.NUMBER_OF_TEAMS, preset_num_teams);
             reset_timers();
         } else {
             logger.debug("NOT IN PREGAME: IGNORED");
@@ -341,9 +354,9 @@ public class Game implements Runnable, StatsSentListener {
 
     private void button_preset_plus_pressed() {
         if (mode == MODE_CLOCK_PREGAME) {
-            preset_position++;
-            if (preset_position > preset_times.length - 1) preset_position = 0;
-            Main.getConfigs().put(Configs.GAMETIME, preset_position);
+            preset_gametime_position++;
+            if (preset_gametime_position > preset_times.length - 1) preset_gametime_position = 0;
+            Main.getConfigs().put(Configs.GAMETIME, preset_gametime_position);
             reset_timers();
         } else {
             logger.debug("NOT IN PREGAME: IGNORED");
@@ -383,9 +396,13 @@ public class Game implements Runnable, StatsSentListener {
         mode = MODE_CLOCK_PREGAME;
         min_stat_sent_time = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
 
-        time = preset_times[preset_position]; // aktuelle Wahl minus 1 Sekunde. Dann wird aus 5 Stunden -> 04:59:59
-        time_blue = 0l;
+        time = preset_times[preset_gametime_position]; // aktuelle Wahl minus 1 Sekunde. Dann wird aus 5 Stunden -> 04:59:59
+
         time_red = 0l;
+        time_blue = 0l;
+        time_green = 0l;
+        time_yellow = 0l;
+
         running_match_id = 0;
         lastStatsSent = 0l;
         statistics.reset();
@@ -395,20 +412,24 @@ public class Game implements Runnable, StatsSentListener {
     private void refreshDisplay() {
         try {
             display_white.setTime(time);
-            display_blue.setTime(time_blue);
             display_red.setTime(time_red);
-            display_yellow.setTime(time_yellow);
+            display_blue.setTime(time_blue);
             display_green.setTime(time_green);
+            display_yellow.setTime(time_yellow);
 
             if (min_stat_sent_time > 0 && running_match_id > 0)
-                statistics.setTimes(running_match_id, time, time_blue, time_red);
+                statistics.setTimes(running_match_id, time, time_red, time_blue, time_green, time_yellow);
 
-            display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
-            display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
             display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+            display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+            display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+            display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+            display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
 
             Main.getPinHandler().off(Main.PH_LED_RED_BTN);
             Main.getPinHandler().off(Main.PH_LED_BLUE_BTN);
+            Main.getPinHandler().off(Main.PH_LED_GREEN_BTN);
+            Main.getPinHandler().off(Main.PH_LED_YELLOW_BTN);
 
             if (mode == MODE_CLOCK_PREGAME || mode == MODE_CLOCK_GAME_PAUSED) {
                 logger.debug("PREGAME");
@@ -418,8 +439,13 @@ public class Game implements Runnable, StatsSentListener {
                 Main.getPinHandler().off(Main.PH_LED_WHITE);
             }
 
+            if (mode == MODE_CLOCK_PREGAME) {
+                if (preset_num_teams < 3) display_green.clear();
+                if (preset_num_teams < 4) display_yellow.clear();
+            }
+
             if (mode == MODE_CLOCK_GAME_PAUSED) {
-                display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
+                display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
             }
 
             if (mode == MODE_CLOCK_GAME_RUNNING) {
@@ -437,6 +463,11 @@ public class Game implements Runnable, StatsSentListener {
                             "                                                                         ");
                     Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
                     Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,500;off,500");
+                    if (preset_num_teams < 3)
+                        Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "∞:on,500;off,500");
+                    if (preset_num_teams < 4)
+                        Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
+
                     Main.getPinHandler().setScheme(Main.PH_POLE, "NEUTRAL", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
                 if (flag == FLAG_STATE_RED) {
@@ -448,7 +479,12 @@ public class Game implements Runnable, StatsSentListener {
                             " |_|   |_|\\__,_|\\__, | |_|___/ |_| \\_\\_____|____/  |_| |_|\\___/ \\_/\\_/  \n" +
                             "                |___/                                                   ");
                     Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,500;off,500");
-                    display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_1HZ);
+                    if (preset_num_teams < 3)
+                        Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "∞:on,500;off,500");
+                    if (preset_num_teams < 4)
+                        Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
+
+                    display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                     Main.getPinHandler().setScheme(Main.PH_POLE, "RED ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.RED, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
                 if (flag == FLAG_STATE_BLUE) {
@@ -460,8 +496,42 @@ public class Game implements Runnable, StatsSentListener {
                             " |_|   |_|\\__,_|\\__, | |_|___/ |____/|_____\\___/|_____| |_| |_|\\___/ \\_/\\_/  \n" +
                             "                |___/                                                        ");
                     Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
-                    display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_1HZ);
+                    if (preset_num_teams < 3)
+                        Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "∞:on,500;off,500");
+                    if (preset_num_teams < 4)
+                        Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
+                    display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                     Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.BLUE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
+                }
+                if (flag == FLAG_STATE_GREEN) {
+                    logger.debug("\n" +
+                            "  _____ _               _        ____ ____  _____ _____ _   _                       \n" +
+                            " |  ___| | __ _  __ _  (_)___   / ___|  _ \\| ____| ____| \\ | |  _ __   _____      __\n" +
+                            " | |_  | |/ _` |/ _` | | / __| | |  _| |_) |  _| |  _| |  \\| | | '_ \\ / _ \\ \\ /\\ / /\n" +
+                            " |  _| | | (_| | (_| | | \\__ \\ | |_| |  _ <| |___| |___| |\\  | | | | | (_) \\ V  V / \n" +
+                            " |_|   |_|\\__,_|\\__, | |_|___/  \\____|_| \\_\\_____|_____|_| \\_| |_| |_|\\___/ \\_/\\_/  \n" +
+                            "                |___/                                                               ");
+                    Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
+                    Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,500;off,500");
+                    if (preset_num_teams < 4)
+                        Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
+                    display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                    Main.getPinHandler().setScheme(Main.PH_POLE, "GREEN ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.GREEN, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
+                }
+                if (flag == FLAG_STATE_YELLOW) {
+                    logger.debug("\n" +
+                            "  _____ _               _      __   _______ _     _     _____        __                      \n" +
+                            " |  ___| | __ _  __ _  (_)___  \\ \\ / / ____| |   | |   / _ \\ \\      / /  _ __   _____      __\n" +
+                            " | |_  | |/ _` |/ _` | | / __|  \\ V /|  _| | |   | |  | | | \\ \\ /\\ / /  | '_ \\ / _ \\ \\ /\\ / /\n" +
+                            " |  _| | | (_| | (_| | | \\__ \\   | | | |___| |___| |__| |_| |\\ V  V /   | | | | (_) \\ V  V / \n" +
+                            " |_|   |_|\\__,_|\\__, | |_|___/   |_| |_____|_____|_____\\___/  \\_/\\_/    |_| |_|\\___/ \\_/\\_/  \n" +
+                            "                |___/                                                                        ");
+                    Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
+                    Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,500;off,500");
+                    Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "∞:on,500;off,500");
+
+                    display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                    Main.getPinHandler().setScheme(Main.PH_POLE, "GREEN ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.YELLOW, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
             }
 
@@ -469,6 +539,37 @@ public class Game implements Runnable, StatsSentListener {
                 // das hier mache ich, damit die Zeiten nur auf Sekunden Ebene verglichen werden.
                 DateTime dateTime_red = new DateTime(time_red, DateTimeZone.UTC);
                 DateTime dateTime_blue = new DateTime(time_blue, DateTimeZone.UTC);
+                DateTime dateTime_yellow = new DateTime(time_yellow, DateTimeZone.UTC);
+                DateTime dateTime_green = new DateTime(time_green, DateTimeZone.UTC);
+
+                int redSeconds = dateTime_red.getSecondOfDay();
+                int blueSeconds = dateTime_blue.getSecondOfDay();
+                int yellowSeconds = dateTime_yellow.getSecondOfDay();
+                int greenSeconds = dateTime_green.getSecondOfDay();
+
+
+                ArrayList<GameTimes> gametimes = new ArrayList<>();
+                gametimes.add(new GameTimes(Color.red, redSeconds));
+                gametimes.add(new GameTimes(Color.blue, blueSeconds));
+                gametimes.add(new GameTimes(Color.yellow, yellowSeconds));
+                gametimes.add(new GameTimes(Color.green, greenSeconds));
+
+                Collections.sort(gametimes);
+
+                // https://stackoverflow.com/questions/31227061/how-to-calculate-the-rank-of-a-player-from-a-list
+                int[] score = {Integer.MIN_VALUE};
+                int[] no = {0};
+                int[] rank = {0};
+                java.util.List<Ranking> ranking = gametimes.stream()
+                        .sorted((a, b) -> b.getRight() - a.getRight())
+                        .map(p -> {
+                            ++no[0];
+                            if (score[0] != p.getRight()) rank[0] = no[0];
+                            return new Ranking(rank[0], score[0] = p.getRight());
+                        })
+                        // .distinct() // if you want to remove duplicate rankings.
+                        .collect(Collectors.toList());
+                System.out.println(ranking);
 
                 if (dateTime_red.getSecondOfDay() > dateTime_blue.getSecondOfDay()) {
                     logger.debug("\n" +
@@ -533,7 +634,7 @@ public class Game implements Runnable, StatsSentListener {
 
                     // Statistiken, wenn gewünscht
                     if (min_stat_sent_time > 0) {
-                        statistics.setTimes(running_match_id, time, time_blue, time_red);
+                        statistics.setTimes(running_match_id, time, time_red, time_blue, time_green, time_yellow);
                         if (now - lastStatsSent > min_stat_sent_time) {
                             statistics.sendStats();
                             lastStatsSent = now;
@@ -541,16 +642,24 @@ public class Game implements Runnable, StatsSentListener {
                     }
 
                     // Zeit zum entpsrechenden Team addieren.
-                    if (flag == FLAG_STATE_BLUE) {
-                        time_blue += diff;
-                    }
                     if (flag == FLAG_STATE_RED) {
                         time_red += diff;
                     }
+                    if (flag == FLAG_STATE_BLUE) {
+                        time_blue += diff;
+                    }
+                    if (flag == FLAG_STATE_GREEN) {
+                        time_green += diff;
+                    }
+                    if (flag == FLAG_STATE_YELLOW) {
+                        time_yellow += diff;
+                    }
 
                     display_white.setTime(time);
-                    display_blue.setTime(time_blue);
                     display_red.setTime(time_red);
+                    display_blue.setTime(time_blue);
+                    display_green.setTime(time_green);
+                    display_yellow.setTime(time_yellow);
 
                     if (time == 0) {
                         logger.debug("\n" +
