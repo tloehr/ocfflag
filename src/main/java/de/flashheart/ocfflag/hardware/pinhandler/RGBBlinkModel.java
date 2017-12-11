@@ -25,7 +25,7 @@ public class RGBBlinkModel implements GenericBlinkModel {
 
     public RGBBlinkModel(MyRGBLed myRGBLed) {
         this.myRGBLed = myRGBLed;
-        logger.setLevel(Main.getLogLevel());
+
         this.blinkAndColorSchemes = new ArrayList<>();
         this.positionInScheme = -1;
         this.repeat = Integer.MAX_VALUE;
@@ -33,7 +33,7 @@ public class RGBBlinkModel implements GenericBlinkModel {
 
     @Override
     public String call() throws Exception {
-        logger.debug(new DateTime().toString() + " call() to:" + myRGBLed.getName() + " [" + myRGBLed.getText() + "]");
+        logger.debug(new DateTime().toString() + " call() to:" + myRGBLed.getName() + " [" + myRGBLed.getToolTipText() + "]");
 
         if (repeat == 0) {
             myRGBLed.off();
@@ -61,7 +61,7 @@ public class RGBBlinkModel implements GenericBlinkModel {
             }
         }
 
-        myRGBLed.setText("");
+        myRGBLed.setToolTipText("");
         return null;
     }
 
@@ -100,7 +100,7 @@ public class RGBBlinkModel implements GenericBlinkModel {
 
     @Override
     public void setText(String text) {
-        myRGBLed.setText(text);
+        myRGBLed.setToolTipText(text);
     }
 
 

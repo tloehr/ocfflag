@@ -47,7 +47,7 @@ public class MessageProcessor extends Thread {
     public MessageProcessor() {
         super();
         this.listeners = new CopyOnWriteArrayList<>();
-        logger.setLevel(Main.getLogLevel());
+
         lock = new ReentrantLock();
         messageQ = new Stack<>();
         interrupted = false;

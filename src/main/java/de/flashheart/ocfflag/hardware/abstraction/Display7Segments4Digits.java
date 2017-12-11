@@ -29,7 +29,7 @@ public class Display7Segments4Digits {
 
     public Display7Segments4Digits(int addr, JLabel lblSegment, String name) throws IOException {
         this.name = name;
-        logger.setLevel(Main.getLogLevel());
+
         this.lblSegment = lblSegment;
         btnSegment = null;
 
@@ -47,7 +47,7 @@ public class Display7Segments4Digits {
 
     public Display7Segments4Digits(int addr, JButton btnSegment, String name) throws IOException {
         this.name = name;
-        logger.setLevel(Main.getLogLevel());
+
         this.btnSegment = btnSegment;
         lblSegment = null;
 
@@ -139,9 +139,9 @@ public class Display7Segments4Digits {
 
     public void clear() throws IOException {
         if (lblSegment != null)
-            lblSegment.setText(null);
+            lblSegment.setText("no team");
         if (btnSegment != null)
-            btnSegment.setText(null);
+            btnSegment.setText("no team");
         if (segment == null) return;
         segment.clear();
     }

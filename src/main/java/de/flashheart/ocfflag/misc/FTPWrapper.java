@@ -47,7 +47,7 @@ public class FTPWrapper {
         FileOutputStream fos = null;
         boolean resultOk = true;
         Logger logger = Logger.getLogger(FTPWrapper.class);
-        logger.setLevel(Main.getLogLevel());
+
         try {
             ftpClient.connect(host, port);
             if (showMessages) {
@@ -100,7 +100,7 @@ public class FTPWrapper {
 
         boolean resultOk = true;
         Logger logger = Logger.getLogger(FTPWrapper.class);
-        logger.setLevel(Main.getLogLevel());
+
 
         File tempPHPFile = File.createTempFile("ocfflag", ".php");
         tempPHPFile.deleteOnExit();
@@ -167,7 +167,7 @@ public class FTPWrapper {
 
         boolean resultOk = true;
         Logger logger = Logger.getLogger(FTPWrapper.class);
-        logger.setLevel(Main.getLogLevel());
+
         try {
             ftpClient.connect(host, port);
 
@@ -233,7 +233,7 @@ public class FTPWrapper {
         String pwd = Main.getConfigs().get(Configs.FTPPWD);
         String uuid = Main.getConfigs().get(Configs.MYUUID);
         Logger logger = Logger.getLogger(FTPWrapper.class);
-        logger.setLevel(Main.getLogLevel());
+
         boolean success = false;
 
         SwingWorker<Boolean, Boolean> worker = new SwingWorker<Boolean, Boolean>() {

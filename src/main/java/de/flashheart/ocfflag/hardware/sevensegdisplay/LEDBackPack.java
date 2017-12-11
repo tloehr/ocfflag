@@ -58,7 +58,7 @@ public class LEDBackPack {
     }
 
     public LEDBackPack(int address, boolean v) throws I2CFactory.UnsupportedBusNumberException {
-        logger.setLevel(Main.getLogLevel());
+
         this.verbose = v;
         try {
             // Get i2c bus

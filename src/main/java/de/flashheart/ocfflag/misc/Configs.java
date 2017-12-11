@@ -44,8 +44,10 @@ public class Configs {
         configs.put(FTPS, "false");
         configs.put(FTPPORT, "21");
         configs.put(BRIGHTNESS_WHITE, "10");
-        configs.put(BRIGHTNESS_BLUE, "10");
         configs.put(BRIGHTNESS_RED, "10");
+        configs.put(BRIGHTNESS_BLUE, "10");
+        configs.put(BRIGHTNESS_GREEN, "10");
+        configs.put(BRIGHTNESS_YELLOW, "10");
         configs.put(MIN_STAT_SEND_TIME, "0"); // in Millis, wie oft sollen die Stastiken spätestens gesendet werden. 0 = gar nicht
 
         // configdatei einlesen

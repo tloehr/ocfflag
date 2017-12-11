@@ -2,7 +2,6 @@ package de.flashheart.ocfflag.hardware.abstraction;
 
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.wiringpi.SoftPwm;
-import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Logger;
 
@@ -24,22 +23,27 @@ public class MyRGBLed {
         this.pinGreen = pinGreen;
         this.pinBlue = pinBlue;
         this.name = name;
-        logger.setLevel(Main.getLogLevel());
+
     }
 
-    public void setText(String text) {
-        if (lbl == null) return;
-        lbl.setText(text);
-    }
+//    public void setText(String text) {
+//        if (lbl == null) return;
+//        lbl.setText(text);
+//    }
 
-    public String getText() {
-        if (lbl == null) return "--";
-        return lbl.getText();
-    }
+//    public String getText() {
+//        if (lbl == null) return "--";
+//        return lbl.getText();
+//    }
 
     public void setToolTipText(String text) {
         if (lbl == null) return;
         lbl.setToolTipText(text);
+    }
+
+    public String getToolTipText() {
+        if (lbl == null) return "";
+        return lbl.getToolTipText();
     }
 
 
@@ -57,7 +61,7 @@ public class MyRGBLed {
             lbl.setBackground(color);
             lbl.setForeground(Tools.getContrastColor(color));
         }
-        
+
         if (pinRed != null) {
             SoftPwm.softPwmWrite(pinRed.getAddress(), red);
             SoftPwm.softPwmWrite(pinGreen.getAddress(), green);

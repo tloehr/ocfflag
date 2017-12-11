@@ -21,7 +21,7 @@ public class PinBlinkModel implements GenericBlinkModel {
     String infinity = "\u221E";
 
     public PinBlinkModel(MyPin pin) {
-        logger.setLevel(Main.getLogLevel());
+
         this.onOffScheme = new ArrayList<>();
         this.pin = pin;
         this.repeat = Integer.MAX_VALUE;

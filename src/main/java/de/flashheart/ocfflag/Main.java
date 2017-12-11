@@ -123,7 +123,7 @@ public class Main {
      */
     private static void initGameSystem() throws I2CFactory.UnsupportedBusNumberException, IOException {
 
-        display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblWhiteTime(), "display_white");
+        display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblPole(), "display_white");
 
         display_red = new Display7Segments4Digits(DISPLAY_RED, getFrameDebug().getBtnRed(), "display_red");
         display_blue = new Display7Segments4Digits(DISPLAY_BLUE, getFrameDebug().getBtnBlue(), "display_blue");
@@ -167,7 +167,7 @@ public class Main {
         pinHandler.add(ledGreen);
         pinHandler.add(ledWhite);
 
-        Game game = new Game(display_blue, display_red, display_white, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game);
+        Game game = new Game(display_white, display_red, display_blue, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game);
         game.run();
 
 

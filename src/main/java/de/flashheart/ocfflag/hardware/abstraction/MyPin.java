@@ -19,7 +19,7 @@ public class MyPin {
 
     public MyPin(GpioController gpio, Pin pin, MyLED guiControlLED, String name) {
         this.name = name;
-        logger.setLevel(Main.getLogLevel());
+
         this.guiControlLED = guiControlLED;
         this.outputPin = gpio == null ? null : gpio.provisionDigitalOutputPin(pin, PinState.LOW);
         if (outputPin != null) outputPin.setState(PinState.LOW);

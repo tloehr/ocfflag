@@ -30,7 +30,7 @@ public class PinHandler {
         pinMap = new HashMap<>();
         futures = new HashMap<>();
         logger = Logger.getLogger(getClass());
-        logger.setLevel(Main.getLogLevel());
+
 
         executorService = Executors.newFixedThreadPool(20);
 
