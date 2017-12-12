@@ -14,7 +14,6 @@ import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
 import de.flashheart.ocfflag.mechanics.Game;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.FTPWrapper;
 import de.flashheart.ocfflag.misc.MessageProcessor;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Level;
@@ -26,7 +25,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class Main {
-
 
 
     private static GpioController GPIO;
@@ -41,6 +39,10 @@ public class Main {
     public static final String PH_LED_BLUE_BTN = "ledBlueButton";
     public static final String PH_LED_GREEN = "ledGreen";
     public static final String PH_LED_WHITE = "ledWhite";
+    public static final String PH_SIREN_COLOR_CHANGE = "colorchangesiren";
+    public static final String PH_AIRSIREN = "airsiren";
+
+
 
     // Parameter für die einzelnen PINs am Raspi sowie die I2C Adressen.
     private static final int DISPLAY_BLUE = 0x71;
@@ -94,7 +96,6 @@ public class Main {
     }
 
 
-
     public static void main(String[] args) throws Exception {
         initBaseSystem();
         initDebugFrame();
@@ -118,7 +119,7 @@ public class Main {
         display_blue = new Display7Segments4Digits(DISPLAY_BLUE, getFrameDebug().getLblBlueTime(), "display_blue");
         display_red = new Display7Segments4Digits(DISPLAY_RED, getFrameDebug().getLblRedTime(), "display_red");
         display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblWhiteTime(), "display_white");
-                 
+
         button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue());
         button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed());
         button_reset = new MyAbstractButton(GPIO, BUTTON_RESET, frameDebug.getBtnReset());
@@ -136,11 +137,8 @@ public class Main {
         ledGreen = new MyPin(GPIO, LED_GREEN, frameDebug.getLedStandbyActive(), PH_LED_GREEN);
         ledWhite = new MyPin(GPIO, LED_WHITE, frameDebug.getLedStatsSent(), PH_LED_WHITE);
 
-        // später
-        MyPin siren1 = new MyPin(GPIO, SIREN_AIR, null, "sirenAir");
-        MyPin siren2 = new MyPin(GPIO, SIREN_COLOR_CHANGE, null, "sirenColorChange");
-        pinHandler.add(siren1);
-        pinHandler.add(siren2);
+        pinHandler.add(new MyPin(GPIO, SIREN_AIR, null, PH_AIRSIREN, 50, 90));
+        pinHandler.add(new MyPin(GPIO, SIREN_COLOR_CHANGE, null, PH_SIREN_COLOR_CHANGE, 70, 60));
 
         pinHandler.add(pole);
         pinHandler.add(ledRedButton);

@@ -228,6 +228,7 @@ public class Game implements Runnable, StatsSentListener {
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != FLAG_STATE_BLUE) {
                 flag = FLAG_STATE_BLUE;
+                Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, "2:on,50;off,50");
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_BLUE_ACTIVATED);
                 refreshDisplay();
             }
@@ -240,6 +241,7 @@ public class Game implements Runnable, StatsSentListener {
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != FLAG_STATE_RED) {
                 flag = FLAG_STATE_RED;
+                Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, "2:on,50;off,50");
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_RED_ACTIVATED);
                 refreshDisplay();
             }
@@ -254,13 +256,6 @@ public class Game implements Runnable, StatsSentListener {
             if (mode == MODE_CLOCK_GAME_PAUSED) {
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
             }
-            // Das führt zu Konflikten.
-            // todo: addEvent muss auf aborted auch direkt die Datei abschließen.
-//            try {
-//                FTPWrapper.initFTPDir();
-//            } catch (IOException e) {
-//                logger.error(e);
-//            }
             reset_timers();
         } else {
             logger.debug("RUNNING: IGNORED");
@@ -312,6 +307,7 @@ public class Game implements Runnable, StatsSentListener {
             }
             lastStatsSent = statistics.addEvent(Statistics.EVENT_START_GAME);
             mode = MODE_CLOCK_GAME_RUNNING;
+            Main.getPinHandler().setScheme(Main.PH_AIRSIREN, "1:on,5000;off,1");
             refreshDisplay();
         }
         lastPIT = System.currentTimeMillis();
@@ -330,7 +326,7 @@ public class Game implements Runnable, StatsSentListener {
         statistics.reset();
         refreshDisplay();
     }
-    
+
     private void refreshDisplay() {
         try {
             display_white.setTime(time);
@@ -406,6 +402,9 @@ public class Game implements Runnable, StatsSentListener {
                 // das hier mache ich, damit die Zeiten nur auf Sekunden Ebene verglichen werden.
                 DateTime dateTime_red = new DateTime(time_red, DateTimeZone.UTC);
                 DateTime dateTime_blue = new DateTime(time_blue, DateTimeZone.UTC);
+
+
+                Main.getPinHandler().setScheme(Main.PH_AIRSIREN, "1:on,5000;off,1");
 
                 if (dateTime_red.getSecondOfDay() > dateTime_blue.getSecondOfDay()) {
                     logger.debug("\n" +
