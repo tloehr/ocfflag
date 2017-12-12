@@ -69,7 +69,7 @@ public class PinBlinkModel implements GenericBlinkModel {
 
 
     /**
-     * accepts a blinking scheme as a String formed like this: "repeat;ontimeINms;offtimeINms".
+     * accepts a blinking scheme as a String formed like this: "repeat:[on|off],timeINms;*".
      * if repeat is 0 then a previous blinking process is stopped and the pin is set to OFF.
      * There is no "BLINK FOREVER" really. But You could always put Integer.MAX_VALUE as REPEAT instead into the String.
      *

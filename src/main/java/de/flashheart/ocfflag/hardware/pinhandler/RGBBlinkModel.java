@@ -90,6 +90,8 @@ public class RGBBlinkModel implements GenericBlinkModel {
             String[] splitSecondTurn = splitFirstTurn[1].trim().split(";");
 
             for (String pattern : splitSecondTurn) {
+                if (pattern == null) break; // für die leeren ";" am ende
+
                 String[] splitThirdTurn = pattern.trim().split(",");
                 blinkAndColorSchemes.add(new RGBScheduleElement(splitThirdTurn[0], splitThirdTurn[1], splitThirdTurn[2], splitThirdTurn[3]));
             }

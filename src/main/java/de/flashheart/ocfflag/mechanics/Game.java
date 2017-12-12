@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 
 /**
  * In dieser Klasse befindet sich die Spielmechanik.
@@ -602,17 +603,27 @@ public class Game implements Runnable, StatsSentListener {
                     lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_DRAW);
                 } else {
 
-                    ArrayList<Color> colors2praise = new ArrayList<>();
-
+                    HashMap<Color, MutableTriple<Color, Integer, Integer>> winningteams = new HashMap<>();
                     rank = 0;
                     // Darstellung
                     for (MutableTriple<Color, Integer, Integer> triple : ranking) {
-                        if (triple.getMiddle() == 1){ // ein Sieger
-                            colors2praise.add(triple.getLeft());
+                        if (triple.getMiddle() == 1) { // ein Sieger
+                            winningteams.put(triple.getLeft(), triple);
                         }
                     }
-                    TODO: hier gehts weiter
-                    if (dateTime_red.getSecondOfDay() > dateTime_blue.getSecondOfDay()) {
+
+                    if (winningteams.size() > 1) {
+                        lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_MULTI_WINNERS);
+                        logger.debug("\n" +
+                                "  __  __  ___  ____  _____   _____ _   _    _    _   _    ___  _   _ _____  __        _____ _   _ _   _ _____ ____  \n" +
+                                " |  \\/  |/ _ \\|  _ \\| ____| |_   _| | | |  / \\  | \\ | |  / _ \\| \\ | | ____| \\ \\      / /_ _| \\ | | \\ | | ____|  _ \\ \n" +
+                                " | |\\/| | | | | |_) |  _|     | | | |_| | / _ \\ |  \\| | | | | |  \\| |  _|    \\ \\ /\\ / / | ||  \\| |  \\| |  _| | |_) |\n" +
+                                " | |  | | |_| |  _ <| |___    | | |  _  |/ ___ \\| |\\  | | |_| | |\\  | |___    \\ V  V /  | || |\\  | |\\  | |___|  _ < \n" +
+                                " |_|  |_|\\___/|_| \\_\\_____|   |_| |_| |_/_/   \\_\\_| \\_|  \\___/|_| \\_|_____|    \\_/\\_/  |___|_| \\_|_| \\_|_____|_| \\_\\\n" +
+                                "                                                                                                                    ");
+                    }
+
+                    if (winningteams.containsKey(Color.red)) {
                         logger.debug("\n" +
                                 "  ____  _____ ____   __        _____  _   _ \n" +
                                 " |  _ \\| ____|  _ \\  \\ \\      / / _ \\| \\ | |\n" +
@@ -622,10 +633,9 @@ public class Game implements Runnable, StatsSentListener {
                                 "                                            ");
                         display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                         Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,100;off,100");
-                        Main.getPinHandler().setScheme(Main.PH_POLE, "RED TEAM WON", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.RED, 250) + ";" + new RGBScheduleElement(Color.BLACK, 250));
                         lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_RED_WON);
                     }
-                    if (dateTime_red.getSecondOfDay() < dateTime_blue.getSecondOfDay()) {
+                    if (winningteams.containsKey(Color.blue)) {
                         logger.debug("\n" +
                                 "  ____  _    _   _ _____  __        _____  _   _ \n" +
                                 " | __ )| |  | | | | ____| \\ \\      / / _ \\| \\ | |\n" +
@@ -633,11 +643,43 @@ public class Game implements Runnable, StatsSentListener {
                                 " | |_) | |__| |_| | |___    \\ V  V /| |_| | |\\  |\n" +
                                 " |____/|_____\\___/|_____|    \\_/\\_/  \\___/|_| \\_|\n" +
                                 "                                                 ");
-                        display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
+                        display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                         Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,100;off,100");
-                        Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE TEAM WON", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.BLUE, 250) + ";" + new RGBScheduleElement(Color.BLACK, 250));
                         lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_BLUE_WON);
                     }
+                    if (winningteams.containsKey(Color.green)) {
+                        logger.debug("\n" +
+                                "    ____ ____  _____ _____ _   _  __        _____  _   _ \n" +
+                                "  / ___|  _ \\| ____| ____| \\ | | \\ \\      / / _ \\| \\ | |\n" +
+                                " | |  _| |_) |  _| |  _| |  \\| |  \\ \\ /\\ / / | | |  \\| |\n" +
+                                " | |_| |  _ <| |___| |___| |\\  |   \\ V  V /| |_| | |\\  |\n" +
+                                "  \\____|_| \\_\\_____|_____|_| \\_|    \\_/\\_/  \\___/|_| \\_|\n" +
+                                "                                                        ");
+                        display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                        Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "∞:on,100;off,100");
+                        lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_GREEN_WON);
+                    }
+                    if (winningteams.containsKey(Color.yellow)) {
+                        logger.debug("\n" +
+                                " __   _______ _     _     _____        __ __        _____  _   _ \n" +
+                                " \\ \\ / / ____| |   | |   / _ \\ \\      / / \\ \\      / / _ \\| \\ | |\n" +
+                                "  \\ V /|  _| | |   | |  | | | \\ \\ /\\ / /   \\ \\ /\\ / / | | |  \\| |\n" +
+                                "   | | | |___| |___| |__| |_| |\\ V  V /     \\ V  V /| |_| | |\\  |\n" +
+                                "   |_| |_____|_____|_____\\___/  \\_/\\_/       \\_/\\_/  \\___/|_| \\_|\n" +
+                                "                                                                 ");
+                        display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                        Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,100;off,100");
+                        lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_YELLOW_WON);
+                    }
+
+                    // die Flagge soll alle Sieger anzeigen
+                    String winningScheme = PinHandler.FOREVER + ":";
+                    String text = "Winning Team(s): ";
+                    for (Color teamColor : winningteams.keySet()) {
+                        winningScheme += new RGBScheduleElement(teamColor, 250) + ";" + new RGBScheduleElement(Color.BLACK, 250) + ";";
+                        text += teamColor.toString() + " ";
+                    }
+                    Main.getPinHandler().setScheme(Main.PH_POLE, text, winningScheme);
                 }
             }
         } catch (IOException e) {
