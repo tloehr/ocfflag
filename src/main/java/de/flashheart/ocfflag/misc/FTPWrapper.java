@@ -180,13 +180,22 @@ public class FTPWrapper {
             if (resultOk) {
                 DateTime now = new DateTime();
                 String uuid = Main.getConfigs().get(Configs.MYUUID);
+
+
                 String remotepath = Main.getConfigs().get(Configs.FTPREMOTEPATH);
-                String remoteFile = remotepath + "/active/" + uuid + ".php";
-                String localFile = Tools.getWorkingPath() + File.separator + uuid + ".php";
+
                 String archivepath = remotepath + "/archive";
+                String activepath = remotepath + "/active";
+
+                String remoteFile = activepath + "/" + uuid + ".php";
+
+                String localFile = Tools.getWorkingPath() + File.separator + uuid + ".php";
+
                 String archivefile = archivepath + "/" + now.toString("yyyyMMddHHmmss") + "-" + uuid + ".php";
 
-                // archive Verzeichnis erstellen, wenn nötig
+                // Verzeichnisse erstellen, wenn nötig
+                resultOk &= ftpClient.makeDirectory(remotepath);
+                resultOk &= ftpClient.makeDirectory(activepath);
                 resultOk &= ftpClient.makeDirectory(archivepath);
 
                 // Gibts noch eine aktive Statistik Datei ?

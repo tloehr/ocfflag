@@ -267,6 +267,7 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void button_quit_pressed() {
+        if (mode == MODE_CLOCK_GAME_RUNNING) return;
         button_reset_pressed();
         System.exit(0);
     }
@@ -476,8 +477,6 @@ public class Game implements Runnable, StatsSentListener {
                     if (preset_num_teams >= 4)
                         Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
 
-                    else Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
-
                     Main.getPinHandler().setScheme(Main.PH_POLE, "NEUTRAL", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
                 if (flag == FLAG_STATE_RED) {
@@ -552,6 +551,14 @@ public class Game implements Runnable, StatsSentListener {
 
             if (mode == MODE_CLOCK_GAME_OVER) {
                 // das hier mache ich, damit die Zeiten nur auf Sekunden Ebene verglichen werden.
+
+
+                time_red = 70000;
+                time_blue = 120000;
+                time_green = 70300;
+                time_yellow = 70200;
+
+
                 DateTime dateTime_red = new DateTime(time_red, DateTimeZone.UTC);
                 DateTime dateTime_blue = new DateTime(time_blue, DateTimeZone.UTC);
                 DateTime dateTime_yellow = new DateTime(time_yellow, DateTimeZone.UTC);
@@ -576,6 +583,8 @@ public class Game implements Runnable, StatsSentListener {
                     prev_time = triple.getRight();
                     triple.setMiddle(rank);
                 }
+
+                statistics.setRanking(ranking);
 
                 if (drawgame(ranking)) {
                     logger.debug("\n" +
@@ -602,7 +611,6 @@ public class Game implements Runnable, StatsSentListener {
                     Main.getPinHandler().setScheme(Main.PH_POLE, "DRAW GAME", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                     lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_DRAW);
                 } else {
-
                     HashMap<Color, MutableTriple<Color, Integer, Integer>> winningteams = new HashMap<>();
                     rank = 0;
                     // Darstellung
@@ -737,8 +745,11 @@ public class Game implements Runnable, StatsSentListener {
                     display_white.setTime(time);
                     display_red.setTime(time_red);
                     display_blue.setTime(time_blue);
-                    display_green.setTime(time_green);
-                    display_yellow.setTime(time_yellow);
+                    if (preset_num_teams < 3) display_green.clear();
+                    else display_green.setTime(time_green);
+                    if (preset_num_teams < 4) display_yellow.clear();
+                    else display_yellow.setTime(time_yellow);
+
 
                     if (time == 0) {
                         logger.debug("\n" +
