@@ -1,19 +1,24 @@
 package de.flashheart.ocfflag.misc;
 
+import de.flashheart.ocfflag.mechanics.GameEvent;
+
 public class PHPMessage {
     String php;
-    int event;
 
-    public PHPMessage(String php, int event) {
+    GameEvent gameEvent;
+
+    public PHPMessage(String php, GameEvent gameEvent) {
         this.php = php;
-        this.event = event;
+        this.gameEvent = gameEvent;
+
     }
 
     public String getPhp() {
         return php;
     }
 
-    public int getEvent() {
-        return event;
+
+    public GameEvent getGameEvent() {
+        return gameEvent;
     }
 }

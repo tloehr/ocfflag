@@ -67,12 +67,10 @@ public class Statistics {
         this.time_red = time_red;
     }
 
-    /**
-     * @return true, wenn die Operation erfolgreich war.
-     */
     public void sendStats() {
         logger.debug(toPHP());
-        if (Main.getMessageProcessor() != null) Main.getMessageProcessor().pushMessage(new PHPMessage(toPHP(), stackEvents.peek().getEvent()));
+        if (Main.getMessageProcessor() != null)
+            Main.getMessageProcessor().pushMessage(new PHPMessage(toPHP(), stackEvents.peek()));
     }
 
     public long addEvent(int event) {
@@ -98,35 +96,7 @@ public class Statistics {
         return now.getMillis();
     }
 
-    private class GameEvent {
-        private DateTime pit;
-        private int event;
 
-        public GameEvent(DateTime pit, int event) {
-            this.pit = pit;
-            this.event = event;
-        }
-
-        public DateTime getPit() {
-            return pit;
-        }
-
-        public int getEvent() {
-            return event;
-        }
-
-        @Override
-        public String toString() {
-            return "GameEvent{" +
-                    "pit=" + pit.toString(DateTimeFormat.mediumDateTime()) +
-                    ", event=" + EVENTS[event] +
-                    '}';
-        }
-
-        public String toPHPArray() {
-            return "   array('pit' => '" + pit.toString("HH:mm:ss") + "','event' => '" + EVENTS[event] + "'),\n";
-        }
-    }
 
     private String toPHP() {
         String php = "<?php\n";
@@ -134,7 +104,7 @@ public class Statistics {
         String flagname = Main.getConfigs().get(Configs.FLAGNAME);
 
         flagname = StringUtils.replace(flagname, "'", "\\'");
-        flagname =  StringUtils.replace(flagname, "\"", "\\\"");
+        flagname = StringUtils.replace(flagname, "\"", "\\\"");
 
 
         php += "$game['flagname'] = '" + flagname + "';\n";

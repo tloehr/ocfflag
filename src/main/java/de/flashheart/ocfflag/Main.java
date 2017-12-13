@@ -45,10 +45,10 @@ public class Main {
 
 
     // Parameter für die einzelnen PINs am Raspi sowie die I2C Adressen.
+    private static final int DISPLAY_WHITE = 0x70;
     private static final int DISPLAY_BLUE = 0x71;
     private static final int DISPLAY_RED = 0x72;
-    private static final int DISPLAY_WHITE = 0x70;
-
+    
     // Linke Seite des JP8 Header
     // Sirenen
     // Relais Screw Header

@@ -85,6 +85,7 @@ public class Game implements Runnable, StatsSentListener {
             18000000l - 1000l // 04:59:59
     };
     private int preset_position = 0;
+    private boolean quit_programm;
 
     public Game(Display7Segments4Digits display_blue,
                 Display7Segments4Digits display_red,
@@ -221,8 +222,9 @@ public class Game implements Runnable, StatsSentListener {
 
     private void button_quit_pressed() {
         if (mode == MODE_CLOCK_GAME_RUNNING) return;
+        if (mode == MODE_CLOCK_PREGAME) System.exit(0);
+        quit_programm = true;
         button_reset_pressed();
-        System.exit(0);
     }
 
     private void button_blue_pressed() {
@@ -520,6 +522,10 @@ public class Game implements Runnable, StatsSentListener {
         if (statsSentEvent.isSuccessful())
             Main.getPinHandler().setScheme(Main.PH_LED_WHITE, "∞:on,100;off," + min_stat_sent_time / 10);
         else
-            Main.getPinHandler().off();
+            Main.getPinHandler().off(Main.PH_LED_WHITE);
+
+        if (quit_programm) System.exit(0);
     }
+
+
 }
