@@ -220,6 +220,7 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void button_quit_pressed() {
+        if (mode == MODE_CLOCK_GAME_RUNNING) return;
         button_reset_pressed();
         System.exit(0);
     }
@@ -228,7 +229,7 @@ public class Game implements Runnable, StatsSentListener {
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != FLAG_STATE_BLUE) {
                 flag = FLAG_STATE_BLUE;
-                Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, "2:on,50;off,50");
+                Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_BLUE_ACTIVATED);
                 refreshDisplay();
             }
@@ -241,7 +242,7 @@ public class Game implements Runnable, StatsSentListener {
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != FLAG_STATE_RED) {
                 flag = FLAG_STATE_RED;
-                Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, "2:on,50;off,50");
+                Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_RED_ACTIVATED);
                 refreshDisplay();
             }
@@ -307,7 +308,7 @@ public class Game implements Runnable, StatsSentListener {
             }
             lastStatsSent = statistics.addEvent(Statistics.EVENT_START_GAME);
             mode = MODE_CLOCK_GAME_RUNNING;
-            Main.getPinHandler().setScheme(Main.PH_AIRSIREN, "1:on,5000;off,1");
+            Main.getPinHandler().setScheme(Main.PH_AIRSIREN, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
             refreshDisplay();
         }
         lastPIT = System.currentTimeMillis();
@@ -404,7 +405,7 @@ public class Game implements Runnable, StatsSentListener {
                 DateTime dateTime_blue = new DateTime(time_blue, DateTimeZone.UTC);
 
 
-                Main.getPinHandler().setScheme(Main.PH_AIRSIREN, "1:on,5000;off,1");
+                Main.getPinHandler().setScheme(Main.PH_AIRSIREN, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
 
                 if (dateTime_red.getSecondOfDay() > dateTime_blue.getSecondOfDay()) {
                     logger.debug("\n" +
