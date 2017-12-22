@@ -29,12 +29,11 @@ public class MessageProcessor extends Thread {
         this.listeners.add(l);
     }
 
-    public void removeListener(StatsSentListener l) {
-        this.listeners.remove(l);
-    }
+//    public void removeListener(StatsSentListener l) {
+//        this.listeners.remove(l);
+//    }
 
-    protected void fireChangeEvent(boolean succesful) {
-        StatsSentEvent evt = new StatsSentEvent(this, succesful);
+    protected void fireChangeEvent(StatsSentEvent evt) {
         for (StatsSentListener l : listeners) {
             l.statsSentEventReceived(evt);
         }
@@ -69,9 +68,10 @@ public class MessageProcessor extends Thread {
                 try {
                     if (!messageQ.isEmpty()) {
                         PHPMessage myMessage = messageQ.pop();
-                        boolean successful = FTPWrapper.upload(myMessage.getPhp(), myMessage.getEvent() == Statistics.EVENT_GAME_ABORTED);
+                        boolean  successful = FTPWrapper.upload(myMessage.getPhp(), myMessage.getGameEvent().getEvent() == Statistics.EVENT_GAME_ABORTED);
                         messageQ.clear(); // nur die letzte Nachricht ist wichtig
-                        fireChangeEvent(successful); // sorge dafür, dass die weiße LED den erfolgreichen Versand anzeigt
+                        // sorge dafür, dass die weiße LED den erfolgreichen Versand anzeigt
+                        fireChangeEvent(new StatsSentEvent(this, myMessage.getGameEvent(), successful));
                     }
                 } finally {
                     lock.unlock();

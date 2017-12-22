@@ -113,7 +113,7 @@ public class Statistics {
         if (event == EVENT_GREEN_ACTIVATED) flagcolor = "green";
         if (event == EVENT_YELLOW_ACTIVATED) flagcolor = "yellow";
 
-        sendStats();
+        sendStats(); // jedes Ereignis wird gesendet.
 
         return now.getMillis();
     }
@@ -122,35 +122,6 @@ public class Statistics {
         this.ranking = ranking;
     }
 
-    private class GameEvent {
-        private DateTime pit;
-        private int event;
-
-        public GameEvent(DateTime pit, int event) {
-            this.pit = pit;
-            this.event = event;
-        }
-
-        public DateTime getPit() {
-            return pit;
-        }
-
-        public int getEvent() {
-            return event;
-        }
-
-        @Override
-        public String toString() {
-            return "GameEvent{" +
-                    "pit=" + pit.toString(DateTimeFormat.mediumDateTime()) +
-                    ", event=" + EVENTS[event] +
-                    '}';
-        }
-
-        public String toPHPArray() {
-            return "   array('pit' => '" + pit.toString("HH:mm:ss") + "','event' => '" + EVENTS[event] + "'),\n";
-        }
-    }
 
     private String toPHP() {
         String php = "<?php\n";

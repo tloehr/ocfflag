@@ -32,6 +32,8 @@ public class Configs {
     public static final String BRIGHTNESS_YELLOW = "brightness_yellow";
     public static final String BRIGHTNESS_GREEN = "brightness_green";
     public static final String NUMBER_OF_TEAMS = "num_teams";
+    public static final String AIRSIREN_SIGNAL = "airsiren_signal";
+    public static final String COLORCHANGE_SIREN_SIGNAL = "colorchange_siren_signal";
 
     public Configs() throws IOException {
         configs = new SortedProperties();
@@ -49,6 +51,8 @@ public class Configs {
         configs.put(BRIGHTNESS_GREEN, "10");
         configs.put(BRIGHTNESS_YELLOW, "10");
         configs.put(MIN_STAT_SEND_TIME, "0"); // in Millis, wie oft sollen die Stastiken spätestens gesendet werden. 0 = gar nicht
+        configs.put(AIRSIREN_SIGNAL, "1:on,5000;off,1");
+        configs.put(COLORCHANGE_SIREN_SIGNAL, "2:on,50;off,50");
 
         // configdatei einlesen
         loadConfigs();
