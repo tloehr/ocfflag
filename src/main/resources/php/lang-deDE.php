@@ -17,4 +17,9 @@ $lang['EVENT_RESULT_MULTI_WINNERS'] = 'Es gibt mehrere Gewinner-Teams';
 $lang['NO_GAMES_RUNNING'] = 'Im Moment laufen keine Spiele, guck ins <a href="https://flashheart.de/rlg/index-archive.php">Archiv</a>.';
 $lang['EMPTY_ARCHIVE'] = 'Das Archiv ist leer';
 $lang['EVENT_QUIT_PROGRAM'] = 'Das Programm wurde beendet';
+$lang['TEAM_RED'] = 'Team Rot';
+$lang['TEAM_BLUE'] = 'Team Blau';
+$lang['TEAM_GREEN'] = 'Team Grün';
+$lang['TEAM_YELLOW'] = 'Team Gelb';
+$lang['REMAINING'] = 'Restliche Spielzeit';
 ?>

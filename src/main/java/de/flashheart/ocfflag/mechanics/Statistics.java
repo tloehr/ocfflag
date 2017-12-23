@@ -78,8 +78,8 @@ public class Statistics {
         this.time = time;
         this.time_blue = time_blue;
         this.time_red = time_red;
-        this.time_green = time_green;
-        this.time_yellow = time_yellow;
+        this.time_green = numTeams >= 3 ? time_green : -1l;
+        this.time_yellow = numTeams >= 4 ? time_yellow : -1l;
     }
 
     /**
