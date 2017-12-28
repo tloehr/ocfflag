@@ -32,10 +32,10 @@ public class FrameDebug extends JFrame {
 
 
     public FrameDebug() {
-
         initComponents();
         initFonts();
         initFrame();
+        setTitle("ocfflag "+ Main.getConfigs().getApplicationInfo("my.version") + " ["+Main.getConfigs().getApplicationInfo("buildNumber")+"]");
     }
 
     private void initFrame() {

@@ -1,18 +1,19 @@
 package de.flashheart.ocfflag.misc;
 
+import de.flashheart.ocfflag.Main;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Properties;
 import java.util.UUID;
 
 public class Configs {
     private final SortedProperties configs;
+    private final Properties applicationContext;
+    ;
     private final Logger logger = Logger.getLogger(getClass());
+
 
     public static final String MATCHID = "matchid";
     public static final String MYUUID = "uuid";
@@ -36,7 +37,9 @@ public class Configs {
     public static final String COLORCHANGE_SIREN_SIGNAL = "colorchange_siren_signal";
 
     public Configs() throws IOException {
-        configs = new SortedProperties();
+        configs = new SortedProperties(); // Einstellungen, die verändert werden
+        applicationContext = new Properties(); // inhalte der application.properties (von Maven)
+
         // defaults
         configs.put(MATCHID, "1");
         configs.put(NUMBER_OF_TEAMS, "2");
@@ -56,12 +59,20 @@ public class Configs {
 
         // configdatei einlesen
         loadConfigs();
+        loadApplicationContext();
 
         // und der Rest
         logger.setLevel(Level.toLevel(configs.getProperty(LOGLEVEL), Level.DEBUG));
         if (!configs.containsKey(MYUUID)) {
             configs.put(MYUUID, UUID.randomUUID().toString());
         }
+    }
+
+
+    private void loadApplicationContext() throws IOException {
+        InputStream in2 = Main.class.getResourceAsStream("/application.properties");
+        applicationContext.load(in2);
+        in2.close();
     }
 
     private void loadConfigs() throws IOException {
@@ -86,6 +97,10 @@ public class Configs {
         return configs.containsKey(FTPUSER) && configs.containsKey(FTPHOST) && configs.containsKey(FTPPORT) && configs.containsKey(FTPPWD) && configs.containsKey(FTPS) && configs.containsKey(FTPREMOTEPATH);
     }
 
+
+    public String getApplicationInfo(Object key) {
+        return applicationContext.containsKey(key) ? applicationContext.get(key).toString() : "null";
+    }
 
     public String get(Object key) {
         return configs.containsKey(key) ? configs.get(key).toString() : "null";

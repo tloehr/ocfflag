@@ -21,8 +21,10 @@ import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Properties;
 
 public class Main {
 
@@ -43,7 +45,6 @@ public class Main {
     public static final String PH_LED_WHITE = "ledWhite";
     public static final String PH_SIREN_COLOR_CHANGE = "colorchangesiren";
     public static final String PH_AIRSIREN = "airsiren";
-
 
 
     // Parameter für die einzelnen PINs am Raspi sowie die I2C Adressen.
@@ -170,8 +171,6 @@ public class Main {
 
         Game game = new Game(display_white, display_red, display_blue, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game);
         game.run();
-
-
     }
 
     /**

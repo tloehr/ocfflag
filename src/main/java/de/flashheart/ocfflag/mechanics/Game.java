@@ -13,6 +13,7 @@ import de.flashheart.ocfflag.hardware.pinhandler.RGBScheduleElement;
 import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.FTPWrapper;
+import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -20,10 +21,9 @@ import org.joda.time.DateTimeZone;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.net.URL;
+import java.util.*;
+import java.util.jar.Manifest;
 
 /**
  * In dieser Klasse befindet sich die Spielmechanik.
@@ -779,6 +779,8 @@ public class Game implements Runnable, StatsSentListener {
                 }
 
                 Thread.sleep(PAUSE_PER_CYCLE);
+
+
             } catch (InterruptedException ie) {
                 logger.debug(this + " interrupted!");
             } catch (Exception e) {

@@ -6,7 +6,7 @@
 
     <groupId>de.flashheart.ocfflag</groupId>
     <artifactId>ocfflag</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 
     <properties>
         <!-- Generic properties -->
@@ -23,6 +23,11 @@
         <pi.password></pi.password>
         <pi.deployDirectory>/home/pi/ocfflag</pi.deployDirectory>
         <pi.main.class>de.flashheart.ocfflag.Main</pi.main.class>
+
+        <project.build.timestamp>${maven.build.timestamp}</project.build.timestamp>
+        
+        <my.version>${project.version}</my.version>
+        
     </properties>
 
     <dependencies>
@@ -80,6 +85,19 @@
             <groupId>com.jgoodies</groupId>
             <artifactId>jgoodies-common</artifactId>
             <version>1.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>properties-maven-plugin</artifactId>
+            <version>1.0.0</version>
+            <type>maven-plugin</type>
+
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant-jsch</artifactId>
+            <version>1.9.6</version>
+
         </dependency>
     </dependencies>
 
@@ -157,6 +175,7 @@
                         </manifest>
                         <manifestEntries>
                             <Implementation-Build>${buildNumber}</Implementation-Build>
+                            <Implementation-Date>${maven.build.timestamp}</Implementation-Date>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -238,13 +257,27 @@
                         </configuration>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.ant</groupId>
-                        <artifactId>ant-jsch</artifactId>
-                        <version>1.9.6</version>
-                    </dependency>
-                </dependencies>
+
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>write-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <outputFile>
+                                ${project.build.outputDirectory}/application.properties
+                            </outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
 
