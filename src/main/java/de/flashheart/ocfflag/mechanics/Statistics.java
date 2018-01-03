@@ -5,21 +5,22 @@ import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.PHPMessage;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Stack;
 
 public class Statistics {
 
     private final int numTeams;
-    private long time, time_red, time_blue, time_green, time_yellow;
+    private long time;
+
+    private LinkedHashMap<String, Integer> rank;
 
     private final Logger logger = Logger.getLogger(getClass());
 
@@ -51,10 +52,10 @@ public class Statistics {
     private SwingWorker<Boolean, Boolean> worker;
 
     private String flagcolor;
-    private ArrayList<MutableTriple<Color, Integer, Integer>> ranking;
 
     public Statistics(int numTeams) {
         this.numTeams = numTeams;
+        rank = new LinkedHashMap<>();
         stackEvents = new Stack<>();
         reset();
     }
@@ -63,23 +64,22 @@ public class Statistics {
         endOfGame = null;
         flagcolor = "neutral";
         winningTeams.clear();
+        rank.clear();
         time = 0l;
-        time_red = 0l;
-        time_blue = 0l;
-        time_green = 0l;
-        time_yellow = 0l;
+
+        rank.put("red", 0);
+        rank.put("blue", 0);
+        if (numTeams >= 3) rank.put("green", 0);
+        if (numTeams >= 4) rank.put("yellow", 0);
+
         matchid = 0;
         stackEvents.clear();
-        ranking = null;
     }
 
-    public void setTimes(int matchid, long time, long time_red, long time_blue, long time_green, long time_yellow) {
+    public void setTimes(int matchid, long time, LinkedHashMap<String, Integer> myrank) {
         this.matchid = matchid;
         this.time = time;
-        this.time_blue = time_blue;
-        this.time_red = time_red;
-        this.time_green = numTeams >= 3 ? time_green : -1l;
-        this.time_yellow = numTeams >= 4 ? time_yellow : -1l;
+        this.rank = myrank;
     }
 
     /**
@@ -87,8 +87,8 @@ public class Statistics {
      */
     public void sendStats() {
         logger.debug(toPHP());
-        if (Main.getMessageProcessor() != null)
-            Main.getMessageProcessor().pushMessage(new PHPMessage(toPHP(), stackEvents.peek()));
+//        if (Main.getMessageProcessor() != null)
+//            Main.getMessageProcessor().pushMessage(new PHPMessage(toPHP(), stackEvents.peek()));
     }
 
     public long addEvent(int event) {
@@ -118,64 +118,58 @@ public class Statistics {
         return now.getMillis();
     }
 
-    public void setRanking(ArrayList<MutableTriple<Color, Integer, Integer>> ranking) {
-        this.ranking = ranking;
-    }
-
 
     private String toPHP() {
-        String php = "<?php\n";
+
+
+        final StringBuilder php = new StringBuilder();
+        php.append("<?php\n");
 
         String flagname = Main.getConfigs().get(Configs.FLAGNAME);
 
         flagname = StringUtils.replace(flagname, "'", "\\'");
         flagname = StringUtils.replace(flagname, "\"", "\\\"");
 
-        php += "$game['flagname'] = '" + flagname + "';\n";
-        php += "$game['flagcolor'] = '" + flagcolor + "';\n";
-        php += "$game['uuid'] = '" + Main.getConfigs().get(Configs.MYUUID) + "';\n";
-        php += "$game['matchid'] = '" + matchid + "';\n";
-        php += "$game['timestamp'] = '" + DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(new DateTime()) + "';\n";
-        php += "$game['ts_game_started'] = '" + DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(stackEvents.get(0).getPit()) + "';\n";
-        php += "$game['ts_game_paused'] = '" + (stackEvents.peek().getEvent() == EVENT_PAUSE ? DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(stackEvents.peek().getPit()) : "null") + "';\n";
-        php += "$game['ts_game_ended'] = '" + (endOfGame == null ? "null" : DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(endOfGame)) + "';\n";
-        php += "$game['time'] = '" + Tools.formatLongTime(time, "HH:mm:ss") + "';\n";
-        php += "$game['time_blue'] = '" + Tools.formatLongTime(time_blue, "HH:mm:ss") + "';\n";
-        php += "$game['time_red'] = '" + Tools.formatLongTime(time_red, "HH:mm:ss") + "';\n";
-        php += "$game['time_green'] = '" + Tools.formatLongTime(time_green, "HH:mm:ss") + "';\n";
-        php += "$game['time_yellow'] = '" + Tools.formatLongTime(time_yellow, "HH:mm:ss") + "';\n";
-        php += "$game['num_teams'] = '" + numTeams + "';\n";
+        php.append("$game['flagname'] = '" + flagname + "';\n");
+        php.append("$game['flagcolor'] = '" + flagcolor + "';\n");
+        php.append("$game['uuid'] = '" + Main.getConfigs().get(Configs.MYUUID) + "';\n");
+        php.append("$game['matchid'] = '" + matchid + "';\n");
+        php.append("$game['timestamp'] = '" + DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(new DateTime()) + "';\n");
+        php.append("$game['ts_game_started'] = '" + DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(stackEvents.get(0).getPit()) + "';\n");
+        php.append("$game['ts_game_paused'] = '" + (stackEvents.peek().getEvent() == EVENT_PAUSE ? DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(stackEvents.peek().getPit()) : "null") + "';\n");
+        php.append("$game['ts_game_ended'] = '" + (endOfGame == null ? "null" : DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(endOfGame)) + "';\n");
+        php.append("$game['time'] = '" + Tools.formatLongTime(time, "HH:mm:ss") + "';\n");
+        php.append("$game['num_teams'] = '" + numTeams + "';\n");
 
 
-        php += "$game['ranking'] = array(\n";
-        if (ranking == null) {
-            php += "'notdecidedyet'";
-        } else {
-            for (MutableTriple<Color, Integer, Integer> triple : ranking) {
-                php += "   array('color' => '" + triple.getLeft() + "','rank' => '" + triple.getMiddle() + "','time' => '" + triple.getMiddle() + "'),\n";
-            }
-        }
-        php += ");\n";
+        php.append("$game['rank'] = array(\n");
 
-        php += "$game['winning_teams'] = array(\n";
+        rank.entrySet().stream()
+                .forEach(stringIntegerEntry -> {
+                    php.append("   array('" + stringIntegerEntry.getKey() + "' => '" + stringIntegerEntry.getValue() + "'),\n");
+                });
+
+        php.append(");\n");
+
+        php.append("$game['winning_teams'] = array(\n");
         if (winningTeams.isEmpty()) {
-            php += endOfGame == null ? "'notdecidedyet'" : "'drawgame'";
+            php.append(endOfGame == null ? "'notdecidedyet'" : "'drawgame'");
         } else {
             for (String team : winningTeams) {
-                php += "'" + team + "',";
+                php.append("'" + team + "',");
             }
         }
-        php += ");\n";
+        php.append(");\n");
 
-        php += "$game['events'] = array(\n";
+        php.append("$game['events'] = array(\n");
         for (GameEvent event : stackEvents) {
-            php += event.toPHPArray();
+            php.append(event.toPHPArray());
         }
 
-        php += ");\n";
+        php.append(");\n?>");
 
 
-        return php + "?>";
+        return php.toString();
     }
 
 

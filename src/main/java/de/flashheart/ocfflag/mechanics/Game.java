@@ -13,17 +13,14 @@ import de.flashheart.ocfflag.hardware.pinhandler.RGBScheduleElement;
 import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.FTPWrapper;
-import de.flashheart.ocfflag.misc.Tools;
-import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.awt.*;
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
-import java.util.jar.Manifest;
+import java.util.stream.Collectors;
 
 /**
  * In dieser Klasse befindet sich die Spielmechanik.
@@ -79,12 +76,14 @@ public class Game implements Runnable, StatsSentListener {
     private final long PAUSE_PER_CYCLE = 500;
 
     private Statistics statistics;
+    private final HashMap<String, Color> colors = new HashMap<>();
 
     private long time, time_blue, time_red, time_yellow, time_green, lastPIT, lastStatsSent, min_stat_sent_time;
 
     // das sind die standard spieldauern in millis.
     // In Minuten: 30, 60, 90, 120, 150, 180, 210, 240, 270, 300
     private Long[] preset_times = new Long[]{
+            10000l, // 00:00:10
             60000l, // 00:01:00
             600000l, // 00:10:00
             900000l, // 00:15:00
@@ -143,6 +142,11 @@ public class Game implements Runnable, StatsSentListener {
         preset_num_teams = Integer.parseInt(Main.getConfigs().get(Configs.NUMBER_OF_TEAMS));
 
         statistics = new Statistics(preset_num_teams);
+
+        colors.put("green", Color.green);
+        colors.put("red", Color.red);
+        colors.put("blue", Color.blue);
+        colors.put("yellow", Color.yellow);
 
         initGame();
     }
@@ -302,22 +306,22 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void button_green_pressed() {
-           if (preset_num_teams < 3) {
-               logger.debug("NO GREEN TEAM: ignoring");
-               return;
-           }
-           if (mode == MODE_CLOCK_GAME_RUNNING) {
-               if (flag != FLAG_STATE_GREEN) {
-                   flag = FLAG_STATE_GREEN;
-                   Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
-                   lastStatsSent = statistics.addEvent(Statistics.EVENT_GREEN_ACTIVATED);
-                   refreshDisplay();
-               }
+        if (preset_num_teams < 3) {
+            logger.debug("NO GREEN TEAM: ignoring");
+            return;
+        }
+        if (mode == MODE_CLOCK_GAME_RUNNING) {
+            if (flag != FLAG_STATE_GREEN) {
+                flag = FLAG_STATE_GREEN;
+                Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
+                lastStatsSent = statistics.addEvent(Statistics.EVENT_GREEN_ACTIVATED);
+                refreshDisplay();
+            }
 
-           } else {
-               logger.debug("NOT RUNNING: IGNORED");
-           }
-       }
+        } else {
+            logger.debug("NOT RUNNING: IGNORED");
+        }
+    }
 
     private void button_yellow_pressed() {
         if (preset_num_teams < 4) {
@@ -337,15 +341,15 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void button_reset_pressed() {
-         if (mode != MODE_CLOCK_GAME_RUNNING) {
-             if (mode == MODE_CLOCK_GAME_PAUSED) {
-                 lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
-             }
-             reset_timers();
-         } else {
-             logger.debug("RUNNING: IGNORED");
-         }
-     }
+        if (mode != MODE_CLOCK_GAME_RUNNING) {
+            if (mode == MODE_CLOCK_GAME_PAUSED) {
+                lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
+            }
+            reset_timers();
+        } else {
+            logger.debug("RUNNING: IGNORED");
+        }
+    }
 
     private void button_preset_num_teams() {
         if (MAX_TEAMS == 2) return;
@@ -418,7 +422,7 @@ public class Game implements Runnable, StatsSentListener {
         statistics.reset();
         refreshDisplay();
     }
-    
+
     private void refreshDisplay() {
         try {
             display_white.setTime(time);
@@ -432,7 +436,7 @@ public class Game implements Runnable, StatsSentListener {
             else display_yellow.setTime(time_yellow);
 
             if (min_stat_sent_time > 0 && running_match_id > 0)
-                statistics.setTimes(running_match_id, time, time_red, time_blue, time_green, time_yellow);
+                statistics.setTimes(running_match_id, time, getRank());
 
             display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
             display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
@@ -557,151 +561,111 @@ public class Game implements Runnable, StatsSentListener {
             }
 
             if (mode == MODE_CLOCK_GAME_OVER) {
-                // das hier mache ich, damit die Zeiten nur auf Sekunden Ebene verglichen werden.
-
-
-                time_red = 70000;
-                time_blue = 120000;
-                time_green = 70300;
-                time_yellow = 70200;
-
-
-                DateTime dateTime_red = new DateTime(time_red, DateTimeZone.UTC);
-                DateTime dateTime_blue = new DateTime(time_blue, DateTimeZone.UTC);
-                DateTime dateTime_yellow = new DateTime(time_yellow, DateTimeZone.UTC);
-                DateTime dateTime_green = new DateTime(time_green, DateTimeZone.UTC);
-
 
                 Main.getPinHandler().setScheme(Main.PH_AIRSIREN, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
 
-                if (dateTime_red.getSecondOfDay() > dateTime_blue.getSecondOfDay()) {
-                    // eine TOP4 der Teams erstellen. Bzw TOP{soviele Teams es gibt}.
-                    ArrayList<MutableTriple<Color, Integer, Integer>> ranking = new ArrayList<>();
-                    ranking.add(new MutableTriple<>(Color.red, 0, dateTime_red.getSecondOfDay()));
-                    ranking.add(new MutableTriple<>(Color.blue, 0, dateTime_blue.getSecondOfDay()));
+                LinkedHashMap<String, Integer> rank = getRank();
+                statistics.setTimes(running_match_id, 0l, rank);
+
+                if (isDrawgame(rank)) {
+                    logger.debug("\n" +
+                            "  ____  ____      ___        __   ____    _    __  __ _____ \n" +
+                            " |  _ \\|  _ \\    / \\ \\      / /  / ___|  / \\  |  \\/  | ____|\n" +
+                            " | | | | |_) |  / _ \\ \\ /\\ / /  | |  _  / _ \\ | |\\/| |  _|  \n" +
+                            " | |_| |  _ <  / ___ \\ V  V /   | |_| |/ ___ \\| |  | | |___ \n" +
+                            " |____/|_| \\_\\/_/   \\_\\_/\\_/     \\____/_/   \\_\\_|  |_|_____|\n" +
+                            "                                                            ");
+                    display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                    display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                     if (preset_num_teams >= 3)
-                        ranking.add(new MutableTriple<>(Color.green, 0, dateTime_green.getSecondOfDay()));
+                        display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                     if (preset_num_teams >= 4)
-                        ranking.add(new MutableTriple<>(Color.yellow, 0, dateTime_yellow.getSecondOfDay()));
+                        display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
 
-                    // Auswertung
-                    Collections.sort(ranking, Collections.reverseOrder(Comparator.comparingInt(MutableTriple::getRight)));
-                    int rank = 0;
-                    int prev_time = Integer.MAX_VALUE;
-                    for (MutableTriple<Color, Integer, Integer> triple : ranking) {
-                        // das reicht aus, weil die Liste bereits vorher nach den Zeiten sortiert wurde.
-                        if (triple.getRight() < prev_time) rank++;
-                        prev_time = triple.getRight();
-                        triple.setMiddle(rank);
-                    }
+                    Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,1000;off,1000");
+                    Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,1000;off,1000");
+                    if (preset_num_teams >= 3)
+                        Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "∞:on,1000;off,1000");
+                    if (preset_num_teams >= 4)
+                        Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,1000;off,1000");
 
-                    statistics.setRanking(ranking);
+                    Main.getPinHandler().setScheme(Main.PH_POLE, "DRAW GAME", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
+                    lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_DRAW);
+                } else {
+                    ArrayList<String> winners = getWinners(rank);
 
-                    if (drawgame(ranking)) {
+                    if (winners.size() > 1) {
+                        lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_MULTI_WINNERS);
                         logger.debug("\n" +
-                                "  ____  ____      ___        __   ____    _    __  __ _____ \n" +
-                                " |  _ \\|  _ \\    / \\ \\      / /  / ___|  / \\  |  \\/  | ____|\n" +
-                                " | | | | |_) |  / _ \\ \\ /\\ / /  | |  _  / _ \\ | |\\/| |  _|  \n" +
-                                " | |_| |  _ <  / ___ \\ V  V /   | |_| |/ ___ \\| |  | | |___ \n" +
-                                " |____/|_| \\_\\/_/   \\_\\_/\\_/     \\____/_/   \\_\\_|  |_|_____|\n" +
-                                "                                                            ");
-                        display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                        display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                        if (preset_num_teams >= 3)
-                            display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                        if (preset_num_teams >= 4)
-                            display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-
-                        Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,1000;off,1000");
-                        Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,1000;off,1000");
-                        if (preset_num_teams >= 3)
-                            Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "∞:on,1000;off,1000");
-                        if (preset_num_teams >= 4)
-                            Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,1000;off,1000");
-
-                        Main.getPinHandler().setScheme(Main.PH_POLE, "DRAW GAME", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
-                        lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_DRAW);
-                    } else {
-                        HashMap<Color, MutableTriple<Color, Integer, Integer>> winningteams = new HashMap<>();
-                        rank = 0;
-                        // Darstellung
-                        for (MutableTriple<Color, Integer, Integer> triple : ranking) {
-                            if (triple.getMiddle() == 1) { // ein Sieger
-                                winningteams.put(triple.getLeft(), triple);
-                            }
-                        }
-
-                        if (winningteams.size() > 1) {
-                            lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_MULTI_WINNERS);
-                            logger.debug("\n" +
-                                    "  __  __  ___  ____  _____   _____ _   _    _    _   _    ___  _   _ _____  __        _____ _   _ _   _ _____ ____  \n" +
-                                    " |  \\/  |/ _ \\|  _ \\| ____| |_   _| | | |  / \\  | \\ | |  / _ \\| \\ | | ____| \\ \\      / /_ _| \\ | | \\ | | ____|  _ \\ \n" +
-                                    " | |\\/| | | | | |_) |  _|     | | | |_| | / _ \\ |  \\| | | | | |  \\| |  _|    \\ \\ /\\ / / | ||  \\| |  \\| |  _| | |_) |\n" +
-                                    " | |  | | |_| |  _ <| |___    | | |  _  |/ ___ \\| |\\  | | |_| | |\\  | |___    \\ V  V /  | || |\\  | |\\  | |___|  _ < \n" +
-                                    " |_|  |_|\\___/|_| \\_\\_____|   |_| |_| |_/_/   \\_\\_| \\_|  \\___/|_| \\_|_____|    \\_/\\_/  |___|_| \\_|_| \\_|_____|_| \\_\\\n" +
-                                    "                                                                                                                    ");
-                        }
-
-                        if (winningteams.containsKey(Color.red)) {
-                            logger.debug("\n" +
-                                    "  ____  _____ ____   __        _____  _   _ \n" +
-                                    " |  _ \\| ____|  _ \\  \\ \\      / / _ \\| \\ | |\n" +
-                                    " | |_) |  _| | | | |  \\ \\ /\\ / / | | |  \\| |\n" +
-                                    " |  _ <| |___| |_| |   \\ V  V /| |_| | |\\  |\n" +
-                                    " |_| \\_\\_____|____/     \\_/\\_/  \\___/|_| \\_|\n" +
-                                    "                                            ");
-                            display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                            Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,100;off,100");
-                            lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_RED_WON);
-                        }
-                        if (winningteams.containsKey(Color.blue)) {
-                            logger.debug("\n" +
-                                    "  ____  _    _   _ _____  __        _____  _   _ \n" +
-                                    " | __ )| |  | | | | ____| \\ \\      / / _ \\| \\ | |\n" +
-                                    " |  _ \\| |  | | | |  _|    \\ \\ /\\ / / | | |  \\| |\n" +
-                                    " | |_) | |__| |_| | |___    \\ V  V /| |_| | |\\  |\n" +
-                                    " |____/|_____\\___/|_____|    \\_/\\_/  \\___/|_| \\_|\n" +
-                                    "                                                 ");
-                            display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                            Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,100;off,100");
-                            lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_BLUE_WON);
-                        }
-                        if (winningteams.containsKey(Color.green)) {
-                            logger.debug("\n" +
-                                    "    ____ ____  _____ _____ _   _  __        _____  _   _ \n" +
-                                    "  / ___|  _ \\| ____| ____| \\ | | \\ \\      / / _ \\| \\ | |\n" +
-                                    " | |  _| |_) |  _| |  _| |  \\| |  \\ \\ /\\ / / | | |  \\| |\n" +
-                                    " | |_| |  _ <| |___| |___| |\\  |   \\ V  V /| |_| | |\\  |\n" +
-                                    "  \\____|_| \\_\\_____|_____|_| \\_|    \\_/\\_/  \\___/|_| \\_|\n" +
-                                    "                                                        ");
-                            display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                            Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "∞:on,100;off,100");
-                            lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_GREEN_WON);
-                        }
-                        if (winningteams.containsKey(Color.yellow)) {
-                            logger.debug("\n" +
-                                    " __   _______ _     _     _____        __ __        _____  _   _ \n" +
-                                    " \\ \\ / / ____| |   | |   / _ \\ \\      / / \\ \\      / / _ \\| \\ | |\n" +
-                                    "  \\ V /|  _| | |   | |  | | | \\ \\ /\\ / /   \\ \\ /\\ / / | | |  \\| |\n" +
-                                    "   | | | |___| |___| |__| |_| |\\ V  V /     \\ V  V /| |_| | |\\  |\n" +
-                                    "   |_| |_____|_____|_____\\___/  \\_/\\_/       \\_/\\_/  \\___/|_| \\_|\n" +
-                                    "                                                                 ");
-                            display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                            Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,100;off,100");
-                            lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_YELLOW_WON);
-                        }
-
-                        // die Flagge soll alle Sieger anzeigen
-                        String winningScheme = PinHandler.FOREVER + ":";
-                        String text = "Winning Team(s): ";
-                        for (Color teamColor : winningteams.keySet()) {
-                            winningScheme += new RGBScheduleElement(teamColor, 250) + ";" + new RGBScheduleElement(Color.BLACK, 250) + ";";
-                            text += teamColor.toString() + " ";
-                        }
-                        Main.getPinHandler().setScheme(Main.PH_POLE, text, winningScheme);
+                                "  __  __  ___  ____  _____   _____ _   _    _    _   _    ___  _   _ _____  __        _____ _   _ _   _ _____ ____  \n" +
+                                " |  \\/  |/ _ \\|  _ \\| ____| |_   _| | | |  / \\  | \\ | |  / _ \\| \\ | | ____| \\ \\      / /_ _| \\ | | \\ | | ____|  _ \\ \n" +
+                                " | |\\/| | | | | |_) |  _|     | | | |_| | / _ \\ |  \\| | | | | |  \\| |  _|    \\ \\ /\\ / / | ||  \\| |  \\| |  _| | |_) |\n" +
+                                " | |  | | |_| |  _ <| |___    | | |  _  |/ ___ \\| |\\  | | |_| | |\\  | |___    \\ V  V /  | || |\\  | |\\  | |___|  _ < \n" +
+                                " |_|  |_|\\___/|_| \\_\\_____|   |_| |_| |_/_/   \\_\\_| \\_|  \\___/|_| \\_|_____|    \\_/\\_/  |___|_| \\_|_| \\_|_____|_| \\_\\\n" +
+                                "                                                                                                                    ");
                     }
+
+                    if (winners.contains("red")) {
+                        logger.debug("\n" +
+                                "  ____  _____ ____   __        _____  _   _ \n" +
+                                " |  _ \\| ____|  _ \\  \\ \\      / / _ \\| \\ | |\n" +
+                                " | |_) |  _| | | | |  \\ \\ /\\ / / | | |  \\| |\n" +
+                                " |  _ <| |___| |_| |   \\ V  V /| |_| | |\\  |\n" +
+                                " |_| \\_\\_____|____/     \\_/\\_/  \\___/|_| \\_|\n" +
+                                "                                            ");
+                        display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                        Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,100;off,100");
+                        lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_RED_WON);
+                    }
+                    if (winners.contains("blue")) {
+                        logger.debug("\n" +
+                                "  ____  _    _   _ _____  __        _____  _   _ \n" +
+                                " | __ )| |  | | | | ____| \\ \\      / / _ \\| \\ | |\n" +
+                                " |  _ \\| |  | | | |  _|    \\ \\ /\\ / / | | |  \\| |\n" +
+                                " | |_) | |__| |_| | |___    \\ V  V /| |_| | |\\  |\n" +
+                                " |____/|_____\\___/|_____|    \\_/\\_/  \\___/|_| \\_|\n" +
+                                "                                                 ");
+                        display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                        Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,100;off,100");
+                        lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_BLUE_WON);
+                    }
+                    if (winners.contains("green")) {
+                        logger.debug("\n" +
+                                "    ____ ____  _____ _____ _   _  __        _____  _   _ \n" +
+                                "  / ___|  _ \\| ____| ____| \\ | | \\ \\      / / _ \\| \\ | |\n" +
+                                " | |  _| |_) |  _| |  _| |  \\| |  \\ \\ /\\ / / | | |  \\| |\n" +
+                                " | |_| |  _ <| |___| |___| |\\  |   \\ V  V /| |_| | |\\  |\n" +
+                                "  \\____|_| \\_\\_____|_____|_| \\_|    \\_/\\_/  \\___/|_| \\_|\n" +
+                                "                                                        ");
+                        display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                        Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "∞:on,100;off,100");
+                        lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_GREEN_WON);
+                    }
+                    if (winners.contains("yellow")) {
+                        logger.debug("\n" +
+                                " __   _______ _     _     _____        __ __        _____  _   _ \n" +
+                                " \\ \\ / / ____| |   | |   / _ \\ \\      / / \\ \\      / / _ \\| \\ | |\n" +
+                                "  \\ V /|  _| | |   | |  | | | \\ \\ /\\ / /   \\ \\ /\\ / / | | |  \\| |\n" +
+                                "   | | | |___| |___| |__| |_| |\\ V  V /     \\ V  V /| |_| | |\\  |\n" +
+                                "   |_| |_____|_____|_____\\___/  \\_/\\_/       \\_/\\_/  \\___/|_| \\_|\n" +
+                                "                                                                 ");
+                        display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                        Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,100;off,100");
+                        lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_YELLOW_WON);
+                    }
+
+                    // die Flagge soll alle Sieger anzeigen
+                    String winningScheme = PinHandler.FOREVER + ":";
+                    String text = "Winning Team(s): ";
+                    for (String teamColor : winners) {
+
+                        winningScheme += new RGBScheduleElement(colors.get(teamColor), 250) + ";" + new RGBScheduleElement(Color.BLACK, 250) + ";";
+                        text += teamColor + " ";
+                    }
+                    Main.getPinHandler().setScheme(Main.PH_POLE, text, winningScheme);
                 }
             }
+
         } catch (IOException e) {
             logger.fatal(e);
             System.exit(1);
@@ -711,11 +675,44 @@ public class Game implements Runnable, StatsSentListener {
     /**
      * wenn alle rankings den rang 1 haben, müssen alle teams gleich gespielt haben.
      *
-     * @param ranking
+     * @param rank
      * @return
      */
-    private boolean drawgame(ArrayList<MutableTriple<Color, Integer, Integer>> ranking) {
-        return (Collections.max(ranking, Comparator.comparingInt(MutableTriple::getMiddle)).getMiddle() == 1);
+    private boolean isDrawgame(LinkedHashMap<String, Integer> rank) {
+        return rank.values().stream()
+                .distinct().count() == 1; // ermittelt ob alle Werte in der Map gleich sind.
+    }
+
+    private ArrayList<String> getWinners(LinkedHashMap<String, Integer> rank) {
+        ArrayList<String> winners = new ArrayList<>();
+        Integer maxtime = rank.entrySet().stream().max(Map.Entry.comparingByValue()).get().getValue();
+        rank.entrySet().stream().forEach(stringIntegerEntry -> {
+            if (stringIntegerEntry.getValue().equals(maxtime)) winners.add(stringIntegerEntry.getKey());
+        });
+        return winners;
+    }
+
+    private LinkedHashMap<String, Integer> getRank() {
+
+        DateTime dateTime_red = new DateTime(time_red, DateTimeZone.UTC);
+        DateTime dateTime_blue = new DateTime(time_blue, DateTimeZone.UTC);
+        DateTime dateTime_green = preset_num_teams >= 3 ? new DateTime(time_green, DateTimeZone.UTC) : null;
+        DateTime dateTime_yellow = preset_num_teams >= 4 ? new DateTime(time_yellow, DateTimeZone.UTC) : null;
+
+        HashMap<String, Integer> rank = new HashMap<>();
+        rank.put("red", dateTime_red.getSecondOfDay());
+        rank.put("blue", dateTime_blue.getSecondOfDay());
+        if (preset_num_teams >= 3) rank.put("green", dateTime_green.getSecondOfDay());
+        if (preset_num_teams >= 4) rank.put("yellow", dateTime_yellow.getSecondOfDay());
+
+
+        LinkedHashMap<String, Integer> toplist =
+                rank.entrySet().stream()
+                        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+
+        return toplist;
     }
 
 
@@ -733,7 +730,7 @@ public class Game implements Runnable, StatsSentListener {
 
                     // Statistiken, wenn gewünscht
                     if (min_stat_sent_time > 0) {
-                        statistics.setTimes(running_match_id, time, time_red, time_blue, time_green, time_yellow);
+                        statistics.setTimes(running_match_id, time, getRank());
                         if (now - lastStatsSent > min_stat_sent_time) {
                             statistics.sendStats();
                             lastStatsSent = now;
@@ -757,10 +754,13 @@ public class Game implements Runnable, StatsSentListener {
                     display_white.setTime(time);
                     display_red.setTime(time_red);
                     display_blue.setTime(time_blue);
-                    if (preset_num_teams < 3) display_green.clear();
-                    else display_green.setTime(time_green);
-                    if (preset_num_teams < 4) display_yellow.clear();
-                    else display_yellow.setTime(time_yellow);
+//                    if (preset_num_teams < 3) display_green.clear();
+//                    else display_green.setTime(time_green);
+//                    if (preset_num_teams < 4) display_yellow.clear();
+//                    else display_yellow.setTime(time_yellow);
+
+                    if (preset_num_teams >= 3) display_green.setTime(time_green);
+                    if (preset_num_teams >= 4) display_yellow.setTime(time_yellow);
 
 
                     if (time == 0) {

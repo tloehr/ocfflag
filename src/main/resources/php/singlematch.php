@@ -38,29 +38,33 @@ if ($game['ts_game_ended'] == 'null') {
 
 } else {
     // GAME OVER
-    if ($game['winning_team'] == 'draw') {
+    if (in_array("drawgame", $game['winning_teams'])) {
         echo '<div class="well" style="font-size:175%;background:white;color:black;font-weight:bold">GAME OVER: Unentschieden</div>';
-    } elseif ($game['winning_team'] == 'red') {
+    }
+
+    if (in_array("red", $game['winning_teams'])) {
         echo '<div class="well" style="font-size:175%;background:red;color:yellow;font-weight:bold">GAME OVER: Rot hat gewonnen</div>';
-    } elseif ($game['winning_team'] == 'blue') {
+    }
+
+    if (in_array("blue", $game['winning_teams'])) {
         echo '<div class="well" style="font-size:175%;background:royalblue;color:yellow;font-weight:bold">GAME OVER: Blau hat gewonnen</div>';
-    } elseif ($game['winning_team'] == 'green') {
+    }
+
+    if (in_array("green", $game['winning_teams'])) {
         echo '<div class="well" style="font-size:175%;background:green;color:white;font-weight:bold">GAME OVER: Grün hat gewonnen</div>';
-    } elseif ($game['winning_team'] == 'yellow') {
+    }
+
+    if (in_array("yellow", $game['winning_teams'])) {
         echo '<div class="well" style="font-size:175%;background:yellow;color:black;font-weight:bold">GAME OVER: Gelb hat gewonnen</div>';
-    } elseif ($game['winning_team'] == 'not_yet') {
-        echo '<div class="well" style="font-size:175%;background:grey;color:white;font-weight:bold">GAME OVER: Keiner hat gewonnen</div>';
-    } else {
-        echo '<div class="well" style="font-size:175%;background:black;color:white;font-weight:bold">ERROR</div>';
     }
 }
 ?>
 
 <table class="table" style="width:100%">
     <tr>
-        <th style="font-size:125%;font-weight:bold;text-align:center"><?php echo$lang['REMAINING']?></th>
-        <th><?php echo$lang['TEAM_RED']?></th>
-        <th><?php echo$lang['TEAM_BLUE']?></th>
+        <th style="font-size:125%;font-weight:bold;text-align:center"><?php echo $lang['REMAINING'] ?></th>
+        <th><?php echo $lang['TEAM_RED'] ?></th>
+        <th><?php echo $lang['TEAM_BLUE'] ?></th>
         <th><?php echo($game['time_green'] != '--' ? $lang['TEAM_GREEN'] : '<s>' . $lang['TEAM_GREEN'] . '</s>') ?></th>
         <th><?php echo($game['time_yellow'] != '--' ? $lang['TEAM_YELLOW'] : '<s>' . $lang['TEAM_YELLOW'] . '</s>') ?></th>
     </tr>

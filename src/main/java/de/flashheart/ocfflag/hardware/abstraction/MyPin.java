@@ -32,7 +32,6 @@ public class MyPin {
 
     public MyPin(GpioController gpio, Pin pin, MyLED guiControlLED, String name, int instrument, int note) {
         this.name = name;
-
         this.guiControlLED = guiControlLED;
         this.outputPin = gpio == null ? null : gpio.provisionDigitalOutputPin(pin, PinState.LOW);
         if (outputPin != null) outputPin.setState(PinState.LOW);

@@ -9,6 +9,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.FTPWrapper;
+import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -52,7 +53,7 @@ public class FrameDebug extends JFrame {
         lblPole.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
 
         setTab(0);
-        setExtendedState(MAXIMIZED_BOTH);
+        if (Tools.isArm()) setExtendedState(MAXIMIZED_BOTH);
     }
 
     private void initFonts() {
