@@ -42,7 +42,7 @@ public class Display7Segments4Digits {
             }
         }
 
-        if (segment != null) segment.setBrightness(10);
+        if (segment != null) segment.setBrightness(Integer.parseInt(Main.getConfigs().get(name)));
     }
 
     public Display7Segments4Digits(int addr, JButton btnSegment, String name) throws IOException {
@@ -60,7 +60,7 @@ public class Display7Segments4Digits {
             }
         }
 
-        if (segment != null) segment.setBrightness(10);
+        if (segment != null) segment.setBrightness(Integer.parseInt(Main.getConfigs().get(name)));
     }
 
     public void setColon(boolean colon) {

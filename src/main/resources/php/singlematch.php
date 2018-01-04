@@ -43,19 +43,19 @@ if ($game['ts_game_ended'] == 'null') {
     }
 
     if (in_array("red", $game['winning_teams'])) {
-        echo '<div class="well" style="font-size:175%;background:red;color:yellow;font-weight:bold">GAME OVER: Rot hat gewonnen</div>';
+        echo '<div class="well" style="font-size:175%;background:red;color:yellow;font-weight:bold">Rot hat gewonnen</div>';
     }
 
     if (in_array("blue", $game['winning_teams'])) {
-        echo '<div class="well" style="font-size:175%;background:royalblue;color:yellow;font-weight:bold">GAME OVER: Blau hat gewonnen</div>';
+        echo '<div class="well" style="font-size:175%;background:royalblue;color:yellow;font-weight:bold">Blau hat gewonnen</div>';
     }
 
     if (in_array("green", $game['winning_teams'])) {
-        echo '<div class="well" style="font-size:175%;background:green;color:white;font-weight:bold">GAME OVER: Grün hat gewonnen</div>';
+        echo '<div class="well" style="font-size:175%;background:green;color:white;font-weight:bold">Grün hat gewonnen</div>';
     }
 
     if (in_array("yellow", $game['winning_teams'])) {
-        echo '<div class="well" style="font-size:175%;background:yellow;color:black;font-weight:bold">GAME OVER: Gelb hat gewonnen</div>';
+        echo '<div class="well" style="font-size:175%;background:yellow;color:black;font-weight:bold">Gelb hat gewonnen</div>';
     }
 }
 ?>
@@ -63,17 +63,17 @@ if ($game['ts_game_ended'] == 'null') {
 <table class="table" style="width:100%">
     <tr>
         <th style="font-size:125%;font-weight:bold;text-align:center"><?php echo $lang['REMAINING'] ?></th>
-        <th><?php echo $lang['TEAM_RED'] ?></th>
-        <th><?php echo $lang['TEAM_BLUE'] ?></th>
-        <th><?php echo($game['time_green'] != '--' ? $lang['TEAM_GREEN'] : '<s>' . $lang['TEAM_GREEN'] . '</s>') ?></th>
-        <th><?php echo($game['time_yellow'] != '--' ? $lang['TEAM_YELLOW'] : '<s>' . $lang['TEAM_YELLOW'] . '</s>') ?></th>
+        <th style="font-size:125%;font-weight:bold;text-align:center"><?php echo $lang['TEAM_RED'] ?></th>
+        <th style="font-size:125%;font-weight:bold;text-align:center"><?php echo $lang['TEAM_BLUE'] ?></th>
+        <th style="font-size:125%;font-weight:bold;text-align:center"><?php echo(intval($game['num_teams'])  >= 3 ? $lang['TEAM_GREEN'] : '<s>' . $lang['TEAM_GREEN'] . '</s>') ?></th>
+        <th style="font-size:125%;font-weight:bold;text-align:center"><?php echo(intval($game['num_teams'])  >= 4 ? $lang['TEAM_YELLOW'] : '<s>' . $lang['TEAM_YELLOW'] . '</s>') ?></th>
     </tr>
     <tr>
         <td style="font-size:175%;font-weight:bold;text-align:center"><?php echo $game['time']; ?></td>
-        <td style="font-size:175%;color:red;font-weight:bold;text-align:center"><?php echo $game['time_red']; ?></td>
-        <td style="font-size:175%;color:royalblue;font-weight:bold;text-align:center"><?php echo $game['time_blue']; ?></td>
-        <td style="font-size:175%;color:green;font-weight:bold;text-align:center"><?php echo $game['time_green']; ?></td>
-        <td style="font-size:175%;color:yellow;font-weight:bold;text-align:center"><?php echo $game['time_yellow']; ?></td>
+        <td style="font-size:175%;color:red;font-weight:bold;text-align:center"><?php echo $game['rank']['red']; ?></td>
+        <td style="font-size:175%;color:royalblue;font-weight:bold;text-align:center"><?php echo $game['rank']['blue']; ?></td>
+        <td style="font-size:175%;color:green;font-weight:bold;text-align:center"><?php echo (intval($game['num_teams'])  >= 3 ? $game['rank']['green'] : '--'); ?></td>
+        <td style="font-size:175%;color:black;background:yellow;font-weight:bold;text-align:center"><?php echo (intval($game['num_teams'])  >= 4 ? $game['rank']['yellow'] : '--'); ?></td>
     </tr>
 </table>
 <br/>

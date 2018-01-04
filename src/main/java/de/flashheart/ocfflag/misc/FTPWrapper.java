@@ -96,7 +96,7 @@ public class FTPWrapper {
         String remotepath = Main.getConfigs().get(Configs.FTPREMOTEPATH);
         String uuid = Main.getConfigs().get(Configs.MYUUID);
 
-        String activeFile = remotepath + "/active/" + uuid + ".php";
+        String activeFile = remotepath + "/ocfflag/active/" + uuid + ".php";
 
         boolean resultOk = true;
         Logger logger = Logger.getLogger(FTPWrapper.class);
@@ -122,7 +122,7 @@ public class FTPWrapper {
 
             if (move2archive) {
                 DateTime now = new DateTime();
-                String archivefile = remotepath + "/archive/" + now.toString("yyyyMMddHHmmss") + "-" + uuid + ".php";
+                String archivefile = remotepath + "/ocfflag/archive/" + now.toString("yyyyMMddHHmmss") + "-" + uuid + ".php";
                 resultOk &= ftpClient.storeFile(archivefile, fis);
                 ftpClient.deleteFile(activeFile); // egal ob es eine gab oder nicht
             } else {
@@ -184,8 +184,8 @@ public class FTPWrapper {
 
                 String remotepath = Main.getConfigs().get(Configs.FTPREMOTEPATH);
 
-                String archivepath = remotepath + "/archive";
-                String activepath = remotepath + "/active";
+                String archivepath = remotepath + "/ocfflag/archive";
+                String activepath = remotepath + "/ocfflag/active";
 
                 String remoteFile = activepath + "/" + uuid + ".php";
 

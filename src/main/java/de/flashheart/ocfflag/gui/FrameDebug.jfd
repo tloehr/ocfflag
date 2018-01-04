@@ -365,6 +365,47 @@ new FormModel {
 						"gridX": 7
 						"gridY": 21
 					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "label10"
+						"text": "Helligkeit"
+						"font": #Font1
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridY": 23
+						"gridX": 3
+					} )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
+						"hgap": 5
+					} ) {
+						name: "panel4"
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "btnWhiteBrght"
+							"text": "text"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnWhiteBrghtActionPerformed", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "btnRedBrght"
+							"text": "text"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnBrghtActionPerformed", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "btnBlueBrght"
+							"text": "text"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnBrghtActionPerformed", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "btnGreenBrght"
+							"text": "text"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnBrghtActionPerformed", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "btnYellowBrght"
+							"text": "text"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnBrghtActionPerformed", true ) )
+						} )
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 7
+						"gridY": 23
+					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
 						name: "btnPlay"
 						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE

@@ -272,10 +272,8 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void button_quit_pressed() {
-        if (mode == MODE_CLOCK_GAME_RUNNING) return;
-        if (mode == MODE_CLOCK_PREGAME) System.exit(0);
-        quit_programm = true;
-        button_reset_pressed();
+        if (mode != MODE_CLOCK_PREGAME) return;
+        System.exit(0);
     }
 
     private void button_red_pressed() {
@@ -560,6 +558,7 @@ public class Game implements Runnable, StatsSentListener {
                 }
             }
 
+            // hier findet die Auswertung nach dem Spielende statt.
             if (mode == MODE_CLOCK_GAME_OVER) {
 
                 Main.getPinHandler().setScheme(Main.PH_AIRSIREN, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));

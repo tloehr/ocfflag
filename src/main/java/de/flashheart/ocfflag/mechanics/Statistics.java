@@ -87,8 +87,8 @@ public class Statistics {
      */
     public void sendStats() {
         logger.debug(toPHP());
-//        if (Main.getMessageProcessor() != null)
-//            Main.getMessageProcessor().pushMessage(new PHPMessage(toPHP(), stackEvents.peek()));
+        if (Main.getMessageProcessor() != null)
+            Main.getMessageProcessor().pushMessage(new PHPMessage(toPHP(), stackEvents.peek()));
     }
 
     public long addEvent(int event) {
@@ -142,16 +142,16 @@ public class Statistics {
         php.append("$game['num_teams'] = '" + numTeams + "';\n");
 
 
-        php.append("$game['rank'] = array(\n");
+        php.append("$game['rank'] = [\n");
 
         rank.entrySet().stream()
                 .forEach(stringIntegerEntry -> {
-                    php.append("   array('" + stringIntegerEntry.getKey() + "' => '" + stringIntegerEntry.getValue() + "'),\n");
+                    php.append("   '" + stringIntegerEntry.getKey() + "' => '" + Tools.formatLongTime(stringIntegerEntry.getValue() * 1000, "HH:mm:ss") + "',\n");
                 });
 
-        php.append(");\n");
+        php.append("];\n");
 
-        php.append("$game['winning_teams'] = array(\n");
+        php.append("$game['winning_teams'] = [\n");
         if (winningTeams.isEmpty()) {
             php.append(endOfGame == null ? "'notdecidedyet'" : "'drawgame'");
         } else {
@@ -159,14 +159,14 @@ public class Statistics {
                 php.append("'" + team + "',");
             }
         }
-        php.append(");\n");
+        php.append("];\n");
 
-        php.append("$game['events'] = array(\n");
+        php.append("$game['events'] = [\n");
         for (GameEvent event : stackEvents) {
             php.append(event.toPHPArray());
         }
 
-        php.append(");\n?>");
+        php.append("];\n?>");
 
 
         return php.toString();

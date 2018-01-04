@@ -31,8 +31,8 @@
 </head>
 
 	<body>
-		<?php		
-			require("navbar.php");
+		<?php
+			require("../navbar.php");
 			?>
 		
 		
@@ -41,7 +41,7 @@
 		</div>
 	
 		<?php		
-			require("lang-deDE.php");
+			require("../lang-deDE.php");
 			// für die Archive
 			require $_GET["gamefile"];
 			require("singlematch.php");

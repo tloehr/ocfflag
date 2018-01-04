@@ -30,7 +30,7 @@ public class GameEvent {
     }
 
     public String toPHPArray() {
-        return "   array('pit' => '" + pit.toString("HH:mm:ss") + "','event' => '" + Statistics.EVENTS[event] + "'),\n";
+        return "   ['pit' => '" + pit.toString("HH:mm:ss") + "','event' => '" + Statistics.EVENTS[event] + "'],\n";
     }
 
 }

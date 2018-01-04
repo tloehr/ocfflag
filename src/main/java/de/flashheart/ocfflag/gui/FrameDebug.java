@@ -145,6 +145,16 @@ public class FrameDebug extends JFrame {
         }
     }
 
+    private void btnBrghtActionPerformed(ActionEvent e) {
+        if (e.getSource().equals(btnBlueBrght)){
+
+        }
+    }
+
+    private void btnWhiteBrghtActionPerformed(ActionEvent e) {
+        // TODO add your code here
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         mainPanel = new JTabbedPane();
@@ -190,6 +200,13 @@ public class FrameDebug extends JFrame {
         btnTestFTP = new JButton();
         label9 = new JLabel();
         txtUUID = new JTextField();
+        label10 = new JLabel();
+        panel4 = new JPanel();
+        btnWhiteBrght = new JButton();
+        btnRedBrght = new JButton();
+        btnBlueBrght = new JButton();
+        btnGreenBrght = new JButton();
+        btnYellowBrght = new JButton();
         btnPlay = new JButton();
         scrollPane1 = new JScrollPane();
         txtFTPlog = new JTextArea();
@@ -481,6 +498,42 @@ public class FrameDebug extends JFrame {
                 txtUUID.setEditable(false);
                 configView.add(txtUUID, CC.xy(7, 21));
 
+                //---- label10 ----
+                label10.setText("Helligkeit");
+                label10.setFont(new Font("Dialog", Font.PLAIN, 22));
+                configView.add(label10, CC.xy(3, 23));
+
+                //======== panel4 ========
+                {
+                    panel4.setLayout(new GridLayout(1, 0, 5, 0));
+
+                    //---- btnWhiteBrght ----
+                    btnWhiteBrght.setText("text");
+                    btnWhiteBrght.addActionListener(e -> btnWhiteBrghtActionPerformed(e));
+                    panel4.add(btnWhiteBrght);
+
+                    //---- btnRedBrght ----
+                    btnRedBrght.setText("text");
+                    btnRedBrght.addActionListener(e -> btnBrghtActionPerformed(e));
+                    panel4.add(btnRedBrght);
+
+                    //---- btnBlueBrght ----
+                    btnBlueBrght.setText("text");
+                    btnBlueBrght.addActionListener(e -> btnBrghtActionPerformed(e));
+                    panel4.add(btnBlueBrght);
+
+                    //---- btnGreenBrght ----
+                    btnGreenBrght.setText("text");
+                    btnGreenBrght.addActionListener(e -> btnBrghtActionPerformed(e));
+                    panel4.add(btnGreenBrght);
+
+                    //---- btnYellowBrght ----
+                    btnYellowBrght.setText("text");
+                    btnYellowBrght.addActionListener(e -> btnBrghtActionPerformed(e));
+                    panel4.add(btnYellowBrght);
+                }
+                configView.add(panel4, CC.xy(7, 23));
+
                 //---- btnPlay ----
                 btnPlay.setText(null);
                 btnPlay.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/agt_games.png")));
@@ -613,6 +666,13 @@ public class FrameDebug extends JFrame {
     private JButton btnTestFTP;
     private JLabel label9;
     private JTextField txtUUID;
+    private JLabel label10;
+    private JPanel panel4;
+    private JButton btnWhiteBrght;
+    private JButton btnRedBrght;
+    private JButton btnBlueBrght;
+    private JButton btnGreenBrght;
+    private JButton btnYellowBrght;
     private JButton btnPlay;
     private JScrollPane scrollPane1;
     private JTextArea txtFTPlog;

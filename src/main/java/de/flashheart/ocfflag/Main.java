@@ -21,10 +21,8 @@ import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Properties;
 
 public class Main {
 
@@ -128,12 +126,13 @@ public class Main {
      */
     private static void initGameSystem() throws I2CFactory.UnsupportedBusNumberException, IOException {
 
-        display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblPole(), "display_white");
-
-        display_red = new Display7Segments4Digits(DISPLAY_RED, getFrameDebug().getBtnRed(), "display_red");
-        display_blue = new Display7Segments4Digits(DISPLAY_BLUE, getFrameDebug().getBtnBlue(), "display_blue");
-        display_green = new Display7Segments4Digits(DISPLAY_GREEN, getFrameDebug().getBtnGreen(), "display_green");
-        display_yellow = new Display7Segments4Digits(DISPLAY_YELLOW, getFrameDebug().getBtnYellow(), "display_yellow");
+        // die internal names auf den Brightness Key zu setzen ist ein kleiner Trick. Die namen müssen und eindeutig sein
+        // so kann das Display7Segment4Digits direkt die Helligkeit aus den configs lesen
+        display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblPole(), Configs.BRIGHTNESS_WHITE);
+        display_red = new Display7Segments4Digits(DISPLAY_RED, getFrameDebug().getBtnRed(), Configs.BRIGHTNESS_RED);
+        display_blue = new Display7Segments4Digits(DISPLAY_BLUE, getFrameDebug().getBtnBlue(), Configs.BRIGHTNESS_BLUE);
+        display_green = new Display7Segments4Digits(DISPLAY_GREEN, getFrameDebug().getBtnGreen(), Configs.BRIGHTNESS_GREEN);
+        display_yellow = new Display7Segments4Digits(DISPLAY_YELLOW, getFrameDebug().getBtnYellow(), Configs.BRIGHTNESS_BLUE);
 
         button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed());
         button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue());

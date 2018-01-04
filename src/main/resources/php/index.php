@@ -48,7 +48,7 @@
 		<?php		
 			require("lang-deDE.php");
 			
-			$files = glob("ocfflag4/active/*.php");
+			$files = glob("ocfflag/active/*.php");
 			
 			$filecount = 0;
 			if ($files){
@@ -61,7 +61,7 @@
 				foreach($files AS $file){
 					// echo '<p>'.$file."</p>";
 					require($file);					
-		 			require("singlematch.php"); 
+		 			require("ocfflag/singlematch.php");
 		 			echo '<hr style="background:lightgray;height:15px"/>';
 		 		}
 		 	}

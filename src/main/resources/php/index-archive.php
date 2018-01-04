@@ -40,12 +40,13 @@
 				echo "<ul>";
 				
 				$protocol = $_SERVER['HTTPS'] == '' ? 'http://' : 'https://';
-				$folder = $protocol . $_SERVER['HTTP_HOST']  .dirname($_SERVER['PHP_SELF'])."/";
+				$folder = $protocol . $_SERVER['HTTP_HOST']  .dirname($_SERVER['PHP_SELF'])."/ocfflag/";
 								
 				foreach($files AS $file){
 					require($file);
-					//echo '<li>leck mich</li>';
-					echo '<li><a href="'.$folder.'singlearchive.php?gamefile='.$file.'">'.$game['ts_game_started'].' ['.$game['flagname'].']'.'</a></li>';
+					// Das mit dem "../" ist ein Trick. Da die index-archive.php ein Verzeichnis drüber ist, hat der Dateiname den falschen Pfad.
+                    //                                                       VVV
+					echo '<li><a href="'.$folder.'singlearchive.php?gamefile=../'.$file.'">'.$game['ts_game_started'].' ['.$game['flagname'].']'.'</a></li>';
 				}
 				echo "</ul>";
 			}		
