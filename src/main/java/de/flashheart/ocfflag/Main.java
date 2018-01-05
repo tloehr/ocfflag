@@ -23,6 +23,7 @@ import javax.swing.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
 
 public class Main {
 
@@ -100,6 +101,9 @@ public class Main {
 
     private static MessageProcessor messageProcessor;
 
+
+    private static final HashMap<String, Object> applicationContext = new HashMap<>();;
+
     public static final int DEBOUNCE = 200; //ms
 
     public static MessageProcessor getMessageProcessor() {
@@ -126,13 +130,21 @@ public class Main {
      */
     private static void initGameSystem() throws I2CFactory.UnsupportedBusNumberException, IOException {
 
+
+
         // die internal names auf den Brightness Key zu setzen ist ein kleiner Trick. Die namen müssen und eindeutig sein
         // so kann das Display7Segment4Digits direkt die Helligkeit aus den configs lesen
         display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblPole(), Configs.BRIGHTNESS_WHITE);
         display_red = new Display7Segments4Digits(DISPLAY_RED, getFrameDebug().getBtnRed(), Configs.BRIGHTNESS_RED);
         display_blue = new Display7Segments4Digits(DISPLAY_BLUE, getFrameDebug().getBtnBlue(), Configs.BRIGHTNESS_BLUE);
         display_green = new Display7Segments4Digits(DISPLAY_GREEN, getFrameDebug().getBtnGreen(), Configs.BRIGHTNESS_GREEN);
-        display_yellow = new Display7Segments4Digits(DISPLAY_YELLOW, getFrameDebug().getBtnYellow(), Configs.BRIGHTNESS_BLUE);
+        display_yellow = new Display7Segments4Digits(DISPLAY_YELLOW, getFrameDebug().getBtnYellow(), Configs.BRIGHTNESS_YELLOW);
+
+        applicationContext.put(display_white.getName(), display_white);
+        applicationContext.put(display_red.getName(), display_red);
+        applicationContext.put(display_blue.getName(), display_blue);
+        applicationContext.put(display_green.getName(), display_green);
+        applicationContext.put(display_yellow.getName(), display_yellow);
 
         button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed());
         button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue());
@@ -170,6 +182,10 @@ public class Main {
 
         Game game = new Game(display_white, display_red, display_blue, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game);
         game.run();
+    }
+
+    public static Object getFromContext(String key){
+        return applicationContext.get(key);
     }
 
     /**

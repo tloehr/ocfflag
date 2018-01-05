@@ -380,26 +380,36 @@ new FormModel {
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnWhiteBrght"
 							"text": "text"
-							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnWhiteBrghtActionPerformed", true ) )
+							"foreground": new java.awt.Color( 153, 153, 153, 255 )
+							"toolTipText": "weiß"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnBrghtActionPerformed", true ) )
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnRedBrght"
 							"text": "text"
+							"foreground": sfield java.awt.Color red
+							"toolTipText": "rot"
 							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnBrghtActionPerformed", true ) )
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnBlueBrght"
 							"text": "text"
+							"foreground": sfield java.awt.Color blue
+							"toolTipText": "blau"
 							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnBrghtActionPerformed", true ) )
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnGreenBrght"
 							"text": "text"
+							"foreground": new java.awt.Color( 0, 153, 102, 255 )
+							"toolTipText": "grün"
 							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnBrghtActionPerformed", true ) )
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnYellowBrght"
 							"text": "text"
+							"foreground": new java.awt.Color( 204, 204, 0, 255 )
+							"toolTipText": "gelb"
 							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnBrghtActionPerformed", true ) )
 						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {

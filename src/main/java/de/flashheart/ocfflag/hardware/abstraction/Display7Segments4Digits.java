@@ -26,6 +26,9 @@ public class Display7Segments4Digits {
     private boolean colon = true;
     private long lastTimeSet = 0;
 
+    public String getName() {
+        return name;
+    }
 
     public Display7Segments4Digits(int addr, JLabel lblSegment, String name) throws IOException {
         this.name = name;
@@ -42,7 +45,7 @@ public class Display7Segments4Digits {
             }
         }
 
-        if (segment != null) segment.setBrightness(Integer.parseInt(Main.getConfigs().get(name)));
+        if (segment != null) segment.setBrightness(Main.getConfigs().getInt(name));
     }
 
     public Display7Segments4Digits(int addr, JButton btnSegment, String name) throws IOException {
@@ -60,7 +63,7 @@ public class Display7Segments4Digits {
             }
         }
 
-        if (segment != null) segment.setBrightness(Integer.parseInt(Main.getConfigs().get(name)));
+        if (segment != null) segment.setBrightness(Main.getConfigs().getInt(name));
     }
 
     public void setColon(boolean colon) {
@@ -120,6 +123,11 @@ public class Display7Segments4Digits {
         }
         colon = !colon;
 
+    }
+
+    public void setBrightness(int brightness) throws IOException {
+        if (segment == null) return;
+        segment.setBrightness(brightness);
     }
 
     public void setBlinkRate(int rate) throws IOException {

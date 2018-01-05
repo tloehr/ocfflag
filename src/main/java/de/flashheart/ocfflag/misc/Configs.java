@@ -102,6 +102,10 @@ public class Configs {
         return applicationContext.containsKey(key) ? applicationContext.get(key).toString() : "null";
     }
 
+    public int getInt(Object key) {
+            return Integer.parseInt(configs.containsKey(key) ? configs.get(key).toString() : "-1");
+        }
+
     public String get(Object key) {
         return configs.containsKey(key) ? configs.get(key).toString() : "null";
     }

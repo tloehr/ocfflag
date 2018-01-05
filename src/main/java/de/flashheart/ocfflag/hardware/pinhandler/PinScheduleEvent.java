@@ -6,7 +6,8 @@ public class PinScheduleEvent {
 
     public PinScheduleEvent(String on, String duration) {
         this.on = on.equalsIgnoreCase("on");
-        this.duration = Long.parseLong(duration);
+        if (duration.equals("∞")) this.duration = Long.MAX_VALUE;
+        else this.duration = Long.parseLong(duration);
     }
 
     public boolean isOn() {

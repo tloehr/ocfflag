@@ -157,6 +157,7 @@ public class Game implements Runnable, StatsSentListener {
             Main.getMessageProcessor().addListener(this);
         }
 
+
         button_blue.addListener(e -> {
             logger.debug("GUI_button_blue");
             button_blue_pressed();
@@ -451,23 +452,27 @@ public class Game implements Runnable, StatsSentListener {
                 logger.debug("PREGAME");
                 button_switch_mode.setIcon(FrameDebug.IconPlay);
                 Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", "1:" + new RGBScheduleElement(Color.WHITE));
-                Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,1000;off,2000");
-                Main.getPinHandler().off(Main.PH_LED_WHITE);
             }
 
             if (mode == MODE_CLOCK_PREGAME) {
                 logger.debug("preset_num_teams " + preset_num_teams);
                 if (preset_num_teams < 3) display_green.clear();
                 if (preset_num_teams < 4) display_yellow.clear();
+
+                Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,1000;off,1000");
+                Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:off,1000;on,1000");
             }
 
             if (mode == MODE_CLOCK_GAME_PAUSED) {
                 display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,500;off,500");
+                Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:off,500;on,500");
             }
 
             if (mode == MODE_CLOCK_GAME_RUNNING) {
                 button_switch_mode.setIcon(FrameDebug.IconPause);
-                Main.getPinHandler().off(Main.PH_LED_GREEN);
+                Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,250;off,2000");
+                Main.getPinHandler().off(Main.PH_LED_WHITE);
                 display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
 
                 if (flag == FLAG_STATE_NEUTRAL) {
@@ -793,7 +798,7 @@ public class Game implements Runnable, StatsSentListener {
     @Override
     public void statsSentEventReceived(StatsSentEvent statsSentEvent) {
         if (statsSentEvent.isSuccessful())
-            Main.getPinHandler().setScheme(Main.PH_LED_WHITE, "∞:on,100;off," + min_stat_sent_time / 10);
+            Main.getPinHandler().setScheme(Main.PH_LED_WHITE, "∞:on,1000;off,∞");
         else
             Main.getPinHandler().off(Main.PH_LED_WHITE);
 

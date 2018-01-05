@@ -7,19 +7,19 @@ package de.flashheart.ocfflag.gui;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.FTPWrapper;
 import de.flashheart.ocfflag.misc.Tools;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
-import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.io.IOException;
 
 /**
  * @author Torsten Löhr
@@ -36,7 +36,7 @@ public class FrameDebug extends JFrame {
         initComponents();
         initFonts();
         initFrame();
-        setTitle("ocfflag "+ Main.getConfigs().getApplicationInfo("my.version") + " ["+Main.getConfigs().getApplicationInfo("buildNumber")+"]");
+        setTitle("ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + " [" + Main.getConfigs().getApplicationInfo("buildNumber") + "]");
     }
 
     private void initFrame() {
@@ -44,6 +44,19 @@ public class FrameDebug extends JFrame {
         tbFTPs.setEnabled(false);
         tbFTPs.setToolTipText("Hab ich noch nicht hinbekommen");
         configView.add(tbFTPs, CC.xy(7, 15));
+
+        // kleiner Trick, damit ich nur eine Action Methode brauche
+        btnWhiteBrght.setName(Configs.BRIGHTNESS_WHITE);
+        btnRedBrght.setName(Configs.BRIGHTNESS_RED);
+        btnBlueBrght.setName(Configs.BRIGHTNESS_BLUE);
+        btnGreenBrght.setName(Configs.BRIGHTNESS_GREEN);
+        btnYellowBrght.setName(Configs.BRIGHTNESS_YELLOW);
+
+        btnWhiteBrght.setText(Main.getConfigs().get(Configs.BRIGHTNESS_WHITE));
+        btnRedBrght.setText(Main.getConfigs().get(Configs.BRIGHTNESS_RED));
+        btnBlueBrght.setText(Main.getConfigs().get(Configs.BRIGHTNESS_BLUE));
+        btnGreenBrght.setText(Main.getConfigs().get(Configs.BRIGHTNESS_GREEN));
+        btnYellowBrght.setText(Main.getConfigs().get(Configs.BRIGHTNESS_YELLOW));
 
         btnRed.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
         btnBlue.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
@@ -145,15 +158,23 @@ public class FrameDebug extends JFrame {
         }
     }
 
+
     private void btnBrghtActionPerformed(ActionEvent e) {
-        if (e.getSource().equals(btnBlueBrght)){
+        JButton source = (JButton) e.getSource();
+        String name = source.getName();
+        int brightness = Main.getConfigs().getInt(name) + 1;
+        if (brightness > 15) brightness = 1;
+        Main.getConfigs().put(name, brightness);
+        source.setText(Integer.toString(brightness));
 
+        try {
+            ((Display7Segments4Digits) Main.getFromContext(name)).setBlinkRate(brightness);
+        } catch (IOException e1) {
+            logger.error(e1);
         }
+
     }
 
-    private void btnWhiteBrghtActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -509,26 +530,36 @@ public class FrameDebug extends JFrame {
 
                     //---- btnWhiteBrght ----
                     btnWhiteBrght.setText("text");
-                    btnWhiteBrght.addActionListener(e -> btnWhiteBrghtActionPerformed(e));
+                    btnWhiteBrght.setForeground(new Color(153, 153, 153));
+                    btnWhiteBrght.setToolTipText("wei\u00df");
+                    btnWhiteBrght.addActionListener(e -> btnBrghtActionPerformed(e));
                     panel4.add(btnWhiteBrght);
 
                     //---- btnRedBrght ----
                     btnRedBrght.setText("text");
+                    btnRedBrght.setForeground(Color.red);
+                    btnRedBrght.setToolTipText("rot");
                     btnRedBrght.addActionListener(e -> btnBrghtActionPerformed(e));
                     panel4.add(btnRedBrght);
 
                     //---- btnBlueBrght ----
                     btnBlueBrght.setText("text");
+                    btnBlueBrght.setForeground(Color.blue);
+                    btnBlueBrght.setToolTipText("blau");
                     btnBlueBrght.addActionListener(e -> btnBrghtActionPerformed(e));
                     panel4.add(btnBlueBrght);
 
                     //---- btnGreenBrght ----
                     btnGreenBrght.setText("text");
+                    btnGreenBrght.setForeground(new Color(0, 153, 102));
+                    btnGreenBrght.setToolTipText("gr\u00fcn");
                     btnGreenBrght.addActionListener(e -> btnBrghtActionPerformed(e));
                     panel4.add(btnGreenBrght);
 
                     //---- btnYellowBrght ----
                     btnYellowBrght.setText("text");
+                    btnYellowBrght.setForeground(new Color(204, 204, 0));
+                    btnYellowBrght.setToolTipText("gelb");
                     btnYellowBrght.addActionListener(e -> btnBrghtActionPerformed(e));
                     panel4.add(btnYellowBrght);
                 }
