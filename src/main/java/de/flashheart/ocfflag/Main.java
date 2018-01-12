@@ -1,9 +1,12 @@
 package de.flashheart.ocfflag;
 
+import com.pi4j.gpio.extension.mcp.MCP23017GpioProvider;
+import com.pi4j.gpio.extension.mcp.MCP23017Pin;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
+import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
 import com.pi4j.wiringpi.SoftPwm;
 import de.flashheart.ocfflag.gui.FrameDebug;
@@ -53,42 +56,43 @@ public class Main {
     private static final int DISPLAY_YELLOW = 0x73;
     private static final int DISPLAY_GREEN = 0x74;
 
+    private static final int MCP23017_1 = 0x20;
+
     // Linke Seite des JP8 Header
-    // Sirenen
-    // Relais Screw Header
-    private static final Pin SIREN_AIR = RaspiPin.GPIO_00;
-    private static final Pin SIREN_COLOR_CHANGE = RaspiPin.GPIO_02;
 
     // Klemmleiste
-    private static final Pin BUTTON_STANDBY_ACTIVE = RaspiPin.GPIO_03;
-    private static final Pin BUTTON_PRESET_NUM_TEAMS = RaspiPin.GPIO_12;
-    private static final Pin BUTTON_PRESET_GAMETIME = RaspiPin.GPIO_13;
-    private static final Pin BUTTON_RESET = RaspiPin.GPIO_14;
-    private static final Pin BUTTON_RED = RaspiPin.GPIO_21;
-    private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
-    private static final Pin BUTTON_GREEN = RaspiPin.GPIO_07;
-    private static final Pin BUTTON_YELLOW = RaspiPin.GPIO_29;
+    /* btn01 */ private static final Pin BUTTON_STANDBY_ACTIVE = RaspiPin.GPIO_03;
+    /* btn02 */ private static final Pin BUTTON_PRESET_NUM_TEAMS = RaspiPin.GPIO_12;
+    /* btn03 */ private static final Pin BUTTON_PRESET_GAMETIME = RaspiPin.GPIO_13;
+    /* btn04 */ private static final Pin BUTTON_RESET = RaspiPin.GPIO_14;
+    /* btn05 */ private static final Pin BUTTON_RED = RaspiPin.GPIO_21;
+    /* btn06 */ private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
+    /* btn07 */ private static final Pin BUTTON_GREEN = RaspiPin.GPIO_23;
+    /* btn08 */ private static final Pin BUTTON_YELLOW = RaspiPin.GPIO_24;
 
-    private static final Pin LED_RED_BUTTON = RaspiPin.GPIO_23;
-    private static final Pin LED_BLUE_BUTTON = RaspiPin.GPIO_24;
+    // Sirenen
+    /* da01 */ private static final Pin SIREN_AIR = RaspiPin.GPIO_07;
+    /* da02 */ private static final Pin SIREN_COLOR_CHANGE = RaspiPin.GPIO_00;
+    /* da03 */ private static final Pin SIREN3 = RaspiPin.GPIO_02; // unbenutzt
+    /* da04 */ private static final Pin SIREN4 = RaspiPin.GPIO_25; // unbenutzt
 
-    private static final Pin LED_GREEN = RaspiPin.GPIO_25;
 
+    private static final Pin LED_RED_BUTTON = MCP23017Pin.GPIO_B0;
+    private static final Pin LED_BLUE_BUTTON = MCP23017Pin.GPIO_B1;
+    private static final Pin LED_GREEN = MCP23017Pin.GPIO_B2;
+    private static final Pin LED_GREEN_BUTTON = MCP23017Pin.GPIO_B3;
+    private static final Pin LED_YELLOW_BUTTON = MCP23017Pin.GPIO_B4;
+    private static final Pin LED_WHITE = MCP23017Pin.GPIO_B5;
 
     // Rechte Seite des JP8 Headers
     // RGB Flagge
     // RJ45
-    private static final Pin POLE_RGB_RED = RaspiPin.GPIO_01;
-    private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_04;
-    private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_05;
+    /* rgb-red   */ private static final Pin POLE_RGB_RED = RaspiPin.GPIO_01;
+    /* rgb-green */ private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_04;
+    /* rgb-blue  */ private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_05;
 
 
-    private static final Pin LED_GREEN_BUTTON = RaspiPin.GPIO_26;
-    private static final Pin LED_YELLOW_BUTTON = RaspiPin.GPIO_28;
-
-
-    private static final Pin LED_WHITE = RaspiPin.GPIO_27;
-
+    private static MCP23017GpioProvider mcp23017_1;
 
     private static Display7Segments4Digits display_blue, display_red, display_white, display_green, display_yellow;
     private static MyAbstractButton button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game;
@@ -102,7 +106,8 @@ public class Main {
     private static MessageProcessor messageProcessor;
 
 
-    private static final HashMap<String, Object> applicationContext = new HashMap<>();;
+    private static final HashMap<String, Object> applicationContext = new HashMap<>();
+
 
     public static final int DEBOUNCE = 200; //ms
 
@@ -129,7 +134,6 @@ public class Main {
      * @throws IOException
      */
     private static void initGameSystem() throws I2CFactory.UnsupportedBusNumberException, IOException {
-
 
 
         // die internal names auf den Brightness Key zu setzen ist ein kleiner Trick. Die namen müssen und eindeutig sein
@@ -160,13 +164,14 @@ public class Main {
 
         pole = new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), PH_POLE);
 
-        ledRedButton = new MyPin(GPIO, LED_RED_BUTTON, frameDebug.getLedRedButton(), PH_LED_RED_BTN);
-        ledBlueButton = new MyPin(GPIO, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), PH_LED_BLUE_BTN);
-        ledGreenButton = new MyPin(GPIO, LED_GREEN_BUTTON, frameDebug.getLedGreenButton(), PH_LED_GREEN_BTN);
-        ledYellowButton = new MyPin(GPIO, LED_YELLOW_BUTTON, frameDebug.getLedYellowButton(), PH_LED_YELLOW_BTN);
+        mcp23017_1 = new MCP23017GpioProvider(I2CBus.BUS_1, MCP23017_1);
+        ledRedButton = new MyPin(GPIO, mcp23017_1, LED_RED_BUTTON, frameDebug.getLedRedButton(), PH_LED_RED_BTN);
+        ledBlueButton = new MyPin(GPIO, mcp23017_1, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), PH_LED_BLUE_BTN);
+        ledGreenButton = new MyPin(GPIO, mcp23017_1, LED_GREEN_BUTTON, frameDebug.getLedGreenButton(), PH_LED_GREEN_BTN);
+        ledYellowButton = new MyPin(GPIO, mcp23017_1, LED_YELLOW_BUTTON, frameDebug.getLedYellowButton(), PH_LED_YELLOW_BTN);
 
-        ledGreen = new MyPin(GPIO, LED_GREEN, frameDebug.getLedStandbyActive(), PH_LED_GREEN);
-        ledWhite = new MyPin(GPIO, LED_WHITE, frameDebug.getLedStatsSent(), PH_LED_WHITE);
+        ledGreen = new MyPin(GPIO, mcp23017_1, LED_GREEN, frameDebug.getLedStandbyActive(), PH_LED_GREEN);
+        ledWhite = new MyPin(GPIO, mcp23017_1, LED_WHITE, frameDebug.getLedStatsSent(), PH_LED_WHITE);
 
         pinHandler.add(new MyPin(GPIO, SIREN_AIR, null, PH_AIRSIREN, 50, 90));
         pinHandler.add(new MyPin(GPIO, SIREN_COLOR_CHANGE, null, PH_SIREN_COLOR_CHANGE, 70, 60));
@@ -184,7 +189,7 @@ public class Main {
         game.run();
     }
 
-    public static Object getFromContext(String key){
+    public static Object getFromContext(String key) {
         return applicationContext.get(key);
     }
 

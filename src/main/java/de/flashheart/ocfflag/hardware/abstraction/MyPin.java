@@ -1,5 +1,6 @@
 package de.flashheart.ocfflag.hardware.abstraction;
 
+import com.pi4j.gpio.extension.mcp.MCP23017GpioProvider;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
@@ -25,15 +26,18 @@ public class MyPin {
     private MidiChannel[] channels;
 
 
-    public MyPin(GpioController gpio, Pin pin, MyLED guiControlLED, String name) {
-        this(gpio, pin, guiControlLED, name, -1, -1);
-
+    public MyPin(GpioController gpio, MCP23017GpioProvider gpioprovider, Pin pin, MyLED guiControlLED, String name) {
+        this(gpio, gpioprovider, pin, guiControlLED, name, -1, -1);
     }
 
-    public MyPin(GpioController gpio, Pin pin, MyLED guiControlLED, String name, int instrument, int note) {
+    public MyPin(GpioController gpio, MCP23017GpioProvider gpioprovider, Pin pin, MyLED guiControlLED, String name, int instrument, int note) {
+        this(gpio == null ? null : gpio.provisionDigitalOutputPin(gpioprovider, pin, PinState.LOW), guiControlLED, name, instrument, note);
+    }
+
+    private MyPin(GpioPinDigitalOutput outputPin, MyLED guiControlLED, String name, int instrument, int note) {
         this.name = name;
         this.guiControlLED = guiControlLED;
-        this.outputPin = gpio == null ? null : gpio.provisionDigitalOutputPin(pin, PinState.LOW);
+        this.outputPin = outputPin;
         if (outputPin != null) outputPin.setState(PinState.LOW);
         this.note = note;
 
@@ -52,6 +56,14 @@ public class MyPin {
                 synthesizer = null;
             }
         }
+    }
+
+    public MyPin(GpioController gpio, Pin pin, MyLED guiControlLED, String name) {
+        this(gpio, pin, guiControlLED, name, -1, -1);
+    }
+
+    public MyPin(GpioController gpio, Pin pin, MyLED guiControlLED, String name, int instrument, int note) {
+        this(gpio == null ? null : gpio.provisionDigitalOutputPin(pin, PinState.LOW), guiControlLED, name, instrument, note);
     }
 
     public String getName() {
