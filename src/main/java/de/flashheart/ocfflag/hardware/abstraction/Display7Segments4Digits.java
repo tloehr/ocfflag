@@ -90,7 +90,7 @@ public class Display7Segments4Digits {
         lastTimeSet = time;
 
         DateTime dateTime = new DateTime(time, DateTimeZone.UTC);
-
+        logger.debug(name+": "+dateTime.toString());
         int hours = dateTime.getHourOfDay();
 
 

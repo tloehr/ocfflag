@@ -92,7 +92,7 @@ public class Main {
     /* rgb-blue  */ private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_05;
 
 
-    private static MCP23017GpioProvider mcp23017_1;
+    private static MCP23017GpioProvider mcp23017_1 = null;
 
     private static Display7Segments4Digits display_blue, display_red, display_white, display_green, display_yellow;
     private static MyAbstractButton button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game;
@@ -164,7 +164,6 @@ public class Main {
 
         pole = new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), PH_POLE);
 
-        mcp23017_1 = new MCP23017GpioProvider(I2CBus.BUS_1, MCP23017_1);
         ledRedButton = new MyPin(GPIO, mcp23017_1, LED_RED_BUTTON, frameDebug.getLedRedButton(), PH_LED_RED_BTN);
         ledBlueButton = new MyPin(GPIO, mcp23017_1, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), PH_LED_BLUE_BTN);
         ledGreenButton = new MyPin(GPIO, mcp23017_1, LED_GREEN_BUTTON, frameDebug.getLedGreenButton(), PH_LED_GREEN_BTN);
@@ -259,6 +258,7 @@ public class Main {
     private static void initRaspi() throws Exception {
         if (!Tools.isArm()) return;
         GPIO = GpioFactory.getInstance();
+        mcp23017_1 =  new MCP23017GpioProvider(I2CBus.BUS_1, MCP23017_1);
         SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
         SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
         SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);

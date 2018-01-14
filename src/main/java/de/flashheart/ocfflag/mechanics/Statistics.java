@@ -87,8 +87,8 @@ public class Statistics {
      */
     public void sendStats() {
         logger.debug(toPHP());
-        if (Main.getMessageProcessor() != null)
-            Main.getMessageProcessor().pushMessage(new PHPMessage(toPHP(), stackEvents.peek()));
+//        if (Main.getMessageProcessor() != null)
+//            Main.getMessageProcessor().pushMessage(new PHPMessage(toPHP(), stackEvents.peek()));
     }
 
     public long addEvent(int event) {
