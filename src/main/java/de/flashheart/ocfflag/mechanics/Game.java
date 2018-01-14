@@ -79,7 +79,18 @@ public class Game implements Runnable, StatsSentListener {
     private Statistics statistics;
     private final HashMap<String, Color> colors = new HashMap<>();
 
-    private long time, time_blue, time_red, time_yellow, time_green, lastPIT, standbyStartedAt, lastStatsSent, min_stat_sent_time;
+    private long time, time_blue, time_red, time_yellow, time_green, standbyStartedAt, lastStatsSent, min_stat_sent_time;
+    /**
+     * In der methode run() wird in regelmässigen Abständen die Restspielzeit time neu berechnet. Dabei rechnen
+     * wir bei jedem Durchgang die abgelaufene Zeit seit dem letzten Mal aus. Das machen wir mittels der Variable
+     * lastPIT (letzer Zeitpunkt). Die aktuelle Zeit abzüglich lastPIT bildet die Zeitdifferenz zum letzten Mal.
+     * Diese Differenz wird von der verbliebenen Spielzeit abgezogen.
+     * Bei Pause wird einmalig (am Ende der Pause) lastPIT um die Pausezeit erhöht. Somit wirkt sich die Spielpause
+     * nicht auf die Restspielzeit aus.
+     *
+     * lastPIT wird einmal bei buttonStandbyActivePressed() und einmal in run() bearbeitet.
+     */
+    private long lastPIT;
 
     // das sind die standard spieldauern in millis.
     // In Minuten: 30, 60, 90, 120, 150, 180, 210, 240, 270, 300
@@ -406,6 +417,7 @@ public class Game implements Runnable, StatsSentListener {
                 Main.getConfigs().put(Configs.MATCHID, Integer.toString(running_match_id));
             }
             lastStatsSent = statistics.addEvent(Statistics.EVENT_START_GAME);
+            lastPIT = System.currentTimeMillis();
             mode = MODE_CLOCK_GAME_RUNNING;
             Main.getPinHandler().setScheme(Main.PH_AIRSIREN, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
             setDisplayToEvent();
@@ -740,14 +752,19 @@ public class Game implements Runnable, StatsSentListener {
                     long now = System.currentTimeMillis();
                     long diff = now - lastPIT;
 
-                    logger.debug("run()-now: "+ Tools.formatLongTime(now));
-                    logger.debug("run()-diff: "+ Tools.formatLongTime(diff));
-                    logger.debug("run()-lastpit: "+ Tools.formatLongTime(now));
+                    logger.debug("run()/now: "+ Tools.formatLongTime(now));
+                    logger.debug("run()/lastpit: "+ Tools.formatLongTime(lastPIT));
+                    logger.debug("run()/diff: "+ Tools.formatLongTime(diff));
 
                     lastPIT = now;
 
                     time = time - diff;
+
+                    logger.debug("run()/time1: "+ Tools.formatLongTime(time));
+
                     time = Math.max(time, 0);
+
+                    logger.debug("run()/time2: "+ Tools.formatLongTime(time));
 
                     // Statistiken, wenn gewünscht
                     if (min_stat_sent_time > 0) {

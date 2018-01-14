@@ -33,7 +33,7 @@ public class RGBBlinkModel implements GenericBlinkModel {
 
     @Override
     public String call() throws Exception {
-        logger.debug(new DateTime().toString() + " call() to:" + myRGBLed.getName() + " [" + myRGBLed.getToolTipText() + "]");
+        //logger.debug(new DateTime().toString() + " call() to:" + myRGBLed.getName() + " [" + myRGBLed.getToolTipText() + "]");
 
         if (repeat == 0) {
             myRGBLed.off();

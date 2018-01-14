@@ -29,7 +29,7 @@ public class PinBlinkModel implements GenericBlinkModel {
 
     @Override
     public String call() throws Exception {
-        logger.debug(new DateTime().toString() + " working on:" + pin.getName() + " [" + pin.getText() + "]  onOffScheme.size()=" + onOffScheme.size());
+        //logger.debug(new DateTime().toString() + " working on:" + pin.getName() + " [" + pin.getText() + "]  onOffScheme.size()=" + onOffScheme.size());
 
         if (repeat == 0) {
             pin.setState(false);
@@ -81,7 +81,7 @@ public class PinBlinkModel implements GenericBlinkModel {
 
         onOffScheme.clear();
 
-        logger.debug("new scheme for pin: " + pin.getName() + " : " + scheme);
+        //logger.debug("new scheme for pin: " + pin.getName() + " : " + scheme);
 
 
         // zuerst wiederholungen vom muster trennen

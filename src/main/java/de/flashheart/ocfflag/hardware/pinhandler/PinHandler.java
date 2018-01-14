@@ -81,10 +81,10 @@ public class PinHandler {
             genericBlinkModel.setText(text);
             if (genericBlinkModel != null) {
                 if (futures.containsKey(name) && !futures.get(name).isDone()) { // but only if it runs
-                    logger.debug("terminating: " + name);
+                    //logger.debug("terminating: " + name);
                     futures.get(name).cancel(true);
                 }
-                logger.debug("set Scheme: " + name);
+                //logger.debug("set Scheme: " + name);
                 genericBlinkModel.setScheme(scheme);
                 futures.put(name, executorService.submit(genericBlinkModel));
             } else {
