@@ -48,6 +48,16 @@ public class Main {
     public static final String PH_SIREN_COLOR_CHANGE = "colorchangesiren";
     public static final String PH_AIRSIREN = "airsiren";
 
+    public static final String PH_RESERVE01 = "reserve01";
+    public static final String PH_RESERVE02 = "reserve02";
+    public static final String PH_RESERVE03 = "reserve03";
+    public static final String PH_RESERVE04 = "reserve04";
+    public static final String PH_RESERVE05 = "reserve05";
+    public static final String PH_RESERVE06 = "reserve06";
+    public static final String PH_RESERVE07 = "reserve07";
+    public static final String PH_RESERVE08 = "reserve08";
+    public static final String PH_RESERVE09 = "reserve09";
+    public static final String PH_RESERVE10 = "reserve10";
 
     // Parameter für die einzelnen PINs am Raspi sowie die I2C Adressen.
     private static final int DISPLAY_BLUE = 0x71;
@@ -84,6 +94,17 @@ public class Main {
     private static final Pin LED_YELLOW_BUTTON = MCP23017Pin.GPIO_B4;
     private static final Pin LED_WHITE = MCP23017Pin.GPIO_B5;
 
+    private static final Pin RESERVE01 = MCP23017Pin.GPIO_B6;
+    private static final Pin RESERVE02 = MCP23017Pin.GPIO_B7;
+    private static final Pin RESERVE03 = MCP23017Pin.GPIO_A0;
+    private static final Pin RESERVE04 = MCP23017Pin.GPIO_A1;
+    private static final Pin RESERVE05 = MCP23017Pin.GPIO_A2;
+    private static final Pin RESERVE06 = MCP23017Pin.GPIO_A3;
+    private static final Pin RESERVE07 = MCP23017Pin.GPIO_A4;
+    private static final Pin RESERVE08 = MCP23017Pin.GPIO_A5;
+    private static final Pin RESERVE09 = MCP23017Pin.GPIO_A6;
+    private static final Pin RESERVE10 = MCP23017Pin.GPIO_A7;
+
     // Rechte Seite des JP8 Headers
     // RGB Flagge
     // RJ45
@@ -99,6 +120,9 @@ public class Main {
     private static MyRGBLed pole;
 
     private static MyPin ledRedButton, ledBlueButton, ledGreenButton, ledYellowButton, ledGreen, ledWhite;
+
+    // diese pins werden noch nicht verwendet, sind aber in der Hardware bereits vorbereitet.
+    private static MyPin reserve01,reserve02,reserve03,reserve04,reserve05,reserve06,reserve07,reserve08,reserve09,reserve10;
 
     private static PinHandler pinHandler; // One handler, to rule them all...
     private static Configs configs;
@@ -172,6 +196,17 @@ public class Main {
         ledGreen = new MyPin(GPIO, mcp23017_1, LED_GREEN, frameDebug.getLedStandbyActive(), PH_LED_GREEN);
         ledWhite = new MyPin(GPIO, mcp23017_1, LED_WHITE, frameDebug.getLedStatsSent(), PH_LED_WHITE);
 
+        reserve01 = new MyPin(GPIO, mcp23017_1, RESERVE01, null, PH_RESERVE01);
+        reserve02 = new MyPin(GPIO, mcp23017_1, RESERVE02, null, PH_RESERVE02);
+        reserve03 = new MyPin(GPIO, mcp23017_1, RESERVE03, null, PH_RESERVE03);
+        reserve04 = new MyPin(GPIO, mcp23017_1, RESERVE04, null, PH_RESERVE04);
+        reserve05 = new MyPin(GPIO, mcp23017_1, RESERVE05, null, PH_RESERVE05);
+        reserve06 = new MyPin(GPIO, mcp23017_1, RESERVE06, null, PH_RESERVE06);
+        reserve07 = new MyPin(GPIO, mcp23017_1, RESERVE07, null, PH_RESERVE07);
+        reserve08 = new MyPin(GPIO, mcp23017_1, RESERVE08, null, PH_RESERVE08);
+        reserve09 = new MyPin(GPIO, mcp23017_1, RESERVE09, null, PH_RESERVE09);
+        reserve10 = new MyPin(GPIO, mcp23017_1, RESERVE10, null, PH_RESERVE10);
+
         pinHandler.add(new MyPin(GPIO, SIREN_AIR, null, PH_AIRSIREN, 50, 90));
         pinHandler.add(new MyPin(GPIO, SIREN_COLOR_CHANGE, null, PH_SIREN_COLOR_CHANGE, 70, 60));
 
@@ -180,6 +215,17 @@ public class Main {
         pinHandler.add(ledBlueButton);
         pinHandler.add(ledGreenButton);
         pinHandler.add(ledYellowButton);
+
+        pinHandler.add(reserve01);
+        pinHandler.add(reserve02);
+        pinHandler.add(reserve03);
+        pinHandler.add(reserve04);
+        pinHandler.add(reserve05);
+        pinHandler.add(reserve06);
+        pinHandler.add(reserve07);
+        pinHandler.add(reserve08);
+        pinHandler.add(reserve09);
+        pinHandler.add(reserve10);
 
         pinHandler.add(ledGreen);
         pinHandler.add(ledWhite);

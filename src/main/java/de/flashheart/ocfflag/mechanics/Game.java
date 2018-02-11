@@ -95,8 +95,8 @@ public class Game implements Runnable, StatsSentListener {
     // das sind die standard spieldauern in millis.
     // In Minuten: 30, 60, 90, 120, 150, 180, 210, 240, 270, 300
     private Long[] preset_times = new Long[]{
-            10000l, // 00:00:10
-            60000l, // 00:01:00
+//            10000l, // 00:00:10
+//            60000l, // 00:01:00
             600000l, // 00:10:00
             900000l, // 00:15:00
             1200000l, // 00:20:00
@@ -114,6 +114,7 @@ public class Game implements Runnable, StatsSentListener {
     private int preset_gametime_position = 0;
     private int preset_num_teams = 2; // Reihenfolge: red, blue, green, yellow
     private boolean quit_programm;
+    private boolean CONFIG_PAGE = false;
 
     public Game(Display7Segments4Digits display_white,
                 Display7Segments4Digits display_red,
@@ -168,7 +169,6 @@ public class Game implements Runnable, StatsSentListener {
         if (Main.getMessageProcessor() != null) {
             Main.getMessageProcessor().addListener(this);
         }
-
 
         button_blue.addListener(e -> {
             logger.debug("GUI_button_blue");
@@ -271,14 +271,17 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void button_back2game_pressed() {
+        CONFIG_PAGE = false;
         reset_timers();
         Main.getFrameDebug().setTab(0);
     }
 
     private void button_config_pressed() {
+
         if (mode != MODE_CLOCK_GAME_RUNNING) {
             reset_timers();
             Main.getFrameDebug().setTab(1);
+            CONFIG_PAGE = true;
         } else {
             logger.debug("GAME RUNNING: IGNORED");
         }
@@ -290,6 +293,9 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void button_red_pressed() {
+        Main.getFrameDebug().addToConfigLog("button_red_pressed");
+        if (CONFIG_PAGE) return;
+
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != FLAG_STATE_RED) {
                 flag = FLAG_STATE_RED;
@@ -304,6 +310,8 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void button_blue_pressed() {
+        Main.getFrameDebug().addToConfigLog("button_blue_pressed");
+        if (CONFIG_PAGE) return;
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != FLAG_STATE_BLUE) {
                 flag = FLAG_STATE_BLUE;
@@ -317,6 +325,8 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void button_green_pressed() {
+        Main.getFrameDebug().addToConfigLog("button_green_pressed");
+        if (CONFIG_PAGE) return;
         if (preset_num_teams < 3) {
             logger.debug("NO GREEN TEAM: ignoring");
             return;
@@ -335,6 +345,8 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void button_yellow_pressed() {
+        Main.getFrameDebug().addToConfigLog("button_yellow_pressed");
+        if (CONFIG_PAGE) return;
         if (preset_num_teams < 4) {
             logger.debug("NO YELLOW TEAM: ignoring");
             return;
@@ -352,6 +364,8 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void button_reset_pressed() {
+        Main.getFrameDebug().addToConfigLog("button_reset_pressed");
+        if (CONFIG_PAGE) return;
         if (mode != MODE_CLOCK_GAME_RUNNING) {
             if (mode == MODE_CLOCK_GAME_PAUSED) {
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
@@ -363,6 +377,8 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void button_preset_num_teams() {
+        Main.getFrameDebug().addToConfigLog("button_num_teams_pressed");
+        if (CONFIG_PAGE) return;
         if (MAX_TEAMS == 2) return;
         if (mode == MODE_CLOCK_PREGAME) {
             preset_num_teams++;
@@ -377,6 +393,8 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void button_preset_plus_pressed() {
+        Main.getFrameDebug().addToConfigLog("button_gametime_pressed");
+        if (CONFIG_PAGE) return;
         if (mode == MODE_CLOCK_PREGAME) {
             preset_gametime_position++;
             if (preset_gametime_position > preset_times.length - 1) preset_gametime_position = 0;
@@ -388,7 +406,8 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void buttonStandbyActivePressed() {
-
+        Main.getFrameDebug().addToConfigLog("button_Standby_Active_pressed");
+        if (CONFIG_PAGE) return;
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             standbyStartedAt = System.currentTimeMillis();
             mode = MODE_CLOCK_GAME_PAUSED;
@@ -484,6 +503,9 @@ public class Game implements Runnable, StatsSentListener {
 
                 Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,1000;off,1000");
                 Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:off,1000;on,1000");
+
+//                display_red.setText(Main.getConfigs().getApplicationInfo("my.version"));
+//                display_blue.setText(Main.getConfigs().getApplicationInfo("buildNumber"));
             }
 
             if (mode == MODE_CLOCK_GAME_PAUSED) {
@@ -584,7 +606,8 @@ public class Game implements Runnable, StatsSentListener {
                     Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "∞:on,500;off,500");
 
                     display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                    Main.getPinHandler().setScheme(Main.PH_POLE, "GREEN ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.YELLOW, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
+                    Color myyellow    = new Color(255, 128, 0);
+                    Main.getPinHandler().setScheme(Main.PH_POLE, "YELLOW ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(myyellow, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
             }
 
@@ -752,19 +775,19 @@ public class Game implements Runnable, StatsSentListener {
                     long now = System.currentTimeMillis();
                     long diff = now - lastPIT;
 
-                    logger.debug("run()/now: "+ Tools.formatLongTime(now));
-                    logger.debug("run()/lastpit: "+ Tools.formatLongTime(lastPIT));
-                    logger.debug("run()/diff: "+ Tools.formatLongTime(diff));
+//                    logger.debug("run()/now: "+ Tools.formatLongTime(now));
+//                    logger.debug("run()/lastpit: "+ Tools.formatLongTime(lastPIT));
+//                    logger.debug("run()/diff: "+ Tools.formatLongTime(diff));
 
                     lastPIT = now;
 
                     time = time - diff;
 
-                    logger.debug("run()/time1: "+ Tools.formatLongTime(time));
+//                    logger.debug("run()/time1: "+ Tools.formatLongTime(time));
 
                     time = Math.max(time, 0);
 
-                    logger.debug("run()/time2: "+ Tools.formatLongTime(time));
+//                    logger.debug("run()/time2: "+ Tools.formatLongTime(time));
 
                     // Statistiken, wenn gewünscht
                     if (min_stat_sent_time > 0) {

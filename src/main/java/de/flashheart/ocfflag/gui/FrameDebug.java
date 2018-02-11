@@ -45,6 +45,8 @@ public class FrameDebug extends JFrame {
         tbFTPs.setToolTipText("Hab ich noch nicht hinbekommen");
         configView.add(tbFTPs, CC.xy(7, 15));
 
+        btnTestHardware.setEnabled(Tools.isArm());
+
         // kleiner Trick, damit ich nur eine Action Methode brauche
         btnWhiteBrght.setName(Configs.BRIGHTNESS_WHITE);
         btnRedBrght.setName(Configs.BRIGHTNESS_RED);
@@ -82,6 +84,7 @@ public class FrameDebug extends JFrame {
         mainPanel.setSelectedIndex(tab);
     }
 
+
     public JButton getBtnQuit() {
         return btnQuit;
     }
@@ -118,6 +121,11 @@ public class FrameDebug extends JFrame {
     private void txtFlagNameFocusLost(FocusEvent e) {
         String flagname = txtFlagName.getText().trim();
         Main.getConfigs().put(Configs.FLAGNAME, flagname);
+    }
+
+    public void addToConfigLog(String text) {
+        if (mainPanel.getSelectedIndex() != 1) return;
+        txtFTPlog.append(text+"\n");
     }
 
     private void btnTestFTPActionPerformed(ActionEvent e) {
@@ -175,6 +183,33 @@ public class FrameDebug extends JFrame {
 
     }
 
+    private void btnTestHardwareActionPerformed(ActionEvent e) {
+
+        Main.getPinHandler().off();
+
+        Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_LED_GREEN, "5:on,1000;off,1000");
+
+        Main.getPinHandler().setScheme(Main.PH_LED_WHITE, "5:on,1000;off,1000");
+
+        Main.getPinHandler().setScheme(Main.PH_RESERVE01, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_RESERVE02, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_RESERVE03, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_RESERVE04, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_RESERVE05, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_RESERVE06, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_RESERVE07, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_RESERVE08, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_RESERVE09, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_RESERVE10, "5:on,1000;off,1000");
+
+
+
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -218,7 +253,9 @@ public class FrameDebug extends JFrame {
         label7 = new JLabel();
         label8 = new JLabel();
         txtSendStats = new JTextField();
+        panel6 = new JPanel();
         btnTestFTP = new JButton();
+        btnTestHardware = new JButton();
         label9 = new JLabel();
         txtUUID = new JTextField();
         label10 = new JLabel();
@@ -503,11 +540,23 @@ public class FrameDebug extends JFrame {
                 });
                 configView.add(txtSendStats, CC.xy(7, 17));
 
-                //---- btnTestFTP ----
-                btnTestFTP.setText("Test FTP Server");
-                btnTestFTP.setFont(new Font("Dialog", Font.PLAIN, 20));
-                btnTestFTP.addActionListener(e -> btnTestFTPActionPerformed(e));
-                configView.add(btnTestFTP, CC.xywh(3, 19, 5, 1));
+                //======== panel6 ========
+                {
+                    panel6.setLayout(new BoxLayout(panel6, BoxLayout.X_AXIS));
+
+                    //---- btnTestFTP ----
+                    btnTestFTP.setText("Test FTP Server");
+                    btnTestFTP.setFont(new Font("Dialog", Font.PLAIN, 20));
+                    btnTestFTP.addActionListener(e -> btnTestFTPActionPerformed(e));
+                    panel6.add(btnTestFTP);
+
+                    //---- btnTestHardware ----
+                    btnTestHardware.setText("Test Hardware");
+                    btnTestHardware.setFont(new Font("Dialog", Font.PLAIN, 20));
+                    btnTestHardware.addActionListener(e -> btnTestHardwareActionPerformed(e));
+                    panel6.add(btnTestHardware);
+                }
+                configView.add(panel6, CC.xywh(3, 19, 5, 1));
 
                 //---- label9 ----
                 label9.setText("UUID");
@@ -694,7 +743,9 @@ public class FrameDebug extends JFrame {
     private JLabel label7;
     private JLabel label8;
     private JTextField txtSendStats;
+    private JPanel panel6;
     private JButton btnTestFTP;
+    private JButton btnTestHardware;
     private JLabel label9;
     private JTextField txtUUID;
     private JLabel label10;

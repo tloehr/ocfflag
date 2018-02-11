@@ -55,6 +55,7 @@ public class MessageProcessor extends Thread {
     public void pushMessage(PHPMessage message) {
         lock.lock();
         try {
+            logger.debug("pushing "+message);
             messageQ.push(message);
         } finally {
             lock.unlock();
