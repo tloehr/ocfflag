@@ -2,6 +2,7 @@ package de.flashheart.ocfflag.mechanics;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Configs;
+import de.flashheart.ocfflag.misc.HasLogger;
 import de.flashheart.ocfflag.misc.PHPMessage;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.lang3.StringUtils;
@@ -15,14 +16,12 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Stack;
 
-public class Statistics {
+public class Statistics implements HasLogger {
 
     private final int numTeams;
     private long time;
 
     private LinkedHashMap<String, Integer> rank;
-
-    private final Logger logger = Logger.getLogger(getClass());
 
     public static final int EVENT_PAUSE = 0;
     public static final int EVENT_RESUME = 1;
@@ -30,7 +29,7 @@ public class Statistics {
     public static final int EVENT_BLUE_ACTIVATED = 3;
     public static final int EVENT_RED_ACTIVATED = 4;
     public static final int EVENT_GAME_OVER = 5; // wenn die Spielzeit abgelaufen ist
-    public static final int EVENT_GAME_ABORTED = 6; // wenn die Spielzeit abgelaufen ist
+    public static final int EVENT_GAME_ABORTED = 6; // wenn das Spiel beendet wurde
     public static final int EVENT_RESULT_RED_WON = 7;
     public static final int EVENT_RESULT_BLUE_WON = 8;
     public static final int EVENT_RESULT_DRAW = 9; // Unentschieden
@@ -86,7 +85,7 @@ public class Statistics {
      * @return true, wenn die Operation erfolgreich war.
      */
     public void sendStats() {
-        logger.debug(toPHP());
+        getLogger().debug("sendStats()\n"+toPHP());
         if (Main.getMessageProcessor() != null)
             Main.getMessageProcessor().pushMessage(new PHPMessage(toPHP(), stackEvents.peek()));
     }

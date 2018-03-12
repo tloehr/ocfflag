@@ -22,4 +22,6 @@ $lang['TEAM_BLUE'] = 'Team Blau';
 $lang['TEAM_GREEN'] = 'Team Grün';
 $lang['TEAM_YELLOW'] = 'Team Gelb';
 $lang['REMAINING'] = 'Restliche Spielzeit';
+$lang['TITLE'] = 'Titel';
+$lang['TIME'] = 'Zeit';
 ?>

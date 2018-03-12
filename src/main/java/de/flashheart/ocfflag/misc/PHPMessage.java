@@ -21,4 +21,12 @@ public class PHPMessage {
     public GameEvent getGameEvent() {
         return gameEvent;
     }
+
+    @Override
+    public String toString() {
+        return "PHPMessage{" +
+                "php='" + php + '\'' +
+                ", gameEvent=" + gameEvent +
+                '}';
+    }
 }

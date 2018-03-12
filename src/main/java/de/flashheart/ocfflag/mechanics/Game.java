@@ -95,8 +95,8 @@ public class Game implements Runnable, StatsSentListener {
     // das sind die standard spieldauern in millis.
     // In Minuten: 30, 60, 90, 120, 150, 180, 210, 240, 270, 300
     private Long[] preset_times = new Long[]{
-//            10000l, // 00:00:10
-//            60000l, // 00:01:00
+            10000l, // 00:00:10
+            60000l, // 00:01:00
             600000l, // 00:10:00
             900000l, // 00:15:00
             1200000l, // 00:20:00
@@ -828,8 +828,8 @@ public class Game implements Runnable, StatsSentListener {
                                 "  \\____/_/   \\_\\_|  |_|_____|  \\___/  \\_/  |_____|_| \\_\\\n" +
                                 "                                                        ");
                         mode = MODE_CLOCK_GAME_OVER;
-                        lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_OVER);
                         setDisplayToEvent();
+                        lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_OVER);
                     }
 
                 }
