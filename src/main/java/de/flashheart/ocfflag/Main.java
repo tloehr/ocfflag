@@ -79,14 +79,7 @@ public class Main {
     /* btn06 */ private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
     /* btn07 */ private static final Pin BUTTON_GREEN = RaspiPin.GPIO_23;
     /* btn08 */ private static final Pin BUTTON_YELLOW = RaspiPin.GPIO_24;
-
-    // Sirenen
-    /* da01 */ private static final Pin SIREN_AIR = RaspiPin.GPIO_07;
-    /* da02 */ private static final Pin SIREN_COLOR_CHANGE = RaspiPin.GPIO_00;
-    /* da03 */ private static final Pin SIREN3 = RaspiPin.GPIO_02; // unbenutzt
-    /* da04 */ private static final Pin SIREN4 = RaspiPin.GPIO_25; // unbenutzt
-
-
+    
     private static final Pin LED_RED_BUTTON = MCP23017Pin.GPIO_B0;
     private static final Pin LED_BLUE_BUTTON = MCP23017Pin.GPIO_B1;
     private static final Pin LED_GREEN = MCP23017Pin.GPIO_B2;
@@ -105,13 +98,18 @@ public class Main {
     private static final Pin RESERVE09 = MCP23017Pin.GPIO_A6;
     private static final Pin RESERVE10 = MCP23017Pin.GPIO_A7;
 
+    // Sirenen
+    private static final Pin SIREN_AIR = RESERVE01;
+    private static final Pin SIREN_COLOR_CHANGE = RESERVE02;
+//    private static final Pin SIREN3 = RaspiPin.GPIO_02; // unbenutzt
+//    private static final Pin SIREN4 = RaspiPin.GPIO_25; // unbenutzt
+
     // Rechte Seite des JP8 Headers
     // RGB Flagge
     // RJ45
     /* rgb-red   */ private static final Pin POLE_RGB_RED = RaspiPin.GPIO_01;
     /* rgb-green */ private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_04;
     /* rgb-blue  */ private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_05;
-
 
     private static MCP23017GpioProvider mcp23017_1 = null;
 
@@ -122,7 +120,7 @@ public class Main {
     private static MyPin ledRedButton, ledBlueButton, ledGreenButton, ledYellowButton, ledGreen, ledWhite;
 
     // diese pins werden noch nicht verwendet, sind aber in der Hardware bereits vorbereitet.
-    private static MyPin reserve01,reserve02,reserve03,reserve04,reserve05,reserve06,reserve07,reserve08,reserve09,reserve10;
+    private static MyPin reserve03, reserve04, reserve05, reserve06, reserve07, reserve08, reserve09, reserve10;
 
     private static PinHandler pinHandler; // One handler, to rule them all...
     private static Configs configs;
@@ -195,9 +193,7 @@ public class Main {
 
         ledGreen = new MyPin(GPIO, mcp23017_1, LED_GREEN, frameDebug.getLedStandbyActive(), PH_LED_GREEN);
         ledWhite = new MyPin(GPIO, mcp23017_1, LED_WHITE, frameDebug.getLedStatsSent(), PH_LED_WHITE);
-
-        reserve01 = new MyPin(GPIO, mcp23017_1, RESERVE01, null, PH_RESERVE01);
-        reserve02 = new MyPin(GPIO, mcp23017_1, RESERVE02, null, PH_RESERVE02);
+        
         reserve03 = new MyPin(GPIO, mcp23017_1, RESERVE03, null, PH_RESERVE03);
         reserve04 = new MyPin(GPIO, mcp23017_1, RESERVE04, null, PH_RESERVE04);
         reserve05 = new MyPin(GPIO, mcp23017_1, RESERVE05, null, PH_RESERVE05);
@@ -207,8 +203,12 @@ public class Main {
         reserve09 = new MyPin(GPIO, mcp23017_1, RESERVE09, null, PH_RESERVE09);
         reserve10 = new MyPin(GPIO, mcp23017_1, RESERVE10, null, PH_RESERVE10);
 
-        pinHandler.add(new MyPin(GPIO, SIREN_AIR, null, PH_AIRSIREN, 50, 90));
-        pinHandler.add(new MyPin(GPIO, SIREN_COLOR_CHANGE, null, PH_SIREN_COLOR_CHANGE, 70, 60));
+//        pinHandler.add(new MyPin(GPIO, SIREN_AIR, null, PH_AIRSIREN, 50, 90));
+//        pinHandler.add(new MyPin(GPIO, SIREN_COLOR_CHANGE, null, PH_SIREN_COLOR_CHANGE, 70, 60));
+        //pinHandler.add(reserve01);
+
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, SIREN_COLOR_CHANGE, null, PH_SIREN_COLOR_CHANGE, 50, 90)); // mf08
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, SIREN_AIR, null, PH_AIRSIREN, 70, 60)); // mf09
 
         pinHandler.add(pole);
         pinHandler.add(ledRedButton);
@@ -216,8 +216,7 @@ public class Main {
         pinHandler.add(ledGreenButton);
         pinHandler.add(ledYellowButton);
 
-        pinHandler.add(reserve01);
-        pinHandler.add(reserve02);
+
         pinHandler.add(reserve03);
         pinHandler.add(reserve04);
         pinHandler.add(reserve05);
@@ -304,7 +303,7 @@ public class Main {
     private static void initRaspi() throws Exception {
         if (!Tools.isArm()) return;
         GPIO = GpioFactory.getInstance();
-        mcp23017_1 =  new MCP23017GpioProvider(I2CBus.BUS_1, MCP23017_1);
+        mcp23017_1 = new MCP23017GpioProvider(I2CBus.BUS_1, MCP23017_1);
         SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
         SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
         SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);

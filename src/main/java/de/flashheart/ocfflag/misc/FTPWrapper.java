@@ -127,6 +127,7 @@ public class FTPWrapper {
                 ftpClient.deleteFile(activeFile); // egal ob es eine gab oder nicht
             } else {
                 resultOk &= ftpClient.storeFile(activeFile, fis);
+                logger.debug("Uploading file to :" + activeFile);
             }
 
             logger.debug(ftpClient.getReplyString());
