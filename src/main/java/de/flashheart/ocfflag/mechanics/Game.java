@@ -87,7 +87,7 @@ public class Game implements Runnable, StatsSentListener {
      * Diese Differenz wird von der verbliebenen Spielzeit abgezogen.
      * Bei Pause wird einmalig (am Ende der Pause) lastPIT um die Pausezeit erhöht. Somit wirkt sich die Spielpause
      * nicht auf die Restspielzeit aus.
-     *
+     * <p>
      * lastPIT wird einmal bei buttonStandbyActivePressed() und einmal in run() bearbeitet.
      */
     private long lastPIT;
@@ -417,7 +417,7 @@ public class Game implements Runnable, StatsSentListener {
             // lastPIT neu berechnen und anpassen
             long now = System.currentTimeMillis();
             long pause = now - standbyStartedAt;
-            lastPIT = lastPIT+pause;
+            lastPIT = lastPIT + pause;
             standbyStartedAt = 0l;
 
             mode = MODE_CLOCK_GAME_RUNNING;
@@ -492,7 +492,17 @@ public class Game implements Runnable, StatsSentListener {
 
             if (mode == MODE_CLOCK_PREGAME || mode == MODE_CLOCK_GAME_PAUSED) {
                 button_switch_mode.setIcon(FrameDebug.IconPlay);
-                Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", "1:" + new RGBScheduleElement(Color.WHITE));
+
+                String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
+                        new RGBScheduleElement(Configs.FLAG_COLOR_RED, 500l) + ";" +
+                        new RGBScheduleElement(Configs.FLAG_COLOR_BLUE, 500l) + ";" +
+                        (preset_num_teams >= 3 ? new RGBScheduleElement(Configs.FLAG_COLOR_GREEN, 500l) + ";" : "") +
+                        (preset_num_teams >= 4 ? new RGBScheduleElement(Configs.FLAG_COLOR_YELLOW, 500l) + ";" : "") +
+                        new RGBScheduleElement(Color.BLACK, 1500l);
+
+                logger.debug(pregamePoleColorScheme);
+
+                Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", pregamePoleColorScheme); //"1:" + new RGBScheduleElement(Color.WHITE));
             }
 
             if (mode == MODE_CLOCK_PREGAME) {
@@ -500,6 +510,14 @@ public class Game implements Runnable, StatsSentListener {
                 logger.debug("preset_num_teams " + preset_num_teams);
                 if (preset_num_teams < 3) display_green.clear();
                 if (preset_num_teams < 4) display_yellow.clear();
+
+
+                Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, null, "∞:on,250;off,250");
+                Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, null, "∞:on,250;off,250");
+                if (preset_num_teams < 3) Main.getPinHandler().off(Main.PH_LED_GREEN_BTN);
+                else Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, null, "∞:on,250;off,250");
+                if (preset_num_teams < 4) Main.getPinHandler().off(Main.PH_LED_YELLOW_BTN);
+                else Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, null, "∞:on,250;off,250");
 
                 Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,1000;off,1000");
                 Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:off,1000;on,1000");
@@ -538,7 +556,7 @@ public class Game implements Runnable, StatsSentListener {
                     if (preset_num_teams >= 4)
                         Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
 
-                    Main.getPinHandler().setScheme(Main.PH_POLE, "NEUTRAL", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
+                    Main.getPinHandler().setScheme(Main.PH_POLE, "NEUTRAL", PinHandler.FOREVER + ":" + new RGBScheduleElement(Configs.FLAG_COLOR_WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
                 if (flag == FLAG_STATE_RED) {
                     logger.debug("\n" +
@@ -556,7 +574,7 @@ public class Game implements Runnable, StatsSentListener {
                         Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
 
                     display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                    Main.getPinHandler().setScheme(Main.PH_POLE, "RED ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.RED, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
+                    Main.getPinHandler().setScheme(Main.PH_POLE, "RED ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Configs.FLAG_COLOR_RED, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
                 if (flag == FLAG_STATE_BLUE) {
                     logger.debug("\n" +
@@ -574,7 +592,7 @@ public class Game implements Runnable, StatsSentListener {
                         Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
 
                     display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                    Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.BLUE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
+                    Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Configs.FLAG_COLOR_BLUE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
                 if (flag == FLAG_STATE_GREEN) {
                     logger.debug("\n" +
@@ -591,7 +609,7 @@ public class Game implements Runnable, StatsSentListener {
                         Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
 
                     display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                    Main.getPinHandler().setScheme(Main.PH_POLE, "GREEN ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.GREEN, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
+                    Main.getPinHandler().setScheme(Main.PH_POLE, "GREEN ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Configs.FLAG_COLOR_GREEN, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
                 if (flag == FLAG_STATE_YELLOW) {
                     logger.debug("\n" +
@@ -606,7 +624,7 @@ public class Game implements Runnable, StatsSentListener {
                     Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "∞:on,500;off,500");
 
                     display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                    Color myyellow    = new Color(255, 128, 0);
+                    Color myyellow = Tools.getColor(Main.getConfigs().get(Configs.FLAG_COLOR_YELLOW));
                     Main.getPinHandler().setScheme(Main.PH_POLE, "YELLOW ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(myyellow, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
             }

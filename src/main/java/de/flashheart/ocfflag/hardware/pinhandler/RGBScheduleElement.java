@@ -1,5 +1,8 @@
 package de.flashheart.ocfflag.hardware.pinhandler;
 
+import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.misc.Tools;
+
 import java.awt.*;
 
 public class RGBScheduleElement {
@@ -24,6 +27,10 @@ public class RGBScheduleElement {
 
     public RGBScheduleElement(Color color, long duration) {
         this(color.getRed(), color.getGreen(), color.getBlue(), duration);
+    }
+
+    public RGBScheduleElement(String configKey, long duration) {
+        this(Tools.getColor(Main.getConfigs().get(configKey)), duration);
     }
 
     public RGBScheduleElement(Color color) {

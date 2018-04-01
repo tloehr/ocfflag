@@ -16,18 +16,18 @@ public class Tools {
     public static Color darkorange = new Color(0xff, 0x8c, 0x00);
 
     public static Manifest getManifest(Class<?> clz) {
-      String resource = "/" + clz.getName().replace(".", "/") + ".class";
-      String fullPath = clz.getResource(resource).toString();
-      String archivePath = fullPath.substring(0, fullPath.length() - resource.length());
-      if (archivePath.endsWith("\\WEB-INF\\classes") || archivePath.endsWith("/WEB-INF/classes")) {
-        archivePath = archivePath.substring(0, archivePath.length() - "/WEB-INF/classes".length()); // Required for wars
-      }
+        String resource = "/" + clz.getName().replace(".", "/") + ".class";
+        String fullPath = clz.getResource(resource).toString();
+        String archivePath = fullPath.substring(0, fullPath.length() - resource.length());
+        if (archivePath.endsWith("\\WEB-INF\\classes") || archivePath.endsWith("/WEB-INF/classes")) {
+            archivePath = archivePath.substring(0, archivePath.length() - "/WEB-INF/classes".length()); // Required for wars
+        }
 
-      try (InputStream input = new URL(archivePath + "/META-INF/MANIFEST.MF").openStream()) {
-        return new Manifest(input);
-      } catch (Exception e) {
-        throw new RuntimeException("Loading MANIFEST for class " + clz + " failed!", e);
-      }
+        try (InputStream input = new URL(archivePath + "/META-INF/MANIFEST.MF").openStream()) {
+            return new Manifest(input);
+        } catch (Exception e) {
+            throw new RuntimeException("Loading MANIFEST for class " + clz + " failed!", e);
+        }
     }
 
     public static String formatLongTime(long time, String pattern) {
@@ -60,63 +60,63 @@ public class Tools {
 
 
     public static String catchNull(Object in) {
-           return catchNull(in, "");
+        return catchNull(in, "");
 
-       }
-
-       /**
-        * Ermittelt die Zeichendarstellung eines Objekts (toString). Ist das Ergebnis null oder eine leere Zeichenkette, dann wird
-        * der String neutral zurück gegeben.
-        *
-        * @param in
-        * @param neutral
-        * @return
-        */
-       public static String catchNull(Object in, String neutral) {
-           String result = neutral;
-           if (in != null) {
-               result = in.toString();
-               if (result.isEmpty()) {
-                   result = neutral;
-               }
-               result = xx(result);
-           }
-           return result;
-       }
-
-       public static String catchNull(String in) {
-           return (in == null ? "" : xx(in.trim()));
-       }
-
-       /**
-        * Gibt die toString Ausgabe eines Objektes zurück. Hierbei kann man sicher sein, dass man nicht über
-        * ein <code>null</code> stolpert.
-        *
-        * @param in     Eingangsobjekt
-        * @param prefix Präfix, der vorangestellt wird, wenn das Objekt nicht null ist.
-        * @param suffix Suffix, der angehangen wird, wenn das Objekt nicht null ist.
-        * @return
-        */
-       public static String catchNull(Object in, String prefix, String suffix) {
-           String result = "";
-           if (!catchNull(in).isEmpty()) {
-               result = prefix + catchNull(in) + suffix;
-           }
-           return result;
-       }
+    }
 
     /**
-        * tiny method to automatically find out if the message is a language key or not.
-        *
-        * @param message
-        * @return replaced message or the original message if there is no appropriate language key.
-        */
-       public static String xx(String message, Object... args) {
-           if (message == null || message.isEmpty()) return "";
+     * Ermittelt die Zeichendarstellung eines Objekts (toString). Ist das Ergebnis null oder eine leere Zeichenkette, dann wird
+     * der String neutral zurück gegeben.
+     *
+     * @param in
+     * @param neutral
+     * @return
+     */
+    public static String catchNull(Object in, String neutral) {
+        String result = neutral;
+        if (in != null) {
+            result = in.toString();
+            if (result.isEmpty()) {
+                result = neutral;
+            }
+            result = xx(result);
+        }
+        return result;
+    }
 
-           return message;
+    public static String catchNull(String in) {
+        return (in == null ? "" : xx(in.trim()));
+    }
 
-           // für später
+    /**
+     * Gibt die toString Ausgabe eines Objektes zurück. Hierbei kann man sicher sein, dass man nicht über
+     * ein <code>null</code> stolpert.
+     *
+     * @param in     Eingangsobjekt
+     * @param prefix Präfix, der vorangestellt wird, wenn das Objekt nicht null ist.
+     * @param suffix Suffix, der angehangen wird, wenn das Objekt nicht null ist.
+     * @return
+     */
+    public static String catchNull(Object in, String prefix, String suffix) {
+        String result = "";
+        if (!catchNull(in).isEmpty()) {
+            result = prefix + catchNull(in) + suffix;
+        }
+        return result;
+    }
+
+    /**
+     * tiny method to automatically find out if the message is a language key or not.
+     *
+     * @param message
+     * @return replaced message or the original message if there is no appropriate language key.
+     */
+    public static String xx(String message, Object... args) {
+        if (message == null || message.isEmpty()) return "";
+
+        return message;
+
+        // für später
 //
 //           String title = message;
 //           try {
@@ -125,7 +125,7 @@ public class Tools {
 //               // ok, its not a langbundle key
 //           }
 //           return title;
-       }
+    }
 
     /**
      * läuft rekursiv durch alle Kinder eines Containers und setzt deren Enabled Status auf
@@ -212,6 +212,7 @@ public class Tools {
         } else if (colornameOrHTMLCode.equalsIgnoreCase("dark_orange")) {
             color = darkorange;
         } else {
+            colornameOrHTMLCode = colornameOrHTMLCode.startsWith("#") ? colornameOrHTMLCode.substring(1) : colornameOrHTMLCode;
             try {
                 int red = Integer.parseInt(colornameOrHTMLCode.substring(0, 2), 16);
                 int green = Integer.parseInt(colornameOrHTMLCode.substring(2, 4), 16);

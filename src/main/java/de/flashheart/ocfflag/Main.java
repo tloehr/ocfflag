@@ -79,19 +79,19 @@ public class Main {
     /* btn06 */ private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
     /* btn07 */ private static final Pin BUTTON_GREEN = RaspiPin.GPIO_23;
     /* btn08 */ private static final Pin BUTTON_YELLOW = RaspiPin.GPIO_24;
-    
-    private static final Pin LED_RED_BUTTON = MCP23017Pin.GPIO_B0;
-    private static final Pin LED_BLUE_BUTTON = MCP23017Pin.GPIO_B1;
-    private static final Pin LED_GREEN = MCP23017Pin.GPIO_B2;
-    private static final Pin LED_GREEN_BUTTON = MCP23017Pin.GPIO_B3;
-    private static final Pin LED_YELLOW_BUTTON = MCP23017Pin.GPIO_B4;
-    private static final Pin LED_WHITE = MCP23017Pin.GPIO_B5;
 
-    private static final Pin RESERVE01 = MCP23017Pin.GPIO_B6;
-    private static final Pin RESERVE02 = MCP23017Pin.GPIO_B7;
-    private static final Pin RESERVE03 = MCP23017Pin.GPIO_A0;
-    private static final Pin RESERVE04 = MCP23017Pin.GPIO_A1;
-    private static final Pin RESERVE05 = MCP23017Pin.GPIO_A2;
+    private static final Pin LED_RED_BUTTON = MCP23017Pin.GPIO_B0; //mf01
+    private static final Pin LED_BLUE_BUTTON = MCP23017Pin.GPIO_B1;//mf02
+    private static final Pin LED_GREEN_STATUS = MCP23017Pin.GPIO_B2; //mf03
+    private static final Pin LED_GREEN_BUTTON = MCP23017Pin.GPIO_B3; //mf04
+    private static final Pin LED_YELLOW_BUTTON = MCP23017Pin.GPIO_B4; //mf05
+    private static final Pin LED_WHITE_STATUS = MCP23017Pin.GPIO_B5; //mf06
+
+    private static final Pin RESERVE01 = MCP23017Pin.GPIO_B6;  //mf07
+    private static final Pin RESERVE02 = MCP23017Pin.GPIO_B7;  //mf08
+    private static final Pin RESERVE03 = MCP23017Pin.GPIO_A0;  //mf09
+    private static final Pin RESERVE04 = MCP23017Pin.GPIO_A1;  //mf10
+    private static final Pin RESERVE05 = MCP23017Pin.GPIO_A2;  //mf11
     private static final Pin RESERVE06 = MCP23017Pin.GPIO_A3;
     private static final Pin RESERVE07 = MCP23017Pin.GPIO_A4;
     private static final Pin RESERVE08 = MCP23017Pin.GPIO_A5;
@@ -99,8 +99,8 @@ public class Main {
     private static final Pin RESERVE10 = MCP23017Pin.GPIO_A7;
 
     // Sirenen
-    private static final Pin SIREN_AIR = RESERVE01;
-    private static final Pin SIREN_COLOR_CHANGE = RESERVE02;
+    private static final Pin SIREN_COLOR_CHANGE = RESERVE04; //mf10
+    private static final Pin SIREN_AIR = RESERVE03;//mf09
 //    private static final Pin SIREN3 = RaspiPin.GPIO_02; // unbenutzt
 //    private static final Pin SIREN4 = RaspiPin.GPIO_25; // unbenutzt
 
@@ -191,17 +191,17 @@ public class Main {
         ledGreenButton = new MyPin(GPIO, mcp23017_1, LED_GREEN_BUTTON, frameDebug.getLedGreenButton(), PH_LED_GREEN_BTN);
         ledYellowButton = new MyPin(GPIO, mcp23017_1, LED_YELLOW_BUTTON, frameDebug.getLedYellowButton(), PH_LED_YELLOW_BTN);
 
-        ledGreen = new MyPin(GPIO, mcp23017_1, LED_GREEN, frameDebug.getLedStandbyActive(), PH_LED_GREEN);
-        ledWhite = new MyPin(GPIO, mcp23017_1, LED_WHITE, frameDebug.getLedStatsSent(), PH_LED_WHITE);
-        
-        reserve03 = new MyPin(GPIO, mcp23017_1, RESERVE03, null, PH_RESERVE03);
-        reserve04 = new MyPin(GPIO, mcp23017_1, RESERVE04, null, PH_RESERVE04);
-        reserve05 = new MyPin(GPIO, mcp23017_1, RESERVE05, null, PH_RESERVE05);
-        reserve06 = new MyPin(GPIO, mcp23017_1, RESERVE06, null, PH_RESERVE06);
-        reserve07 = new MyPin(GPIO, mcp23017_1, RESERVE07, null, PH_RESERVE07);
-        reserve08 = new MyPin(GPIO, mcp23017_1, RESERVE08, null, PH_RESERVE08);
-        reserve09 = new MyPin(GPIO, mcp23017_1, RESERVE09, null, PH_RESERVE09);
-        reserve10 = new MyPin(GPIO, mcp23017_1, RESERVE10, null, PH_RESERVE10);
+        ledGreen = new MyPin(GPIO, mcp23017_1, LED_GREEN_STATUS, frameDebug.getLedStandbyActive(), PH_LED_GREEN);
+        ledWhite = new MyPin(GPIO, mcp23017_1, LED_WHITE_STATUS, frameDebug.getLedStatsSent(), PH_LED_WHITE);
+
+//        reserve03 = new MyPin(GPIO, mcp23017_1, RESERVE01, null, PH_RESERVE01);
+//        reserve04 = new MyPin(GPIO, mcp23017_1, RESERVE04, null, PH_RESERVE04);
+//        reserve05 = new MyPin(GPIO, mcp23017_1, RESERVE05, null, PH_RESERVE05);
+//        reserve06 = new MyPin(GPIO, mcp23017_1, RESERVE06, null, PH_RESERVE06);
+//        reserve07 = new MyPin(GPIO, mcp23017_1, RESERVE07, null, PH_RESERVE07);
+//        reserve08 = new MyPin(GPIO, mcp23017_1, RESERVE08, null, PH_RESERVE08);
+//        reserve09 = new MyPin(GPIO, mcp23017_1, RESERVE09, null, PH_RESERVE09);
+//        reserve10 = new MyPin(GPIO, mcp23017_1, RESERVE10, null, PH_RESERVE10);
 
 //        pinHandler.add(new MyPin(GPIO, SIREN_AIR, null, PH_AIRSIREN, 50, 90));
 //        pinHandler.add(new MyPin(GPIO, SIREN_COLOR_CHANGE, null, PH_SIREN_COLOR_CHANGE, 70, 60));
@@ -217,14 +217,14 @@ public class Main {
         pinHandler.add(ledYellowButton);
 
 
-        pinHandler.add(reserve03);
-        pinHandler.add(reserve04);
-        pinHandler.add(reserve05);
-        pinHandler.add(reserve06);
-        pinHandler.add(reserve07);
-        pinHandler.add(reserve08);
-        pinHandler.add(reserve09);
-        pinHandler.add(reserve10);
+//        pinHandler.add(reserve03);
+//        pinHandler.add(reserve04);
+//        pinHandler.add(reserve05);
+//        pinHandler.add(reserve06);
+//        pinHandler.add(reserve07);
+//        pinHandler.add(reserve08);
+//        pinHandler.add(reserve09);
+//        pinHandler.add(reserve10);
 
         pinHandler.add(ledGreen);
         pinHandler.add(ledWhite);

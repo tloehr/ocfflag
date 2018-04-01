@@ -11,7 +11,6 @@ import java.util.UUID;
 public class Configs {
     private final SortedProperties configs;
     private final Properties applicationContext;
-    ;
     private final Logger logger = Logger.getLogger(getClass());
 
 
@@ -36,6 +35,12 @@ public class Configs {
     public static final String AIRSIREN_SIGNAL = "airsiren_signal";
     public static final String COLORCHANGE_SIREN_SIGNAL = "colorchange_siren_signal";
 
+    public static final String FLAG_COLOR_WHITE = "flag_color_white";
+    public static final String FLAG_COLOR_BLUE = "flag_color_blue";
+    public static final String FLAG_COLOR_RED = "flag_color_red";
+    public static final String FLAG_COLOR_GREEN = "flag_color_green";
+    public static final String FLAG_COLOR_YELLOW = "flag_color_yellow";
+    
     public Configs() throws IOException {
         configs = new SortedProperties(); // Einstellungen, die verändert werden
         applicationContext = new Properties(); // inhalte der application.properties (von Maven)
@@ -56,6 +61,12 @@ public class Configs {
         configs.put(MIN_STAT_SEND_TIME, "0"); // in Millis, wie oft sollen die Stastiken spätestens gesendet werden. 0 = gar nicht
         configs.put(AIRSIREN_SIGNAL, "1:on,5000;off,1");
         configs.put(COLORCHANGE_SIREN_SIGNAL, "2:on,50;off,50");
+
+        configs.put(FLAG_COLOR_WHITE, "white");
+        configs.put(FLAG_COLOR_BLUE, "blue");
+        configs.put(FLAG_COLOR_GREEN, "green");
+        configs.put(FLAG_COLOR_RED, "red");
+        configs.put(FLAG_COLOR_YELLOW, "#ff8000");
 
         // configdatei einlesen
         loadConfigs();
