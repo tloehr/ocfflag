@@ -25,9 +25,9 @@
         <pi.main.class>de.flashheart.ocfflag.Main</pi.main.class>
 
         <project.build.timestamp>${maven.build.timestamp}</project.build.timestamp>
-        
+
         <my.version>${project.version}</my.version>
-        
+
     </properties>
 
     <dependencies>
@@ -76,6 +76,12 @@
             <artifactId>joda-time</artifactId>
             <version>2.9.9</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-exec -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-exec</artifactId>
+            <version>1.3</version>
+        </dependency>
         <dependency>
             <groupId>com.jgoodies</groupId>
             <artifactId>jgoodies-forms</artifactId>
@@ -91,13 +97,11 @@
             <artifactId>properties-maven-plugin</artifactId>
             <version>1.0.0</version>
             <type>maven-plugin</type>
-
         </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant-jsch</artifactId>
             <version>1.9.6</version>
-
         </dependency>
     </dependencies>
 

@@ -14,6 +14,8 @@ import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.FTPWrapper;
 import de.flashheart.ocfflag.misc.Tools;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -43,6 +45,7 @@ public class Game implements Runnable, StatsSentListener {
     private final int MAX_TEAMS = 4;
     private final int MIN_TEAMS = 2;
 
+    private long shutdown_button_down_since = 0l, shutdown_button_min_downtime = 0l;
 
     private int mode = MODE_CLOCK_PREGAME;
     private int running_match_id = 0;
@@ -64,6 +67,7 @@ public class Game implements Runnable, StatsSentListener {
     private final MyAbstractButton button_quit;
     private final MyAbstractButton button_config;
     private final MyAbstractButton button_back2game;
+    private final MyAbstractButton button_shutdown;
     private final MyAbstractButton button_preset_num_teams;
     private final MyAbstractButton button_preset_gametime;
     private final MyAbstractButton button_blue;
@@ -95,8 +99,8 @@ public class Game implements Runnable, StatsSentListener {
     // das sind die standard spieldauern in millis.
     // In Minuten: 30, 60, 90, 120, 150, 180, 210, 240, 270, 300
     private Long[] preset_times = new Long[]{
-            10000l, // 00:00:10
-            60000l, // 00:01:00
+//            10000l, // 00:00:10
+//            60000l, // 00:01:00
             600000l, // 00:10:00
             900000l, // 00:15:00
             1200000l, // 00:20:00
@@ -131,7 +135,8 @@ public class Game implements Runnable, StatsSentListener {
                 MyAbstractButton button_preset_gametime,
                 MyAbstractButton button_quit,
                 MyAbstractButton button_config,
-                MyAbstractButton button_back2game
+                MyAbstractButton button_back2game,
+                MyAbstractButton button_shutdown
     ) {
         this.display_green = display_green;
         this.display_yellow = display_yellow;
@@ -142,6 +147,7 @@ public class Game implements Runnable, StatsSentListener {
         this.button_quit = button_quit;
         this.button_config = button_config;
         this.button_back2game = button_back2game;
+        this.button_shutdown = button_shutdown;
         thread = new Thread(this);
         this.display_blue = display_blue;
         this.display_red = display_red;
@@ -259,6 +265,28 @@ public class Game implements Runnable, StatsSentListener {
             logger.debug("GUI_button_back2game");
             button_back2game_pressed();
         });
+        button_shutdown.addListener((GpioPinListenerDigital) event -> {
+            if (event.getState() != PinState.LOW) {
+                logger.debug("GPIO_button_shutdown UP");
+                shutdown_button_down_since = 0l;
+            } else {
+                logger.debug("GPIO_button_shutdown DOWN");
+                shutdown_button_down_since = System.currentTimeMillis();
+                Main.prepareShutdown();
+                try {
+                    String line = "nohup /bin/sh /home/pi/shutdown.sh &";
+                    CommandLine commandLine = CommandLine.parse(line);
+                    DefaultExecutor executor = new DefaultExecutor();
+                    executor.setExitValue(1);
+                    executor.execute(commandLine);
+                    Thread.sleep(5000);
+                } catch (IOException e) {
+                    logger.error(e);
+                } catch (InterruptedException e) {
+                    logger.error(e);
+                }
+            }
+        });
 
         try {
             FTPWrapper.initFTPDir();
@@ -300,6 +328,7 @@ public class Game implements Runnable, StatsSentListener {
             if (flag != FLAG_STATE_RED) {
                 flag = FLAG_STATE_RED;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
+//                Main.getPinHandler().setScheme(Main.PH_AIRSIREN, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_RED_ACTIVATED);
                 setDisplayToEvent();
             }
@@ -316,6 +345,7 @@ public class Game implements Runnable, StatsSentListener {
             if (flag != FLAG_STATE_BLUE) {
                 flag = FLAG_STATE_BLUE;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
+//                Main.getPinHandler().setScheme(Main.PH_AIRSIREN, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_BLUE_ACTIVATED);
                 setDisplayToEvent();
             }
@@ -335,6 +365,7 @@ public class Game implements Runnable, StatsSentListener {
             if (flag != FLAG_STATE_GREEN) {
                 flag = FLAG_STATE_GREEN;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
+                // Main.getPinHandler().setScheme(Main.PH_AIRSIREN, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_GREEN_ACTIVATED);
                 setDisplayToEvent();
             }
@@ -355,6 +386,7 @@ public class Game implements Runnable, StatsSentListener {
             if (flag != FLAG_STATE_YELLOW) {
                 flag = FLAG_STATE_YELLOW;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
+                //Main.getPinHandler().setScheme(Main.PH_AIRSIREN, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_YELLOW_ACTIVATED);
                 setDisplayToEvent();
             }
@@ -512,12 +544,24 @@ public class Game implements Runnable, StatsSentListener {
                 if (preset_num_teams < 4) display_yellow.clear();
 
 
-                Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, null, "∞:on,250;off,250");
-                Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, null, "∞:on,250;off,250");
+                if (preset_num_teams == 3) {
+                    Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, null, "∞:on,250;off,500");
+                    Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, null, "∞:off,250;on,250;off,250");
+                } else if (preset_num_teams == 4) {
+                    Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, null, "∞:on,250;off,750");
+                    Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, null, "∞:off,250;on,250;off,500");
+                } else {
+                    Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, null, "∞:on,250;off,250");
+                    Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, null, "∞:off,250;on,250");
+                }
                 if (preset_num_teams < 3) Main.getPinHandler().off(Main.PH_LED_GREEN_BTN);
-                else Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, null, "∞:on,250;off,250");
+                else if (preset_num_teams == 3) {
+                    Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, null, "∞:off,500;on,250");
+                } else if (preset_num_teams == 4) {
+                    Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, null, "∞:off,500;on,250;off,250");
+                }
                 if (preset_num_teams < 4) Main.getPinHandler().off(Main.PH_LED_YELLOW_BTN);
-                else Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, null, "∞:on,250;off,250");
+                else Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, null, "∞:off,750;on,250");
 
                 Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,1000;off,1000");
                 Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:off,1000;on,1000");

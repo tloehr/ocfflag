@@ -6,6 +6,8 @@ package de.flashheart.ocfflag.gui;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.pi4j.gpio.extension.mcp.MCP23017Pin;
+import com.pi4j.io.gpio.Pin;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.misc.Configs;
@@ -192,13 +194,13 @@ public class FrameDebug extends JFrame {
         Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "5:on,1000;off,1000");
         Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "5:on,1000;off,1000");
         Main.getPinHandler().setScheme(Main.PH_LED_GREEN, "5:on,1000;off,1000");
-
         Main.getPinHandler().setScheme(Main.PH_LED_WHITE, "5:on,1000;off,1000");
+
+        Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_AIRSIREN, "5:on,1000;off,1000");
 
         Main.getPinHandler().setScheme(Main.PH_RESERVE01, "5:on,1000;off,1000");
         Main.getPinHandler().setScheme(Main.PH_RESERVE02, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_RESERVE03, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_RESERVE04, "5:on,1000;off,1000");
         Main.getPinHandler().setScheme(Main.PH_RESERVE05, "5:on,1000;off,1000");
         Main.getPinHandler().setScheme(Main.PH_RESERVE06, "5:on,1000;off,1000");
         Main.getPinHandler().setScheme(Main.PH_RESERVE07, "5:on,1000;off,1000");

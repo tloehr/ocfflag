@@ -29,7 +29,7 @@ public class PinBlinkModel implements GenericBlinkModel {
 
     @Override
     public String call() throws Exception {
-        //logger.debug(new DateTime().toString() + " working on:" + pin.getName() + " [" + pin.getText() + "]  onOffScheme.size()=" + onOffScheme.size());
+        logger.debug(new DateTime().toString() + " working on:" + pin.getName() + " [" + pin.getText() + "]  onOffScheme.size()=" + onOffScheme.size());
 
         if (repeat == 0) {
             pin.setState(false);
