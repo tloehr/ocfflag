@@ -132,9 +132,6 @@ public class Main {
 
     private static final HashMap<String, Object> applicationContext = new HashMap<>();
 
-
-    public static final int DEBOUNCE = 200; //ms
-
     public static MessageProcessor getMessageProcessor() {
         return messageProcessor;
     }
@@ -158,8 +155,6 @@ public class Main {
      * @throws IOException
      */
     private static void initGameSystem() throws I2CFactory.UnsupportedBusNumberException, IOException {
-
-
         // die internal names auf den Brightness Key zu setzen ist ein kleiner Trick. Die namen müssen und eindeutig sein
         // so kann das Display7Segment4Digits direkt die Helligkeit aus den configs lesen
         display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblPole(), Configs.BRIGHTNESS_WHITE);

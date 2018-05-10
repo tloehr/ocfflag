@@ -10,6 +10,8 @@ import com.pi4j.gpio.extension.mcp.MCP23017Pin;
 import com.pi4j.io.gpio.Pin;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
+import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
+import de.flashheart.ocfflag.hardware.pinhandler.RGBScheduleElement;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.FTPWrapper;
 import de.flashheart.ocfflag.misc.Tools;
@@ -38,7 +40,12 @@ public class FrameDebug extends JFrame {
         initComponents();
         initFonts();
         initFrame();
-        setTitle("ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + " [" + Main.getConfigs().getApplicationInfo("buildNumber") + "]");
+
+        // " ("+Tools.formatLongTime(Long.parseLong(Main.getConfigs().getApplicationInfo("timestamp")))+")
+
+        String title = "ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + " [" + Main.getConfigs().getApplicationInfo("buildNumber") + "]";
+        logger.info(title);
+        setTitle(title);
     }
 
     private void initFrame() {
@@ -212,6 +219,14 @@ public class FrameDebug extends JFrame {
 
     }
 
+    private void txtFlagColorActionPerformed(ActionEvent e) {
+//        String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
+//                new RGBScheduleElement(Color.BLUE, 500l) +
+//                new RGBScheduleElement(Color.BLACK, 500l);
+//        logger.debug(pregamePoleColorScheme);
+//        Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", pregamePoleColorScheme);
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -258,6 +273,7 @@ public class FrameDebug extends JFrame {
         panel6 = new JPanel();
         btnTestFTP = new JButton();
         btnTestHardware = new JButton();
+        txtFlagColor = new JTextField();
         label9 = new JLabel();
         txtUUID = new JTextField();
         label10 = new JLabel();
@@ -557,6 +573,11 @@ public class FrameDebug extends JFrame {
                     btnTestHardware.setFont(new Font("Dialog", Font.PLAIN, 20));
                     btnTestHardware.addActionListener(e -> btnTestHardwareActionPerformed(e));
                     panel6.add(btnTestHardware);
+
+                    //---- txtFlagColor ----
+                    txtFlagColor.setText("#ff8000");
+                    txtFlagColor.addActionListener(e -> txtFlagColorActionPerformed(e));
+                    panel6.add(txtFlagColor);
                 }
                 configView.add(panel6, CC.xywh(3, 19, 5, 1));
 
@@ -748,6 +769,7 @@ public class FrameDebug extends JFrame {
     private JPanel panel6;
     private JButton btnTestFTP;
     private JButton btnTestHardware;
+    private JTextField txtFlagColor;
     private JLabel label9;
     private JTextField txtUUID;
     private JLabel label10;

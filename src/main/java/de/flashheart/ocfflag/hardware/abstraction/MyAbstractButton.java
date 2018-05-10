@@ -19,14 +19,14 @@ import java.awt.event.ItemListener;
  * // todo: das geht bestimmt über ein Callback. Und ein Button Name für die Debugausgaben. Button auf GND sind Aktiv im Pin_State_LOW
  */
 public class MyAbstractButton {
-
+    private static final int DEBOUNCE = 200; //ms
     
     private final GpioPinDigitalInput hardwareButton;
     private final JButton guiButton;
 
     public MyAbstractButton(GpioController gpio, Pin pin, JButton guiButton) {
         hardwareButton = gpio == null ? null : gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
-        if (hardwareButton != null) hardwareButton.setDebounce(Main.DEBOUNCE);
+        if (hardwareButton != null) hardwareButton.setDebounce(DEBOUNCE);
         this.guiButton = guiButton;
     }
 
