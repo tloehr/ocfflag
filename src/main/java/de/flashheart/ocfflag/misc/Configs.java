@@ -26,6 +26,7 @@ public class Configs {
     public static final String MIN_STAT_SEND_TIME = "sendstats";
     public static final String FLAGNAME = "flagname";
     public static final String GAMETIME = "gametime";
+    public static final String SLEEP_PER_CYCLE = "sleep_per_cycle";
     public static final String BRIGHTNESS_WHITE = "brightness_white";
     public static final String BRIGHTNESS_BLUE = "brightness_blue";
     public static final String BRIGHTNESS_RED = "brightness_red";
@@ -34,6 +35,8 @@ public class Configs {
     public static final String NUMBER_OF_TEAMS = "num_teams";
     public static final String AIRSIREN_SIGNAL = "airsiren_signal";
     public static final String COLORCHANGE_SIREN_SIGNAL = "colorchange_siren_signal";
+
+    public static final String FORCE_NOT_ARM = "force_not_arm";
 
     public static final String FLAG_COLOR_WHITE = "flag_color_white";
     public static final String FLAG_COLOR_BLUE = "flag_color_blue";
@@ -47,6 +50,7 @@ public class Configs {
 
         // defaults
         configs.put(MATCHID, "1");
+        configs.put(SLEEP_PER_CYCLE, "500");
         configs.put(NUMBER_OF_TEAMS, "2");
         configs.put(LOGLEVEL, "debug");
         configs.put(FLAGNAME, "OCF Flagge #" + new java.util.Random().nextInt());
@@ -61,6 +65,7 @@ public class Configs {
         configs.put(MIN_STAT_SEND_TIME, "0"); // in Millis, wie oft sollen die Stastiken spätestens gesendet werden. 0 = gar nicht
         configs.put(AIRSIREN_SIGNAL, "1:on,5000;off,1");
         configs.put(COLORCHANGE_SIREN_SIGNAL, "2:on,50;off,50");
+        configs.put(FORCE_NOT_ARM, "false");
 
         configs.put(FLAG_COLOR_WHITE, "white");
         configs.put(FLAG_COLOR_BLUE, "blue");

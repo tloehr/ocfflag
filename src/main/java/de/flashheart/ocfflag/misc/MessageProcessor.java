@@ -47,6 +47,10 @@ public class MessageProcessor extends Thread implements HasLogger {
     }
 
     public void pushMessage(PHPMessage message) {
+        // https://github.com/tloehr/ocfflag/issues/4
+        if (lock.isLocked()) return; // Sonst kann es passieren, dass das hier alles blockiert.
+        // auf eine Message kann man ruhig verzichten.
+
         lock.lock();
         try {
             getLogger().debug("pushMessage() pushing " + message.toString());

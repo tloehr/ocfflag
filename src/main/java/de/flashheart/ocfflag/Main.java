@@ -33,6 +33,7 @@ public class Main {
 
     private static GpioController GPIO;
     private static FrameDebug frameDebug;
+    private static boolean raspi = false;
 //    private static SortedProperties config;
 
     private static Logger logger;
@@ -303,12 +304,14 @@ public class Main {
     }
 
     private static void initRaspi() throws Exception {
-        if (!Tools.isArm()) return;
-        GPIO = GpioFactory.getInstance();
-        mcp23017_1 = new MCP23017GpioProvider(I2CBus.BUS_1, MCP23017_1);
-        SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
-        SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
-        SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);
+
+//        if (!Tools.isArm()) return;
+//        GPIO = GpioFactory.getInstance();
+//        mcp23017_1 = new MCP23017GpioProvider(I2CBus.BUS_1, MCP23017_1);
+//        SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
+//        SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
+//        SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);
+        raspi = false;
     }
 
     public static Level getLogLevel() {
@@ -323,6 +326,9 @@ public class Main {
         return frameDebug;
     }
 
+    public static boolean isRaspi() {
+        return raspi;
+    }
 
     public static Configs getConfigs() {
         return configs;

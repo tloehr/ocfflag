@@ -78,7 +78,7 @@ public class Game implements Runnable, StatsSentListener {
     private final MyAbstractButton button_switch_mode;
 
     private final Thread thread;
-    private final long PAUSE_PER_CYCLE = 500;
+    private long SLEEP_PER_CYCLE = 500;
 
     private Statistics statistics;
     private final HashMap<String, Color> colors = new HashMap<>();
@@ -158,6 +158,7 @@ public class Game implements Runnable, StatsSentListener {
         this.button_switch_mode = button_switch_mode;
 
         preset_gametime_position = Integer.parseInt(Main.getConfigs().get(Configs.GAMETIME));
+        SLEEP_PER_CYCLE = Long.parseLong(Main.getConfigs().get(Configs.SLEEP_PER_CYCLE));
         preset_num_teams = Integer.parseInt(Main.getConfigs().get(Configs.NUMBER_OF_TEAMS));
 
         statistics = new Statistics(preset_num_teams);
@@ -165,7 +166,7 @@ public class Game implements Runnable, StatsSentListener {
         colors.put("green", Color.green);
         colors.put("red", Color.red);
         colors.put("blue", Color.blue);
-        colors.put("yellow", Color.yellow);
+        colors.put("yellow", Tools.getColor(Main.getConfigs().get(Configs.FLAG_COLOR_YELLOW)));
 
         initGame();
     }
@@ -772,7 +773,6 @@ public class Game implements Runnable, StatsSentListener {
                     String winningScheme = PinHandler.FOREVER + ":";
                     String text = "Winning Team(s): ";
                     for (String teamColor : winners) {
-
                         winningScheme += new RGBScheduleElement(colors.get(teamColor), 250) + ";" + new RGBScheduleElement(Color.BLACK, 250) + ";";
                         text += teamColor + " ";
                     }
@@ -896,7 +896,7 @@ public class Game implements Runnable, StatsSentListener {
 
                 }
 
-                Thread.sleep(PAUSE_PER_CYCLE);
+                Thread.sleep(SLEEP_PER_CYCLE);
 
 
             } catch (InterruptedException ie) {

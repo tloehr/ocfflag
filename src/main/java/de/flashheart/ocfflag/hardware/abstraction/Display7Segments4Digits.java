@@ -36,7 +36,7 @@ public class Display7Segments4Digits {
         this.lblSegment = lblSegment;
         btnSegment = null;
 
-        if (Tools.isArm()) {
+        if (Main.isRaspi()) {
             try {
                 segment = new SevenSegment(addr, true);
             } catch (I2CFactory.UnsupportedBusNumberException e) {
@@ -54,7 +54,7 @@ public class Display7Segments4Digits {
         this.btnSegment = btnSegment;
         lblSegment = null;
 
-        if (Tools.isArm()) {
+        if (Main.isRaspi()) {
             try {
                 segment = new SevenSegment(addr, true);
             } catch (I2CFactory.UnsupportedBusNumberException e) {

@@ -1,5 +1,6 @@
 package de.flashheart.ocfflag.misc;
 
+import de.flashheart.ocfflag.Main;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -46,10 +47,8 @@ public class Tools {
 
     // http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
     public static boolean isArm() {
-
         String os = System.getProperty("os.arch").toLowerCase();
         return (os.indexOf("arm") >= 0);
-
     }
 
     // https://stackoverflow.com/questions/4672271/reverse-opposing-colors
