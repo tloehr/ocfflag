@@ -36,7 +36,7 @@ public class Configs {
     public static final String AIRSIREN_SIGNAL = "airsiren_signal";
     public static final String COLORCHANGE_SIREN_SIGNAL = "colorchange_siren_signal";
 
-    public static final String FORCE_NOT_ARM = "force_not_arm";
+    public static final String APPCONTEXT_NOGPIO = "appctx_nogpio";
 
     public static final String FLAG_COLOR_WHITE = "flag_color_white";
     public static final String FLAG_COLOR_BLUE = "flag_color_blue";
@@ -65,7 +65,6 @@ public class Configs {
         configs.put(MIN_STAT_SEND_TIME, "0"); // in Millis, wie oft sollen die Stastiken spätestens gesendet werden. 0 = gar nicht
         configs.put(AIRSIREN_SIGNAL, "1:on,5000;off,1");
         configs.put(COLORCHANGE_SIREN_SIGNAL, "2:on,50;off,50");
-        configs.put(FORCE_NOT_ARM, "false");
 
         configs.put(FLAG_COLOR_WHITE, "white");
         configs.put(FLAG_COLOR_BLUE, "blue");

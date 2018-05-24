@@ -42,13 +42,15 @@ public class Tools {
 
 
     public static String getWorkingPath() {
-        return (isArm() ? "/home/pi" : System.getProperty("user.home")) + File.separator + "ocfflag";
+        String os = System.getProperty("os.arch").toLowerCase();
+        return (os.indexOf("arm") >= 0 ? "/home/pi" : System.getProperty("user.home")) + File.separator + "ocfflag";
     }
 
     // http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
     public static boolean isArm() {
+        Boolean nogpio = (Boolean) Main.getFromContext(Configs.APPCONTEXT_NOGPIO);
         String os = System.getProperty("os.arch").toLowerCase();
-        return (os.indexOf("arm") >= 0);
+        return (!nogpio && os.indexOf("arm") >= 0);
     }
 
     // https://stackoverflow.com/questions/4672271/reverse-opposing-colors

@@ -19,6 +19,7 @@ import de.flashheart.ocfflag.mechanics.Game;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.MessageProcessor;
 import de.flashheart.ocfflag.misc.Tools;
+import org.apache.commons.cli.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -33,7 +34,7 @@ public class Main {
 
     private static GpioController GPIO;
     private static FrameDebug frameDebug;
-    private static boolean raspi = false;
+
 //    private static SortedProperties config;
 
     private static Logger logger;
@@ -138,7 +139,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        initBaseSystem();
+        initBaseSystem(args);
         initDebugFrame();
         initRaspi();
         initGameSystem();
@@ -240,9 +241,10 @@ public class Main {
      * Diese Methode enthält alles was initialisiert werden muss, gleich ob wir das Programm auf einem Raspi ausführen oder einem anderen Computer.
      *
      * @throws InterruptedException
+     * @param args
      */
 
-    private static void initBaseSystem() throws InterruptedException, IOException {
+    private static void initBaseSystem(String[] args) throws InterruptedException, IOException {
         System.setProperty("logs", Tools.getWorkingPath());
         Logger.getRootLogger().setLevel(logLevel);
         logger = Logger.getLogger("Main");
@@ -260,9 +262,70 @@ public class Main {
             logger.fatal(sw);
         });
 
-
         pinHandler = new PinHandler();
         configs = new Configs();
+
+        /***
+         *       ____                                          _   _     _               ___        _   _
+         *      / ___|___  _ __ ___  _ __ ___   __ _ _ __   __| | | |   (_)_ __   ___   / _ \ _ __ | |_(_) ___  _ __  ___
+         *     | |   / _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` | | |   | | '_ \ / _ \ | | | | '_ \| __| |/ _ \| '_ \/ __|
+         *     | |__| (_) | | | | | | | | | | | (_| | | | | (_| | | |___| | | | |  __/ | |_| | |_) | |_| | (_) | | | \__ \
+         *      \____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_| |_____|_|_| |_|\___|  \___/| .__/ \__|_|\___/|_| |_|___/
+         *                                                                                   |_|
+         */
+        Options opts = new Options();
+        opts.addOption("h", "help", false, Tools.xx("cmdline.help.description"));
+        opts.addOption("v", "version", false, Tools.xx("cmdline.version.description"));
+        opts.addOption("n", "nogpio", false, Tools.xx("cmdline.nogpio.description"));
+
+        CommandLineParser parser = new DefaultParser();
+        CommandLine cl = null;
+        String title = "ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + " [" + Main.getConfigs().getApplicationInfo("buildNumber") + "]";
+
+        String footer = "https://www.flashheart.de" + " " + Main.getConfigs().getApplicationInfo("buildNumber");
+
+        /***
+         *      _          _
+         *     | |__   ___| |_ __    ___  ___ _ __ ___  ___ _ __
+         *     | '_ \ / _ \ | '_ \  / __|/ __| '__/ _ \/ _ \ '_ \
+         *     | | | |  __/ | |_) | \__ \ (__| | |  __/  __/ | | |
+         *     |_| |_|\___|_| .__/  |___/\___|_|  \___|\___|_| |_|
+         *                  |_|
+         */
+        try {
+            cl = parser.parse(opts, args);
+        } catch (ParseException ex) {
+            HelpFormatter f = new HelpFormatter();
+            f.printHelp("ocfflag-1.1.jar [OPTION]", "ocfflag, Version " + Main.getConfigs().getApplicationInfo("my.version"), opts, footer);
+            System.exit(0);
+        }
+
+        if (cl.hasOption("h")) {
+            HelpFormatter f = new HelpFormatter();
+            f.printHelp("ocfflag-1.1.jar [OPTION]", "ocfflag, Version " + Main.getConfigs().getApplicationInfo("my.version"), opts, footer);
+            System.exit(0);
+        }
+
+        /***
+         *     __     __            _
+         *     \ \   / /__ _ __ ___(_) ___  _ __
+         *      \ \ / / _ \ '__/ __| |/ _ \| '_ \
+         *       \ V /  __/ |  \__ \ | (_) | | | |
+         *        \_/ \___|_|  |___/_|\___/|_| |_|
+         *
+         */
+
+        if (cl.hasOption("v")) {
+            System.out.println(title);
+            System.out.println(footer);
+            System.exit(0);
+        }
+
+        if (cl.hasOption("n")) {
+            applicationContext.put(Configs.APPCONTEXT_NOGPIO, Boolean.TRUE);
+        } else {
+            applicationContext.put(Configs.APPCONTEXT_NOGPIO, Tools.isArm() ? Boolean.FALSE : Boolean.TRUE);
+        }
 
         if (Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME)) > 0 && Main.getConfigs().isFTPComplete()) {
             messageProcessor = new MessageProcessor();
@@ -311,7 +374,7 @@ public class Main {
 //        SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
 //        SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
 //        SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);
-        raspi = false;
+
     }
 
     public static Level getLogLevel() {
@@ -326,9 +389,6 @@ public class Main {
         return frameDebug;
     }
 
-    public static boolean isRaspi() {
-        return raspi;
-    }
 
     public static Configs getConfigs() {
         return configs;

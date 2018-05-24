@@ -54,7 +54,7 @@ public class FrameDebug extends JFrame {
         tbFTPs.setToolTipText("Hab ich noch nicht hinbekommen");
         configView.add(tbFTPs, CC.xy(7, 15));
 
-        btnTestHardware.setEnabled(Main.isRaspi());
+        btnTestHardware.setEnabled(Tools.isArm());
 
         // kleiner Trick, damit ich nur eine Action Methode brauche
         btnWhiteBrght.setName(Configs.BRIGHTNESS_WHITE);
@@ -77,7 +77,7 @@ public class FrameDebug extends JFrame {
         lblPole.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
 
         setTab(0);
-        if (Main.isRaspi()) setExtendedState(MAXIMIZED_BOTH);
+        if (Tools.isArm()) setExtendedState(MAXIMIZED_BOTH);
     }
 
     private void initFonts() {
