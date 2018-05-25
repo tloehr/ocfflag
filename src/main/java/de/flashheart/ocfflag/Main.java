@@ -241,8 +241,8 @@ public class Main {
     /**
      * Diese Methode enthält alles was initialisiert werden muss, gleich ob wir das Programm auf einem Raspi ausführen oder einem anderen Computer.
      *
-     * @throws InterruptedException
      * @param args
+     * @throws InterruptedException
      */
 
     private static void initBaseSystem(String[] args) throws InterruptedException, IOException {
@@ -331,13 +331,11 @@ public class Main {
         if (cl.hasOption("n")) {
             applicationContext.put(Configs.APPCONTEXT_NOGPIO, Boolean.TRUE);
         } else {
-            applicationContext.put(Configs.APPCONTEXT_NOGPIO, Tools.isArm() ? Boolean.FALSE : Boolean.TRUE);
+            applicationContext.put(Configs.APPCONTEXT_NOGPIO, System.getProperty("os.arch").toLowerCase().indexOf("arm") >= 0 ? Boolean.FALSE : Boolean.TRUE);
         }
 
-        if (Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME)) > 0 && Main.getConfigs().isFTPComplete()) {
-            messageProcessor = new MessageProcessor();
-            messageProcessor.start();
-        }
+        messageProcessor = new MessageProcessor();
+        messageProcessor.start();
     }
 
     public static void prepareShutdown() {
@@ -375,13 +373,12 @@ public class Main {
     }
 
     private static void initRaspi() throws Exception {
-
-//        if (!Tools.isArm()) return;
-//        GPIO = GpioFactory.getInstance();
-//        mcp23017_1 = new MCP23017GpioProvider(I2CBus.BUS_1, MCP23017_1);
-//        SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
-//        SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
-//        SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);
+        if (!Tools.isArm()) return;
+        GPIO = GpioFactory.getInstance();
+        mcp23017_1 = new MCP23017GpioProvider(I2CBus.BUS_1, MCP23017_1);
+        SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
+        SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
+        SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);
 
     }
 

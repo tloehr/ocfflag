@@ -95,26 +95,8 @@ public class Game implements Runnable, StatsSentListener {
      * lastPIT wird einmal bei buttonStandbyActivePressed() und einmal in run() bearbeitet.
      */
     private long lastPIT;
-
-    // das sind die standard spieldauern in millis.
-    // In Minuten: 30, 60, 90, 120, 150, 180, 210, 240, 270, 300
-    private Long[] preset_times = new Long[]{
-//            10000l, // 00:00:10
-//            60000l, // 00:01:00
-            600000l, // 00:10:00
-            900000l, // 00:15:00
-            1200000l, // 00:20:00
-            1800000l, // 00:30:00
-            3600000l, // 01:00:00
-            5400000l, // 01:30:00
-            7200000l, // 02:00:00
-            9000000l, // 02:30:00
-            10800000l, // 03:00:00
-            12600000l, // 03:30:00
-            14400000l, // 04:00:00
-            16200000l, // 01:30:00
-            18000000l - 1000l // 04:59:59
-    };
+    
+    private Long[] preset_times;
     private int preset_gametime_position = 0;
     private int preset_num_teams = 2; // Reihenfolge: red, blue, green, yellow
     private boolean quit_programm;
@@ -158,6 +140,13 @@ public class Game implements Runnable, StatsSentListener {
         this.button_switch_mode = button_switch_mode;
 
         preset_gametime_position = Integer.parseInt(Main.getConfigs().get(Configs.GAMETIME));
+        preset_times = Main.getConfigs().getGameTimes();
+        if (preset_gametime_position >= preset_times.length - 1) {
+            preset_gametime_position = 0;
+            Main.getConfigs().put(Configs.GAMETIME, preset_gametime_position);
+        }
+
+
         SLEEP_PER_CYCLE = Long.parseLong(Main.getConfigs().get(Configs.SLEEP_PER_CYCLE));
         preset_num_teams = Integer.parseInt(Main.getConfigs().get(Configs.NUMBER_OF_TEAMS));
 
@@ -172,10 +161,7 @@ public class Game implements Runnable, StatsSentListener {
     }
 
     private void initGame() {
-
-        if (Main.getMessageProcessor() != null) {
-            Main.getMessageProcessor().addListener(this);
-        }
+        Main.getMessageProcessor().addListener(this);
 
         button_blue.addListener(e -> {
             logger.debug("GUI_button_blue");

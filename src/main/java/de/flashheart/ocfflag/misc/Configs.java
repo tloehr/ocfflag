@@ -5,6 +5,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -35,6 +36,7 @@ public class Configs {
     public static final String NUMBER_OF_TEAMS = "num_teams";
     public static final String AIRSIREN_SIGNAL = "airsiren_signal";
     public static final String COLORCHANGE_SIREN_SIGNAL = "colorchange_siren_signal";
+    public static final String GAME_TIME_LIST = "game_time_list";
 
     public static final String APPCONTEXT_NOGPIO = "appctx_nogpio";
 
@@ -65,6 +67,7 @@ public class Configs {
         configs.put(MIN_STAT_SEND_TIME, "0"); // in Millis, wie oft sollen die Stastiken spätestens gesendet werden. 0 = gar nicht
         configs.put(AIRSIREN_SIGNAL, "1:on,5000;off,1");
         configs.put(COLORCHANGE_SIREN_SIGNAL, "2:on,50;off,50");
+        configs.put(GAME_TIME_LIST, "600000,900000,1200000,1800000,3600000,5400000,7200000,9000000,10800000,12600000,14400000,16200000,17999000");
 
         configs.put(FLAG_COLOR_WHITE, "white");
         configs.put(FLAG_COLOR_BLUE, "blue");
@@ -135,6 +138,13 @@ public class Configs {
             logger.fatal(ex);
             System.exit(1);
         }
+    }
+
+    public Long[] getGameTimes(){
+        String[] listTimes = get(GAME_TIME_LIST).split("\\,");
+        ArrayList<Long> list = new ArrayList<>();
+        for (String time : listTimes) list.add(Long.parseLong(time));
+        return list.toArray(new Long[list.size()]);
     }
 
 

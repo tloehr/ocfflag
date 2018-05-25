@@ -6,7 +6,6 @@ import de.flashheart.ocfflag.misc.HasLogger;
 import de.flashheart.ocfflag.misc.PHPMessage;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
@@ -49,7 +48,7 @@ public class Statistics implements HasLogger {
     private DateTime endOfGame = null;
     private ArrayList<String> winningTeams = new ArrayList<>();
     private SwingWorker<Boolean, Boolean> worker;
-
+    private long min_stat_send_time;
     private String flagcolor;
 
     public Statistics(int numTeams) {
@@ -60,6 +59,7 @@ public class Statistics implements HasLogger {
     }
 
     public void reset() {
+        min_stat_send_time = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
         endOfGame = null;
         flagcolor = "neutral";
         winningTeams.clear();
@@ -85,8 +85,8 @@ public class Statistics implements HasLogger {
      * @return true, wenn die Operation erfolgreich war.
      */
     public void sendStats() {
-        getLogger().debug("sendStats()\n"+toPHP());
-        if (Main.getMessageProcessor() != null)
+        getLogger().debug("sendStats()\n" + toPHP());
+        if (min_stat_send_time > 0)
             Main.getMessageProcessor().pushMessage(new PHPMessage(toPHP(), stackEvents.peek()));
     }
 
