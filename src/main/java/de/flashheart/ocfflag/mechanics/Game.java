@@ -289,12 +289,6 @@ public class Game implements Runnable, StatsSentListener {
             }
         });
 
-        try {
-            FTPWrapper.initFTPDir();
-        } catch (IOException e) {
-            logger.error(e);
-        }
-
         mode = MODE_CLOCK_PREGAME;
         reset_timers();
     }
@@ -457,19 +451,16 @@ public class Game implements Runnable, StatsSentListener {
             lastStatsSent = statistics.addEvent(Statistics.EVENT_RESUME);
             setDisplayToEvent();
         } else if (mode == MODE_CLOCK_GAME_OVER) {
-            try {
-                FTPWrapper.initFTPDir();
-            } catch (IOException e) {
-                logger.error(e);
-            }
             reset_timers();
         } else if (mode == MODE_CLOCK_PREGAME) {
+            ((FTPWrapper) Main.getFromContext("ftpwrapper")).cleanupStatsFile();
             if (running_match_id == 0) {
                 running_match_id = Integer.parseInt(Main.getConfigs().get(Configs.MATCHID)) + 1;
                 Main.getConfigs().put(Configs.MATCHID, Integer.toString(running_match_id));
             }
             lastStatsSent = statistics.addEvent(Statistics.EVENT_START_GAME);
             lastPIT = System.currentTimeMillis();
+
             mode = MODE_CLOCK_GAME_RUNNING;
             Main.getPinHandler().setScheme(Main.PH_AIRSIREN, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
             setDisplayToEvent();

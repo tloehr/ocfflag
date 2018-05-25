@@ -6,12 +6,8 @@ package de.flashheart.ocfflag.gui;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.pi4j.gpio.extension.mcp.MCP23017Pin;
-import com.pi4j.io.gpio.Pin;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
-import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
-import de.flashheart.ocfflag.hardware.pinhandler.RGBScheduleElement;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.FTPWrapper;
 import de.flashheart.ocfflag.misc.Tools;
@@ -33,7 +29,7 @@ public class FrameDebug extends JFrame {
     private Font font;
     public static final Icon IconPlay = new ImageIcon(FrameDebug.class.getResource("/artwork/128x128/player_play.png"));
     public static final Icon IconPause = new ImageIcon(FrameDebug.class.getResource("/artwork/128x128/player_pause.png"));
-    private YesNoToggleButton tbFTPs;
+
 
 
     public FrameDebug() {
@@ -49,10 +45,7 @@ public class FrameDebug extends JFrame {
     }
 
     private void initFrame() {
-        tbFTPs = new YesNoToggleButton();
-        tbFTPs.setEnabled(false);
-        tbFTPs.setToolTipText("Hab ich noch nicht hinbekommen");
-        configView.add(tbFTPs, CC.xy(7, 15));
+
 
         btnTestHardware.setEnabled(Tools.isArm());
 
@@ -122,7 +115,6 @@ public class FrameDebug extends JFrame {
         txtFTPUser.setText(Main.getConfigs().get(Configs.FTPUSER));
         txtFTPPassword.setText(Main.getConfigs().get(Configs.FTPPWD));
         txtFTPRemotePath.setText(Main.getConfigs().get(Configs.FTPREMOTEPATH));
-        tbFTPs.setSelected(Main.getConfigs().get(Configs.FTPS).equals("true"));
         txtSendStats.setText(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
         txtUUID.setText(Main.getConfigs().get(Configs.MYUUID));
     }
@@ -134,11 +126,11 @@ public class FrameDebug extends JFrame {
 
     public void addToConfigLog(String text) {
         if (mainPanel.getSelectedIndex() != 1) return;
-        txtFTPlog.append(text+"\n");
+        txtFTPlog.append(text + "\n");
     }
 
     private void btnTestFTPActionPerformed(ActionEvent e) {
-        FTPWrapper.testFTP(txtFTPlog, btnTestFTP);
+        ((FTPWrapper) Main.getFromContext("ftpwrapper")).testFTP(txtFTPlog, btnTestFTP);
     }
 
     private void txtFTPHostFocusLost(FocusEvent e) {
@@ -216,7 +208,6 @@ public class FrameDebug extends JFrame {
         Main.getPinHandler().setScheme(Main.PH_RESERVE10, "5:on,1000;off,1000");
 
 
-
     }
 
     private void txtFlagColorActionPerformed(ActionEvent e) {
@@ -267,7 +258,6 @@ public class FrameDebug extends JFrame {
         txtFTPPassword = new JTextField();
         label6 = new JLabel();
         txtFTPRemotePath = new JTextField();
-        label7 = new JLabel();
         label8 = new JLabel();
         txtSendStats = new JTextField();
         panel6 = new JPanel();
@@ -450,11 +440,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label1 ----
                 label1.setText("Flag-Name");
-                label1.setFont(new Font("Dialog", Font.PLAIN, 22));
+                label1.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label1, CC.xy(3, 3));
 
                 //---- txtFlagName ----
-                txtFlagName.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtFlagName.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtFlagName.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -465,11 +455,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label2 ----
                 label2.setText("FTP-Host");
-                label2.setFont(new Font("Dialog", Font.PLAIN, 22));
+                label2.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label2, CC.xy(3, 5));
 
                 //---- txtFTPHost ----
-                txtFTPHost.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtFTPHost.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtFTPHost.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -480,11 +470,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label3 ----
                 label3.setText("FTP-Port");
-                label3.setFont(new Font("Dialog", Font.PLAIN, 22));
+                label3.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label3, CC.xy(3, 7));
 
                 //---- txtFTPPort ----
-                txtFTPPort.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtFTPPort.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtFTPPort.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -495,11 +485,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label4 ----
                 label4.setText("FTP-User");
-                label4.setFont(new Font("Dialog", Font.PLAIN, 22));
+                label4.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label4, CC.xy(3, 9));
 
                 //---- txtFTPUser ----
-                txtFTPUser.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtFTPUser.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtFTPUser.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -510,11 +500,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label5 ----
                 label5.setText("FTP-Password");
-                label5.setFont(new Font("Dialog", Font.PLAIN, 22));
+                label5.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label5, CC.xy(3, 11));
 
                 //---- txtFTPPassword ----
-                txtFTPPassword.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtFTPPassword.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtFTPPassword.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -525,11 +515,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label6 ----
                 label6.setText("Remote Path");
-                label6.setFont(new Font("Dialog", Font.PLAIN, 22));
+                label6.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label6, CC.xy(3, 13));
 
                 //---- txtFTPRemotePath ----
-                txtFTPRemotePath.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtFTPRemotePath.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtFTPRemotePath.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -538,18 +528,13 @@ public class FrameDebug extends JFrame {
                 });
                 configView.add(txtFTPRemotePath, CC.xy(7, 13));
 
-                //---- label7 ----
-                label7.setText("FTPS");
-                label7.setFont(new Font("Dialog", Font.PLAIN, 22));
-                configView.add(label7, CC.xy(3, 15));
-
                 //---- label8 ----
                 label8.setText("Send Stats");
-                label8.setFont(new Font("Dialog", Font.PLAIN, 22));
+                label8.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label8, CC.xy(3, 17));
 
                 //---- txtSendStats ----
-                txtSendStats.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtSendStats.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtSendStats.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -564,13 +549,13 @@ public class FrameDebug extends JFrame {
 
                     //---- btnTestFTP ----
                     btnTestFTP.setText("Test FTP Server");
-                    btnTestFTP.setFont(new Font("Dialog", Font.PLAIN, 20));
+                    btnTestFTP.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
                     btnTestFTP.addActionListener(e -> btnTestFTPActionPerformed(e));
                     panel6.add(btnTestFTP);
 
                     //---- btnTestHardware ----
                     btnTestHardware.setText("Test Hardware");
-                    btnTestHardware.setFont(new Font("Dialog", Font.PLAIN, 20));
+                    btnTestHardware.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
                     btnTestHardware.addActionListener(e -> btnTestHardwareActionPerformed(e));
                     panel6.add(btnTestHardware);
 
@@ -583,17 +568,17 @@ public class FrameDebug extends JFrame {
 
                 //---- label9 ----
                 label9.setText("UUID");
-                label9.setFont(new Font("Dialog", Font.PLAIN, 22));
+                label9.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label9, CC.xy(3, 21));
 
                 //---- txtUUID ----
-                txtUUID.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtUUID.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtUUID.setEditable(false);
                 configView.add(txtUUID, CC.xy(7, 21));
 
                 //---- label10 ----
                 label10.setText("Helligkeit");
-                label10.setFont(new Font("Dialog", Font.PLAIN, 22));
+                label10.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label10, CC.xy(3, 23));
 
                 //======== panel4 ========
@@ -763,7 +748,6 @@ public class FrameDebug extends JFrame {
     private JTextField txtFTPPassword;
     private JLabel label6;
     private JTextField txtFTPRemotePath;
-    private JLabel label7;
     private JLabel label8;
     private JTextField txtSendStats;
     private JPanel panel6;

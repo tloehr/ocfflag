@@ -1,10 +1,10 @@
 package de.flashheart.ocfflag.misc;
 
+import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.events.StatsSentEvent;
 import de.flashheart.ocfflag.gui.events.StatsSentListener;
 import de.flashheart.ocfflag.mechanics.Statistics;
 
-import java.io.IOException;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
@@ -19,13 +19,11 @@ public class MessageProcessor extends Thread implements HasLogger {
     private ReentrantLock lock;
     private boolean interrupted;
     private final Stack<PHPMessage> messageQ;
-
     private final CopyOnWriteArrayList<StatsSentListener> listeners;
 
     public void addListener(StatsSentListener l) {
         this.listeners.add(l);
     }
-
 
     protected void fireChangeEvent(StatsSentEvent evt) {
         for (StatsSentListener l : listeners) {
@@ -72,11 +70,10 @@ public class MessageProcessor extends Thread implements HasLogger {
                                 myMessage.getGameEvent().getEvent() == Statistics.EVENT_GAME_OVER;
                         getLogger().debug("run() move2archive=" + move2archive);
 
-
-                        boolean successful = FTPWrapper.upload(myMessage.getPhp(), move2archive);
+                        ((FTPWrapper) Main.getFromContext("ftpwrapper")).upload(myMessage.getPhp(), move2archive);
                         messageQ.clear(); // nur die letzte Nachricht ist wichtig
                         // sorge dafür, dass die weiße LED den erfolgreichen Versand anzeigt
-                        fireChangeEvent(new StatsSentEvent(this, myMessage.getGameEvent(), successful));
+                        fireChangeEvent(new StatsSentEvent(this, myMessage.getGameEvent(), ((FTPWrapper) Main.getFromContext("ftpwrapper")).isFTPWorking()));
                     }
                 } finally {
                     lock.unlock();
@@ -84,8 +81,6 @@ public class MessageProcessor extends Thread implements HasLogger {
                 Thread.sleep(500); // Millisekunden
             } catch (InterruptedException ie) {
                 interrupted = true;
-            } catch (IOException io) {
-                getLogger().error(io);
             }
         }
     }
