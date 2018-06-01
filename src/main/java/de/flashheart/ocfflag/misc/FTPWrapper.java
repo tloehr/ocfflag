@@ -22,9 +22,11 @@ import java.util.concurrent.ExecutionException;
  * {@link "http://commons.apache.org/net/apidocs/org/apache/commons/net/ftp/FTPClient.html"}
  */
 public class FTPWrapper implements HasLogger {
+    static final String SUBDIR = "ocfflag";
+
     private FTPClient ftp;
     private boolean lastOperationSuccessful = false;
-    private String statspath, archivepath, activepath, remoteFile, uuid;
+    private String archivepath, activepath, remoteFile, uuid;
 
     public FTPWrapper() {
         tryToInitFTP();
@@ -50,9 +52,9 @@ public class FTPWrapper implements HasLogger {
 
             uuid = Main.getConfigs().get(Configs.MYUUID);
 
-            statspath = "ocfflag";
-            archivepath = statspath + "/" + "archive";
-            activepath = statspath + "/" + "active";
+
+            archivepath = SUBDIR + "/" + "archive";
+            activepath = SUBDIR + "/" + "active";
             remoteFile = activepath + "/" + uuid + ".php";
 
             setupFTPDirStructure();
@@ -121,7 +123,7 @@ public class FTPWrapper implements HasLogger {
      * Dabei benennt es die Datei um.
      */
     private void setupFTPDirStructure() throws Exception {
-        mkdir(statspath);
+        mkdir(SUBDIR);
         mkdir(activepath);
         mkdir(archivepath);
 
