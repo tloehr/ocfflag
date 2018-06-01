@@ -266,6 +266,16 @@ public class Main {
         pinHandler = new PinHandler();
         configs = new Configs();
 
+        String title = "ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + " [" + Main.getConfigs().getApplicationInfo("buildNumber") + "]";
+        logger.info("  ____ _____  _    ____ _____ ___ _   _  ____    ___   ____ _____ _____ _             \n" +
+                " / ___|_   _|/ \\  |  _ \\_   _|_ _| \\ | |/ ___|  / _ \\ / ___|  ___|  ___| | __ _  __ _ \n" +
+                " \\___ \\ | | / _ \\ | |_) || |  | ||  \\| | |  _  | | | | |   | |_  | |_  | |/ _` |/ _` |\n" +
+                "  ___) || |/ ___ \\|  _ < | |  | || |\\  | |_| | | |_| | |___|  _| |  _| | | (_| | (_| |\n" +
+                " |____/ |_/_/   \\_\\_| \\_\\|_| |___|_| \\_|\\____|  \\___/ \\____|_|   |_|   |_|\\__,_|\\__, |\n" +
+                "                                                                                |___/ ");
+        logger.info(title);
+
+
         FTPWrapper ftpWrapper = new FTPWrapper();
         applicationContext.put("ftpwrapper", ftpWrapper);
 
@@ -287,7 +297,6 @@ public class Main {
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cl = null;
-        String title = "ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + " [" + Main.getConfigs().getApplicationInfo("buildNumber") + "]";
 
         String footer = "https://www.flashheart.de" + " " + Main.getConfigs().getApplicationInfo("buildNumber");
 
@@ -357,6 +366,12 @@ public class Main {
                 logger.error(e);
             }
         }
+        logger.info("  _____ _   _ ____     ___  _____    ___   ____ _____ _____ _             \n" +
+                " | ____| \\ | |  _ \\   / _ \\|  ___|  / _ \\ / ___|  ___|  ___| | __ _  __ _ \n" +
+                " |  _| |  \\| | | | | | | | | |_    | | | | |   | |_  | |_  | |/ _` |/ _` |\n" +
+                " | |___| |\\  | |_| | | |_| |  _|   | |_| | |___|  _| |  _| | | (_| | (_| |\n" +
+                " |_____|_| \\_|____/   \\___/|_|      \\___/ \\____|_|   |_|   |_|\\__,_|\\__, |\n" +
+                "                                                                    |___/ ");
     }
 
 
