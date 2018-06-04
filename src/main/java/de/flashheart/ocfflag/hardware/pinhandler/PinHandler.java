@@ -74,8 +74,10 @@ public class PinHandler {
      * @param scheme
      */
     public void setScheme(String name, String text, String scheme) {
-//        logger.debug(name + "-" + scheme);
+        logger.debug(name + "-" + scheme);
+        logger.debug("aquiring lock");
         lock.lock();
+        logger.debug("locked");
         try {
             GenericBlinkModel genericBlinkModel = pinMap.get(name);
             genericBlinkModel.setText(text);
@@ -96,6 +98,7 @@ public class PinHandler {
             System.exit(0);
         } finally {
             lock.unlock();
+            logger.debug("unlocked");
         }
     }
 

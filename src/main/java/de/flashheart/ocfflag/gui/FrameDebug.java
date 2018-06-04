@@ -31,7 +31,6 @@ public class FrameDebug extends JFrame {
     public static final Icon IconPause = new ImageIcon(FrameDebug.class.getResource("/artwork/128x128/player_pause.png"));
 
 
-
     public FrameDebug() {
         initComponents();
         initFonts();
@@ -39,7 +38,8 @@ public class FrameDebug extends JFrame {
 
         // " ("+Tools.formatLongTime(Long.parseLong(Main.getConfigs().getApplicationInfo("timestamp")))+")
 
-        String title = "ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + " [" + Main.getConfigs().getApplicationInfo("buildNumber") + "]";
+        String title = "ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + "." + Main.getConfigs().getApplicationInfo("buildNumber") + " [" + Main.getConfigs().getApplicationInfo("project.build.timestamp")+"]";
+
         logger.info(title);
         setTitle(title);
     }
@@ -291,14 +291,14 @@ public class FrameDebug extends JFrame {
             //======== mainView ========
             {
                 mainView.setLayout(new FormLayout(
-                    "$rgap, $lcgap, pref, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow, $lcgap, $rgap",
-                    "$rgap, $lgap, fill:55dlu:grow, $rgap, fill:default:grow, $lgap, $rgap"));
+                        "$rgap, $lcgap, pref, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow, $lcgap, $rgap",
+                        "$rgap, $lgap, fill:55dlu:grow, $rgap, fill:default:grow, $lgap, $rgap"));
 
                 //======== panel1 ========
                 {
                     panel1.setLayout(new FormLayout(
-                        "default, $lcgap, pref:grow, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow, $lcgap, default",
-                        "fill:22dlu:grow, $lgap, fill:default:grow"));
+                            "default, $lcgap, pref:grow, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow, $lcgap, default",
+                            "fill:22dlu:grow, $lgap, fill:default:grow"));
 
                     //---- ledRedButton ----
                     ledRedButton.setColor(Color.red);
@@ -358,8 +358,8 @@ public class FrameDebug extends JFrame {
                 //======== panel5 ========
                 {
                     panel5.setLayout(new FormLayout(
-                        "pref",
-                        "default, $lgap, fill:default:grow, $ugap, default"));
+                            "pref",
+                            "default, $lgap, fill:default:grow, $ugap, default"));
 
                     //---- btnConfig ----
                     btnConfig.setText(null);
@@ -393,8 +393,8 @@ public class FrameDebug extends JFrame {
                 //======== panel2 ========
                 {
                     panel2.setLayout(new FormLayout(
-                        "3*(default:grow)",
-                        "fill:default:grow, $lgap, fill:default:grow"));
+                            "3*(default:grow)",
+                            "fill:default:grow, $lgap, fill:default:grow"));
 
                     //---- btnPresetNumTeams ----
                     btnPresetNumTeams.setText(null);
@@ -426,8 +426,8 @@ public class FrameDebug extends JFrame {
             //======== configView ========
             {
                 configView.setLayout(new FormLayout(
-                    "$ugap, $lcgap, pref, $lcgap, $rgap, $lcgap, default:grow, $lcgap, $ugap",
-                    "2*(default, $ugap), 6*(default, $lgap), default, $rgap, default, $ugap, default, $lgap, default:grow, $lgap, 85dlu, $lgap, default"));
+                        "$ugap, $lcgap, pref, $lcgap, $rgap, $lcgap, default:grow, $lcgap, $ugap",
+                        "2*(default, $ugap), 6*(default, $lgap), default, $rgap, default, $ugap, default, $lgap, default:grow, $lgap, 85dlu, $lgap, default"));
 
                 //---- lblConfigTitle ----
                 lblConfigTitle.setOpaque(true);

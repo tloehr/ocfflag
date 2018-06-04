@@ -53,12 +53,12 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.7</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/commons-net/commons-net -->
-        <dependency>
-            <groupId>commons-net</groupId>
-            <artifactId>commons-net</artifactId>
-            <version>3.4</version>
-        </dependency>
+        <!--&lt;!&ndash; https://mvnrepository.com/artifact/commons-net/commons-net &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>commons-net</groupId>-->
+            <!--<artifactId>commons-net</artifactId>-->
+            <!--<version>3.4</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
@@ -115,7 +115,6 @@
             <artifactId>edtFTPj</artifactId>
             <version>2.5.0</version>
         </dependency>
-
     </dependencies>
 
     <scm>
