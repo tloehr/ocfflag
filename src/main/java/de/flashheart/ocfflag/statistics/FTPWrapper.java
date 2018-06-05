@@ -7,7 +7,6 @@ import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
@@ -68,8 +67,13 @@ class FTPWrapper implements HasLogger {
             getLogger().error(e);
             e.printStackTrace();
             errorCount++;
+            getLogger().warn("Try #" + errorCount + " out of " + MAX_ERROR_COUNT);
         } finally {
-            if (errorCount >= MAX_ERROR_COUNT) ftp = null;
+            if (errorCount >= MAX_ERROR_COUNT) {
+                ftp = null;
+                getLogger().warn("Did try to connect for " + errorCount + " times. Giving up.");
+            }
+
         }
     }
 
@@ -88,12 +92,19 @@ class FTPWrapper implements HasLogger {
                 ftp.chdir(Configs.FTPREMOTEPATH);
                 getLogger().debug(ftp.getLastReply().getReplyText());
             }
+            errorCount = 0;
         } catch (Exception e) {
             getLogger().error(e);
             e.printStackTrace();
-            ftp = null; // Fehler im Connect. Dann Ende.
+            errorCount++;
+            getLogger().warn("Try #" + errorCount + " out of " + MAX_ERROR_COUNT);
+        } finally {
+            if (errorCount >= MAX_ERROR_COUNT) {
+                ftp = null;
+                getLogger().warn("Did try to connect for " + errorCount + " times. Giving up.");
+            }
         }
-        return ftp != null;
+        return errorCount == 0;
     }
 
     /**
@@ -111,13 +122,18 @@ class FTPWrapper implements HasLogger {
             upload(tempPHPFile.getPath(), remoteFile);
             if (move2archive) move2archive();
             ftp.quit();
+            errorCount = 0;
             getLogger().debug(ftp.getLastReply().getReplyText());
         } catch (Exception e) {
             getLogger().error(e);
             e.printStackTrace();
             errorCount++;
+            getLogger().warn("Try #" + errorCount + " out of " + MAX_ERROR_COUNT);
         } finally {
-            if (errorCount >= MAX_ERROR_COUNT) ftp = null;
+            if (errorCount >= MAX_ERROR_COUNT) {
+                ftp = null;
+                getLogger().warn("Did try to connect for " + errorCount + " times. Giving up.");
+            }
         }
         return ftp != null;
     }
@@ -144,13 +160,18 @@ class FTPWrapper implements HasLogger {
         try {
             move2archive();
             ftp.quit();
+            errorCount = 0;
             getLogger().debug(ftp.getLastReply().getReplyText());
         } catch (Exception e) {
             getLogger().error(e);
             e.printStackTrace();
             errorCount++;
+            getLogger().warn("Try #" + errorCount + " out of " + MAX_ERROR_COUNT);
         } finally {
-            if (errorCount >= MAX_ERROR_COUNT) ftp = null;
+            if (errorCount >= MAX_ERROR_COUNT) {
+                ftp = null;
+                getLogger().warn("Did try to connect for " + errorCount + " times. Giving up.");
+            }
         }
     }
 
@@ -291,7 +312,7 @@ class FTPWrapper implements HasLogger {
         public void close() {
         }
 
-        public void setActive(boolean active){
+        public void setActive(boolean active) {
             this.active = active;
         }
 

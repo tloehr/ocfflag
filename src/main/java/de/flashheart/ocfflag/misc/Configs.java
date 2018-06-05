@@ -113,6 +113,7 @@ public class Configs {
 
     public boolean isFTPComplete() {
         return configs.containsKey(FTPUSER) && configs.containsKey(FTPHOST) && configs.containsKey(FTPPORT) && configs.containsKey(FTPPWD) && configs.containsKey(FTPS) && configs.containsKey(FTPREMOTEPATH);
+
     }
 
 
