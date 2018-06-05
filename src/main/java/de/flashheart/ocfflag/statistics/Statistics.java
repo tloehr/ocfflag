@@ -1,10 +1,8 @@
-package de.flashheart.ocfflag.mechanics;
+package de.flashheart.ocfflag.statistics;
 
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.HasLogger;
-import de.flashheart.ocfflag.misc.PHPMessage;
-import de.flashheart.ocfflag.misc.Tools;
+import de.flashheart.ocfflag.mechanics.GameEvent;
+import de.flashheart.ocfflag.misc.*;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -50,8 +48,10 @@ public class Statistics implements HasLogger {
     private SwingWorker<Boolean, Boolean> worker;
     private long min_stat_send_time;
     private String flagcolor;
+    private final MessageProcessor messageProcessor;
 
     public Statistics(int numTeams) {
+        messageProcessor = Main.getMessageProcessor();
         this.numTeams = numTeams;
         rank = new LinkedHashMap<>();
         stackEvents = new Stack<>();
@@ -73,6 +73,7 @@ public class Statistics implements HasLogger {
 
         matchid = 0;
         stackEvents.clear();
+        messageProcessor.cleanupStatsFile();
     }
 
     public void setTimes(int matchid, long time, LinkedHashMap<String, Integer> myrank) {
@@ -87,7 +88,7 @@ public class Statistics implements HasLogger {
     public void sendStats() {
         getLogger().debug("sendStats()\n" + toPHP());
         if (min_stat_send_time > 0)
-            Main.getMessageProcessor().pushMessage(new PHPMessage(toPHP(), stackEvents.peek()));
+            messageProcessor.pushMessage(new PHPMessage(toPHP(), stackEvents.peek()));
     }
 
     public long addEvent(int event) {

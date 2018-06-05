@@ -17,8 +17,7 @@ import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
 import de.flashheart.ocfflag.mechanics.Game;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.FTPWrapper;
-import de.flashheart.ocfflag.misc.MessageProcessor;
+import de.flashheart.ocfflag.statistics.MessageProcessor;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Level;
@@ -276,9 +275,6 @@ public class Main {
         logger.info(title);
 
 
-        FTPWrapper ftpWrapper = new FTPWrapper();
-        applicationContext.put("ftpwrapper", ftpWrapper);
-
         messageProcessor = new MessageProcessor();
         messageProcessor.start();
 
@@ -348,7 +344,7 @@ public class Main {
     }
 
     public static void prepareShutdown() {
-        ((FTPWrapper) Main.getFromContext("ftpwrapper")).cleanupStatsFile();
+//        ((FTPWrapper) Main.getFromContext("ftpwrapper")).cleanupStatsFile();
         pinHandler.off();
         if (GPIO != null) {
             SoftPwm.softPwmStop(POLE_RGB_RED.getAddress());

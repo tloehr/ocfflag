@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.misc;
+package de.flashheart.ocfflag.statistics;
 
 import de.flashheart.ocfflag.mechanics.GameEvent;
 

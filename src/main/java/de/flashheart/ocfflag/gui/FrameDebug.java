@@ -9,7 +9,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.FTPWrapper;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Logger;
 
@@ -38,7 +37,7 @@ public class FrameDebug extends JFrame {
 
         // " ("+Tools.formatLongTime(Long.parseLong(Main.getConfigs().getApplicationInfo("timestamp")))+")
 
-        String title = "ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + "." + Main.getConfigs().getApplicationInfo("buildNumber") + " [" + Main.getConfigs().getApplicationInfo("project.build.timestamp")+"]";
+        String title = "ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + "." + Main.getConfigs().getApplicationInfo("buildNumber") + " [" + Main.getConfigs().getApplicationInfo("project.build.timestamp") + "]";
 
         logger.info(title);
         setTitle(title);
@@ -130,7 +129,7 @@ public class FrameDebug extends JFrame {
     }
 
     private void btnTestFTPActionPerformed(ActionEvent e) {
-        ((FTPWrapper) Main.getFromContext("ftpwrapper")).testFTP(txtFTPlog, btnTestFTP);
+        Main.getMessageProcessor().testFTP(txtFTPlog, btnTestFTP);
     }
 
     private void txtFTPHostFocusLost(FocusEvent e) {

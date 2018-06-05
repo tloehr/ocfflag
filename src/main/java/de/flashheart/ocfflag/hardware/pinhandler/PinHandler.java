@@ -74,19 +74,14 @@ public class PinHandler {
      * @param scheme
      */
     public void setScheme(String name, String text, String scheme) {
-        logger.debug(name + "-" + scheme);
-        logger.debug("aquiring lock");
         lock.lock();
-        logger.debug("locked");
         try {
             GenericBlinkModel genericBlinkModel = pinMap.get(name);
             genericBlinkModel.setText(text);
             if (genericBlinkModel != null) {
                 if (futures.containsKey(name) && !futures.get(name).isDone()) { // but only if it runs
-                    //logger.debug("terminating: " + name);
                     futures.get(name).cancel(true);
                 }
-                //logger.debug("set Scheme: " + name);
                 genericBlinkModel.setScheme(scheme);
                 futures.put(name, executorService.submit(genericBlinkModel));
             } else {
@@ -98,7 +93,6 @@ public class PinHandler {
             System.exit(0);
         } finally {
             lock.unlock();
-            logger.debug("unlocked");
         }
     }
 

@@ -12,8 +12,8 @@ import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
 import de.flashheart.ocfflag.hardware.pinhandler.RGBScheduleElement;
 import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.FTPWrapper;
 import de.flashheart.ocfflag.misc.Tools;
+import de.flashheart.ocfflag.statistics.Statistics;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.log4j.Logger;
@@ -439,7 +439,6 @@ public class Game implements Runnable, StatsSentListener {
         } else if (mode == MODE_CLOCK_GAME_OVER) {
             reset_timers();
         } else if (mode == MODE_CLOCK_PREGAME) {
-            ((FTPWrapper) Main.getFromContext("ftpwrapper")).cleanupStatsFile();
             if (running_match_id == 0) {
                 running_match_id = Integer.parseInt(Main.getConfigs().get(Configs.MATCHID)) + 1;
                 Main.getConfigs().put(Configs.MATCHID, Integer.toString(running_match_id));
