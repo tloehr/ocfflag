@@ -346,6 +346,7 @@ public class Main {
     public static void prepareShutdown() {
 //        ((FTPWrapper) Main.getFromContext("ftpwrapper")).cleanupStatsFile();
         pinHandler.off();
+        messageProcessor.interrupt();
         if (GPIO != null) {
             SoftPwm.softPwmStop(POLE_RGB_RED.getAddress());
             SoftPwm.softPwmStop(POLE_RGB_GREEN.getAddress());
@@ -356,8 +357,6 @@ public class Main {
                 display_red.clear();
                 display_green.clear();
                 display_yellow.clear();
-
-                messageProcessor.interrupt();
             } catch (IOException e) {
                 logger.error(e);
             }

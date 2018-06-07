@@ -23,8 +23,8 @@ import java.util.concurrent.ExecutionException;
  * {@link "http://commons.apache.org/net/apidocs/org/apache/commons/net/ftp/FTPClient.html"}
  */
 class FTPWrapper implements HasLogger {
-    private static final String SUBDIR = "ocfflag";
-    private static final int MAX_ERROR_COUNT = 5;
+    private final String SUBDIR = "ocfflag";
+    private final int MAX_ERROR_COUNT;
 
     private StatusMessageAppender myAppender = null;
     private FTPClient ftp;
@@ -32,6 +32,7 @@ class FTPWrapper implements HasLogger {
     private String archivepath, activepath, remoteFile, uuid;
 
     public FTPWrapper() {
+        MAX_ERROR_COUNT = Main.getConfigs().getInt(Configs.FTPMAXERRORCOUNT);
         tryToInitFTP();
     }
 

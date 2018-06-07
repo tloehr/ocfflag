@@ -27,12 +27,7 @@ import java.util.stream.Collectors;
 
 /**
  * In dieser Klasse befindet sich die Spielmechanik.
- * <p>
- * Wann wird die Statistik Datei auf dem Server ins Archiv geschoben ?
- * FTPWrapper.initFTPDir();
- * * Bei Start der Box
- * * Bei QUIT oder RESET, wenn das Spiel im Pause Modus war
- * * Bei Rückkehr in den PREGAME Modus, wenn das Spiel normal beendet ist.
+
  */
 public class Game implements Runnable, StatsSentListener {
     private final Logger logger = Logger.getLogger(getClass());

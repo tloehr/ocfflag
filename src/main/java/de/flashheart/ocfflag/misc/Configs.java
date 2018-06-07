@@ -24,6 +24,7 @@ public class Configs {
     public static final String FTPPWD = "ftppwd";
     public static final String FTPS = "ftps";
     public static final String FTPREMOTEPATH = "ftpremotepath";
+    public static final String FTPMAXERRORCOUNT = "ftp_maxerror_count";
     public static final String MIN_STAT_SEND_TIME = "sendstats";
     public static final String FLAGNAME = "flagname";
     public static final String GAMETIME = "gametime";
@@ -59,6 +60,7 @@ public class Configs {
         configs.put(GAMETIME, "0");
         configs.put(FTPS, "false");
         configs.put(FTPPORT, "21");
+        configs.put(FTPMAXERRORCOUNT, "30");
         configs.put(BRIGHTNESS_WHITE, "10");
         configs.put(BRIGHTNESS_RED, "10");
         configs.put(BRIGHTNESS_BLUE, "10");

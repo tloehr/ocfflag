@@ -9,11 +9,6 @@ import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Während des Einbuch-Vorgang können sehr schnell viele einzelne kleine Druckaufträge
- * für die Etiketten nötig werden. Damit die Erstellung dieser Jobs das Programm nicht anhält
- * bedienen wir uns hier einer nebenläufigen Programierung.
- */
 public class MessageProcessor extends Thread implements HasLogger {
 
     private ReentrantLock lock;
