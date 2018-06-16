@@ -12,6 +12,7 @@ import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
 import de.flashheart.ocfflag.hardware.pinhandler.RGBScheduleElement;
 import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
 import de.flashheart.ocfflag.misc.Configs;
+import de.flashheart.ocfflag.misc.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
 import de.flashheart.ocfflag.statistics.Statistics;
 import org.apache.commons.exec.CommandLine;
@@ -29,9 +30,8 @@ import java.util.stream.Collectors;
  * In dieser Klasse befindet sich die Spielmechanik.
 
  */
-public class Game implements Runnable, StatsSentListener {
-    private final Logger logger = Logger.getLogger(getClass());
-
+public class Game implements Runnable, StatsSentListener, HasLogger {
+    
     private final int MODE_CLOCK_PREGAME = 0;
     private final int MODE_CLOCK_GAME_RUNNING = 1;
     private final int MODE_CLOCK_GAME_PAUSED = 2;
@@ -158,101 +158,101 @@ public class Game implements Runnable, StatsSentListener {
     private void initGame() {
         Main.getMessageProcessor().addListener(this);
 
-        button_blue.addListener(e -> {
-            logger.debug("GUI_button_blue");
+        button_blue.addActionListener(e -> {
+            getLogger().debug("GUI_button_blue");
             button_blue_pressed();
         });
-        button_blue.addListener((GpioPinListenerDigital) event -> {
+        button_blue.addGPIOListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) return;
-            logger.debug("GPIO__button_blue");
+            getLogger().debug("GPIO__button_blue");
             button_blue_pressed();
         });
 
-        button_red.addListener(e -> {
-            logger.debug("GUI_button_red");
+        button_red.addActionListener(e -> {
+            getLogger().debug("GUI_button_red");
             button_red_pressed();
         });
-        button_red.addListener((GpioPinListenerDigital) event -> {
+        button_red.addGPIOListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) return;
-            logger.debug("GPIO_button_blue");
+            getLogger().debug("GPIO_button_blue");
             button_red_pressed();
         });
 
-        button_yellow.addListener(e -> {
-            logger.debug("GUI_button_yellow");
+        button_yellow.addActionListener(e -> {
+            getLogger().debug("GUI_button_yellow");
             button_yellow_pressed();
         });
-        button_yellow.addListener((GpioPinListenerDigital) event -> {
+        button_yellow.addGPIOListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) return;
-            logger.debug("GPIO__button_yellow");
+            getLogger().debug("GPIO__button_yellow");
             button_yellow_pressed();
         });
 
-        button_green.addListener(e -> {
-            logger.debug("GUI_button_green");
+        button_green.addActionListener(e -> {
+            getLogger().debug("GUI_button_green");
             button_green_pressed();
         });
-        button_green.addListener((GpioPinListenerDigital) event -> {
+        button_green.addGPIOListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) return;
-            logger.debug("GPIO_button_green");
+            getLogger().debug("GPIO_button_green");
             button_green_pressed();
         });
 
 
-        button_reset.addListener(e -> {
-            logger.debug("GUI_button_reset");
+        button_reset.addActionListener(e -> {
+            getLogger().debug("GUI_button_reset");
             button_reset_pressed();
         });
-        button_reset.addListener((GpioPinListenerDigital) event -> {
+        button_reset.addGPIOListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) return;
-            logger.debug("GPIO_button_reset");
+            getLogger().debug("GPIO_button_reset");
             button_reset_pressed();
         });
-        button_preset_num_teams.addListener(e -> {
-            logger.debug("GUI_button_preset_num_teams");
+        button_preset_num_teams.addActionListener(e -> {
+            getLogger().debug("GUI_button_preset_num_teams");
             button_preset_num_teams();
         });
-        button_preset_num_teams.addListener((GpioPinListenerDigital) event -> {
+        button_preset_num_teams.addGPIOListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) return;
-            logger.debug("GPIO_button_preset_num_teams");
+            getLogger().debug("GPIO_button_preset_num_teams");
             button_preset_num_teams();
         });
-        button_preset_gametime.addListener(e -> {
-            logger.debug("GUI_button_preset_gametime");
-            button_preset_plus_pressed();
+        button_preset_gametime.addActionListener(e -> {
+            getLogger().debug("GUI_button_preset_gametime / UNDO");
+            button_gametime_undo_pressed();
         });
-        button_preset_gametime.addListener((GpioPinListenerDigital) event -> {
+        button_preset_gametime.addGPIOListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) return;
-            logger.debug("GPIO_button_preset_gametime");
-            button_preset_plus_pressed();
+            getLogger().debug("GPIO_button_preset_gametime / UNDO");
+            button_gametime_undo_pressed();
         });
-        button_switch_mode.addListener(e -> {
-            logger.debug("GUI_button_switch_mode");
+        button_switch_mode.addActionListener(e -> {
+            getLogger().debug("GUI_button_switch_mode");
             buttonStandbyActivePressed();
         });
-        button_switch_mode.addListener((GpioPinListenerDigital) event -> {
+        button_switch_mode.addGPIOListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) return;
-            logger.debug("GPIO_button_switch_mode");
+            getLogger().debug("GPIO_button_switch_mode");
             buttonStandbyActivePressed();
         });
-        button_quit.addListener(e -> {
-            logger.debug("GUI_button_quit");
+        button_quit.addActionListener(e -> {
+            getLogger().debug("GUI_button_quit");
             button_quit_pressed();
         });
-        button_config.addListener(e -> {
-            logger.debug("GUI_button_config");
+        button_config.addActionListener(e -> {
+            getLogger().debug("GUI_button_config");
             button_config_pressed();
         });
-        button_back2game.addListener(e -> {
-            logger.debug("GUI_button_back2game");
+        button_back2game.addActionListener(e -> {
+            getLogger().debug("GUI_button_back2game");
             button_back2game_pressed();
         });
-        button_shutdown.addListener((GpioPinListenerDigital) event -> {
+        button_shutdown.addGPIOListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) {
-                logger.debug("GPIO_button_shutdown UP");
+                getLogger().debug("GPIO_button_shutdown UP");
                 shutdown_button_down_since = 0l;
             } else {
-                logger.debug("GPIO_button_shutdown DOWN");
+                getLogger().debug("GPIO_button_shutdown DOWN");
                 shutdown_button_down_since = System.currentTimeMillis();
                 Main.prepareShutdown();
                 try {
@@ -263,9 +263,9 @@ public class Game implements Runnable, StatsSentListener {
                     executor.execute(commandLine);
                     Thread.sleep(5000);
                 } catch (IOException e) {
-                    logger.error(e);
+                    getLogger().error(e);
                 } catch (InterruptedException e) {
-                    logger.error(e);
+                    getLogger().error(e);
                 }
             }
         });
@@ -287,7 +287,7 @@ public class Game implements Runnable, StatsSentListener {
             Main.getFrameDebug().setTab(1);
             CONFIG_PAGE = true;
         } else {
-            logger.debug("GAME RUNNING: IGNORED");
+            getLogger().debug("GAME RUNNING: IGNORED");
         }
     }
 
@@ -310,7 +310,7 @@ public class Game implements Runnable, StatsSentListener {
             }
 
         } else {
-            logger.debug("NOT RUNNING: IGNORED");
+            getLogger().debug("NOT RUNNING: IGNORED");
         }
     }
 
@@ -326,7 +326,7 @@ public class Game implements Runnable, StatsSentListener {
                 setDisplayToEvent();
             }
         } else {
-            logger.debug("NOT RUNNING: IGNORED");
+            getLogger().debug("NOT RUNNING: IGNORED");
         }
     }
 
@@ -334,7 +334,7 @@ public class Game implements Runnable, StatsSentListener {
         Main.getFrameDebug().addToConfigLog("button_green_pressed");
         if (CONFIG_PAGE) return;
         if (preset_num_teams < 3) {
-            logger.debug("NO GREEN TEAM: ignoring");
+            getLogger().debug("NO GREEN TEAM: ignoring");
             return;
         }
         if (mode == MODE_CLOCK_GAME_RUNNING) {
@@ -347,7 +347,7 @@ public class Game implements Runnable, StatsSentListener {
             }
 
         } else {
-            logger.debug("NOT RUNNING: IGNORED");
+            getLogger().debug("NOT RUNNING: IGNORED");
         }
     }
 
@@ -355,7 +355,7 @@ public class Game implements Runnable, StatsSentListener {
         Main.getFrameDebug().addToConfigLog("button_yellow_pressed");
         if (CONFIG_PAGE) return;
         if (preset_num_teams < 4) {
-            logger.debug("NO YELLOW TEAM: ignoring");
+            getLogger().debug("NO YELLOW TEAM: ignoring");
             return;
         }
         if (mode == MODE_CLOCK_GAME_RUNNING) {
@@ -367,7 +367,7 @@ public class Game implements Runnable, StatsSentListener {
                 setDisplayToEvent();
             }
         } else {
-            logger.debug("NOT RUNNING: IGNORED");
+            getLogger().debug("NOT RUNNING: IGNORED");
         }
     }
 
@@ -380,7 +380,7 @@ public class Game implements Runnable, StatsSentListener {
             }
             reset_timers();
         } else {
-            logger.debug("RUNNING: IGNORED");
+            getLogger().debug("RUNNING: IGNORED");
         }
     }
 
@@ -391,25 +391,29 @@ public class Game implements Runnable, StatsSentListener {
         if (mode == MODE_CLOCK_PREGAME) {
             preset_num_teams++;
             if (preset_num_teams > MAX_TEAMS) preset_num_teams = MIN_TEAMS;
-            logger.debug("num_teams is now: " + preset_num_teams);
+            getLogger().debug("num_teams is now: " + preset_num_teams);
             statistics = new Statistics(preset_num_teams);
             Main.getConfigs().put(Configs.NUMBER_OF_TEAMS, preset_num_teams);
             reset_timers();
         } else {
-            logger.debug("NOT IN PREGAME: IGNORED");
+            getLogger().debug("NOT IN PREGAME: IGNORED");
         }
     }
 
-    private void button_preset_plus_pressed() {
-        Main.getFrameDebug().addToConfigLog("button_gametime_pressed");
+    private void button_gametime_undo_pressed() {
+        Main.getFrameDebug().addToConfigLog("button_gametime_undo_pressed");
         if (CONFIG_PAGE) return;
         if (mode == MODE_CLOCK_PREGAME) {
             preset_gametime_position++;
             if (preset_gametime_position > preset_times.length - 1) preset_gametime_position = 0;
             Main.getConfigs().put(Configs.GAMETIME, preset_gametime_position);
             reset_timers();
+        } else if (mode == MODE_CLOCK_GAME_PAUSED) {
+            getLogger().debug("IN PAUSE MODE - Trying to UNDO");
+            GameEvent lastEvent = statistics.getLastEvent();
+            getLogger().debug(lastEvent);
         } else {
-            logger.debug("NOT IN PREGAME: IGNORED");
+            getLogger().debug("NOT IN PREGAME: IGNORED");
         }
     }
 
@@ -494,6 +498,12 @@ public class Game implements Runnable, StatsSentListener {
             Main.getPinHandler().off(Main.PH_LED_GREEN_BTN);
             Main.getPinHandler().off(Main.PH_LED_YELLOW_BTN);
 
+            if (mode == MODE_CLOCK_GAME_PAUSED){
+                this.button_preset_gametime.setIcon(FrameDebug.IconUNDO);
+            } else {
+                this.button_preset_gametime.setIcon(FrameDebug.IconGametime);
+            }
+
             if (mode == MODE_CLOCK_PREGAME || mode == MODE_CLOCK_GAME_PAUSED) {
                 button_switch_mode.setIcon(FrameDebug.IconPlay);
 
@@ -504,14 +514,14 @@ public class Game implements Runnable, StatsSentListener {
                         (preset_num_teams >= 4 ? new RGBScheduleElement(Configs.FLAG_COLOR_YELLOW, 500l) + ";" : "") +
                         new RGBScheduleElement(Color.BLACK, 1500l);
 
-                logger.debug(pregamePoleColorScheme);
+                getLogger().debug(pregamePoleColorScheme);
 
                 Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", pregamePoleColorScheme); //"1:" + new RGBScheduleElement(Color.WHITE));
             }
 
             if (mode == MODE_CLOCK_PREGAME) {
-                logger.debug("PREGAME");
-                logger.debug("preset_num_teams " + preset_num_teams);
+                getLogger().debug("PREGAME");
+                getLogger().debug("preset_num_teams " + preset_num_teams);
                 if (preset_num_teams < 3) display_green.clear();
                 if (preset_num_teams < 4) display_yellow.clear();
 
@@ -543,21 +553,21 @@ public class Game implements Runnable, StatsSentListener {
             }
 
             if (mode == MODE_CLOCK_GAME_PAUSED) {
-                logger.debug("PAUSED");
+                getLogger().debug("PAUSED");
                 display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                 Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,500;off,500");
                 Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:off,500;on,500");
             }
 
             if (mode == MODE_CLOCK_GAME_RUNNING) {
-                logger.debug("RUNNING");
+                getLogger().debug("RUNNING");
                 button_switch_mode.setIcon(FrameDebug.IconPause);
                 Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,250;off,2000");
                 Main.getPinHandler().off(Main.PH_LED_WHITE);
                 display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
 
                 if (flag == FLAG_STATE_NEUTRAL) {
-                    logger.debug("\n" +
+                    getLogger().debug("\n" +
                             "     _        _   _                     _   _            _             _ \n" +
                             "    / \\   ___| |_(_)_   _____          | \\ | | ___ _   _| |_ _ __ __ _| |\n" +
                             "   / _ \\ / __| __| \\ \\ / / _ \\  _____  |  \\| |/ _ \\ | | | __| '__/ _` | |\n" +
@@ -575,7 +585,7 @@ public class Game implements Runnable, StatsSentListener {
                     Main.getPinHandler().setScheme(Main.PH_POLE, "NEUTRAL", PinHandler.FOREVER + ":" + new RGBScheduleElement(Configs.FLAG_COLOR_WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
                 if (flag == FLAG_STATE_RED) {
-                    logger.debug("\n" +
+                    getLogger().debug("\n" +
                             "  _____ _               _       ____  _____ ____                        \n" +
                             " |  ___| | __ _  __ _  (_)___  |  _ \\| ____|  _ \\   _ __   _____      __\n" +
                             " | |_  | |/ _` |/ _` | | / __| | |_) |  _| | | | | | '_ \\ / _ \\ \\ /\\ / /\n" +
@@ -593,7 +603,7 @@ public class Game implements Runnable, StatsSentListener {
                     Main.getPinHandler().setScheme(Main.PH_POLE, "RED ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Configs.FLAG_COLOR_RED, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
                 if (flag == FLAG_STATE_BLUE) {
-                    logger.debug("\n" +
+                    getLogger().debug("\n" +
                             "  _____ _               _       ____  _    _   _ _____                       \n" +
                             " |  ___| | __ _  __ _  (_)___  | __ )| |  | | | | ____|  _ __   _____      __\n" +
                             " | |_  | |/ _` |/ _` | | / __| |  _ \\| |  | | | |  _|   | '_ \\ / _ \\ \\ /\\ / /\n" +
@@ -611,7 +621,7 @@ public class Game implements Runnable, StatsSentListener {
                     Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Configs.FLAG_COLOR_BLUE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
                 if (flag == FLAG_STATE_GREEN) {
-                    logger.debug("\n" +
+                    getLogger().debug("\n" +
                             "  _____ _               _        ____ ____  _____ _____ _   _                       \n" +
                             " |  ___| | __ _  __ _  (_)___   / ___|  _ \\| ____| ____| \\ | |  _ __   _____      __\n" +
                             " | |_  | |/ _` |/ _` | | / __| | |  _| |_) |  _| |  _| |  \\| | | '_ \\ / _ \\ \\ /\\ / /\n" +
@@ -628,7 +638,7 @@ public class Game implements Runnable, StatsSentListener {
                     Main.getPinHandler().setScheme(Main.PH_POLE, "GREEN ACTIVATED", PinHandler.FOREVER + ":" + new RGBScheduleElement(Configs.FLAG_COLOR_GREEN, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 }
                 if (flag == FLAG_STATE_YELLOW) {
-                    logger.debug("\n" +
+                    getLogger().debug("\n" +
                             "  _____ _               _      __   _______ _     _     _____        __                      \n" +
                             " |  ___| | __ _  __ _  (_)___  \\ \\ / / ____| |   | |   / _ \\ \\      / /  _ __   _____      __\n" +
                             " | |_  | |/ _` |/ _` | | / __|  \\ V /|  _| | |   | |  | | | \\ \\ /\\ / /  | '_ \\ / _ \\ \\ /\\ / /\n" +
@@ -654,7 +664,7 @@ public class Game implements Runnable, StatsSentListener {
                 statistics.setTimes(running_match_id, 0l, rank);
 
                 if (isDrawgame(rank)) {
-                    logger.debug("\n" +
+                    getLogger().debug("\n" +
                             "  ____  ____      ___        __   ____    _    __  __ _____ \n" +
                             " |  _ \\|  _ \\    / \\ \\      / /  / ___|  / \\  |  \\/  | ____|\n" +
                             " | | | | |_) |  / _ \\ \\ /\\ / /  | |  _  / _ \\ | |\\/| |  _|  \n" +
@@ -682,7 +692,7 @@ public class Game implements Runnable, StatsSentListener {
 
                     if (winners.size() > 1) {
                         lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_MULTI_WINNERS);
-                        logger.debug("\n" +
+                        getLogger().debug("\n" +
                                 "  __  __  ___  ____  _____   _____ _   _    _    _   _    ___  _   _ _____  __        _____ _   _ _   _ _____ ____  \n" +
                                 " |  \\/  |/ _ \\|  _ \\| ____| |_   _| | | |  / \\  | \\ | |  / _ \\| \\ | | ____| \\ \\      / /_ _| \\ | | \\ | | ____|  _ \\ \n" +
                                 " | |\\/| | | | | |_) |  _|     | | | |_| | / _ \\ |  \\| | | | | |  \\| |  _|    \\ \\ /\\ / / | ||  \\| |  \\| |  _| | |_) |\n" +
@@ -692,7 +702,7 @@ public class Game implements Runnable, StatsSentListener {
                     }
 
                     if (winners.contains("red")) {
-                        logger.debug("\n" +
+                        getLogger().debug("\n" +
                                 "  ____  _____ ____   __        _____  _   _ \n" +
                                 " |  _ \\| ____|  _ \\  \\ \\      / / _ \\| \\ | |\n" +
                                 " | |_) |  _| | | | |  \\ \\ /\\ / / | | |  \\| |\n" +
@@ -704,7 +714,7 @@ public class Game implements Runnable, StatsSentListener {
                         lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_RED_WON);
                     }
                     if (winners.contains("blue")) {
-                        logger.debug("\n" +
+                        getLogger().debug("\n" +
                                 "  ____  _    _   _ _____  __        _____  _   _ \n" +
                                 " | __ )| |  | | | | ____| \\ \\      / / _ \\| \\ | |\n" +
                                 " |  _ \\| |  | | | |  _|    \\ \\ /\\ / / | | |  \\| |\n" +
@@ -716,7 +726,7 @@ public class Game implements Runnable, StatsSentListener {
                         lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_BLUE_WON);
                     }
                     if (winners.contains("green")) {
-                        logger.debug("\n" +
+                        getLogger().debug("\n" +
                                 "    ____ ____  _____ _____ _   _  __        _____  _   _ \n" +
                                 "  / ___|  _ \\| ____| ____| \\ | | \\ \\      / / _ \\| \\ | |\n" +
                                 " | |  _| |_) |  _| |  _| |  \\| |  \\ \\ /\\ / / | | |  \\| |\n" +
@@ -728,7 +738,7 @@ public class Game implements Runnable, StatsSentListener {
                         lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_GREEN_WON);
                     }
                     if (winners.contains("yellow")) {
-                        logger.debug("\n" +
+                        getLogger().debug("\n" +
                                 " __   _______ _     _     _____        __ __        _____  _   _ \n" +
                                 " \\ \\ / / ____| |   | |   / _ \\ \\      / / \\ \\      / / _ \\| \\ | |\n" +
                                 "  \\ V /|  _| | |   | |  | | | \\ \\ /\\ / /   \\ \\ /\\ / / | | |  \\| |\n" +
@@ -752,7 +762,7 @@ public class Game implements Runnable, StatsSentListener {
             }
 
         } catch (IOException e) {
-            logger.fatal(e);
+            getLogger().fatal(e);
             System.exit(1);
         }
     }
@@ -808,19 +818,19 @@ public class Game implements Runnable, StatsSentListener {
                     long now = System.currentTimeMillis();
                     long diff = now - lastPIT;
 
-//                    logger.debug("run()/now: "+ Tools.formatLongTime(now));
-//                    logger.debug("run()/lastpit: "+ Tools.formatLongTime(lastPIT));
-//                    logger.debug("run()/diff: "+ Tools.formatLongTime(diff));
+//                    getLogger().debug("run()/now: "+ Tools.formatLongTime(now));
+//                    getLogger().debug("run()/lastpit: "+ Tools.formatLongTime(lastPIT));
+//                    getLogger().debug("run()/diff: "+ Tools.formatLongTime(diff));
 
                     lastPIT = now;
 
                     time = time - diff;
 
-//                    logger.debug("run()/time1: "+ Tools.formatLongTime(time));
+//                    getLogger().debug("run()/time1: "+ Tools.formatLongTime(time));
 
                     time = Math.max(time, 0);
 
-//                    logger.debug("run()/time2: "+ Tools.formatLongTime(time));
+//                    getLogger().debug("run()/time2: "+ Tools.formatLongTime(time));
 
                     // Statistiken, wenn gewünscht
                     if (min_stat_sent_time > 0) {
@@ -853,7 +863,7 @@ public class Game implements Runnable, StatsSentListener {
 
 
                     if (time == 0) {
-                        logger.debug("\n" +
+                        getLogger().debug("\n" +
                                 "   ____    _    __  __ _____    _____     _______ ____  \n" +
                                 "  / ___|  / \\  |  \\/  | ____|  / _ \\ \\   / / ____|  _ \\ \n" +
                                 " | |  _  / _ \\ | |\\/| |  _|   | | | \\ \\ / /|  _| | |_) |\n" +
@@ -871,9 +881,9 @@ public class Game implements Runnable, StatsSentListener {
 
 
             } catch (InterruptedException ie) {
-                logger.debug(this + " interrupted!");
+                getLogger().debug(this + " interrupted!");
             } catch (Exception e) {
-                logger.error(e);
+                getLogger().error(e);
                 e.printStackTrace();
                 System.exit(1);
             }

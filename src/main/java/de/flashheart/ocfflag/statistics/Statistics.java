@@ -8,10 +8,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Stack;
+import java.util.*;
 
 public class Statistics implements HasLogger {
 
@@ -36,12 +33,14 @@ public class Statistics implements HasLogger {
     public static final int EVENT_RESULT_YELLOW_WON = 13;
     public static final int EVENT_RESULT_MULTI_WINNERS = 14; // wenn mehr als einer die bestzeit erreicht hat (seeeeehr unwahrscheinlich)
 
+    public static final int[] GAME_RELEVANT_EVENTS = new int[]{EVENT_GREEN_ACTIVATED, EVENT_RED_ACTIVATED, EVENT_BLUE_ACTIVATED, EVENT_YELLOW_ACTIVATED};
+
     public static final String[] EVENTS = new String[]{"EVENT_PAUSE", "EVENT_RESUME", "EVENT_START_GAME",
             "EVENT_BLUE_ACTIVATED", "EVENT_RED_ACTIVATED", "EVENT_GAME_OVER", "EVENT_GAME_ABORTED",
             "EVENT_RESULT_RED_WON", "EVENT_RESULT_BLUE_WON", "EVENT_RESULT_DRAW", "EVENT_YELLOW_ACTIVATED",
             "EVENT_GREEN_ACTIVATED", "EVENT_RESULT_GREEN_WON", "EVENT_RESULT_YELLOW_WON", "EVENT_RESULT_MULTI_WINNERS"};
 
-    public Stack<GameEvent> stackEvents;
+    private Deque<GameEvent> stackDeque;
     private int matchid;
     private DateTime endOfGame = null;
     private ArrayList<String> winningTeams = new ArrayList<>();
@@ -54,7 +53,7 @@ public class Statistics implements HasLogger {
         messageProcessor = Main.getMessageProcessor();
         this.numTeams = numTeams;
         rank = new LinkedHashMap<>();
-        stackEvents = new Stack<>();
+        stackDeque = new ArrayDeque<>();
         reset();
     }
 
@@ -72,7 +71,7 @@ public class Statistics implements HasLogger {
         if (numTeams >= 4) rank.put("yellow", 0);
 
         matchid = 0;
-        stackEvents.clear();
+        stackDeque.clear();
         messageProcessor.cleanupStatsFile();
     }
 
@@ -88,14 +87,14 @@ public class Statistics implements HasLogger {
     public void sendStats() {
         getLogger().debug("sendStats()\n" + toPHP());
         if (min_stat_send_time > 0)
-            messageProcessor.pushMessage(new PHPMessage(toPHP(), stackEvents.peek()));
+            messageProcessor.pushMessage(new PHPMessage(toPHP(), stackDeque.peek()));
     }
 
     public long addEvent(int event) {
         DateTime now = new DateTime();
 //        if (Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME)) > 0) return now.getMillis();
 
-        stackEvents.push(new GameEvent(now, event));
+        stackDeque.push(new GameEvent(now, event));
 
         if (endOfGame == null) {
             if (event == EVENT_GAME_ABORTED || event == EVENT_GAME_OVER) {
@@ -118,6 +117,17 @@ public class Statistics implements HasLogger {
         return now.getMillis();
     }
 
+    /**
+     *
+     * @return den letzten Spiel Relevanten Event. Nicht die Pause
+     */
+    public GameEvent getLastGameEvent(){
+        
+        stackDeque.descendingIterator().forEachRemaining(gameEvent -> {});
+
+        return stackEvents.peek();
+    }
+
 
     private String toPHP() {
 
@@ -135,8 +145,8 @@ public class Statistics implements HasLogger {
         php.append("$game['uuid'] = '" + Main.getConfigs().get(Configs.MYUUID) + "';\n");
         php.append("$game['matchid'] = '" + matchid + "';\n");
         php.append("$game['timestamp'] = '" + DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(new DateTime()) + "';\n");
-        php.append("$game['ts_game_started'] = '" + DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(stackEvents.get(0).getPit()) + "';\n");
-        php.append("$game['ts_game_paused'] = '" + (stackEvents.peek().getEvent() == EVENT_PAUSE ? DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(stackEvents.peek().getPit()) : "null") + "';\n");
+        php.append("$game['ts_game_started'] = '" + DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(stackDeque.getFirst().getPit()) + "';\n");
+        php.append("$game['ts_game_paused'] = '" + (stackDeque.peek().getEvent() == EVENT_PAUSE ? DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(stackDeque.peek().getPit()) : "null") + "';\n");
         php.append("$game['ts_game_ended'] = '" + (endOfGame == null ? "null" : DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(endOfGame)) + "';\n");
         php.append("$game['time'] = '" + Tools.formatLongTime(time, "HH:mm:ss") + "';\n");
         php.append("$game['num_teams'] = '" + numTeams + "';\n");
@@ -162,7 +172,7 @@ public class Statistics implements HasLogger {
         php.append("];\n");
 
         php.append("$game['events'] = [\n");
-        for (GameEvent event : stackEvents) {
+        for (GameEvent event : stackDeque) {
             php.append(event.toPHPArray());
         }
 
