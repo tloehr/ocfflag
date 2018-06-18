@@ -2,13 +2,16 @@ package de.flashheart.ocfflag.statistics;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.mechanics.GameEvent;
-import de.flashheart.ocfflag.misc.*;
+import de.flashheart.ocfflag.misc.Configs;
+import de.flashheart.ocfflag.misc.HasLogger;
+import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
 import javax.swing.*;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class Statistics implements HasLogger {
 
@@ -19,7 +22,7 @@ public class Statistics implements HasLogger {
 
     public static final int EVENT_PAUSE = 0;
     public static final int EVENT_RESUME = 1;
-    public static final int EVENT_START_GAME = 2; // von Standby nach Active
+    public static final int EVENT_START_GAME = 2; // von Standby nach Active. Flagge ist Neutral.
     public static final int EVENT_BLUE_ACTIVATED = 3;
     public static final int EVENT_RED_ACTIVATED = 4;
     public static final int EVENT_GAME_OVER = 5; // wenn die Spielzeit abgelaufen ist
@@ -32,8 +35,8 @@ public class Statistics implements HasLogger {
     public static final int EVENT_RESULT_GREEN_WON = 12;
     public static final int EVENT_RESULT_YELLOW_WON = 13;
     public static final int EVENT_RESULT_MULTI_WINNERS = 14; // wenn mehr als einer die bestzeit erreicht hat (seeeeehr unwahrscheinlich)
-
-    public static final int[] GAME_RELEVANT_EVENTS = new int[]{EVENT_GREEN_ACTIVATED, EVENT_RED_ACTIVATED, EVENT_BLUE_ACTIVATED, EVENT_YELLOW_ACTIVATED};
+    public static final int EVENT_REVERT_LAST_EVENT = 15;
+    public static final int[] GAME_RELEVANT_EVENTS = new int[]{EVENT_START_GAME, EVENT_GREEN_ACTIVATED, EVENT_RED_ACTIVATED, EVENT_BLUE_ACTIVATED, EVENT_YELLOW_ACTIVATED};
 
     public static final String[] EVENTS = new String[]{"EVENT_PAUSE", "EVENT_RESUME", "EVENT_START_GAME",
             "EVENT_BLUE_ACTIVATED", "EVENT_RED_ACTIVATED", "EVENT_GAME_OVER", "EVENT_GAME_ABORTED",
@@ -48,6 +51,7 @@ public class Statistics implements HasLogger {
     private long min_stat_send_time;
     private String flagcolor;
     private final MessageProcessor messageProcessor;
+
 
     public Statistics(int numTeams) {
         messageProcessor = Main.getMessageProcessor();
@@ -114,18 +118,20 @@ public class Statistics implements HasLogger {
 
         sendStats(); // jedes Ereignis wird gesendet.
 
+//        getLastGameRelevantEvent();
+
         return now.getMillis();
     }
 
     /**
-     *
      * @return den letzten Spiel Relevanten Event. Nicht die Pause
      */
-    public GameEvent getLastGameEvent(){
-        
-        stackDeque.descendingIterator().forEachRemaining(gameEvent -> {});
+    public GameEvent getLastRevertableEvent() throws NoSuchElementException {
 
-        return stackEvents.peek();
+        Optional<GameEvent> lastRevertableEvent =
+                stackDeque.stream().filter(gameEvent -> IntStream.of(GAME_RELEVANT_EVENTS).anyMatch(x -> x == gameEvent.getEvent())).findFirst();
+
+        return lastRevertableEvent.get();
     }
 
 

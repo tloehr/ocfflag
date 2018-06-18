@@ -2,9 +2,12 @@ package de.flashheart.ocfflag.hardware.pinhandler;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
+import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 
@@ -33,7 +36,6 @@ public class RGBBlinkModel implements GenericBlinkModel {
 
     @Override
     public String call() throws Exception {
-        //logger.debug(new DateTime().toString() + " call() to:" + myRGBLed.getName() + " [" + myRGBLed.getToolTipText() + "]");
 
         if (repeat == 0) {
             myRGBLed.off();
@@ -56,8 +58,6 @@ public class RGBBlinkModel implements GenericBlinkModel {
                     myRGBLed.off();
                     return null;
                 }
-
-
             }
         }
 
@@ -103,6 +103,65 @@ public class RGBBlinkModel implements GenericBlinkModel {
     @Override
     public void setText(String text) {
         myRGBLed.setToolTipText(text);
+    }
+
+    /**
+     * Erstellt ein Blinkkschema für die Flagge, mit der sich die restliche Spielzeit ablesen lässt.
+     *
+     * @param color
+     * @param time
+     * @return
+     */
+    public static String getGametimeBlinkingScheme(Color color, long time) {
+
+        Logger logger = Logger.getLogger(RGBBlinkModel.class);
+
+        DateTime remainingTime = new DateTime(time, DateTimeZone.UTC);
+
+
+        int minutes = remainingTime.getMinuteOfHour();
+        int seconds = remainingTime.getSecondOfMinute();
+
+
+        int hours = remainingTime.getHourOfDay();
+        int tenminutes = minutes / 10;
+        int remminutes = minutes - tenminutes * 10; // restliche Minuten ausrechnen
+
+        logger.debug("time announcer: " + hours + ":" + minutes + ":" + seconds);
+        String scheme = PinHandler.FOREVER + ":";
+
+        if (minutes > 0) {
+
+            if (hours > 0) {
+                for (int h = 0; h < hours; h++) {
+                    scheme += new RGBScheduleElement(color, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 250l) + ";";
+                }
+            }
+
+            if (tenminutes > 0) {
+                for (int tm = 0; tm < tenminutes; tm++) {
+                    scheme += new RGBScheduleElement(color, 625l) + ";" + new RGBScheduleElement(Color.BLACK, 250l) + ";";
+                }
+            }
+
+            if (remminutes > 0) {
+                for (int rm = 0; rm < remminutes; rm++) {
+                    scheme += new RGBScheduleElement(color, 250l) + ";" + new RGBScheduleElement(Color.BLACK, 250l) + ";";
+                }
+            }
+
+            scheme += new RGBScheduleElement(Color.BLACK, 5000l);
+
+        } else {
+            scheme = new RGBScheduleElement(color, 100l) + ";" + new RGBScheduleElement(Color.BLACK, 100l) + ";";
+            
+        }
+
+        return scheme;
+    }
+
+    public static String getGametimeBlinkingScheme(String color, long time) {
+        return getGametimeBlinkingScheme(Tools.getColor(Main.getConfigs().get(color)), time);
     }
 
 
