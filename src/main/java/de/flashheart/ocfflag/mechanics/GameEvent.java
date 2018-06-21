@@ -2,15 +2,21 @@ package de.flashheart.ocfflag.mechanics;
 
 import de.flashheart.ocfflag.statistics.Statistics;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
+
+import java.util.LinkedHashMap;
 
 public class GameEvent {
 
-    private DateTime pit;
-    private int event;
+    private final DateTime pit;
+    private final long time;
+    private final LinkedHashMap<String, Integer> teams;
+    private final int event;
 
-    public GameEvent(DateTime pit, int event) {
+    
+    public GameEvent(DateTime pit, long time, LinkedHashMap<String, Integer> teams, int event) {
         this.pit = pit;
+        this.time = time;
+        this.teams = teams;
         this.event = event;
     }
 
@@ -25,8 +31,10 @@ public class GameEvent {
     @Override
     public String toString() {
         return "GameEvent{" +
-                "pit=" + pit.toString(DateTimeFormat.mediumDateTime()) +
-                ", event=" + Statistics.EVENTS[event] +
+                "pit=" + pit +
+                ", time=" + time +
+                ", teams=" + teams +
+                ", event=" + event +
                 '}';
     }
 

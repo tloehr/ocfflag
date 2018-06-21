@@ -1,11 +1,15 @@
 package de.flashheart.ocfflag.statistics;
 
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.mechanics.Game;
 import de.flashheart.ocfflag.mechanics.GameEvent;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
@@ -82,7 +86,7 @@ public class Statistics implements HasLogger {
     public void setTimes(int matchid, long time, LinkedHashMap<String, Integer> myrank) {
         this.matchid = matchid;
         this.time = time;
-        this.rank = myrank;
+        this.rank = myrank; //Hier stehen die aktuellen Zeiten einzelnen Teams drin.
     }
 
     /**
@@ -98,7 +102,7 @@ public class Statistics implements HasLogger {
         DateTime now = new DateTime();
 //        if (Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME)) > 0) return now.getMillis();
 
-        stackDeque.push(new GameEvent(now, event));
+        stackDeque.push(new GameEvent(now, time, rank, event));
 
         if (endOfGame == null) {
             if (event == EVENT_GAME_ABORTED || event == EVENT_GAME_OVER) {
@@ -118,20 +122,15 @@ public class Statistics implements HasLogger {
 
         sendStats(); // jedes Ereignis wird gesendet.
 
-//        getLastGameRelevantEvent();
-
         return now.getMillis();
     }
 
     /**
-     * @return den letzten Spiel Relevanten Event. Nicht die Pause
+     * @return die letzten beiden Spiel-Relevanten Events. Wenn es nur einen gibt, dann ist noch nichts passiert, außer dass das Spiel angefangen hat. Die Flagge ist dann noch neutral.
+     *
      */
-    public GameEvent getLastRevertableEvent() throws NoSuchElementException {
-
-        Optional<GameEvent> lastRevertableEvent =
-                stackDeque.stream().filter(gameEvent -> IntStream.of(GAME_RELEVANT_EVENTS).anyMatch(x -> x == gameEvent.getEvent())).findFirst();
-
-        return lastRevertableEvent.get();
+    public GameEvent[] getLastTwoRevertableEvent() throws NoSuchElementException {
+        return stackDeque.stream().filter(gameEvent -> IntStream.of(GAME_RELEVANT_EVENTS).anyMatch(x -> x == gameEvent.getEvent())).limit(2).toArray(GameEvent[]::new);
     }
 
 
