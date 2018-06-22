@@ -153,10 +153,10 @@ public class RGBBlinkModel implements GenericBlinkModel {
             scheme += new RGBScheduleElement(Color.BLACK, 5000l);
 
         } else {
-            scheme = new RGBScheduleElement(color, 100l) + ";" + new RGBScheduleElement(Color.BLACK, 100l) + ";";
+            scheme += new RGBScheduleElement(color, 100l) + ";" + new RGBScheduleElement(Color.BLACK, 100l) + ";";
             
         }
-
+        logger.debug(scheme);
         return scheme;
     }
 

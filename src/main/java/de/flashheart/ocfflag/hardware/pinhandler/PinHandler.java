@@ -88,7 +88,7 @@ public class PinHandler {
                 logger.error("Element not found in handler");
             }
         } catch (Exception e) {
-            logger.trace(e);
+            e.printStackTrace();
             logger.fatal(e);
             System.exit(0);
         } finally {

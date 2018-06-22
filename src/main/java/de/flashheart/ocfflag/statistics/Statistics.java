@@ -1,15 +1,11 @@
 package de.flashheart.ocfflag.statistics;
 
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.mechanics.Game;
 import de.flashheart.ocfflag.mechanics.GameEvent;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
@@ -26,7 +22,7 @@ public class Statistics implements HasLogger {
 
     public static final int EVENT_PAUSE = 0;
     public static final int EVENT_RESUME = 1;
-    public static final int EVENT_START_GAME = 2; // von Standby nach Active. Flagge ist Neutral.
+    public static final int EVENT_FLAG_NEUTRAL = 2; // von Standby nach Active. Flagge ist Neutral.
     public static final int EVENT_BLUE_ACTIVATED = 3;
     public static final int EVENT_RED_ACTIVATED = 4;
     public static final int EVENT_GAME_OVER = 5; // wenn die Spielzeit abgelaufen ist
@@ -40,9 +36,9 @@ public class Statistics implements HasLogger {
     public static final int EVENT_RESULT_YELLOW_WON = 13;
     public static final int EVENT_RESULT_MULTI_WINNERS = 14; // wenn mehr als einer die bestzeit erreicht hat (seeeeehr unwahrscheinlich)
     public static final int EVENT_REVERT_LAST_EVENT = 15;
-    public static final int[] GAME_RELEVANT_EVENTS = new int[]{EVENT_START_GAME, EVENT_GREEN_ACTIVATED, EVENT_RED_ACTIVATED, EVENT_BLUE_ACTIVATED, EVENT_YELLOW_ACTIVATED};
+    public static final int[] GAME_RELEVANT_EVENTS = new int[]{EVENT_FLAG_NEUTRAL, EVENT_GREEN_ACTIVATED, EVENT_RED_ACTIVATED, EVENT_BLUE_ACTIVATED, EVENT_YELLOW_ACTIVATED};
 
-    public static final String[] EVENTS = new String[]{"EVENT_PAUSE", "EVENT_RESUME", "EVENT_START_GAME",
+    public static final String[] EVENTS = new String[]{"EVENT_PAUSE", "EVENT_RESUME", "EVENT_FLAG_NEUTRAL",
             "EVENT_BLUE_ACTIVATED", "EVENT_RED_ACTIVATED", "EVENT_GAME_OVER", "EVENT_GAME_ABORTED",
             "EVENT_RESULT_RED_WON", "EVENT_RESULT_BLUE_WON", "EVENT_RESULT_DRAW", "EVENT_YELLOW_ACTIVATED",
             "EVENT_GREEN_ACTIVATED", "EVENT_RESULT_GREEN_WON", "EVENT_RESULT_YELLOW_WON", "EVENT_RESULT_MULTI_WINNERS"};
@@ -87,6 +83,7 @@ public class Statistics implements HasLogger {
         this.matchid = matchid;
         this.time = time;
         this.rank = myrank; //Hier stehen die aktuellen Zeiten einzelnen Teams drin.
+        getLogger().debug(time);
     }
 
     /**
@@ -127,10 +124,11 @@ public class Statistics implements HasLogger {
 
     /**
      * @return die letzten beiden Spiel-Relevanten Events. Wenn es nur einen gibt, dann ist noch nichts passiert, außer dass das Spiel angefangen hat. Die Flagge ist dann noch neutral.
-     *
      */
-    public GameEvent[] getLastTwoRevertableEvent() throws NoSuchElementException {
-        return stackDeque.stream().filter(gameEvent -> IntStream.of(GAME_RELEVANT_EVENTS).anyMatch(x -> x == gameEvent.getEvent())).limit(2).toArray(GameEvent[]::new);
+    public Optional<GameEvent> getLastRevertableEvent() {
+        GameEvent[] gameEvents = stackDeque.stream().filter(gameEvent -> IntStream.of(GAME_RELEVANT_EVENTS).anyMatch(x -> x == gameEvent.getEvent())).limit(2).toArray(GameEvent[]::new);
+        Optional<GameEvent> myEvent = Optional.ofNullable(gameEvents.length == 2 ? gameEvents[1] : null);
+        return myEvent;
     }
 
 
