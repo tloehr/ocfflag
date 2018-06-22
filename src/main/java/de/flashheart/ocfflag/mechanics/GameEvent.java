@@ -50,16 +50,5 @@ public class GameEvent {
         return "   ['pit' => '" + pit.toString("HH:mm:ss") + "','time' => '" + time + "','event' => '" + Statistics.EVENTS[event] + "'],\n";
     }
 
-    /**
-     * Das Problem mit dem Zurücksetzen sind die Zeiten eines Events. Wenn also z.B. die Flagge versehentlich von Rot nach Grün geschaltet
-     * wurde, was wir hier zurück nehmen wollen. Dann stehen die Zeiten (Teams und Game) auf ANFANG des Events und nicht auf "kurz vor der Fehlbedienung"
-     * Daher muss der Rücksetzpunkt eine Kombination aus vorherigem und falschem Event sein.
-     * @param eventToUndo Event, der nicht hätte sein sollen.
-     * @param revertToEvent Event, zu dem wir zurück springen wollen.
-     * @return Event to jump back to
-     */
-    public static GameEvent createRevertableEvent(GameEvent revertToEvent, GameTimes eventToUndo){
-        
-    }
 
 }

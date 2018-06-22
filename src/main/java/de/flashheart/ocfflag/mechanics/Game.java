@@ -79,8 +79,8 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 
     private long time, time_blue, time_red, time_yellow, time_green, standbyStartedAt, lastStatsSent, min_stat_sent_time;
     private int lastMinuteToChangeTimeblinking;
-    private boolean previousEventSelected = false;
-    private GameEvent currentStateBeforeReverting;
+    private boolean prevSavepointSelect = false;
+    private SavePoint currentState, lastState;
     /**
      * In der methode run() wird in regelmässigen Abständen die Restspielzeit time neu berechnet. Dabei rechnen
      * wir bei jedem Durchgang die abgelaufene Zeit seit dem letzten Mal aus. Das machen wir mittels der Variable
@@ -306,9 +306,11 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != Statistics.EVENT_RED_ACTIVATED) {
+                lastState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
                 flag = Statistics.EVENT_RED_ACTIVATED;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_RED_ACTIVATED);
+
                 setDisplayToEvent();
             }
 
@@ -322,6 +324,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         if (CONFIG_PAGE) return;
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != Statistics.EVENT_BLUE_ACTIVATED) {
+                lastState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
                 flag = Statistics.EVENT_BLUE_ACTIVATED;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_BLUE_ACTIVATED);
@@ -341,6 +344,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         }
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != Statistics.EVENT_GREEN_ACTIVATED) {
+                lastState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
                 flag = Statistics.EVENT_GREEN_ACTIVATED;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_GREEN_ACTIVATED);
@@ -361,6 +365,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         }
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (flag != Statistics.EVENT_YELLOW_ACTIVATED) {
+                lastState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
                 flag = Statistics.EVENT_YELLOW_ACTIVATED;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_YELLOW_ACTIVATED);
@@ -410,21 +415,23 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             reset_timers();
         } else if (mode == MODE_CLOCK_GAME_PAUSED) {
             getLogger().info("IN PAUSE MODE - Trying to UNDO");
-            Optional<GameEvent> revertGameEvent = statistics.getLastRevertableEvent();
-            if (revertGameEvent.isPresent()) {
-                previousEventSelected = !previousEventSelected;
-                GameEvent setEventTo = previousEventSelected ? revertGameEvent.get() : currentStateBeforeReverting;
 
-                flag = setEventTo.getEvent();
-                time = setEventTo.getTime();
-                time_red = setEventTo.getTeams().get("red");
-                time_blue = setEventTo.getTeams().get("blue");
-                if (preset_num_teams >= 3) time_green = setEventTo.getTeams().get("green");
-                if (preset_num_teams >= 4) time_yellow = setEventTo.getTeams().get("yellow");
+            if (lastState != null) {
+                prevSavepointSelect = !prevSavepointSelect;
+                SavePoint savePoint = prevSavepointSelect ? lastState : currentState;
+                flag = savePoint.getFlag();
+                time = savePoint.getTime();
+                time_red = savePoint.getTime_red();
+                time_blue = savePoint.getTime_blue();
+                // spielt keine Rolle ob es diese Teams gibt. Sind dann sowieso 0l;
+                time_green = savePoint.getTime_green();
+                time_yellow = savePoint.getTime_yellow();
+
+                // todo: schreibe es ins Logbuch, wenn wirklich reverted wurde
 
                 setDisplayToEvent();
             } else {
-                getLogger().info("Only one revertable Event. Nothing to undo.");
+                getLogger().info("No revertable Event. Nothing to undo.");
             }
         } else {
             getLogger().debug("NOT IN PREGAME: IGNORED");
@@ -438,8 +445,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             standbyStartedAt = System.currentTimeMillis();
             mode = MODE_CLOCK_GAME_PAUSED;
             lastStatsSent = statistics.addEvent(Statistics.EVENT_PAUSE);
-            // aufbewahren, falls wir doch nicht zurücksetzen wollen.
-            currentStateBeforeReverting = new GameEvent(new DateTime(), time, getRank(), flag);
+            currentState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
             setDisplayToEvent();
         } else if (mode == MODE_CLOCK_GAME_PAUSED) {
             // lastPIT neu berechnen und anpassen
@@ -447,8 +453,9 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             long pause = now - standbyStartedAt;
             lastPIT = lastPIT + pause;
             standbyStartedAt = 0l;
-            previousEventSelected = false;
-            currentStateBeforeReverting = null;
+            prevSavepointSelect = false;
+            currentState = null;
+            lastState = null;
             mode = MODE_CLOCK_GAME_RUNNING;
             lastStatsSent = statistics.addEvent(Statistics.EVENT_RESUME);
             setDisplayToEvent();
@@ -471,7 +478,8 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 
     private void reset_timers() {
         flag = Statistics.EVENT_FLAG_NEUTRAL;
-        currentStateBeforeReverting = null;
+        currentState = null;
+        lastState = null;
         mode = MODE_CLOCK_PREGAME;
         min_stat_sent_time = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
 
@@ -487,7 +495,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         running_match_id = 0;
         lastStatsSent = 0l;
         statistics.reset();
-        previousEventSelected = false;
+        prevSavepointSelect = false;
         setDisplayToEvent();
     }
 

@@ -125,11 +125,11 @@ public class Statistics implements HasLogger {
     /**
      * @return die letzten beiden Spiel-Relevanten Events. Wenn es nur einen gibt, dann ist noch nichts passiert, außer dass das Spiel angefangen hat. Die Flagge ist dann noch neutral.
      */
-    public Optional<GameEvent> getLastRevertableEvent() {
-        GameEvent[] gameEvents = stackDeque.stream().filter(gameEvent -> IntStream.of(GAME_RELEVANT_EVENTS).anyMatch(x -> x == gameEvent.getEvent())).limit(2).toArray(GameEvent[]::new);
-        Optional<GameEvent> myEvent = Optional.ofNullable(gameEvents.length == 2 ? gameEvents[1] : null);
-        return myEvent;
-    }
+//    public Optional<GameEvent> getLastRevertableEvent() {
+//        GameEvent[] gameEvents = stackDeque.stream().filter(gameEvent -> IntStream.of(GAME_RELEVANT_EVENTS).anyMatch(x -> x == gameEvent.getEvent())).limit(2).toArray(GameEvent[]::new);
+//        Optional<GameEvent> myEvent = Optional.ofNullable(gameEvents.length == 2 ? gameEvents[1] : null);
+//        return myEvent;
+//    }
 
 
     private String toPHP() {
