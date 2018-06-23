@@ -39,16 +39,8 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
     private final int MAX_TEAMS = 4;
     private final int MIN_TEAMS = 2;
 
-    //private long shutdown_button_down_since = 0l, shutdown_button_min_downtime = 0l;
-
     private int mode = MODE_CLOCK_PREGAME;
     private int running_match_id = 0;
-
-//    private final int FLAG_STATE_NEUTRAL = 0;
-//    private final int FLAG_STATE_BLUE = 1;
-//    private final int FLAG_STATE_RED = 2;
-//    private final int FLAG_STATE_YELLOW = 3;
-//    private final int FLAG_STATE_GREEN = 4;
 
     private int flag = Statistics.EVENT_FLAG_NEUTRAL;
 
@@ -96,7 +88,6 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
     private Long[] preset_times;
     private int preset_gametime_position = 0;
     private int preset_num_teams = 2; // Reihenfolge: red, blue, green, yellow
-    private boolean quit_programm;
     private boolean CONFIG_PAGE = false;
 
     public Game(Display7Segments4Digits display_white,
@@ -815,6 +806,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                     int thisMinuteOfDay = new DateTime(time, DateTimeZone.UTC).getMinuteOfDay();
                     boolean changeColorBlinking = thisMinuteOfDay != lastMinuteToChangeTimeblinking;
                     if (changeColorBlinking) lastMinuteToChangeTimeblinking = thisMinuteOfDay;
+
                     if (flag == Statistics.EVENT_FLAG_NEUTRAL) {
                         if (changeColorBlinking)
                             Main.getPinHandler().setScheme(Main.PH_POLE, "NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_WHITE, time));
@@ -850,13 +842,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 
 
                     if (time == 0) {
-                        getLogger().debug("\n" +
-                                "   ____    _    __  __ _____    _____     _______ ____  \n" +
-                                "  / ___|  / \\  |  \\/  | ____|  / _ \\ \\   / / ____|  _ \\ \n" +
-                                " | |  _  / _ \\ | |\\/| |  _|   | | | \\ \\ / /|  _| | |_) |\n" +
-                                " | |_| |/ ___ \\| |  | | |___  | |_| |\\ V / | |___|  _ < \n" +
-                                "  \\____/_/   \\_\\_|  |_|_____|  \\___/  \\_/  |_____|_| \\_\\\n" +
-                                "                                                        ");
+                        getLogger().info("GAME OVER");
                         mode = MODE_CLOCK_GAME_OVER;
                         setDisplayToEvent();
                         lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_OVER);
@@ -884,7 +870,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         else
             Main.getPinHandler().off(Main.PH_LED_WHITE);
 
-        if (quit_programm) System.exit(0);
+//        if (quit_programm) System.exit(0);
     }
 
 
