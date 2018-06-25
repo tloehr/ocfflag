@@ -89,6 +89,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
     private int preset_gametime_position = 0;
     private int preset_num_teams = 2; // Reihenfolge: red, blue, green, yellow
     private boolean CONFIG_PAGE = false;
+    
 
     public Game(Display7Segments4Digits display_white,
                 Display7Segments4Digits display_red,
@@ -300,7 +301,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                 lastState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
                 flag = Statistics.EVENT_RED_ACTIVATED;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
-                lastStatsSent = statistics.addEvent(Statistics.EVENT_RED_ACTIVATED);
+                lastStatsSent = statistics.addEvent(flag);
 
                 setDisplayToEvent();
             }
@@ -310,6 +311,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         }
     }
 
+
     private void button_blue_pressed() {
         Main.getFrameDebug().addToConfigLog("button_blue_pressed");
         if (CONFIG_PAGE) return;
@@ -318,7 +320,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                 lastState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
                 flag = Statistics.EVENT_BLUE_ACTIVATED;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
-                lastStatsSent = statistics.addEvent(Statistics.EVENT_BLUE_ACTIVATED);
+                lastStatsSent = statistics.addEvent(flag);
                 setDisplayToEvent();
             }
         } else {
@@ -338,7 +340,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                 lastState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
                 flag = Statistics.EVENT_GREEN_ACTIVATED;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
-                lastStatsSent = statistics.addEvent(Statistics.EVENT_GREEN_ACTIVATED);
+                lastStatsSent = statistics.addEvent(flag);
                 setDisplayToEvent();
             }
 
@@ -359,7 +361,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                 lastState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
                 flag = Statistics.EVENT_YELLOW_ACTIVATED;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
-                lastStatsSent = statistics.addEvent(Statistics.EVENT_YELLOW_ACTIVATED);
+                lastStatsSent = statistics.addEvent(flag);
                 setDisplayToEvent();
             }
         } else {
@@ -417,9 +419,6 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                 // spielt keine Rolle ob es diese Teams gibt. Sind dann sowieso 0l;
                 time_green = savePoint.getTime_green();
                 time_yellow = savePoint.getTime_yellow();
-
-                // todo: schreibe es ins Logbuch, wenn wirklich reverted wurde
-
                 setDisplayToEvent();
             } else {
                 getLogger().info("No revertable Event. Nothing to undo.");
@@ -444,11 +443,16 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             long pause = now - standbyStartedAt;
             lastPIT = lastPIT + pause;
             standbyStartedAt = 0l;
-            prevSavepointSelect = false;
+
             currentState = null;
             lastState = null;
             mode = MODE_CLOCK_GAME_RUNNING;
             lastStatsSent = statistics.addEvent(Statistics.EVENT_RESUME);
+            if (prevSavepointSelect) {
+                prevSavepointSelect = false;
+                lastStatsSent = statistics.addEvent(Statistics.EVENT_REVERT_LAST_EVENT);
+                lastStatsSent = statistics.addEvent(flag);
+            }
             setDisplayToEvent();
         } else if (mode == MODE_CLOCK_GAME_OVER) {
             reset_timers();

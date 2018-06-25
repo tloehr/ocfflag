@@ -32,7 +32,9 @@ class FTPWrapper implements HasLogger {
     private String archivepath, activepath, remoteFile, uuid;
 
     public FTPWrapper() {
-        MAX_ERROR_COUNT = Main.getConfigs().getInt(Configs.FTPMAXERRORCOUNT);
+        int tmperrcnt = Main.getConfigs().getInt(Configs.FTPMAXERRORCOUNT);
+        // Durch errorcount <= 0 schaltet man den FTP Error Count aus. MAX_VALUE wird sowieso nie erreicht.
+        MAX_ERROR_COUNT = tmperrcnt <= 0 ? Integer.MAX_VALUE : tmperrcnt;
         tryToInitFTP();
     }
 

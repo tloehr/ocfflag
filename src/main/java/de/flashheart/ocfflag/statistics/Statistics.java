@@ -36,12 +36,11 @@ public class Statistics implements HasLogger {
     public static final int EVENT_RESULT_YELLOW_WON = 13;
     public static final int EVENT_RESULT_MULTI_WINNERS = 14; // wenn mehr als einer die bestzeit erreicht hat (seeeeehr unwahrscheinlich)
     public static final int EVENT_REVERT_LAST_EVENT = 15;
-    public static final int[] GAME_RELEVANT_EVENTS = new int[]{EVENT_FLAG_NEUTRAL, EVENT_GREEN_ACTIVATED, EVENT_RED_ACTIVATED, EVENT_BLUE_ACTIVATED, EVENT_YELLOW_ACTIVATED};
 
     public static final String[] EVENTS = new String[]{"EVENT_PAUSE", "EVENT_RESUME", "EVENT_FLAG_NEUTRAL",
             "EVENT_BLUE_ACTIVATED", "EVENT_RED_ACTIVATED", "EVENT_GAME_OVER", "EVENT_GAME_ABORTED",
             "EVENT_RESULT_RED_WON", "EVENT_RESULT_BLUE_WON", "EVENT_RESULT_DRAW", "EVENT_YELLOW_ACTIVATED",
-            "EVENT_GREEN_ACTIVATED", "EVENT_RESULT_GREEN_WON", "EVENT_RESULT_YELLOW_WON", "EVENT_RESULT_MULTI_WINNERS"};
+            "EVENT_GREEN_ACTIVATED", "EVENT_RESULT_GREEN_WON", "EVENT_RESULT_YELLOW_WON", "EVENT_RESULT_MULTI_WINNERS","EVENT_REVERT_LAST_EVENT"};
 
     private Deque<GameEvent> stackDeque;
     private int matchid;

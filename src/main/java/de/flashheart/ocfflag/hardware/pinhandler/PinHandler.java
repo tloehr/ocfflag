@@ -3,6 +3,7 @@ package de.flashheart.ocfflag.hardware.pinhandler;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.abstraction.MyPin;
 import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
+import de.flashheart.ocfflag.misc.HasLogger;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -16,10 +17,9 @@ import java.util.concurrent.locks.ReentrantLock;
  * Dieser Handler läuft parallel zum Hauptprogramm. Er steuert alles Relais und achtet auch auf widersprüchliche Befehle und Kollisionen (falls bestimmte Relais nicht gleichzeitig anziehen dürfen, gibt mittlerweile nicht mehr).
  */
 
-public class PinHandler {
+public class PinHandler implements HasLogger {
     public static final String FOREVER = "∞";
 
-    final Logger logger;
     final ReentrantLock lock;
     final HashMap<String, GenericBlinkModel> pinMap;
     final HashMap<String, Future<String>> futures;
@@ -29,7 +29,6 @@ public class PinHandler {
         lock = new ReentrantLock();
         pinMap = new HashMap<>();
         futures = new HashMap<>();
-        logger = Logger.getLogger(getClass());
 
 
         executorService = Executors.newFixedThreadPool(20);
@@ -74,6 +73,7 @@ public class PinHandler {
      * @param scheme
      */
     public void setScheme(String name, String text, String scheme) {
+        if (lock.isLocked()) getLogger().warn("setScheme() is currently locked. Delay will occur. Why is this happening ?");
         lock.lock();
         try {
             GenericBlinkModel genericBlinkModel = pinMap.get(name);
@@ -85,11 +85,11 @@ public class PinHandler {
                 genericBlinkModel.setScheme(scheme);
                 futures.put(name, executorService.submit(genericBlinkModel));
             } else {
-                logger.error("Element not found in handler");
+                getLogger().error("Element not found in handler");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.fatal(e);
+            getLogger().fatal(e);
             System.exit(0);
         } finally {
             lock.unlock();

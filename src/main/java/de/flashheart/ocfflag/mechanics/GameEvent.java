@@ -1,5 +1,6 @@
 package de.flashheart.ocfflag.mechanics;
 
+import de.flashheart.ocfflag.misc.Tools;
 import de.flashheart.ocfflag.statistics.Statistics;
 import org.joda.time.DateTime;
 
@@ -47,7 +48,7 @@ public class GameEvent {
     }
 
     public String toPHPArray() {
-        return "   ['pit' => '" + pit.toString("HH:mm:ss") + "','time' => '" + time + "','event' => '" + Statistics.EVENTS[event] + "'],\n";
+        return "   ['pit' => '" + pit.toString("HH:mm:ss") + "','longtime' => '" + time + "','humantime' => '" + Tools.formatLongTime(time) + "','event' => '" + Statistics.EVENTS[event] + "'],\n";
     }
 
 
