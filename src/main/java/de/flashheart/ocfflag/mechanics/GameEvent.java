@@ -48,7 +48,7 @@ public class GameEvent {
     }
 
     public String toPHPArray() {
-        return "   ['pit' => '" + pit.toString("HH:mm:ss") + "','longtime' => '" + time + "','humantime' => '" + Tools.formatLongTime(time) + "','event' => '" + Statistics.EVENTS[event] + "'],\n";
+        return "   ['pit' => '" + pit.toString("HH:mm:ss") + "','longtime' => '" + time + "','humantime' => '" + Tools.formatLongTime(time, "mm:ss") + "','event' => '" + Statistics.EVENTS[event] + "'],\n";
     }
 
 
