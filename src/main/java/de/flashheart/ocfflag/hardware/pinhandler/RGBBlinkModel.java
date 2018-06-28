@@ -114,6 +114,8 @@ public class RGBBlinkModel implements GenericBlinkModel {
      */
     public static String getGametimeBlinkingScheme(Color color, long time) {
 
+        //TODO: Auch abschaltbar machen und gegen einfaches Blinken tauschen per COnfig
+
         Logger logger = Logger.getLogger(RGBBlinkModel.class);
 
         DateTime remainingTime = new DateTime(time, DateTimeZone.UTC);
@@ -150,7 +152,7 @@ public class RGBBlinkModel implements GenericBlinkModel {
                 }
             }
 
-            scheme += new RGBScheduleElement(Color.BLACK, 5000l);
+            scheme += new RGBScheduleElement(Color.BLACK, 2500l);
 
         } else {
             scheme += new RGBScheduleElement(color, 100l) + ";" + new RGBScheduleElement(Color.BLACK, 100l) + ";";

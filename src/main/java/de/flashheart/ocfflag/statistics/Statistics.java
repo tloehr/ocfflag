@@ -82,7 +82,7 @@ public class Statistics implements HasLogger {
         this.matchid = matchid;
         this.time = time;
         this.rank = myrank; //Hier stehen die aktuellen Zeiten einzelnen Teams drin.
-        getLogger().debug(time);
+        // getLogger().debug(time);
     }
 
     /**

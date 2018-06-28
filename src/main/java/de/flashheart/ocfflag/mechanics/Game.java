@@ -736,7 +736,6 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 
             display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
             Color myyellow = Tools.getColor(Main.getConfigs().get(Configs.FLAG_COLOR_YELLOW));
-            // TODO: das reicht nicht. Zeit muss jede Minute angepasst werden.
             Main.getPinHandler().setScheme(Main.PH_POLE, "YELLOW ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(myyellow, time));
         }
     }
