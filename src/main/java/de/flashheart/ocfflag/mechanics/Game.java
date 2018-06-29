@@ -36,6 +36,13 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
     private final int MODE_CLOCK_GAME_PAUSED = 2;
     private final int MODE_CLOCK_GAME_OVER = 3;
 
+    private final int SAVEPOINT_NONE = 0;
+    private final int SAVEPOINT_PREVIOUS = 1;
+    private final int SAVEPOINT_CURRENT = 2;
+    private final int SAVEPOINT_RESET = 3;
+
+//    private final int[] SAVEPOINT_SELECTIONS = new int[]{SAVEPOINT_PREVIOUS, SAVEPOINT_CURRENT, SAVEPOINT_RESET};
+
     private final int MAX_TEAMS = 4;
     private final int MIN_TEAMS = 2;
 
@@ -71,8 +78,8 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 
     private long time, time_blue, time_red, time_yellow, time_green, standbyStartedAt, lastStatsSent, min_stat_sent_time;
     private int lastMinuteToChangeTimeblinking;
-    private boolean prevSavepointSelect = false;
-    private SavePoint currentState, lastState;
+    private int SELECTED_SAVEPOINT = SAVEPOINT_NONE;
+    private SavePoint currentState, lastState, resetState;
     /**
      * In der methode run() wird in regelmässigen Abständen die Restspielzeit time neu berechnet. Dabei rechnen
      * wir bei jedem Durchgang die abgelaufene Zeit seit dem letzten Mal aus. Das machen wir mittels der Variable
@@ -89,7 +96,8 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
     private int preset_gametime_position = 0;
     private int preset_num_teams = 2; // Reihenfolge: red, blue, green, yellow
     private boolean CONFIG_PAGE = false;
-    
+    private boolean resetGame = false;
+
 
     public Game(Display7Segments4Digits display_white,
                 Display7Segments4Digits display_red,
@@ -148,6 +156,14 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 
         lastMinuteToChangeTimeblinking = -1;
 
+        /**
+         * dieser ResetState ist ein Trick. Ich wollte aus Sicherheitsgründen auf den RESET Button verzichten,
+         * damit es bei REVERTS im Spiel nicht versehentlich zum RESET kommt.
+         * Daher wird beim UNDO Drücken jeweils die folgenden 3 Zustände durchgegangen. Letzer Zustand, Aktueller Zustand, RESET Zustand, und dann wieder von vorne.
+         */
+        resetState = new SavePoint(Statistics.EVENT_FLAG_NEUTRAL, 0l, 0l, 0l, 0l, 0l);
+
+
         initGame();
     }
 
@@ -194,15 +210,14 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             button_green_pressed();
         });
 
-
         button_reset.addActionListener(e -> {
-            getLogger().debug("GUI_button_reset");
-            button_reset_pressed();
+            getLogger().debug("GUI_button_undo_reset");
+            button_undo_reset_pressed();
         });
         button_reset.addGPIOListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) return;
-            getLogger().debug("GPIO_button_reset");
-            button_reset_pressed();
+            getLogger().debug("GPIO_button_undo_reset");
+            button_undo_reset_pressed();
         });
         button_preset_num_teams.addActionListener(e -> {
             getLogger().debug("GUI_button_preset_num_teams");
@@ -215,12 +230,12 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         });
         button_preset_gametime.addActionListener(e -> {
             getLogger().debug("GUI_button_preset_gametime / UNDO");
-            button_gametime_undo_pressed();
+            button_gametime_pressed();
         });
         button_preset_gametime.addGPIOListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) return;
             getLogger().debug("GPIO_button_preset_gametime / UNDO");
-            button_gametime_undo_pressed();
+            button_gametime_pressed();
         });
         button_switch_mode.addActionListener(e -> {
             getLogger().debug("GUI_button_switch_mode");
@@ -288,7 +303,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
     }
 
     private void button_quit_pressed() {
-        if (mode != MODE_CLOCK_PREGAME) return;
+//        if (mode != MODE_CLOCK_PREGAME) return;
         System.exit(0);
     }
 
@@ -369,16 +384,49 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         }
     }
 
-    private void button_reset_pressed() {
-        Main.getFrameDebug().addToConfigLog("button_reset_pressed");
+    private void button_undo_reset_pressed() {
+        Main.getFrameDebug().addToConfigLog("button_undo_reset_pressed");
         if (CONFIG_PAGE) return;
-        if (mode != MODE_CLOCK_GAME_RUNNING) {
-            if (mode == MODE_CLOCK_GAME_PAUSED) {
-                lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
+
+
+        if (mode == MODE_CLOCK_GAME_PAUSED) {
+            getLogger().info("IN PAUSE MODE - Trying to UNDO");
+
+            SELECTED_SAVEPOINT++;
+            if (SELECTED_SAVEPOINT > SAVEPOINT_RESET) SELECTED_SAVEPOINT = SAVEPOINT_PREVIOUS;
+            // kein vorheriger vorhanden. Daher geht das nicht. Dann nur RESET oder CURRENT.
+            if (lastState == null && SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS) SELECTED_SAVEPOINT++;
+            SavePoint savePoint = null;
+            resetGame = false;
+            switch (SELECTED_SAVEPOINT) {
+                case SAVEPOINT_RESET: {
+                    savePoint = resetState;
+                    resetGame = true;
+                    break;
+                }
+                case SAVEPOINT_PREVIOUS: {
+                    savePoint = lastState;
+                    break;
+                }
+                case SAVEPOINT_CURRENT: {
+                    savePoint = currentState;
+                    break;
+                }
+                default: {
+                    savePoint = null;
+                }
             }
-            reset_timers();
+
+            flag = savePoint.getFlag();
+            time = savePoint.getTime();
+            time_red = savePoint.getTime_red();
+            time_blue = savePoint.getTime_blue();
+            // spielt keine Rolle ob es diese Teams gibt. Sind dann sowieso 0l;
+            time_green = savePoint.getTime_green();
+            time_yellow = savePoint.getTime_yellow();
+            setDisplayToEvent();
         } else {
-            getLogger().debug("RUNNING: IGNORED");
+            getLogger().debug("GAME IS RUNNING: IGNORED");
         }
     }
 
@@ -398,31 +446,14 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         }
     }
 
-    private void button_gametime_undo_pressed() {
-        Main.getFrameDebug().addToConfigLog("button_gametime_undo_pressed");
+    private void button_gametime_pressed() {
+        Main.getFrameDebug().addToConfigLog("button_gametime_pressed");
         if (CONFIG_PAGE) return;
         if (mode == MODE_CLOCK_PREGAME) {
             preset_gametime_position++;
             if (preset_gametime_position > preset_times.length - 1) preset_gametime_position = 0;
             Main.getConfigs().put(Configs.GAMETIME, preset_gametime_position);
             reset_timers();
-        } else if (mode == MODE_CLOCK_GAME_PAUSED) {
-            getLogger().info("IN PAUSE MODE - Trying to UNDO");
-
-            if (lastState != null) {
-                prevSavepointSelect = !prevSavepointSelect;
-                SavePoint savePoint = prevSavepointSelect ? lastState : currentState;
-                flag = savePoint.getFlag();
-                time = savePoint.getTime();
-                time_red = savePoint.getTime_red();
-                time_blue = savePoint.getTime_blue();
-                // spielt keine Rolle ob es diese Teams gibt. Sind dann sowieso 0l;
-                time_green = savePoint.getTime_green();
-                time_yellow = savePoint.getTime_yellow();
-                setDisplayToEvent();
-            } else {
-                getLogger().info("No revertable Event. Nothing to undo.");
-            }
         } else {
             getLogger().debug("NOT IN PREGAME: IGNORED");
         }
@@ -446,14 +477,20 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 
             currentState = null;
             lastState = null;
-            mode = MODE_CLOCK_GAME_RUNNING;
-            lastStatsSent = statistics.addEvent(Statistics.EVENT_RESUME);
-            if (prevSavepointSelect) {
-                prevSavepointSelect = false;
-                lastStatsSent = statistics.addEvent(Statistics.EVENT_REVERT_LAST_EVENT);
-                lastStatsSent = statistics.addEvent(flag);
+
+            if (resetGame) {
+                lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
+                reset_timers();
+            } else {
+                mode = MODE_CLOCK_GAME_RUNNING;
+                lastStatsSent = statistics.addEvent(Statistics.EVENT_RESUME);
+                if (SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS) {
+                    SELECTED_SAVEPOINT = SAVEPOINT_NONE;
+                    lastStatsSent = statistics.addEvent(Statistics.EVENT_REVERT_LAST_EVENT);
+                    lastStatsSent = statistics.addEvent(flag);
+                }
+                setDisplayToEvent();
             }
-            setDisplayToEvent();
         } else if (mode == MODE_CLOCK_GAME_OVER) {
             reset_timers();
         } else if (mode == MODE_CLOCK_PREGAME) {
@@ -473,6 +510,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 
     private void reset_timers() {
         flag = Statistics.EVENT_FLAG_NEUTRAL;
+        resetGame = false;
         currentState = null;
         lastState = null;
         mode = MODE_CLOCK_PREGAME;
@@ -490,7 +528,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         running_match_id = 0;
         lastStatsSent = 0l;
         statistics.reset();
-        prevSavepointSelect = false;
+        SELECTED_SAVEPOINT = SAVEPOINT_NONE;
         setDisplayToEvent();
     }
 
@@ -520,11 +558,11 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             Main.getPinHandler().off(Main.PH_LED_GREEN_BTN);
             Main.getPinHandler().off(Main.PH_LED_YELLOW_BTN);
 
-            if (mode == MODE_CLOCK_GAME_PAUSED) {
-                this.button_preset_gametime.setIcon(FrameDebug.IconUNDO);
-            } else {
-                this.button_preset_gametime.setIcon(FrameDebug.IconGametime);
-            }
+//            if (mode == MODE_CLOCK_GAME_PAUSED) {
+//                this.button_preset_gametime.setIcon(FrameDebug.IconUNDO);
+//            } else {
+//                this.button_preset_gametime.setIcon(FrameDebug.IconGametime);
+//            }
 
             if (mode == MODE_CLOCK_PREGAME) {
                 button_switch_mode.setIcon(FrameDebug.IconPlay);

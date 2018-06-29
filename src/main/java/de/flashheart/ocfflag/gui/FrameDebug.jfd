@@ -216,8 +216,8 @@ new FormModel {
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnReset"
 							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/128x128/player-begin.png" )
-							"toolTipText": "Reset"
+							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/128x128/reload.png" )
+							"toolTipText": "Reset/Undo"
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 							"gridX": 2
 							"gridY": 1

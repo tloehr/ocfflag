@@ -40,6 +40,8 @@ public class Configs {
     public static final String COLORCHANGE_SIREN_SIGNAL = "colorchange_siren_signal";
     public static final String GAME_TIME_LIST = "game_time_list";
 
+    public static final String TIME_ANNOUNCER = "time_announcer"; // schaltet das Blinken gemäß der Restspielzeit ein oder aus.
+
     public static final String APPCONTEXT_NOGPIO = "appctx_nogpio";
 
     public static final String FLAG_COLOR_WHITE = "flag_color_white";
@@ -47,7 +49,7 @@ public class Configs {
     public static final String FLAG_COLOR_RED = "flag_color_red";
     public static final String FLAG_COLOR_GREEN = "flag_color_green";
     public static final String FLAG_COLOR_YELLOW = "flag_color_yellow";
-    
+
     public Configs() throws IOException {
         configs = new SortedProperties(); // Einstellungen, die verändert werden
         applicationContext = new Properties(); // inhalte der application.properties (von Maven)
@@ -62,6 +64,7 @@ public class Configs {
         configs.put(FTPS, "false");
         configs.put(FTPPORT, "21");
         configs.put(FTPMAXERRORCOUNT, "30");
+        configs.put(TIME_ANNOUNCER, "true");
         configs.put(BRIGHTNESS_WHITE, "10");
         configs.put(BRIGHTNESS_RED, "10");
         configs.put(BRIGHTNESS_BLUE, "10");
@@ -124,9 +127,13 @@ public class Configs {
         return applicationContext.containsKey(key) ? applicationContext.get(key).toString() : "null";
     }
 
+    public boolean is(Object key){
+        return Boolean.parseBoolean(configs.containsKey(key) ? configs.get(key).toString() : "false");
+    }
+
     public int getInt(Object key) {
-            return Integer.parseInt(configs.containsKey(key) ? configs.get(key).toString() : "-1");
-        }
+        return Integer.parseInt(configs.containsKey(key) ? configs.get(key).toString() : "-1");
+    }
 
     public String get(Object key) {
         return configs.containsKey(key) ? configs.get(key).toString() : "null";
@@ -144,7 +151,7 @@ public class Configs {
         }
     }
 
-    public Long[] getGameTimes(){
+    public Long[] getGameTimes() {
         String[] listTimes = get(GAME_TIME_LIST).split("\\,");
         ArrayList<Long> list = new ArrayList<>();
         for (String time : listTimes) list.add(Long.parseLong(time));

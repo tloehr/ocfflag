@@ -471,8 +471,8 @@ public class FrameDebug extends JFrame {
 
                     //---- btnReset ----
                     btnReset.setText(null);
-                    btnReset.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/player-begin.png")));
-                    btnReset.setToolTipText("Reset");
+                    btnReset.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/reload.png")));
+                    btnReset.setToolTipText("Reset/Undo");
                     panel2.add(btnReset, CC.xy(2, 1, CC.FILL, CC.FILL));
 
                     //---- btnPresetGametimeUndo ----
