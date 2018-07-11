@@ -18,6 +18,8 @@ public class MessageProcessor extends Thread implements HasLogger {
     private FTPWrapper ftpWrapper;
     private boolean cleanupStatsFile = false;
 
+    private boolean ftpDisabled = false;
+
     protected void fireChangeEvent(StatsSentEvent evt) {
         for (StatsSentListener l : listeners) {
             l.statsSentEventReceived(evt);
@@ -59,7 +61,7 @@ public class MessageProcessor extends Thread implements HasLogger {
         cleanupStatsFile = true;
     }
 
-    public void testFTP(JTextArea outputArea, JButton buttonToDisable){
+    public void testFTP(JTextArea outputArea, JButton buttonToDisable) {
         if (lock.isLocked()) {
             outputArea.setText("MessageProcessor is busy. Try again.");
             return; // Sonst kann es passieren, dass das hier alles blockiert.
@@ -72,7 +74,20 @@ public class MessageProcessor extends Thread implements HasLogger {
             lock.unlock();
         }
     }
-        
+
+    public boolean isFTPworking() {
+        return !ftpDisabled && ftpWrapper.isFTPWorking();
+    }
+
+    public boolean isFtpDisabled() {
+        return ftpDisabled;
+    }
+
+    public void toggleFtpDisabled() {
+        ftpDisabled = !ftpDisabled;
+        getLogger().debug("FTP disabled: " + ftpDisabled);
+    }
+
     public void run() {
         while (!interrupted) {
             try {
@@ -88,7 +103,8 @@ public class MessageProcessor extends Thread implements HasLogger {
                                 myMessage.getGameEvent().getEvent() == Statistics.EVENT_GAME_OVER ||
                                 cleanupStatsFile;
 
-                        boolean success = ftpWrapper.upload(myMessage.getPhp(), move2archive);
+
+                        boolean success = !ftpDisabled && ftpWrapper.upload(myMessage.getPhp(), move2archive);
                         cleanupStatsFile = false; // muss nur einmal passieren
                         messageQ.clear(); // nur die letzte Nachricht ist wichtig
 
@@ -104,6 +120,7 @@ public class MessageProcessor extends Thread implements HasLogger {
                 } finally {
                     lock.unlock();
                 }
+
                 Thread.sleep(500); // Millisekunden
             } catch (InterruptedException ie) {
                 interrupted = true;

@@ -88,7 +88,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
      * Bei Pause wird einmalig (am Ende der Pause) lastPIT um die Pausezeit erhöht. Somit wirkt sich die Spielpause
      * nicht auf die Restspielzeit aus.
      * <p>
-     * lastPIT wird einmal bei buttonStandbyActivePressed() und einmal in run() bearbeitet.
+     * lastPIT wird einmal bei buttonStandbyRunningPressed() und einmal in run() bearbeitet.
      */
     private long lastPIT;
 
@@ -239,12 +239,12 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         });
         button_switch_mode.addActionListener(e -> {
             getLogger().debug("GUI_button_switch_mode");
-            buttonStandbyActivePressed();
+            buttonStandbyRunningPressed();
         });
         button_switch_mode.addGPIOListener((GpioPinListenerDigital) event -> {
             if (event.getState() != PinState.LOW) return;
             getLogger().debug("GPIO_button_switch_mode");
-            buttonStandbyActivePressed();
+            buttonStandbyRunningPressed();
         });
         button_quit.addActionListener(e -> {
             getLogger().debug("GUI_button_quit");
@@ -425,9 +425,14 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             time_green = savePoint.getTime_green();
             time_yellow = savePoint.getTime_yellow();
             setDisplayToEvent();
-        } else {
-            getLogger().debug("GAME IS RUNNING: IGNORED");
         }
+
+        if (mode == MODE_CLOCK_PREGAME) {
+            Main.getMessageProcessor().toggleFtpDisabled();
+            setDisplayToEvent();
+        }
+
+
     }
 
     private void button_preset_num_teams() {
@@ -459,10 +464,11 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         }
     }
 
-    private void buttonStandbyActivePressed() {
+    private void buttonStandbyRunningPressed() {
         Main.getFrameDebug().addToConfigLog("button_Standby_Active_pressed");
         if (CONFIG_PAGE) return;
         if (mode == MODE_CLOCK_GAME_RUNNING) {
+            SELECTED_SAVEPOINT = SAVEPOINT_NONE;
             standbyStartedAt = System.currentTimeMillis();
             mode = MODE_CLOCK_GAME_PAUSED;
             lastStatsSent = statistics.addEvent(Statistics.EVENT_PAUSE);
@@ -476,7 +482,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             standbyStartedAt = 0l;
 
             currentState = null;
-            lastState = null;
+//            lastState = null;
 
             if (resetGame) {
                 lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
@@ -488,6 +494,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                     SELECTED_SAVEPOINT = SAVEPOINT_NONE;
                     lastStatsSent = statistics.addEvent(Statistics.EVENT_REVERT_LAST_EVENT);
                     lastStatsSent = statistics.addEvent(flag);
+                    lastState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
                 }
                 setDisplayToEvent();
             }
@@ -538,6 +545,15 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             display_red.setTime(time_red);
             display_blue.setTime(time_blue);
 
+
+//
+//            if (mode == MODE_CLOCK_PREGAME) {
+//                display_red.setText("  no");
+//                display_blue.setText(" FTP");
+//            } else {
+//            }
+
+
             if (preset_num_teams < 3) display_green.clear();
             else display_green.setTime(time_green);
 
@@ -564,7 +580,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 //                this.button_preset_gametime.setIcon(FrameDebug.IconGametime);
 //            }
 
-            if (mode == MODE_CLOCK_PREGAME) {
+            if (mode == MODE_CLOCK_PREGAME || mode == MODE_CLOCK_GAME_PAUSED) {
                 button_switch_mode.setIcon(FrameDebug.IconPlay);
 
                 String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
@@ -579,20 +595,20 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                 Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", pregamePoleColorScheme); //"1:" + new RGBScheduleElement(Color.WHITE));
             }
 
-            if (mode == MODE_CLOCK_GAME_PAUSED) {
-                button_switch_mode.setIcon(FrameDebug.IconPlay);
-
-                String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
-                        new RGBScheduleElement(Configs.FLAG_COLOR_RED, 500l) + ";" +
-                        new RGBScheduleElement(Configs.FLAG_COLOR_BLUE, 500l) + ";" +
-                        (preset_num_teams >= 3 ? new RGBScheduleElement(Configs.FLAG_COLOR_GREEN, 500l) + ";" : "") +
-                        (preset_num_teams >= 4 ? new RGBScheduleElement(Configs.FLAG_COLOR_YELLOW, 500l) + ";" : "") +
-                        new RGBScheduleElement(Color.BLACK, 1500l);
-
-                getLogger().debug(pregamePoleColorScheme);
-
-                Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", pregamePoleColorScheme); //"1:" + new RGBScheduleElement(Color.WHITE));
-            }
+//            if (mode == MODE_CLOCK_GAME_PAUSED) {
+//                button_switch_mode.setIcon(FrameDebug.IconPlay);
+//
+//                String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
+//                        new RGBScheduleElement(Configs.FLAG_COLOR_RED, 500l) + ";" +
+//                        new RGBScheduleElement(Configs.FLAG_COLOR_BLUE, 500l) + ";" +
+//                        (preset_num_teams >= 3 ? new RGBScheduleElement(Configs.FLAG_COLOR_GREEN, 500l) + ";" : "") +
+//                        (preset_num_teams >= 4 ? new RGBScheduleElement(Configs.FLAG_COLOR_YELLOW, 500l) + ";" : "") +
+//                        new RGBScheduleElement(Color.BLACK, 1500l);
+//
+//                getLogger().debug(pregamePoleColorScheme);
+//
+//                Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", pregamePoleColorScheme); //"1:" + new RGBScheduleElement(Color.WHITE));
+//            }
 
             if (mode == MODE_CLOCK_PREGAME) {
                 getLogger().debug("PREGAME");
@@ -621,7 +637,11 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                 else Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, null, "∞:off,750;on,250");
 
                 Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,1000;off,1000");
-                Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:off,1000;on,1000");
+
+                if (Main.getMessageProcessor().isFTPworking())
+                    Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:on,1000;off,1000");
+                else Main.getPinHandler().off(Main.PH_LED_WHITE);
+
 
             }
 
@@ -629,7 +649,10 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                 getLogger().debug("PAUSED");
                 display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                 Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,500;off,500");
-                Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:off,500;on,500");
+
+                if (Main.getMessageProcessor().isFTPworking())
+                    Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:on,500;off,500");
+                else Main.getPinHandler().off(Main.PH_LED_WHITE);
 
                 setColorsAndBlinkingSchemeAccordingToGameSituation();
 
@@ -638,7 +661,11 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             if (mode == MODE_CLOCK_GAME_RUNNING) {
                 getLogger().debug("RUNNING");
                 button_switch_mode.setIcon(FrameDebug.IconPause);
-                Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,250;off,2000");
+
+
+                Main.getPinHandler().off(Main.PH_LED_GREEN);
+
+
                 Main.getPinHandler().off(Main.PH_LED_WHITE);
                 display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
 

@@ -17,8 +17,8 @@ import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
 import de.flashheart.ocfflag.mechanics.Game;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.statistics.MessageProcessor;
 import de.flashheart.ocfflag.misc.Tools;
+import de.flashheart.ocfflag.statistics.MessageProcessor;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -275,9 +275,6 @@ public class Main {
         logger.info(title);
 
 
-        messageProcessor = new MessageProcessor();
-        messageProcessor.start();
-
         /***
          *       ____                                          _   _     _               ___        _   _
          *      / ___|___  _ __ ___  _ __ ___   __ _ _ __   __| | | |   (_)_ __   ___   / _ \ _ __ | |_(_) ___  _ __  ___
@@ -341,6 +338,7 @@ public class Main {
 
         messageProcessor = new MessageProcessor();
         messageProcessor.start();
+
     }
 
     public static void prepareShutdown() {
