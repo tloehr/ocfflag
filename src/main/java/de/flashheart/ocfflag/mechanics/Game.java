@@ -38,8 +38,8 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 
     private final int SAVEPOINT_NONE = 0;
     private final int SAVEPOINT_PREVIOUS = 1;
-    private final int SAVEPOINT_CURRENT = 2;
-    private final int SAVEPOINT_RESET = 3;
+    private final int SAVEPOINT_RESET = 2;
+    private final int SAVEPOINT_CURRENT = 3;
 
 //    private final int[] SAVEPOINT_SELECTIONS = new int[]{SAVEPOINT_PREVIOUS, SAVEPOINT_CURRENT, SAVEPOINT_RESET};
 
@@ -393,7 +393,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             getLogger().info("IN PAUSE MODE - Trying to UNDO");
 
             SELECTED_SAVEPOINT++;
-            if (SELECTED_SAVEPOINT > SAVEPOINT_RESET) SELECTED_SAVEPOINT = SAVEPOINT_PREVIOUS;
+            if (SELECTED_SAVEPOINT > 3) SELECTED_SAVEPOINT = 1;
             // kein vorheriger vorhanden. Daher geht das nicht. Dann nur RESET oder CURRENT.
             if (lastState == null && SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS) SELECTED_SAVEPOINT++;
             SavePoint savePoint = null;
@@ -590,7 +590,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                         (preset_num_teams >= 4 ? new RGBScheduleElement(Configs.FLAG_COLOR_YELLOW, 500l) + ";" : "") +
                         new RGBScheduleElement(Color.BLACK, 1500l);
 
-                getLogger().debug(pregamePoleColorScheme);
+//                getLogger().debug(pregamePoleColorScheme);
 
                 Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", pregamePoleColorScheme); //"1:" + new RGBScheduleElement(Color.WHITE));
             }
