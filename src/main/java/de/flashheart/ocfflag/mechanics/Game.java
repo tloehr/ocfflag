@@ -395,7 +395,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             SELECTED_SAVEPOINT++;
             if (SELECTED_SAVEPOINT > 3) SELECTED_SAVEPOINT = 1;
             // kein vorheriger vorhanden. Daher geht das nicht. Dann nur RESET oder CURRENT.
-            if (lastState == null && SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS) SELECTED_SAVEPOINT++;
+            if (lastState == null && SELECTED_SAVEPOINT == 1) SELECTED_SAVEPOINT++;
             SavePoint savePoint = null;
             resetGame = false;
             switch (SELECTED_SAVEPOINT) {
