@@ -6,7 +6,7 @@
 
     <groupId>de.flashheart.ocfflag</groupId>
     <artifactId>ocfflag</artifactId>
-    <version>1.1</version>
+    <version>1.2.1</version>
 
     <properties>
         <!-- Generic properties -->
@@ -109,12 +109,12 @@
             <artifactId>ant-jsch</artifactId>
             <version>1.9.6</version>
         </dependency>
-        <!-- local libs -->
-        <dependency>
-            <groupId>com.enterprisedt</groupId>
-            <artifactId>edtFTPj</artifactId>
-            <version>2.5.0</version>
-        </dependency>
+        <!--&lt;!&ndash; local libs &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>com.enterprisedt</groupId>-->
+            <!--<artifactId>edtFTPj</artifactId>-->
+            <!--<version>2.5.0</version>-->
+        <!--</dependency>-->
     </dependencies>
 
     <scm>
@@ -297,30 +297,6 @@
             </plugin>
 
 
-            <!--<plugin>-->
-            <!--<groupId>org.apache.maven.plugins</groupId>-->
-            <!--<artifactId>maven-jar-plugin</artifactId>-->
-            <!--<configuration>-->
-            <!--<archive>-->
-            <!--<manifest>-->
-            <!--<mainClass>de.flashheart.lara.Main</mainClass>-->
-            <!--</manifest>-->
-            <!--</archive>-->
-            <!--</configuration>-->
-            <!--</plugin>-->
-            <!--<plugin>-->
-            <!--<artifactId>maven-assembly-plugin</artifactId>-->
-            <!--<configuration>-->
-            <!--<archive>-->
-            <!--<manifest>-->
-            <!--<mainClass>de.flashheart.lara.Main</mainClass>-->
-            <!--</manifest>-->
-            <!--</archive>-->
-            <!--<descriptorRefs>-->
-            <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
-            <!--</descriptorRefs>-->
-            <!--</configuration>-->
-            <!--</plugin>-->
         </plugins>
     </build>
 

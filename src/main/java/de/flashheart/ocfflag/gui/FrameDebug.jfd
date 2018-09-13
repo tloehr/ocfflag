@@ -19,7 +19,7 @@ new FormModel {
 				} ) {
 					name: "mainView"
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-						"$columnSpecs": "default, labelcompgap, pref:grow, labelcompgap, default, labelcompgap, unrelgap, labelcompgap, 62dlu:grow, labelcompgap, labelcompgap, default, unrelgap, labelcompgap, pref:grow, labelcompgap, default, labelcompgap, default"
+						"$columnSpecs": "default, labelcompgap, pref:grow, labelcompgap, unrelgap, labelcompgap, 62dlu:grow, labelcompgap, unrelgap, labelcompgap, pref:grow, labelcompgap, default, labelcompgap, default"
 						"$rowSpecs": "fill:22dlu:grow, linegap, fill:default:grow"
 					} ) {
 						name: "panel1"
@@ -36,17 +36,6 @@ new FormModel {
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 							"gridX": 3
 						} )
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnEditRed"
-							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"icon": &SwingIcon0 new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/edit.png" )
-							"contentAreaFilled": false
-							"borderPainted": false
-							"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridX": 5
-							"gridY": 1
-						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "lblPole"
 							"opaque": true
@@ -56,18 +45,7 @@ new FormModel {
 							"horizontalAlignment": 0
 							"font": new java.awt.Font( "DSEG7 Classic", 3, 36 )
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridX": 9
-							"gridHeight": 3
-						} )
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnEditWhite"
-							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"icon": #SwingIcon0
-							"borderPainted": false
-							"contentAreaFilled": false
-							"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridX": 12
+							"gridX": 7
 							"gridHeight": 3
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
@@ -77,24 +55,14 @@ new FormModel {
 							"font": #Font0
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-							"gridX": 15
-						} )
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnEditBlue"
-							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"icon": #SwingIcon0
-							"borderPainted": false
-							"contentAreaFilled": false
-							"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridX": 17
+							"gridX": 11
 						} )
 						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
 							name: "ledBlueButton"
 							"color": sfield java.awt.Color blue
 							"toolTipText": "Blue LED in Button"
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridX": 19
+							"gridX": 15
 						} )
 						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
 							name: "ledGreenButton"
@@ -113,17 +81,6 @@ new FormModel {
 							"gridY": 3
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnEditGreen"
-							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"icon": #SwingIcon0
-							"borderPainted": false
-							"contentAreaFilled": false
-							"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridY": 3
-							"gridX": 5
-						} )
-						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnYellow"
 							"text": "Yellow"
 							"foreground": new java.awt.Color( 210, 199, 27, 255 )
@@ -131,18 +88,7 @@ new FormModel {
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 							"gridY": 3
-							"gridX": 15
-						} )
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnEditYellow"
-							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"icon": #SwingIcon0
-							"borderPainted": false
-							"contentAreaFilled": false
-							"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridY": 3
-							"gridX": 17
+							"gridX": 11
 						} )
 						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
 							name: "ledYellowButton"
@@ -150,7 +96,7 @@ new FormModel {
 							"toolTipText": "Yellow LED in Button"
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 							"gridY": 3
-							"gridX": 19
+							"gridX": 15
 						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 3

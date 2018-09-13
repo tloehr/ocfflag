@@ -249,17 +249,12 @@ public class FrameDebug extends JFrame {
         panel1 = new JPanel();
         ledRedButton = new MyLED();
         btnRed = new JButton();
-        btnEditRed = new JButton();
         lblPole = new JLabel();
-        btnEditWhite = new JButton();
         btnBlue = new JButton();
-        btnEditBlue = new JButton();
         ledBlueButton = new MyLED();
         ledGreenButton = new MyLED();
         btnGreen = new JButton();
-        btnEditGreen = new JButton();
         btnYellow = new JButton();
-        btnEditYellow = new JButton();
         ledYellowButton = new MyLED();
         panel5 = new JPanel();
         btnConfig = new JButton();
@@ -325,7 +320,7 @@ public class FrameDebug extends JFrame {
                 //======== panel1 ========
                 {
                     panel1.setLayout(new FormLayout(
-                        "default, $lcgap, pref:grow, $lcgap, default, $lcgap, $ugap, $lcgap, 62dlu:grow, 2*($lcgap), default, $ugap, $lcgap, pref:grow, 2*($lcgap, default)",
+                        "default, $lcgap, pref:grow, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow, 2*($lcgap, default)",
                         "fill:22dlu:grow, $lgap, fill:default:grow"));
 
                     //---- ledRedButton ----
@@ -339,14 +334,6 @@ public class FrameDebug extends JFrame {
                     btnRed.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 36));
                     panel1.add(btnRed, CC.xy(3, 1));
 
-                    //---- btnEditRed ----
-                    btnEditRed.setText(null);
-                    btnEditRed.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit.png")));
-                    btnEditRed.setContentAreaFilled(false);
-                    btnEditRed.setBorderPainted(false);
-                    btnEditRed.setBorder(null);
-                    panel1.add(btnEditRed, CC.xy(5, 1));
-
                     //---- lblPole ----
                     lblPole.setOpaque(true);
                     lblPole.setBackground(Color.white);
@@ -354,34 +341,18 @@ public class FrameDebug extends JFrame {
                     lblPole.setForeground(Color.black);
                     lblPole.setHorizontalAlignment(SwingConstants.CENTER);
                     lblPole.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 36));
-                    panel1.add(lblPole, CC.xywh(9, 1, 1, 3));
-
-                    //---- btnEditWhite ----
-                    btnEditWhite.setText(null);
-                    btnEditWhite.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit.png")));
-                    btnEditWhite.setBorderPainted(false);
-                    btnEditWhite.setContentAreaFilled(false);
-                    btnEditWhite.setBorder(null);
-                    panel1.add(btnEditWhite, CC.xywh(12, 1, 1, 3));
+                    panel1.add(lblPole, CC.xywh(7, 1, 1, 3));
 
                     //---- btnBlue ----
                     btnBlue.setText("Blue");
                     btnBlue.setForeground(Color.blue);
                     btnBlue.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 36));
-                    panel1.add(btnBlue, CC.xy(15, 1, CC.FILL, CC.DEFAULT));
-
-                    //---- btnEditBlue ----
-                    btnEditBlue.setText(null);
-                    btnEditBlue.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit.png")));
-                    btnEditBlue.setBorderPainted(false);
-                    btnEditBlue.setContentAreaFilled(false);
-                    btnEditBlue.setBorder(null);
-                    panel1.add(btnEditBlue, CC.xy(17, 1));
+                    panel1.add(btnBlue, CC.xy(11, 1, CC.FILL, CC.DEFAULT));
 
                     //---- ledBlueButton ----
                     ledBlueButton.setColor(Color.blue);
                     ledBlueButton.setToolTipText("Blue LED in Button");
-                    panel1.add(ledBlueButton, CC.xy(19, 1));
+                    panel1.add(ledBlueButton, CC.xy(15, 1));
 
                     //---- ledGreenButton ----
                     ledGreenButton.setColor(Color.green);
@@ -394,32 +365,16 @@ public class FrameDebug extends JFrame {
                     btnGreen.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 36));
                     panel1.add(btnGreen, CC.xy(3, 3));
 
-                    //---- btnEditGreen ----
-                    btnEditGreen.setText(null);
-                    btnEditGreen.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit.png")));
-                    btnEditGreen.setBorderPainted(false);
-                    btnEditGreen.setContentAreaFilled(false);
-                    btnEditGreen.setBorder(null);
-                    panel1.add(btnEditGreen, CC.xy(5, 3));
-
                     //---- btnYellow ----
                     btnYellow.setText("Yellow");
                     btnYellow.setForeground(new Color(210, 199, 27));
                     btnYellow.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 36));
-                    panel1.add(btnYellow, CC.xy(15, 3, CC.FILL, CC.DEFAULT));
-
-                    //---- btnEditYellow ----
-                    btnEditYellow.setText(null);
-                    btnEditYellow.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit.png")));
-                    btnEditYellow.setBorderPainted(false);
-                    btnEditYellow.setContentAreaFilled(false);
-                    btnEditYellow.setBorder(null);
-                    panel1.add(btnEditYellow, CC.xy(17, 3));
+                    panel1.add(btnYellow, CC.xy(11, 3, CC.FILL, CC.DEFAULT));
 
                     //---- ledYellowButton ----
                     ledYellowButton.setColor(Color.yellow);
                     ledYellowButton.setToolTipText("Yellow LED in Button");
-                    panel1.add(ledYellowButton, CC.xy(19, 3));
+                    panel1.add(ledYellowButton, CC.xy(15, 3));
                 }
                 mainView.add(panel1, CC.xywh(3, 3, 9, 1));
 
@@ -784,17 +739,12 @@ public class FrameDebug extends JFrame {
     private JPanel panel1;
     private MyLED ledRedButton;
     private JButton btnRed;
-    private JButton btnEditRed;
     private JLabel lblPole;
-    private JButton btnEditWhite;
     private JButton btnBlue;
-    private JButton btnEditBlue;
     private MyLED ledBlueButton;
     private MyLED ledGreenButton;
     private JButton btnGreen;
-    private JButton btnEditGreen;
     private JButton btnYellow;
-    private JButton btnEditYellow;
     private MyLED ledYellowButton;
     private JPanel panel5;
     private JButton btnConfig;
