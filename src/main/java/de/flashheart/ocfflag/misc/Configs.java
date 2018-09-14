@@ -18,14 +18,10 @@ public class Configs {
     public static final String MATCHID = "matchid";
     public static final String MYUUID = "uuid";
     public static final String LOGLEVEL = "loglevel";
-    public static final String FTPHOST = "ftphost";
-    public static final String FTPPORT = "ftpport";
-    public static final String FTPUSER = "ftpuser";
-    public static final String FTPPWD = "ftppwd";
-    public static final String FTPS = "ftps";
-    public static final String FTPREMOTEPATH = "ftpremotepath";
-    // -1 bedeutet, FTP abschalten. 0 heisst immer weiter versuchen. Ansonsten die konkrete Anzahl
-    public static final String FTPMAXERRORCOUNT = "ftp_maxerror_count";
+
+    public static final String REST_URL = "resturl";
+    public static final String REST_AUTH = "restauth";
+
     public static final String MIN_STAT_SEND_TIME = "sendstats";
     public static final String FLAGNAME = "flagname";
     public static final String GAMETIME = "gametime";
@@ -61,9 +57,10 @@ public class Configs {
         configs.put(LOGLEVEL, "debug");
         configs.put(FLAGNAME, "OCF Flagge #" + new java.util.Random().nextInt());
         configs.put(GAMETIME, "0");
-        configs.put(FTPS, "false");
-        configs.put(FTPPORT, "21");
-        configs.put(FTPMAXERRORCOUNT, "30");
+
+        configs.put(REST_URL, "http://localhost:8090/rest/gamestate/create");
+        configs.put(REST_AUTH, "Torsten:test1234");
+
         configs.put(TIME_ANNOUNCER, "true");
         configs.put(BRIGHTNESS_WHITE, "10");
         configs.put(BRIGHTNESS_RED, "10");
@@ -93,6 +90,12 @@ public class Configs {
     }
 
 
+    public long getNextMatchID(){
+            long nextmachtid = Long.parseLong(get(MATCHID)) + 1l;
+            put(MATCHID, Long.toString(nextmachtid));
+            return nextmachtid;
+        }
+
     private void loadApplicationContext() throws IOException {
         InputStream in2 = Main.class.getResourceAsStream("/application.properties");
         applicationContext.load(in2);
@@ -116,12 +119,6 @@ public class Configs {
         configs.put(key, value.toString());
         saveConfigs();
     }
-
-    public boolean isFTPComplete() {
-        return getInt(FTPMAXERRORCOUNT) >= 0 && configs.containsKey(FTPUSER) && configs.containsKey(FTPHOST) && configs.containsKey(FTPPORT) && configs.containsKey(FTPPWD) && configs.containsKey(FTPS) && configs.containsKey(FTPREMOTEPATH);
-
-    }
-
 
     public String getApplicationInfo(Object key) {
         return applicationContext.containsKey(key) ? applicationContext.get(key).toString() : "null";

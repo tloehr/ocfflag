@@ -36,8 +36,6 @@ public class FrameDebug extends JFrame {
         initFonts();
         initFrame();
 
-        // " ("+Tools.formatLongTime(Long.parseLong(Main.getConfigs().getApplicationInfo("timestamp")))+")
-
         String title = "ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + "." + Main.getConfigs().getApplicationInfo("buildNumber") + " [" + Main.getConfigs().getApplicationInfo("project.build.timestamp") + "]";
 
         logger.info(title);
@@ -99,26 +97,6 @@ public class FrameDebug extends JFrame {
         return btnConfig;
     }
 
-    public JButton getBtnEditRed() {
-        return btnEditRed;
-    }
-
-    public JButton getBtnEditWhite() {
-        return btnEditWhite;
-    }
-
-    public JButton getBtnEditBlue() {
-        return btnEditBlue;
-    }
-
-    public JButton getBtnEditGreen() {
-        return btnEditGreen;
-    }
-
-    public JButton getBtnEditYellow() {
-        return btnEditYellow;
-    }
-
     private void mainPanelStateChanged(ChangeEvent e) {
         if (mainPanel.getSelectedIndex() == 1) {
             setConfigsToScreen();
@@ -130,11 +108,10 @@ public class FrameDebug extends JFrame {
 
     private void setConfigsToScreen() {
         txtFlagName.setText(Main.getConfigs().get(Configs.FLAGNAME));
-        txtFTPHost.setText(Main.getConfigs().get(Configs.FTPHOST));
-        txtFTPPort.setText(Main.getConfigs().get(Configs.FTPPORT));
-        txtFTPUser.setText(Main.getConfigs().get(Configs.FTPUSER));
-        txtFTPPassword.setText(Main.getConfigs().get(Configs.FTPPWD));
-        txtFTPRemotePath.setText(Main.getConfigs().get(Configs.FTPREMOTEPATH));
+        txtResturl.setText(Main.getConfigs().get(Configs.REST_URL));
+        txtResturl.setText(Main.getConfigs().get(Configs.REST_URL));
+
+
         txtSendStats.setText(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
         txtUUID.setText(Main.getConfigs().get(Configs.MYUUID));
     }
@@ -146,36 +123,7 @@ public class FrameDebug extends JFrame {
 
     public void addToConfigLog(String text) {
         if (mainPanel.getSelectedIndex() != 1) return;
-        txtFTPlog.append(text + "\n");
-    }
-
-    private void btnTestFTPActionPerformed(ActionEvent e) {
-        Main.getMessageProcessor().testFTP(txtFTPlog, btnTestFTP);
-    }
-
-    private void txtFTPHostFocusLost(FocusEvent e) {
-        Main.getConfigs().put(Configs.FTPHOST, txtFTPHost.getText().trim());
-    }
-
-    private void txtFTPPortFocusLost(FocusEvent e) {
-        try {
-            Integer.parseInt(txtFTPPort.getText().trim());
-            Main.getConfigs().put(Configs.FTPPORT, txtFTPPort.getText().trim());
-        } catch (NumberFormatException nfe) {
-            txtFTPPort.setText(Main.getConfigs().get(Configs.FTPPORT));
-        }
-    }
-
-    private void txtFTPUserFocusLost(FocusEvent e) {
-        Main.getConfigs().put(Configs.FTPUSER, txtFTPUser.getText().trim());
-    }
-
-    private void txtFTPPasswordFocusLost(FocusEvent e) {
-        Main.getConfigs().put(Configs.FTPPWD, txtFTPPassword.getText().trim());
-    }
-
-    private void txtFTPRemotePathFocusLost(FocusEvent e) {
-        Main.getConfigs().put(Configs.FTPREMOTEPATH, txtFTPRemotePath.getText().trim());
+        txtLog.append(text + "\n");
     }
 
     private void txtSendStatsFocusLost(FocusEvent e) {
@@ -238,8 +186,13 @@ public class FrameDebug extends JFrame {
 //        Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", pregamePoleColorScheme);
     }
 
+    private void txtResturlFocusLost(FocusEvent e) {
+        Main.getConfigs().put(Configs.REST_URL, txtResturl.getText().trim());
+    }
 
-
+    private void txtRestAuthFocusLost(FocusEvent e) {
+        Main.getConfigs().put(Configs.REST_AUTH, txtRestAuth.getText().trim());
+    }
 
 
     private void initComponents() {
@@ -272,19 +225,13 @@ public class FrameDebug extends JFrame {
         label1 = new JLabel();
         txtFlagName = new JTextField();
         label2 = new JLabel();
-        txtFTPHost = new JTextField();
-        label3 = new JLabel();
-        txtFTPPort = new JTextField();
+        txtResturl = new JTextField();
         label4 = new JLabel();
-        txtFTPUser = new JTextField();
-        label5 = new JLabel();
-        txtFTPPassword = new JTextField();
-        label6 = new JLabel();
-        txtFTPRemotePath = new JTextField();
+        txtRestAuth = new JTextField();
         label8 = new JLabel();
         txtSendStats = new JTextField();
         panel6 = new JPanel();
-        btnTestFTP = new JButton();
+        btnTestRest = new JButton();
         btnTestHardware = new JButton();
         txtFlagColor = new JTextField();
         label9 = new JLabel();
@@ -298,7 +245,7 @@ public class FrameDebug extends JFrame {
         btnYellowBrght = new JButton();
         btnPlay = new JButton();
         scrollPane1 = new JScrollPane();
-        txtFTPlog = new JTextArea();
+        txtLog = new JTextArea();
 
         //======== this ========
         setTitle("OCF-Flag 1.0.0.0");
@@ -450,7 +397,7 @@ public class FrameDebug extends JFrame {
             {
                 configView.setLayout(new FormLayout(
                     "$ugap, $lcgap, pref, $lcgap, $rgap, $lcgap, default:grow, $lcgap, $ugap",
-                    "2*(default, $ugap), 6*(default, $lgap), default, $rgap, default, $ugap, default, $lgap, default:grow, $lgap, 85dlu, $lgap, default"));
+                    "2*(default, $ugap), 2*(default, $lgap), default, $rgap, default, $ugap, default, $lgap, pref, $lgap, 85dlu:grow, $lgap, default"));
 
                 //---- lblConfigTitle ----
                 lblConfigTitle.setOpaque(true);
@@ -477,84 +424,39 @@ public class FrameDebug extends JFrame {
                 configView.add(txtFlagName, CC.xy(7, 3));
 
                 //---- label2 ----
-                label2.setText("FTP-Host");
+                label2.setText("Rest URL");
                 label2.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label2, CC.xy(3, 5));
 
-                //---- txtFTPHost ----
-                txtFTPHost.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                txtFTPHost.addFocusListener(new FocusAdapter() {
+                //---- txtResturl ----
+                txtResturl.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtResturl.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
-                        txtFTPHostFocusLost(e);
+                        txtResturlFocusLost(e);
                     }
                 });
-                configView.add(txtFTPHost, CC.xy(7, 5));
-
-                //---- label3 ----
-                label3.setText("FTP-Port");
-                label3.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                configView.add(label3, CC.xy(3, 7));
-
-                //---- txtFTPPort ----
-                txtFTPPort.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                txtFTPPort.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtFTPPortFocusLost(e);
-                    }
-                });
-                configView.add(txtFTPPort, CC.xy(7, 7));
+                configView.add(txtResturl, CC.xy(7, 5));
 
                 //---- label4 ----
-                label4.setText("FTP-User");
+                label4.setText("Rest-Auth");
                 label4.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                configView.add(label4, CC.xy(3, 9));
+                configView.add(label4, CC.xy(3, 7));
 
-                //---- txtFTPUser ----
-                txtFTPUser.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                txtFTPUser.addFocusListener(new FocusAdapter() {
+                //---- txtRestAuth ----
+                txtRestAuth.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtRestAuth.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
-                        txtFTPUserFocusLost(e);
+                        txtRestAuthFocusLost(e);
                     }
                 });
-                configView.add(txtFTPUser, CC.xy(7, 9));
-
-                //---- label5 ----
-                label5.setText("FTP-Password");
-                label5.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                configView.add(label5, CC.xy(3, 11));
-
-                //---- txtFTPPassword ----
-                txtFTPPassword.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                txtFTPPassword.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtFTPPasswordFocusLost(e);
-                    }
-                });
-                configView.add(txtFTPPassword, CC.xy(7, 11));
-
-                //---- label6 ----
-                label6.setText("Remote Path");
-                label6.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                configView.add(label6, CC.xy(3, 13));
-
-                //---- txtFTPRemotePath ----
-                txtFTPRemotePath.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                txtFTPRemotePath.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtFTPRemotePathFocusLost(e);
-                    }
-                });
-                configView.add(txtFTPRemotePath, CC.xy(7, 13));
+                configView.add(txtRestAuth, CC.xy(7, 7));
 
                 //---- label8 ----
                 label8.setText("Send Stats");
                 label8.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                configView.add(label8, CC.xy(3, 17));
+                configView.add(label8, CC.xy(3, 9));
 
                 //---- txtSendStats ----
                 txtSendStats.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
@@ -564,17 +466,16 @@ public class FrameDebug extends JFrame {
                         txtSendStatsFocusLost(e);
                     }
                 });
-                configView.add(txtSendStats, CC.xy(7, 17));
+                configView.add(txtSendStats, CC.xy(7, 9));
 
                 //======== panel6 ========
                 {
                     panel6.setLayout(new BoxLayout(panel6, BoxLayout.X_AXIS));
 
-                    //---- btnTestFTP ----
-                    btnTestFTP.setText("Test FTP Server");
-                    btnTestFTP.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
-                    btnTestFTP.addActionListener(e -> btnTestFTPActionPerformed(e));
-                    panel6.add(btnTestFTP);
+                    //---- btnTestRest ----
+                    btnTestRest.setText("Test Connection");
+                    btnTestRest.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
+                    panel6.add(btnTestRest);
 
                     //---- btnTestHardware ----
                     btnTestHardware.setText("Test Hardware");
@@ -587,22 +488,22 @@ public class FrameDebug extends JFrame {
                     txtFlagColor.addActionListener(e -> txtFlagColorActionPerformed(e));
                     panel6.add(txtFlagColor);
                 }
-                configView.add(panel6, CC.xywh(3, 19, 5, 1));
+                configView.add(panel6, CC.xywh(3, 11, 5, 1));
 
                 //---- label9 ----
                 label9.setText("UUID");
                 label9.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                configView.add(label9, CC.xy(3, 21));
+                configView.add(label9, CC.xy(3, 13));
 
                 //---- txtUUID ----
                 txtUUID.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtUUID.setEditable(false);
-                configView.add(txtUUID, CC.xy(7, 21));
+                configView.add(txtUUID, CC.xy(7, 13));
 
                 //---- label10 ----
                 label10.setText("Helligkeit");
                 label10.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                configView.add(label10, CC.xy(3, 23));
+                configView.add(label10, CC.xy(3, 15));
 
                 //======== panel4 ========
                 {
@@ -643,23 +544,23 @@ public class FrameDebug extends JFrame {
                     btnYellowBrght.addActionListener(e -> btnBrghtActionPerformed(e));
                     panel4.add(btnYellowBrght);
                 }
-                configView.add(panel4, CC.xy(7, 23));
+                configView.add(panel4, CC.xy(7, 15));
 
                 //---- btnPlay ----
                 btnPlay.setText(null);
                 btnPlay.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/agt_games.png")));
                 btnPlay.setToolTipText("Spiel konfigurieren");
-                configView.add(btnPlay, CC.xy(3, 25, CC.LEFT, CC.DEFAULT));
+                configView.add(btnPlay, CC.xy(3, 17, CC.LEFT, CC.DEFAULT));
 
                 //======== scrollPane1 ========
                 {
 
-                    //---- txtFTPlog ----
-                    txtFTPlog.setBackground(Color.black);
-                    txtFTPlog.setForeground(new Color(0, 255, 51));
-                    scrollPane1.setViewportView(txtFTPlog);
+                    //---- txtLog ----
+                    txtLog.setBackground(Color.black);
+                    txtLog.setForeground(new Color(0, 255, 51));
+                    scrollPane1.setViewportView(txtLog);
                 }
-                configView.add(scrollPane1, CC.xy(7, 25, CC.DEFAULT, CC.FILL));
+                configView.add(scrollPane1, CC.xy(7, 17, CC.DEFAULT, CC.FILL));
             }
             mainPanel.addTab("configView", configView);
         }
@@ -762,19 +663,13 @@ public class FrameDebug extends JFrame {
     private JLabel label1;
     private JTextField txtFlagName;
     private JLabel label2;
-    private JTextField txtFTPHost;
-    private JLabel label3;
-    private JTextField txtFTPPort;
+    private JTextField txtResturl;
     private JLabel label4;
-    private JTextField txtFTPUser;
-    private JLabel label5;
-    private JTextField txtFTPPassword;
-    private JLabel label6;
-    private JTextField txtFTPRemotePath;
+    private JTextField txtRestAuth;
     private JLabel label8;
     private JTextField txtSendStats;
     private JPanel panel6;
-    private JButton btnTestFTP;
+    private JButton btnTestRest;
     private JButton btnTestHardware;
     private JTextField txtFlagColor;
     private JLabel label9;
@@ -788,6 +683,6 @@ public class FrameDebug extends JFrame {
     private JButton btnYellowBrght;
     private JButton btnPlay;
     private JScrollPane scrollPane1;
-    private JTextArea txtFTPlog;
+    private JTextArea txtLog;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

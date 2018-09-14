@@ -5,11 +5,11 @@ package de.flashheart.ocfflag.mechanics;
  * Wir bei UNDOs gebraucht.
  */
 public class SavePoint {
-    private final int flag;
+    private final String flag;
     private final long time, time_blue, time_red, time_yellow, time_green;
 
 
-    public SavePoint(int flag, long time, long time_blue, long time_red, long time_yellow, long time_green) {
+    public SavePoint(String flag, long time, long time_blue, long time_red, long time_yellow, long time_green) {
         this.flag = flag;
         this.time = time;
         this.time_blue = time_blue;
@@ -18,7 +18,7 @@ public class SavePoint {
         this.time_green = time_green;
     }
 
-    public int getFlag() {
+    public String getFlag() {
         return flag;
     }
 

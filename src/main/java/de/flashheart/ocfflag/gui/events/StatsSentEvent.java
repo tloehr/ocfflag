@@ -1,16 +1,17 @@
 package de.flashheart.ocfflag.gui.events;
 
-import de.flashheart.ocfflag.mechanics.GameEvent;
+import de.flashheart.ocfflag.statistics.GameState;
 
 import java.util.EventObject;
 
 public class StatsSentEvent extends EventObject {
     private final boolean successful;
-    private final GameEvent gameEvent;
+    private final GameState gameState;
 
-    public StatsSentEvent(Object source, GameEvent gameEvent, boolean successful) {
+    public StatsSentEvent(Object source, GameState gameState, boolean successful) {
         super(source);
-        this.gameEvent = gameEvent;
+        this.gameState = gameState;
+
         this.successful = successful;
 
     }
@@ -19,7 +20,7 @@ public class StatsSentEvent extends EventObject {
         return successful;
     }
 
-    public GameEvent getGameEvent() {
-        return gameEvent;
+    public GameState getGameState() {
+        return gameState;
     }
 }

@@ -204,7 +204,7 @@ new FormModel {
 				} )
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 					"$columnSpecs": "unrelgap, labelcompgap, pref, labelcompgap, relgap, labelcompgap, default:grow, labelcompgap, unrelgap"
-					"$rowSpecs": "default, unrelgap, default, unrelgap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, relgap, default, unrelgap, default, linegap, default:grow, linegap, 85dlu, linegap, default"
+					"$rowSpecs": "default, unrelgap, default, unrelgap, default, linegap, default, linegap, default, relgap, default, unrelgap, default, linegap, pref, linegap, 85dlu:grow, linegap, default"
 				} ) {
 					name: "configView"
 					add( new FormComponent( "javax.swing.JLabel" ) {
@@ -237,90 +237,42 @@ new FormModel {
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "label2"
-						"text": "FTP-Host"
+						"text": "Rest URL"
 						"font": #Font1
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridY": 5
 						"gridX": 3
 					} )
 					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtFTPHost"
+						name: "txtResturl"
 						"font": #Font1
-						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtFTPHostFocusLost", true ) )
+						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtResturlFocusLost", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
 						"gridY": 5
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "label3"
-						"text": "FTP-Port"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 7
-						"gridX": 3
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtFTPPort"
-						"font": #Font1
-						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtFTPPortFocusLost", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 7
-						"gridY": 7
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "label4"
-						"text": "FTP-User"
+						"text": "Rest-Auth"
 						"font": #Font1
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 9
+						"gridY": 7
 						"gridX": 3
 					} )
 					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtFTPUser"
+						name: "txtRestAuth"
 						"font": #Font1
-						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtFTPUserFocusLost", true ) )
+						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtRestAuthFocusLost", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
-						"gridY": 9
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "label5"
-						"text": "FTP-Password"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 11
-						"gridX": 3
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtFTPPassword"
-						"font": #Font1
-						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtFTPPasswordFocusLost", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 7
-						"gridY": 11
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "label6"
-						"text": "Remote Path"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 13
-						"gridX": 3
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtFTPRemotePath"
-						"font": #Font1
-						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtFTPRemotePathFocusLost", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 7
-						"gridY": 13
+						"gridY": 7
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "label8"
 						"text": "Send Stats"
 						"font": #Font1
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 17
+						"gridY": 9
 						"gridX": 3
 					} )
 					add( new FormComponent( "javax.swing.JTextField" ) {
@@ -329,15 +281,14 @@ new FormModel {
 						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtSendStatsFocusLost", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
-						"gridY": 17
+						"gridY": 9
 					} )
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
 						name: "panel6"
 						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnTestFTP"
-							"text": "Test FTP Server"
+							name: "btnTestRest"
+							"text": "Test Connection"
 							"font": &Font2 new java.awt.Font( "Dialog", 0, 20 )
-							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnTestFTPActionPerformed", true ) )
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnTestHardware"
@@ -352,7 +303,7 @@ new FormModel {
 						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 3
-						"gridY": 19
+						"gridY": 11
 						"gridWidth": 5
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
@@ -360,7 +311,7 @@ new FormModel {
 						"text": "UUID"
 						"font": #Font1
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 21
+						"gridY": 13
 						"gridX": 3
 					} )
 					add( new FormComponent( "javax.swing.JTextField" ) {
@@ -369,14 +320,14 @@ new FormModel {
 						"editable": false
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
-						"gridY": 21
+						"gridY": 13
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "label10"
 						"text": "Helligkeit"
 						"font": #Font1
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 23
+						"gridY": 15
 						"gridX": 3
 					} )
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
@@ -420,7 +371,7 @@ new FormModel {
 						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
-						"gridY": 23
+						"gridY": 15
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
 						name: "btnPlay"
@@ -429,19 +380,19 @@ new FormModel {
 						"toolTipText": "Spiel konfigurieren"
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints LEFT
-						"gridY": 25
+						"gridY": 17
 						"gridX": 3
 					} )
 					add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 						name: "scrollPane1"
 						add( new FormComponent( "javax.swing.JTextArea" ) {
-							name: "txtFTPlog"
+							name: "txtLog"
 							"background": sfield java.awt.Color black
 							"foreground": new java.awt.Color( 0, 255, 51, 255 )
 						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
-						"gridY": 25
+						"gridY": 17
 						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					} )
 				}, new FormLayoutConstraints( null ) {

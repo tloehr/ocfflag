@@ -4,8 +4,6 @@ import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.FrameDebug;
-import de.flashheart.ocfflag.gui.events.StatsSentEvent;
-import de.flashheart.ocfflag.gui.events.StatsSentListener;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
 import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
@@ -15,6 +13,7 @@ import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
+import de.flashheart.ocfflag.statistics.GameEvent;
 import de.flashheart.ocfflag.statistics.Statistics;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 /**
  * In dieser Klasse befindet sich die Spielmechanik.
  */
-public class Game implements Runnable, StatsSentListener, HasLogger {
+public class Game implements Runnable, HasLogger {
 
     private final int MODE_CLOCK_PREGAME = 0;
     private final int MODE_CLOCK_GAME_RUNNING = 1;
@@ -47,9 +46,9 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
     private final int MIN_TEAMS = 2;
 
     private int mode = MODE_CLOCK_PREGAME;
-    private int running_match_id = 0;
+//    private int running_match_id = 0;
 
-    private int flag = Statistics.EVENT_FLAG_NEUTRAL;
+    private String flag = GameEvent.FLAG_NEUTRAL;
 
     private final Display7Segments4Digits display_blue;
     private final Display7Segments4Digits display_red;
@@ -76,12 +75,12 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
     private Statistics statistics;
     private final HashMap<String, Color> colors = new HashMap<>();
 
-    private long time, time_blue, time_red, time_yellow, time_green, standbyStartedAt, lastStatsSent, min_stat_sent_time;
+    private long remaining, time_blue, time_red, time_yellow, time_green, standbyStartedAt, lastStatsSent, min_stat_sent_time;
     private int lastMinuteToChangeTimeblinking;
     private int SELECTED_SAVEPOINT = SAVEPOINT_NONE;
     private SavePoint currentState, lastState, resetState;
     /**
-     * In der methode run() wird in regelmässigen Abständen die Restspielzeit time neu berechnet. Dabei rechnen
+     * In der methode run() wird in regelmässigen Abständen die Restspielzeit remaining neu berechnet. Dabei rechnen
      * wir bei jedem Durchgang die abgelaufene Zeit seit dem letzten Mal aus. Das machen wir mittels der Variable
      * lastPIT (letzer Zeitpunkt). Die aktuelle Zeit abzüglich lastPIT bildet die Zeitdifferenz zum letzten Mal.
      * Diese Differenz wird von der verbliebenen Spielzeit abgezogen.
@@ -147,7 +146,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         SLEEP_PER_CYCLE = Long.parseLong(Main.getConfigs().get(Configs.SLEEP_PER_CYCLE));
         preset_num_teams = Integer.parseInt(Main.getConfigs().get(Configs.NUMBER_OF_TEAMS));
 
-        statistics = new Statistics(preset_num_teams);
+        statistics = new Statistics(preset_num_teams, preset_times[preset_gametime_position]);
 
         colors.put("green", Color.green);
         colors.put("red", Color.red);
@@ -161,14 +160,14 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
          * damit es bei REVERTS im Spiel nicht versehentlich zum RESET kommt.
          * Daher wird beim UNDO Drücken jeweils die folgenden 3 Zustände durchgegangen. Letzer Zustand, Aktueller Zustand, RESET Zustand, und dann wieder von vorne.
          */
-        resetState = new SavePoint(Statistics.EVENT_FLAG_NEUTRAL, 0l, 0l, 0l, 0l, 0l);
+        resetState = new SavePoint(GameEvent.FLAG_NEUTRAL, 0l, 0l, 0l, 0l, 0l);
 
 
         initGame();
     }
 
     private void initGame() {
-        Main.getMessageProcessor().addListener(this);
+//        Main.getMessageProcessor().addListener(this);
 
         button_blue.addActionListener(e -> {
             getLogger().debug("GUI_button_blue");
@@ -312,11 +311,11 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         if (CONFIG_PAGE) return;
 
         if (mode == MODE_CLOCK_GAME_RUNNING) {
-            if (flag != Statistics.EVENT_RED_ACTIVATED) {
-                lastState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
-                flag = Statistics.EVENT_RED_ACTIVATED;
+            if (!flag.equals(GameEvent.RED_ACTIVATED)) {
+                lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
+                flag = GameEvent.RED_ACTIVATED;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
-                lastStatsSent = statistics.addEvent(flag);
+                lastStatsSent = statistics.addEvent(new GameEvent(System.currentTimeMillis(), flag, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
 
                 setDisplayToEvent();
             }
@@ -331,11 +330,11 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         Main.getFrameDebug().addToConfigLog("button_blue_pressed");
         if (CONFIG_PAGE) return;
         if (mode == MODE_CLOCK_GAME_RUNNING) {
-            if (flag != Statistics.EVENT_BLUE_ACTIVATED) {
-                lastState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
-                flag = Statistics.EVENT_BLUE_ACTIVATED;
+            if (!flag.equals(GameEvent.BLUE_ACTIVATED)) {
+                lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
+                flag = GameEvent.BLUE_ACTIVATED;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
-                lastStatsSent = statistics.addEvent(flag);
+                lastStatsSent = statistics.addEvent(new GameEvent(System.currentTimeMillis(), flag, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
                 setDisplayToEvent();
             }
         } else {
@@ -351,11 +350,11 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             return;
         }
         if (mode == MODE_CLOCK_GAME_RUNNING) {
-            if (flag != Statistics.EVENT_GREEN_ACTIVATED) {
-                lastState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
-                flag = Statistics.EVENT_GREEN_ACTIVATED;
+            if (!flag.equals(GameEvent.GREEN_ACTIVATED)) {
+                lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
+                flag = GameEvent.GREEN_ACTIVATED;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
-                lastStatsSent = statistics.addEvent(flag);
+                lastStatsSent = statistics.addEvent(new GameEvent(System.currentTimeMillis(), flag, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
                 setDisplayToEvent();
             }
 
@@ -372,11 +371,11 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             return;
         }
         if (mode == MODE_CLOCK_GAME_RUNNING) {
-            if (flag != Statistics.EVENT_YELLOW_ACTIVATED) {
-                lastState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
-                flag = Statistics.EVENT_YELLOW_ACTIVATED;
+            if (!flag.equals(GameEvent.YELLOW_ACTIVATED)) {
+                lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
+                flag = GameEvent.YELLOW_ACTIVATED;
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
-                lastStatsSent = statistics.addEvent(flag);
+                lastStatsSent = statistics.addEvent(new GameEvent(System.currentTimeMillis(), flag, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
                 setDisplayToEvent();
             }
         } else {
@@ -418,7 +417,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             }
 
             flag = savePoint.getFlag();
-            time = savePoint.getTime();
+            remaining = savePoint.getTime();
             time_red = savePoint.getTime_red();
             time_blue = savePoint.getTime_blue();
             // spielt keine Rolle ob es diese Teams gibt. Sind dann sowieso 0l;
@@ -427,10 +426,10 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             setDisplayToEvent();
         }
 
-        if (mode == MODE_CLOCK_PREGAME) {
-            Main.getMessageProcessor().toggleFtpDisabled();
-            setDisplayToEvent();
-        }
+//        if (mode == MODE_CLOCK_PREGAME) {
+//            Main.getMessageProcessor().toggleFtpDisabled();
+//            setDisplayToEvent();
+//        }
 
 
     }
@@ -443,7 +442,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             preset_num_teams++;
             if (preset_num_teams > MAX_TEAMS) preset_num_teams = MIN_TEAMS;
             getLogger().debug("num_teams is now: " + preset_num_teams);
-            statistics = new Statistics(preset_num_teams);
+//            statistics = new Statistics(preset_num_teams);
             Main.getConfigs().put(Configs.NUMBER_OF_TEAMS, preset_num_teams);
             reset_timers();
         } else {
@@ -466,17 +465,17 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 
     private void buttonStandbyRunningPressed() {
         Main.getFrameDebug().addToConfigLog("button_Standby_Active_pressed");
+        long now = System.currentTimeMillis();
         if (CONFIG_PAGE) return;
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             SELECTED_SAVEPOINT = SAVEPOINT_NONE;
             standbyStartedAt = System.currentTimeMillis();
             mode = MODE_CLOCK_GAME_PAUSED;
-            lastStatsSent = statistics.addEvent(Statistics.EVENT_PAUSE);
-            currentState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
+            lastStatsSent = statistics.addEvent(new GameEvent(now, GameEvent.PAUSING, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
+            currentState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
             setDisplayToEvent();
         } else if (mode == MODE_CLOCK_GAME_PAUSED) {
             // lastPIT neu berechnen und anpassen
-            long now = System.currentTimeMillis();
             long pause = now - standbyStartedAt;
             lastPIT = lastPIT + pause;
             standbyStartedAt = 0l;
@@ -485,27 +484,24 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 //            lastState = null;
 
             if (resetGame) {
-                lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_ABORTED);
+                lastStatsSent = statistics.addEvent(new GameEvent(now, GameEvent.GAME_ABORTED, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
                 reset_timers();
             } else {
                 mode = MODE_CLOCK_GAME_RUNNING;
-                lastStatsSent = statistics.addEvent(Statistics.EVENT_RESUME);
+                lastStatsSent = statistics.addEvent(new GameEvent(now, GameEvent.LAST_EVENT_REVERTED, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
                 if (SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS) {
                     SELECTED_SAVEPOINT = SAVEPOINT_NONE;
-                    lastStatsSent = statistics.addEvent(Statistics.EVENT_REVERT_LAST_EVENT);
-                    lastStatsSent = statistics.addEvent(flag);
-                    lastState = new SavePoint(flag, time, time_blue, time_red, time_yellow, time_green);
+                    lastStatsSent = statistics.addEvent(new GameEvent(now, GameEvent.LAST_EVENT_REVERTED, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
+                    lastStatsSent = statistics.addEvent(new GameEvent(now, flag, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
+                    lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 }
                 setDisplayToEvent();
             }
         } else if (mode == MODE_CLOCK_GAME_OVER) {
             reset_timers();
         } else if (mode == MODE_CLOCK_PREGAME) {
-            if (running_match_id == 0) {
-                running_match_id = Integer.parseInt(Main.getConfigs().get(Configs.MATCHID)) + 1;
-                Main.getConfigs().put(Configs.MATCHID, Integer.toString(running_match_id));
-            }
-            lastStatsSent = statistics.addEvent(Statistics.EVENT_FLAG_NEUTRAL);
+
+            lastStatsSent = statistics.addEvent(new GameEvent(now, GameEvent.FLAG_NEUTRAL, preset_times[preset_gametime_position], remaining, getRank()));
             lastPIT = System.currentTimeMillis();
 
             mode = MODE_CLOCK_GAME_RUNNING;
@@ -516,14 +512,14 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
     }
 
     private void reset_timers() {
-        flag = Statistics.EVENT_FLAG_NEUTRAL;
+        flag = GameEvent.FLAG_NEUTRAL;
         resetGame = false;
         currentState = null;
         lastState = null;
         mode = MODE_CLOCK_PREGAME;
         min_stat_sent_time = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
 
-        time = preset_times[preset_gametime_position]; // aktuelle Wahl minus 1 Sekunde. Dann wird aus 5 Stunden -> 04:59:59
+        remaining = preset_times[preset_gametime_position]; // aktuelle Wahl minus 1 Sekunde. Dann wird aus 5 Stunden -> 04:59:59
         standbyStartedAt = 0l;
         lastPIT = 0l;
 
@@ -532,27 +528,18 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         time_green = 0l;
         time_yellow = 0l;
 
-        running_match_id = 0;
         lastStatsSent = 0l;
-        statistics.reset();
+        statistics.reset(preset_num_teams, preset_times[preset_gametime_position]);
         SELECTED_SAVEPOINT = SAVEPOINT_NONE;
         setDisplayToEvent();
     }
 
     private void setDisplayToEvent() {
         try {
-            display_white.setTime(time);
+            long now = System.currentTimeMillis();
+            display_white.setTime(remaining);
             display_red.setTime(time_red);
             display_blue.setTime(time_blue);
-
-
-//
-//            if (mode == MODE_CLOCK_PREGAME) {
-//                display_red.setText("  no");
-//                display_blue.setText(" FTP");
-//            } else {
-//            }
-
 
             if (preset_num_teams < 3) display_green.clear();
             else display_green.setTime(time_green);
@@ -560,8 +547,8 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             if (preset_num_teams < 4) display_yellow.clear();
             else display_yellow.setTime(time_yellow);
 
-            if (running_match_id > 0)
-                statistics.setTimes(running_match_id, time, getRank());
+
+            statistics.updateTimers(now, remaining, getRank());
 
             display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
             display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
@@ -574,11 +561,6 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             Main.getPinHandler().off(Main.PH_LED_GREEN_BTN);
             Main.getPinHandler().off(Main.PH_LED_YELLOW_BTN);
 
-//            if (mode == MODE_CLOCK_GAME_PAUSED) {
-//                this.button_preset_gametime.setIcon(FrameDebug.IconUNDO);
-//            } else {
-//                this.button_preset_gametime.setIcon(FrameDebug.IconGametime);
-//            }
 
             if (mode == MODE_CLOCK_PREGAME || mode == MODE_CLOCK_GAME_PAUSED) {
                 button_switch_mode.setIcon(FrameDebug.IconPlay);
@@ -590,25 +572,8 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                         (preset_num_teams >= 4 ? new RGBScheduleElement(Configs.FLAG_COLOR_YELLOW, 500l) + ";" : "") +
                         new RGBScheduleElement(Color.BLACK, 1500l);
 
-//                getLogger().debug(pregamePoleColorScheme);
-
                 Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", pregamePoleColorScheme); //"1:" + new RGBScheduleElement(Color.WHITE));
             }
-
-//            if (mode == MODE_CLOCK_GAME_PAUSED) {
-//                button_switch_mode.setIcon(FrameDebug.IconPlay);
-//
-//                String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
-//                        new RGBScheduleElement(Configs.FLAG_COLOR_RED, 500l) + ";" +
-//                        new RGBScheduleElement(Configs.FLAG_COLOR_BLUE, 500l) + ";" +
-//                        (preset_num_teams >= 3 ? new RGBScheduleElement(Configs.FLAG_COLOR_GREEN, 500l) + ";" : "") +
-//                        (preset_num_teams >= 4 ? new RGBScheduleElement(Configs.FLAG_COLOR_YELLOW, 500l) + ";" : "") +
-//                        new RGBScheduleElement(Color.BLACK, 1500l);
-//
-//                getLogger().debug(pregamePoleColorScheme);
-//
-//                Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", pregamePoleColorScheme); //"1:" + new RGBScheduleElement(Color.WHITE));
-//            }
 
             if (mode == MODE_CLOCK_PREGAME) {
                 getLogger().debug("PREGAME");
@@ -638,9 +603,9 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 
                 Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,1000;off,1000");
 
-                if (Main.getMessageProcessor().isFTPworking())
-                    Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:on,1000;off,1000");
-                else Main.getPinHandler().off(Main.PH_LED_WHITE);
+//                if (Main.getMessageProcessor().isFTPworking())
+//                    Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:on,1000;off,1000");
+//                else Main.getPinHandler().off(Main.PH_LED_WHITE);
 
 
             }
@@ -649,10 +614,10 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                 getLogger().debug("PAUSED");
                 display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                 Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,500;off,500");
-
-                if (Main.getMessageProcessor().isFTPworking())
-                    Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:on,500;off,500");
-                else Main.getPinHandler().off(Main.PH_LED_WHITE);
+//
+//                if (Main.getMessageProcessor().isFTPworking())
+//                    Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:on,500;off,500");
+//                else Main.getPinHandler().off(Main.PH_LED_WHITE);
 
                 setColorsAndBlinkingSchemeAccordingToGameSituation();
 
@@ -679,7 +644,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                 Main.getPinHandler().setScheme(Main.PH_AIRSIREN, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
 
                 LinkedHashMap<String, Integer> rank = getRank();
-                statistics.setTimes(running_match_id, 0l, rank);
+                statistics.updateTimers(now, remaining, getRank());
 
                 if (isDrawgame(rank)) {
                     getLogger().info("Draw Game");
@@ -698,12 +663,12 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                         Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,1000;off,1000");
 
                     Main.getPinHandler().setScheme(Main.PH_POLE, "DRAW GAME", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
-                    lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_DRAW);
+                    lastStatsSent = statistics.addEvent(new GameEvent(now, GameEvent.GAME_OVER, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
                 } else {
                     ArrayList<String> winners = getWinners(rank);
 
                     if (winners.size() > 1) {
-                        lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_MULTI_WINNERS);
+                        lastStatsSent = statistics.addEvent(new GameEvent(now, GameEvent.RESULT_MULTI_WINNERS, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
                         getLogger().info("More than one winner - very rare");
                     }
 
@@ -711,25 +676,25 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                         getLogger().info("Red Team won");
                         display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                         Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,100;off,100");
-                        lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_RED_WON);
+                        lastStatsSent = statistics.addEvent(new GameEvent(now, GameEvent.RESULT_RED_WON, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
                     }
                     if (winners.contains("blue")) {
                         getLogger().info("Blue Team won");
                         display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                         Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,100;off,100");
-                        lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_BLUE_WON);
+                        lastStatsSent = statistics.addEvent(new GameEvent(now, GameEvent.RESULT_BLUE_WON, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
                     }
                     if (winners.contains("green")) {
                         getLogger().info("Green Team won");
                         display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                         Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "∞:on,100;off,100");
-                        lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_GREEN_WON);
+                        lastStatsSent = statistics.addEvent(new GameEvent(now, GameEvent.RESULT_GREEN_WON, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
                     }
                     if (winners.contains("yellow")) {
                         getLogger().info("Yellow Team won");
                         display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                         Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,100;off,100");
-                        lastStatsSent = statistics.addEvent(Statistics.EVENT_RESULT_YELLOW_WON);
+                        lastStatsSent = statistics.addEvent(new GameEvent(now, GameEvent.RESULT_YELLOW_WON, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
                     }
 
                     // die Flagge soll alle Sieger anzeigen
@@ -750,7 +715,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
     }
 
     private void setColorsAndBlinkingSchemeAccordingToGameSituation() throws IOException {
-        if (flag == Statistics.EVENT_FLAG_NEUTRAL) {
+        if (flag.equals(GameEvent.FLAG_NEUTRAL)) {
             getLogger().info("Flag is neutral");
             Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
             Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,500;off,500");
@@ -760,8 +725,8 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             if (preset_num_teams >= 4)
                 Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
 
-            Main.getPinHandler().setScheme(Main.PH_POLE, "NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_WHITE, time));
-        } else if (flag == Statistics.EVENT_RED_ACTIVATED) {
+            Main.getPinHandler().setScheme(Main.PH_POLE, "NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_WHITE, remaining));
+        } else if (flag.equals(GameEvent.RED_ACTIVATED)) {
             getLogger().info("Flag is red");
             Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,500;off,500");
 
@@ -771,8 +736,8 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                 Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
 
             display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-            Main.getPinHandler().setScheme(Main.PH_POLE, "RED ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_RED, time));
-        } else if (flag == Statistics.EVENT_BLUE_ACTIVATED) {
+            Main.getPinHandler().setScheme(Main.PH_POLE, "RED ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_RED, remaining));
+        } else if (flag.equals(GameEvent.BLUE_ACTIVATED)) {
             getLogger().info("Flag is blue");
             Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
 
@@ -782,8 +747,8 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                 Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
 
             display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-            Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_BLUE, time));
-        } else if (flag == Statistics.EVENT_GREEN_ACTIVATED) {
+            Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_BLUE, remaining));
+        } else if (flag.equals(GameEvent.GREEN_ACTIVATED)) {
             getLogger().info("Flag is green");
             Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
             Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,500;off,500");
@@ -792,8 +757,8 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                 Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
 
             display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-            Main.getPinHandler().setScheme(Main.PH_POLE, "GREEN ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_GREEN, time));
-        } else if (flag == Statistics.EVENT_YELLOW_ACTIVATED) {
+            Main.getPinHandler().setScheme(Main.PH_POLE, "GREEN ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_GREEN, remaining));
+        } else if (flag.equals(GameEvent.YELLOW_ACTIVATED)) {
             getLogger().info("Flag is yellow");
             Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
             Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,500;off,500");
@@ -801,12 +766,12 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 
             display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
             Color myyellow = Tools.getColor(Main.getConfigs().get(Configs.FLAG_COLOR_YELLOW));
-            Main.getPinHandler().setScheme(Main.PH_POLE, "YELLOW ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(myyellow, time));
+            Main.getPinHandler().setScheme(Main.PH_POLE, "YELLOW ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(myyellow, remaining));
         }
     }
 
     /**
-     * wenn alle rankings den rang 1 haben, müssen alle teams gleich gespielt haben.
+     * wenn alle rankings den rang 1 haben, müssen alle teamranking gleich gespielt haben.
      *
      * @param rank
      * @return
@@ -838,7 +803,7 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
         if (preset_num_teams >= 3) rank.put("green", dateTime_green.getSecondOfDay());
         if (preset_num_teams >= 4) rank.put("yellow", dateTime_yellow.getSecondOfDay());
 
-
+        // Sorting
         LinkedHashMap<String, Integer> toplist =
                 rank.entrySet().stream()
                         .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
@@ -858,11 +823,11 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
 
                     lastPIT = now;
 
-                    time = time - diff;
+                    remaining = remaining - diff;
 
-                    time = Math.max(time, 0);
+                    remaining = Math.max(remaining, 0);
 
-                    statistics.setTimes(running_match_id, time, getRank());
+                    statistics.updateTimers(now, remaining, getRank());
                     if (min_stat_sent_time > 0) {
                         if (now - lastStatsSent > min_stat_sent_time) {
                             statistics.sendStats();
@@ -871,49 +836,49 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
                     }
 
 
-                    int thisMinuteOfDay = new DateTime(time, DateTimeZone.UTC).getMinuteOfDay();
+                    int thisMinuteOfDay = new DateTime(remaining, DateTimeZone.UTC).getMinuteOfDay();
                     boolean changeColorBlinking = thisMinuteOfDay != lastMinuteToChangeTimeblinking;
                     if (changeColorBlinking) lastMinuteToChangeTimeblinking = thisMinuteOfDay;
 
-                    if (flag == Statistics.EVENT_FLAG_NEUTRAL) {
+                    if (flag.equals(GameEvent.FLAG_NEUTRAL)) {
                         if (changeColorBlinking)
-                            Main.getPinHandler().setScheme(Main.PH_POLE, "NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_WHITE, time));
+                            Main.getPinHandler().setScheme(Main.PH_POLE, "NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_WHITE, remaining));
                     }
 
                     // Zeit zum entpsrechenden Team addieren.
-                    if (flag == Statistics.EVENT_RED_ACTIVATED) {
+                    if (flag.equals(GameEvent.RED_ACTIVATED)) {
                         time_red += diff;
                         if (changeColorBlinking)
-                            Main.getPinHandler().setScheme(Main.PH_POLE, "RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_RED, time));
+                            Main.getPinHandler().setScheme(Main.PH_POLE, "RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_RED, remaining));
                     }
-                    if (flag == Statistics.EVENT_BLUE_ACTIVATED) {
+                    if (flag.equals(GameEvent.BLUE_ACTIVATED)) {
                         time_blue += diff;
                         if (changeColorBlinking)
-                            Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_BLUE, time));
+                            Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_BLUE, remaining));
                     }
-                    if (flag == Statistics.EVENT_GREEN_ACTIVATED) {
+                    if (flag.equals(GameEvent.GREEN_ACTIVATED)) {
                         time_green += diff;
                         if (changeColorBlinking)
-                            Main.getPinHandler().setScheme(Main.PH_POLE, "GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_GREEN, time));
+                            Main.getPinHandler().setScheme(Main.PH_POLE, "GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_GREEN, remaining));
                     }
-                    if (flag == Statistics.EVENT_YELLOW_ACTIVATED) {
+                    if (flag.equals(GameEvent.YELLOW_ACTIVATED)) {
                         time_yellow += diff;
                         if (changeColorBlinking)
-                            Main.getPinHandler().setScheme(Main.PH_POLE, "YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_YELLOW, time));
+                            Main.getPinHandler().setScheme(Main.PH_POLE, "YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_YELLOW, remaining));
                     }
 
-                    display_white.setTime(time);
+                    display_white.setTime(remaining);
                     display_red.setTime(time_red);
                     display_blue.setTime(time_blue);
                     if (preset_num_teams >= 3) display_green.setTime(time_green);
                     if (preset_num_teams >= 4) display_yellow.setTime(time_yellow);
 
 
-                    if (time == 0) {
+                    if (remaining == 0) {
                         getLogger().info("GAME OVER");
                         mode = MODE_CLOCK_GAME_OVER;
                         setDisplayToEvent();
-                        lastStatsSent = statistics.addEvent(Statistics.EVENT_GAME_OVER);
+                        lastStatsSent = statistics.addEvent(new GameEvent(now, GameEvent.GAME_OVER, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
                     }
 
                 }
@@ -930,16 +895,16 @@ public class Game implements Runnable, StatsSentListener, HasLogger {
             }
         }
     }
-
-    @Override
-    public void statsSentEventReceived(StatsSentEvent statsSentEvent) {
-        if (statsSentEvent.isSuccessful())
-            Main.getPinHandler().setScheme(Main.PH_LED_WHITE, "∞:on,1000;off,∞");
-        else
-            Main.getPinHandler().off(Main.PH_LED_WHITE);
-
-//        if (quit_programm) System.exit(0);
-    }
+//
+//    @Override
+//    public void statsSentEventReceived(StatsSentEvent statsSentEvent) {
+//        if (statsSentEvent.isSuccessful())
+//            Main.getPinHandler().setScheme(Main.PH_LED_WHITE, "∞:on,1000;off,∞");
+//        else
+//            Main.getPinHandler().off(Main.PH_LED_WHITE);
+//
+////        if (quit_programm) System.exit(0);
+//    }
 
 
 }
