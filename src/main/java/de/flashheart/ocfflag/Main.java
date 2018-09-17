@@ -32,7 +32,9 @@ import java.util.HashMap;
 public class Main {
 
 
+    private static long REACTION_TIME = 3000;
     private static GpioController GPIO;
+    private static Game game;
     private static FrameDebug frameDebug;
 
 //    private static SortedProperties config;
@@ -171,10 +173,10 @@ public class Main {
         applicationContext.put(display_green.getName(), display_green);
         applicationContext.put(display_yellow.getName(), display_yellow);
 
-        button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed());
-        button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue());
-        button_green = new MyAbstractButton(GPIO, BUTTON_GREEN, frameDebug.getBtnGreen());
-        button_yellow = new MyAbstractButton(GPIO, BUTTON_YELLOW, frameDebug.getBtnYellow());
+        button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed(), REACTION_TIME, getFrameDebug().getPbRed());
+        button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, getFrameDebug().getPbBlue());
+        button_green = new MyAbstractButton(GPIO, BUTTON_GREEN, frameDebug.getBtnGreen(), REACTION_TIME, getFrameDebug().getPbGreen());
+        button_yellow = new MyAbstractButton(GPIO, BUTTON_YELLOW, frameDebug.getBtnYellow(), REACTION_TIME, getFrameDebug().getPbYellow());
         button_reset = new MyAbstractButton(GPIO, BUTTON_RESET, frameDebug.getBtnReset());
         button_preset_num_teams = new MyAbstractButton(GPIO, BUTTON_PRESET_NUM_TEAMS, frameDebug.getBtnPresetNumTeams());
         button_preset_gametime = new MyAbstractButton(GPIO, BUTTON_PRESET_GAMETIME, frameDebug.getBtnPresetGametime());
@@ -229,8 +231,13 @@ public class Main {
         pinHandler.add(ledGreen);
         pinHandler.add(ledWhite);
 
-        Game game = new Game(display_white, display_red, display_blue, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game, button_shutdown);
+
+        game = new Game(display_white, display_red, display_blue, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game, button_shutdown);
         game.run();
+    }
+
+    public static Game getGame() {
+        return game;
     }
 
     public static Object getFromContext(String key) {
@@ -335,6 +342,8 @@ public class Main {
         } else {
             applicationContext.put(Configs.APPCONTEXT_NOGPIO, System.getProperty("os.arch").toLowerCase().indexOf("arm") >= 0 ? Boolean.FALSE : Boolean.TRUE);
         }
+
+        REACTION_TIME = configs.getLong(Configs.BUTTON_REACTION_TIME);
 
         messageProcessor = new MessageProcessor();
         messageProcessor.start();

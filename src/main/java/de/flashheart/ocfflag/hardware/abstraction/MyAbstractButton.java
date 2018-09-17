@@ -11,6 +11,7 @@ import de.flashheart.ocfflag.misc.HasLogger;
 
 import javax.swing.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeListener;
 
 /**
  * Created by tloehr on 15.03.16.
@@ -20,14 +21,27 @@ import java.awt.event.*;
  */
 public class MyAbstractButton implements HasLogger {
     private static final int DEBOUNCE = 200; //ms
-    
+    private long reactiontime = 0;
+    private final JProgressBar pb;
     private final GpioPinDigitalInput hardwareButton;
     private final JButton guiButton;
 
     public MyAbstractButton(GpioController gpio, Pin pin, JButton guiButton) {
+        this(gpio, pin, guiButton, 0l, null);
+    }
+
+    public MyAbstractButton(GpioController gpio, Pin pin, JButton guiButton, long reactiontime, JProgressBar pb) {
+        this.reactiontime = reactiontime;
+        this.pb = pb;
         hardwareButton = gpio == null ? null : gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
         if (hardwareButton != null) hardwareButton.setDebounce(DEBOUNCE);
         this.guiButton = guiButton;
+    }
+
+    public void setVisible(boolean visible){
+        if (guiButton != null){
+            guiButton.setVisible(visible);
+        }
     }
 
 
@@ -42,7 +56,11 @@ public class MyAbstractButton implements HasLogger {
 
     public void addActionListener(ActionListener var1) {
         if (guiButton == null) return;
-        guiButton.addActionListener(var1);
+        if (reactiontime == 0){
+            guiButton.addActionListener(var1);
+        } else {
+            guiButton.addMouseListener(new HoldDownAdapter(reactiontime, var1, guiButton, pb));
+        }
     }
 
 

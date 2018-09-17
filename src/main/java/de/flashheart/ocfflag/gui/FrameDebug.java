@@ -42,6 +42,22 @@ public class FrameDebug extends JFrame {
         setTitle(title);
     }
 
+    public JProgressBar getPbRed() {
+        return pbRed;
+    }
+
+    public JProgressBar getPbBlue() {
+        return pbBlue;
+    }
+
+    public JProgressBar getPbGreen() {
+        return pbGreen;
+    }
+
+    public JProgressBar getPbYellow() {
+        return pbYellow;
+    }
+
     private void initFrame() {
 
 
@@ -205,10 +221,14 @@ public class FrameDebug extends JFrame {
         lblPole = new JLabel();
         btnBlue = new JButton();
         ledBlueButton = new MyLED();
+        pbRed = new JProgressBar();
+        pbBlue = new JProgressBar();
         ledGreenButton = new MyLED();
         btnGreen = new JButton();
         btnYellow = new JButton();
         ledYellowButton = new MyLED();
+        pbGreen = new JProgressBar();
+        pbYellow = new JProgressBar();
         panel5 = new JPanel();
         btnConfig = new JButton();
         btnQuit = new JButton();
@@ -268,7 +288,7 @@ public class FrameDebug extends JFrame {
                 {
                     panel1.setLayout(new FormLayout(
                         "default, $lcgap, pref:grow, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow, 2*($lcgap, default)",
-                        "fill:22dlu:grow, $lgap, fill:default:grow"));
+                        "fill:22dlu:grow, $lgap, default, $lgap, fill:default:grow, $lgap, default"));
 
                     //---- ledRedButton ----
                     ledRedButton.setColor(Color.red);
@@ -288,7 +308,7 @@ public class FrameDebug extends JFrame {
                     lblPole.setForeground(Color.black);
                     lblPole.setHorizontalAlignment(SwingConstants.CENTER);
                     lblPole.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 36));
-                    panel1.add(lblPole, CC.xywh(7, 1, 1, 3));
+                    panel1.add(lblPole, CC.xywh(7, 1, 1, 5));
 
                     //---- btnBlue ----
                     btnBlue.setText("Blue");
@@ -300,28 +320,32 @@ public class FrameDebug extends JFrame {
                     ledBlueButton.setColor(Color.blue);
                     ledBlueButton.setToolTipText("Blue LED in Button");
                     panel1.add(ledBlueButton, CC.xy(15, 1));
+                    panel1.add(pbRed, CC.xywh(1, 3, 3, 1, CC.DEFAULT, CC.FILL));
+                    panel1.add(pbBlue, CC.xy(11, 3, CC.DEFAULT, CC.FILL));
 
                     //---- ledGreenButton ----
                     ledGreenButton.setColor(Color.green);
                     ledGreenButton.setToolTipText("Red LED in Button");
-                    panel1.add(ledGreenButton, CC.xy(1, 3));
+                    panel1.add(ledGreenButton, CC.xy(1, 5));
 
                     //---- btnGreen ----
                     btnGreen.setText("Green");
                     btnGreen.setForeground(new Color(18, 110, 12));
                     btnGreen.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 36));
-                    panel1.add(btnGreen, CC.xy(3, 3));
+                    panel1.add(btnGreen, CC.xy(3, 5));
 
                     //---- btnYellow ----
                     btnYellow.setText("Yellow");
                     btnYellow.setForeground(new Color(210, 199, 27));
                     btnYellow.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 36));
-                    panel1.add(btnYellow, CC.xy(11, 3, CC.FILL, CC.DEFAULT));
+                    panel1.add(btnYellow, CC.xy(11, 5, CC.FILL, CC.DEFAULT));
 
                     //---- ledYellowButton ----
                     ledYellowButton.setColor(Color.yellow);
                     ledYellowButton.setToolTipText("Yellow LED in Button");
-                    panel1.add(ledYellowButton, CC.xy(15, 3));
+                    panel1.add(ledYellowButton, CC.xy(15, 5));
+                    panel1.add(pbGreen, CC.xywh(1, 7, 3, 1, CC.DEFAULT, CC.FILL));
+                    panel1.add(pbYellow, CC.xy(11, 7, CC.DEFAULT, CC.FILL));
                 }
                 mainView.add(panel1, CC.xywh(3, 3, 9, 1));
 
@@ -643,10 +667,14 @@ public class FrameDebug extends JFrame {
     private JLabel lblPole;
     private JButton btnBlue;
     private MyLED ledBlueButton;
+    private JProgressBar pbRed;
+    private JProgressBar pbBlue;
     private MyLED ledGreenButton;
     private JButton btnGreen;
     private JButton btnYellow;
     private MyLED ledYellowButton;
+    private JProgressBar pbGreen;
+    private JProgressBar pbYellow;
     private JPanel panel5;
     private JButton btnConfig;
     private JButton btnQuit;

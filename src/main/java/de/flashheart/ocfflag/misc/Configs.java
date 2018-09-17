@@ -22,6 +22,9 @@ public class Configs {
     public static final String REST_URL = "resturl";
     public static final String REST_AUTH = "restauth";
 
+
+    public static final String BUTTON_REACTION_TIME = "button_reaction_time";
+
     public static final String MIN_STAT_SEND_TIME = "sendstats";
     public static final String FLAGNAME = "flagname";
     public static final String GAMETIME = "gametime";
@@ -57,6 +60,8 @@ public class Configs {
         configs.put(LOGLEVEL, "debug");
         configs.put(FLAGNAME, "OCF Flagge #" + new java.util.Random().nextInt());
         configs.put(GAMETIME, "0");
+        configs.put(BUTTON_REACTION_TIME, "0");
+
 
         configs.put(REST_URL, "http://localhost:8090/rest/gamestate/create");
         configs.put(REST_AUTH, "Torsten:test1234");
@@ -90,11 +95,11 @@ public class Configs {
     }
 
 
-    public long getNextMatchID(){
-            long nextmachtid = Long.parseLong(get(MATCHID)) + 1l;
-            put(MATCHID, Long.toString(nextmachtid));
-            return nextmachtid;
-        }
+    public long getNextMatchID() {
+        long nextmachtid = Long.parseLong(get(MATCHID)) + 1l;
+        put(MATCHID, Long.toString(nextmachtid));
+        return nextmachtid;
+    }
 
     private void loadApplicationContext() throws IOException {
         InputStream in2 = Main.class.getResourceAsStream("/application.properties");
@@ -124,12 +129,16 @@ public class Configs {
         return applicationContext.containsKey(key) ? applicationContext.get(key).toString() : "null";
     }
 
-    public boolean is(Object key){
+    public boolean is(Object key) {
         return Boolean.parseBoolean(configs.containsKey(key) ? configs.get(key).toString() : "false");
     }
 
     public int getInt(Object key) {
         return Integer.parseInt(configs.containsKey(key) ? configs.get(key).toString() : "-1");
+    }
+
+    public long getLong(Object key) {
+        return Long.parseLong(configs.containsKey(key) ? configs.get(key).toString() : "-1");
     }
 
     public String get(Object key) {

@@ -164,6 +164,7 @@ public class Game implements Runnable, HasLogger {
 
 
         initGame();
+
     }
 
     private void initGame() {
@@ -894,6 +895,10 @@ public class Game implements Runnable, HasLogger {
                 System.exit(1);
             }
         }
+    }
+
+    public boolean isGameRunning(){
+        return mode == MODE_CLOCK_GAME_RUNNING;
     }
 //
 //    @Override
