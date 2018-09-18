@@ -20,7 +20,7 @@ new FormModel {
 					name: "mainView"
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 						"$columnSpecs": "default, labelcompgap, pref:grow, labelcompgap, unrelgap, labelcompgap, 62dlu:grow, labelcompgap, unrelgap, labelcompgap, pref:grow, labelcompgap, default, labelcompgap, default"
-						"$rowSpecs": "fill:22dlu:grow, linegap, default, linegap, fill:default:grow, linegap, default"
+						"$rowSpecs": "fill:22dlu:grow, linegap, fill:default, linegap, fill:default:grow, linegap, fill:default"
 					} ) {
 						name: "panel1"
 						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
@@ -66,6 +66,7 @@ new FormModel {
 						} )
 						add( new FormComponent( "javax.swing.JProgressBar" ) {
 							name: "pbRed"
+							"stringPainted": true
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 							"gridY": 3
 							"gridWidth": 3
@@ -73,6 +74,7 @@ new FormModel {
 						} )
 						add( new FormComponent( "javax.swing.JProgressBar" ) {
 							name: "pbBlue"
+							"stringPainted": true
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 							"gridY": 3
 							"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
@@ -114,6 +116,7 @@ new FormModel {
 						} )
 						add( new FormComponent( "javax.swing.JProgressBar" ) {
 							name: "pbGreen"
+							"stringPainted": true
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 							"gridY": 7
 							"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
@@ -121,6 +124,7 @@ new FormModel {
 						} )
 						add( new FormComponent( "javax.swing.JProgressBar" ) {
 							name: "pbYellow"
+							"stringPainted": true
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 							"gridY": 7
 							"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL

@@ -1,7 +1,5 @@
 package de.flashheart.ocfflag.mechanics;
 
-import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
@@ -42,7 +40,7 @@ public class Game implements Runnable, HasLogger {
 
 //    private final int[] SAVEPOINT_SELECTIONS = new int[]{SAVEPOINT_PREVIOUS, SAVEPOINT_CURRENT, SAVEPOINT_RESET};
 
-    private final int MAX_TEAMS = 4;
+    private int MAX_TEAMS = 4;
     private final int MIN_TEAMS = 2;
 
     private int mode = MODE_CLOCK_PREGAME;
@@ -142,6 +140,7 @@ public class Game implements Runnable, HasLogger {
             Main.getConfigs().put(Configs.GAMETIME, preset_gametime_position);
         }
 
+        MAX_TEAMS = Main.getConfigs().getInt(Configs.MAX_NUMBER_OF_TEAMS);
 
         SLEEP_PER_CYCLE = Long.parseLong(Main.getConfigs().get(Configs.SLEEP_PER_CYCLE));
         preset_num_teams = Integer.parseInt(Main.getConfigs().get(Configs.NUMBER_OF_TEAMS));
@@ -174,78 +173,78 @@ public class Game implements Runnable, HasLogger {
             getLogger().debug("GUI_button_blue");
             button_blue_pressed();
         });
-        button_blue.addGPIOListener((GpioPinListenerDigital) event -> {
-            if (event.getState() != PinState.LOW) return;
-            getLogger().debug("GPIO__button_blue");
-            button_blue_pressed();
-        });
+//        button_blue.addGPIOListener((GpioPinListenerDigital) event -> {
+//            if (event.getState() != PinState.LOW) return;
+//            getLogger().debug("GPIO__button_blue");
+//            button_blue_pressed();
+//        });
 
         button_red.addActionListener(e -> {
             getLogger().debug("GUI_button_red");
             button_red_pressed();
         });
-        button_red.addGPIOListener((GpioPinListenerDigital) event -> {
-            if (event.getState() != PinState.LOW) return;
-            getLogger().debug("GPIO_button_blue");
-            button_red_pressed();
-        });
+//        button_red.addGPIOListener((GpioPinListenerDigital) event -> {
+//            if (event.getState() != PinState.LOW) return;
+//            getLogger().debug("GPIO_button_blue");
+//            button_red_pressed();
+//        });
 
         button_yellow.addActionListener(e -> {
             getLogger().debug("GUI_button_yellow");
             button_yellow_pressed();
         });
-        button_yellow.addGPIOListener((GpioPinListenerDigital) event -> {
-            if (event.getState() != PinState.LOW) return;
-            getLogger().debug("GPIO__button_yellow");
-            button_yellow_pressed();
-        });
+//        button_yellow.addGPIOListener((GpioPinListenerDigital) event -> {
+//            if (event.getState() != PinState.LOW) return;
+//            getLogger().debug("GPIO__button_yellow");
+//            button_yellow_pressed();
+//        });
 
         button_green.addActionListener(e -> {
             getLogger().debug("GUI_button_green");
             button_green_pressed();
         });
-        button_green.addGPIOListener((GpioPinListenerDigital) event -> {
-            if (event.getState() != PinState.LOW) return;
-            getLogger().debug("GPIO_button_green");
-            button_green_pressed();
-        });
+//        button_green.addGPIOListener((GpioPinListenerDigital) event -> {
+//            if (event.getState() != PinState.LOW) return;
+//            getLogger().debug("GPIO_button_green");
+//            button_green_pressed();
+//        });
 
         button_reset.addActionListener(e -> {
             getLogger().debug("GUI_button_undo_reset");
             button_undo_reset_pressed();
         });
-        button_reset.addGPIOListener((GpioPinListenerDigital) event -> {
-            if (event.getState() != PinState.LOW) return;
-            getLogger().debug("GPIO_button_undo_reset");
-            button_undo_reset_pressed();
-        });
+//        button_reset.addGPIOListener((GpioPinListenerDigital) event -> {
+//            if (event.getState() != PinState.LOW) return;
+//            getLogger().debug("GPIO_button_undo_reset");
+//            button_undo_reset_pressed();
+//        });
         button_preset_num_teams.addActionListener(e -> {
             getLogger().debug("GUI_button_preset_num_teams");
             button_preset_num_teams();
         });
-        button_preset_num_teams.addGPIOListener((GpioPinListenerDigital) event -> {
-            if (event.getState() != PinState.LOW) return;
-            getLogger().debug("GPIO_button_preset_num_teams");
-            button_preset_num_teams();
-        });
+//        button_preset_num_teams.addGPIOListener((GpioPinListenerDigital) event -> {
+//            if (event.getState() != PinState.LOW) return;
+//            getLogger().debug("GPIO_button_preset_num_teams");
+//            button_preset_num_teams();
+//        });
         button_preset_gametime.addActionListener(e -> {
             getLogger().debug("GUI_button_preset_gametime / UNDO");
             button_gametime_pressed();
         });
-        button_preset_gametime.addGPIOListener((GpioPinListenerDigital) event -> {
-            if (event.getState() != PinState.LOW) return;
-            getLogger().debug("GPIO_button_preset_gametime / UNDO");
-            button_gametime_pressed();
-        });
+//        button_preset_gametime.addGPIOListener((GpioPinListenerDigital) event -> {
+//            if (event.getState() != PinState.LOW) return;
+//            getLogger().debug("GPIO_button_preset_gametime / UNDO");
+//            button_gametime_pressed();
+//        });
         button_switch_mode.addActionListener(e -> {
             getLogger().debug("GUI_button_switch_mode");
             buttonStandbyRunningPressed();
         });
-        button_switch_mode.addGPIOListener((GpioPinListenerDigital) event -> {
-            if (event.getState() != PinState.LOW) return;
-            getLogger().debug("GPIO_button_switch_mode");
-            buttonStandbyRunningPressed();
-        });
+//        button_switch_mode.addGPIOListener((GpioPinListenerDigital) event -> {
+//            if (event.getState() != PinState.LOW) return;
+//            getLogger().debug("GPIO_button_switch_mode");
+//            buttonStandbyRunningPressed();
+//        });
         button_quit.addActionListener(e -> {
             getLogger().debug("GUI_button_quit");
             button_quit_pressed();
@@ -258,26 +257,20 @@ public class Game implements Runnable, HasLogger {
             getLogger().debug("GUI_button_back2game");
             button_back2game_pressed();
         });
-        button_shutdown.addGPIOListener((GpioPinListenerDigital) event -> {
-            if (event.getState() != PinState.LOW) {
-                getLogger().debug("GPIO_button_shutdown UP");
-//                shutdown_button_down_since = 0l;
-            } else {
-                getLogger().debug("GPIO_button_shutdown DOWN");
-//                shutdown_button_down_since = System.currentTimeMillis();
-                Main.prepareShutdown();
-                try {
-                    String line = "nohup /bin/sh /home/pi/shutdown.sh &";
-                    CommandLine commandLine = CommandLine.parse(line);
-                    DefaultExecutor executor = new DefaultExecutor();
-                    executor.setExitValue(1);
-                    executor.execute(commandLine);
-                    Thread.sleep(5000);
-                } catch (IOException e) {
-                    getLogger().error(e);
-                } catch (InterruptedException e) {
-                    getLogger().error(e);
-                }
+        button_shutdown.addActionListener(event -> {
+            getLogger().debug("GPIO_button_shutdown DOWN");
+            Main.prepareShutdown();
+            try {
+                String line = "nohup /bin/sh /home/pi/shutdown.sh &";
+                CommandLine commandLine = CommandLine.parse(line);
+                DefaultExecutor executor = new DefaultExecutor();
+                executor.setExitValue(1);
+                executor.execute(commandLine);
+                Thread.sleep(5000);
+            } catch (IOException e) {
+                getLogger().error(e);
+            } catch (InterruptedException e) {
+                getLogger().error(e);
             }
         });
 
@@ -319,6 +312,8 @@ public class Game implements Runnable, HasLogger {
                 lastStatsSent = statistics.addEvent(new GameEvent(System.currentTimeMillis(), flag, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
 
                 setDisplayToEvent();
+            } else {
+                getLogger().debug("RED ALREADY: IGNORED");
             }
 
         } else {
@@ -337,6 +332,8 @@ public class Game implements Runnable, HasLogger {
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
                 lastStatsSent = statistics.addEvent(new GameEvent(System.currentTimeMillis(), flag, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
                 setDisplayToEvent();
+            } else {
+                getLogger().debug("BLUE ALREADY: IGNORED");
             }
         } else {
             getLogger().debug("NOT RUNNING: IGNORED");
@@ -357,6 +354,8 @@ public class Game implements Runnable, HasLogger {
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
                 lastStatsSent = statistics.addEvent(new GameEvent(System.currentTimeMillis(), flag, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
                 setDisplayToEvent();
+            } else {
+                getLogger().debug("GREEN ALREADY: IGNORED");
             }
 
         } else {
@@ -378,6 +377,8 @@ public class Game implements Runnable, HasLogger {
                 Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
                 lastStatsSent = statistics.addEvent(new GameEvent(System.currentTimeMillis(), flag, preset_times[preset_gametime_position] - remaining, remaining, getRank()));
                 setDisplayToEvent();
+            } else {
+                getLogger().debug("YELLOW ALREADY: IGNORED");
             }
         } else {
             getLogger().debug("NOT RUNNING: IGNORED");
@@ -897,7 +898,7 @@ public class Game implements Runnable, HasLogger {
         }
     }
 
-    public boolean isGameRunning(){
+    public boolean isGameRunning() {
         return mode == MODE_CLOCK_GAME_RUNNING;
     }
 //

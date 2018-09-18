@@ -184,7 +184,7 @@ public class Main {
         button_quit = new MyAbstractButton(null, null, frameDebug.getBtnQuit());
         button_config = new MyAbstractButton(null, null, frameDebug.getBtnConfig());
         button_back2game = new MyAbstractButton(null, null, frameDebug.getBtnPlay());
-        button_shutdown = new MyAbstractButton(GPIO, BUTTON_SHUTDOWN, null);
+        button_shutdown = new MyAbstractButton(GPIO, BUTTON_SHUTDOWN, 5000);
 
         pole = new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), PH_POLE);
 

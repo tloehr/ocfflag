@@ -1,17 +1,12 @@
 package de.flashheart.ocfflag.hardware.abstraction;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioPinDigitalInput;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.PinPullResistance;
-import com.pi4j.io.gpio.event.GpioPinListener;
-import de.flashheart.ocfflag.Main;
+import com.pi4j.io.gpio.*;
+import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import de.flashheart.ocfflag.misc.HasLogger;
 
-
 import javax.swing.*;
-import java.awt.event.*;
-import java.beans.PropertyChangeListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Created by tloehr on 15.03.16.
@@ -23,8 +18,13 @@ public class MyAbstractButton implements HasLogger {
     private static final int DEBOUNCE = 200; //ms
     private long reactiontime = 0;
     private final JProgressBar pb;
+    private ActionListener actionListener;
     private final GpioPinDigitalInput hardwareButton;
     private final JButton guiButton;
+
+    public MyAbstractButton(GpioController gpio, Pin pin, long reactiontime) {
+        this(gpio, pin, null, reactiontime, null);
+    }
 
     public MyAbstractButton(GpioController gpio, Pin pin, JButton guiButton) {
         this(gpio, pin, guiButton, 0l, null);
@@ -33,36 +33,44 @@ public class MyAbstractButton implements HasLogger {
     public MyAbstractButton(GpioController gpio, Pin pin, JButton guiButton, long reactiontime, JProgressBar pb) {
         this.reactiontime = reactiontime;
         this.pb = pb;
+        this.actionListener = actionListener;
         hardwareButton = gpio == null ? null : gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
         if (hardwareButton != null) hardwareButton.setDebounce(DEBOUNCE);
         this.guiButton = guiButton;
+
     }
 
-    public void setVisible(boolean visible){
-        if (guiButton != null){
+    public void setVisible(boolean visible) {
+        if (guiButton != null) {
             guiButton.setVisible(visible);
         }
     }
 
 
-    public void setIcon(Icon icon){
+    public void setIcon(Icon icon) {
         if (guiButton != null) guiButton.setIcon(icon);
     }
 
-    public void addGPIOListener(GpioPinListener var1) {
-        if (hardwareButton == null) return;
-        hardwareButton.addListener(var1);
-    }
+    public void addActionListener(ActionListener actionListener) {
+        if (guiButton != null) {
+            if (reactiontime == 0) {
+                guiButton.addActionListener(actionListener);
+            } else {
+                guiButton.addMouseListener(new HoldDownMouseAdapter(reactiontime, actionListener, guiButton, pb));
+            }
+        }
 
-    public void addActionListener(ActionListener var1) {
-        if (guiButton == null) return;
-        if (reactiontime == 0){
-            guiButton.addActionListener(var1);
-        } else {
-            guiButton.addMouseListener(new HoldDownAdapter(reactiontime, var1, guiButton, pb));
+        if (hardwareButton != null) {
+            if (reactiontime == 0) {
+                hardwareButton.addListener((GpioPinListenerDigital) event -> {
+                    if (event.getState() != PinState.LOW) return;
+                    actionListener.actionPerformed(new ActionEvent(this, 1, "action!"));
+                });
+            } else {
+                hardwareButton.addListener(new HoldDownButtonHandler(reactiontime, actionListener, guiButton, pb));
+            }
         }
     }
-
 
 
     public boolean isLow() {

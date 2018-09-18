@@ -34,10 +34,12 @@ public class Configs {
     public static final String BRIGHTNESS_RED = "brightness_red";
     public static final String BRIGHTNESS_YELLOW = "brightness_yellow";
     public static final String BRIGHTNESS_GREEN = "brightness_green";
-    public static final String NUMBER_OF_TEAMS = "num_teams";
     public static final String AIRSIREN_SIGNAL = "airsiren_signal";
     public static final String COLORCHANGE_SIREN_SIGNAL = "colorchange_siren_signal";
     public static final String GAME_TIME_LIST = "game_time_list";
+
+    public static final String NUMBER_OF_TEAMS = "num_teams";
+    public static final String MAX_NUMBER_OF_TEAMS = "max_teams";
 
     public static final String TIME_ANNOUNCER = "time_announcer"; // schaltet das Blinken gemäß der Restspielzeit ein oder aus.
 
@@ -56,11 +58,13 @@ public class Configs {
         // defaults
         configs.put(MATCHID, "1");
         configs.put(SLEEP_PER_CYCLE, "500");
-        configs.put(NUMBER_OF_TEAMS, "2");
         configs.put(LOGLEVEL, "debug");
         configs.put(FLAGNAME, "OCF Flagge #" + new java.util.Random().nextInt());
         configs.put(GAMETIME, "0");
         configs.put(BUTTON_REACTION_TIME, "0");
+
+        configs.put(NUMBER_OF_TEAMS, "2");
+        configs.put(MAX_NUMBER_OF_TEAMS, "4");
 
 
         configs.put(REST_URL, "http://localhost:8090/rest/gamestate/create");

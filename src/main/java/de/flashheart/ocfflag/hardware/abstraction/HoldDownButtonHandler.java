@@ -1,5 +1,8 @@
 package de.flashheart.ocfflag.hardware.abstraction;
 
+import com.pi4j.io.gpio.PinState;
+import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
+import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.HasLogger;
 
@@ -15,7 +18,7 @@ import java.util.ArrayList;
 /**
  * https://stackoverflow.com/questions/6828684/java-mouseevent-check-if-pressed-down
  */
-public class HoldDownAdapter extends MouseAdapter implements HasLogger {
+public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListenerDigital, HasLogger {
     volatile private boolean isRunning = false;
     volatile private boolean mouseDown = false;
     volatile private boolean reactedupon = false;
@@ -30,7 +33,7 @@ public class HoldDownAdapter extends MouseAdapter implements HasLogger {
     private String scheme = "1:on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,2000;off,0";
     private int beeptime_ms = 50;
 
-    public HoldDownAdapter(long reactiontime, ActionListener actionListener, Object source, JProgressBar pb) {
+    public HoldDownButtonHandler(long reactiontime, ActionListener actionListener, Object source, JProgressBar pb) {
         this.reactiontime = reactiontime;
         this.actionListener = actionListener;
         this.source = source;
@@ -44,42 +47,33 @@ public class HoldDownAdapter extends MouseAdapter implements HasLogger {
             }
             scheme += "on,1000;off,0";
             pb.setValue(0);
-            pb.setString(reactiontime/1000+" sec");
-//            pb.setMinimum(0);
-//            pb.setMaximum(new Long(reactiontime).intValue());
-        }
-
-        // zu beginn soll das beepen 250ms lang sein, und dann immer kürzer bis auf 50ms.
-        // 1000ms dauerpiepen, bei event auslösung
-
-    }
-
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        if (!Main.getGame().isGameRunning()) return;
-        
-        if (e.getButton() == MouseEvent.BUTTON1) {
-            getLogger().debug("holding down button");
-            mouseDown = true;
-            holding = System.currentTimeMillis();
-            if (reactiontime > 0) Main.getPinHandler().setScheme(Main.PH_AIRSIREN, scheme);
-            initThread();
+//            pb.setString(reactiontime / 1000 + " sec");
         }
     }
 
-    @Override
-    public void mouseReleased(MouseEvent e) {
+
+    public void buttonPressed() {
         if (!Main.getGame().isGameRunning()) return;
 
-        if (e.getButton() == MouseEvent.BUTTON1) {
-            getLogger().debug("button released");
-            if (reactiontime > 0) Main.getPinHandler().off(Main.PH_AIRSIREN);
-            holding = 0l;
-            pb.setValue(0);
-            reactedupon = false;
-            mouseDown = false;
-        }
+        getLogger().debug("holding down button");
+        mouseDown = true;
+        holding = System.currentTimeMillis();
+        if (reactiontime > 0) Main.getPinHandler().setScheme(Main.PH_AIRSIREN, scheme);
+        initThread();
+    }
+
+
+    public void buttonReleased() {
+        if (!Main.getGame().isGameRunning()) return;
+
+
+        getLogger().debug("button released");
+        if (reactiontime > 0) Main.getPinHandler().off(Main.PH_AIRSIREN);
+        holding = 0l;
+        pb.setValue(0);
+        reactedupon = false;
+        mouseDown = false;
+
     }
 
     private synchronized boolean checkAndMark() {
@@ -100,10 +94,10 @@ public class HoldDownAdapter extends MouseAdapter implements HasLogger {
                     }
                     getLogger().debug("holding down for: " + heldfor / 1000);
 
-                    BigDecimal progress =  new BigDecimal(heldfor).divide(new BigDecimal(reactiontime), 4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).min(new BigDecimal(100));
+                    BigDecimal progress = new BigDecimal(heldfor).divide(new BigDecimal(reactiontime), 4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).min(new BigDecimal(100));
 
                     getLogger().debug(progress);
-                    
+
                     pb.setValue(progress.intValue());
 
                     try {
@@ -117,33 +111,25 @@ public class HoldDownAdapter extends MouseAdapter implements HasLogger {
         }
     }
 
-    private void initBeeperTimes() {
-           if (reactiontime > 0) {
-               beeperTimes = new ArrayList<>();
-               BigDecimal sumTimes = BigDecimal.ZERO;
 
-               for (int i = 0; i < 10; i++) {
-                   beeperTimes.add(new BigDecimal(500).multiply(BigDecimal.ONE.divide(new BigDecimal(i + 1), 4, RoundingMode.HALF_UP)));
-                   sumTimes = sumTimes.add(beeperTimes.get(i));
-               }
+    @Override
+    public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+        if (event.getState() == PinState.LOW) buttonPressed();
+        else buttonReleased();
 
-               BigDecimal scale = new BigDecimal(reactiontime).divide(sumTimes, 4, RoundingMode.HALF_UP);
+    }
 
-               for (int i = 0; i < 10; i++) {
-                   beeperTimes.set(i, beeperTimes.get(i).multiply(scale).divide(new BigDecimal(2), 6, RoundingMode.HALF_UP));
-               }
+    @Override
+    public void mousePressed(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            buttonPressed();
+        }
+    }
 
-
-               scheme = "1:";
-
-               for (int i = 0; i < 10; i++) {
-                   scheme += "on," + beeperTimes.get(i).intValue() + ";off," + beeperTimes.get(i).intValue() + ";";
-               }
-               scheme += "on,1000;off,0";
-           }
-
-
-       }
-
-
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            buttonReleased();
+        }
+    }
 }

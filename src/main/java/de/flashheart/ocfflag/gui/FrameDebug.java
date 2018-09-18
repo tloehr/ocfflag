@@ -288,7 +288,7 @@ public class FrameDebug extends JFrame {
                 {
                     panel1.setLayout(new FormLayout(
                         "default, $lcgap, pref:grow, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow, 2*($lcgap, default)",
-                        "fill:22dlu:grow, $lgap, default, $lgap, fill:default:grow, $lgap, default"));
+                        "fill:22dlu:grow, $lgap, fill:default, $lgap, fill:default:grow, $lgap, fill:default"));
 
                     //---- ledRedButton ----
                     ledRedButton.setColor(Color.red);
@@ -320,7 +320,13 @@ public class FrameDebug extends JFrame {
                     ledBlueButton.setColor(Color.blue);
                     ledBlueButton.setToolTipText("Blue LED in Button");
                     panel1.add(ledBlueButton, CC.xy(15, 1));
+
+                    //---- pbRed ----
+                    pbRed.setStringPainted(true);
                     panel1.add(pbRed, CC.xywh(1, 3, 3, 1, CC.DEFAULT, CC.FILL));
+
+                    //---- pbBlue ----
+                    pbBlue.setStringPainted(true);
                     panel1.add(pbBlue, CC.xy(11, 3, CC.DEFAULT, CC.FILL));
 
                     //---- ledGreenButton ----
@@ -344,7 +350,13 @@ public class FrameDebug extends JFrame {
                     ledYellowButton.setColor(Color.yellow);
                     ledYellowButton.setToolTipText("Yellow LED in Button");
                     panel1.add(ledYellowButton, CC.xy(15, 5));
+
+                    //---- pbGreen ----
+                    pbGreen.setStringPainted(true);
                     panel1.add(pbGreen, CC.xywh(1, 7, 3, 1, CC.DEFAULT, CC.FILL));
+
+                    //---- pbYellow ----
+                    pbYellow.setStringPainted(true);
                     panel1.add(pbYellow, CC.xy(11, 7, CC.DEFAULT, CC.FILL));
                 }
                 mainView.add(panel1, CC.xywh(3, 3, 9, 1));
