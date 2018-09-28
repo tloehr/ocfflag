@@ -235,7 +235,7 @@ new FormModel {
 					"title": "mainView"
 				} )
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-					"$columnSpecs": "unrelgap, labelcompgap, pref, labelcompgap, relgap, labelcompgap, default:grow, labelcompgap, unrelgap"
+					"$columnSpecs": "unrelgap, labelcompgap, pref, labelcompgap, relgap, labelcompgap, 129dlu, unrelgap, center:pref, labelcompgap, 124dlu, labelcompgap, unrelgap"
 					"$rowSpecs": "default, unrelgap, default, unrelgap, default, linegap, default, linegap, default, relgap, default, unrelgap, default, linegap, pref, linegap, 85dlu:grow, linegap, default"
 				} ) {
 					name: "configView"
@@ -243,17 +243,17 @@ new FormModel {
 						name: "lblConfigTitle"
 						"opaque": true
 						"background": sfield java.awt.Color magenta
-						"text": "OCFFlag Configs"
+						"text": "Configs (Änderungen erfordern Neustart)"
 						"foreground": sfield java.awt.Color white
 						"horizontalAlignment": 0
 						"font": new com.jformdesigner.model.SwingDerivedFont( null, 2, 24, true )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridWidth": 5
+						"gridWidth": 9
 						"gridX": 3
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "label1"
-						"text": "Flag-Name"
+						"text": "System-Name"
 						"font": &Font1 new java.awt.Font( "Dialog", 0, 22 )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridY": 3
@@ -266,6 +266,7 @@ new FormModel {
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
 						"gridY": 3
+						"gridWidth": 5
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "label2"
@@ -282,6 +283,7 @@ new FormModel {
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
 						"gridY": 5
+						"gridWidth": 5
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "label4"
@@ -298,10 +300,11 @@ new FormModel {
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
 						"gridY": 7
+						"gridWidth": 5
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "label8"
-						"text": "Send Stats"
+						"text": "Intervall Stats (ms)"
 						"font": #Font1
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridY": 9
@@ -313,6 +316,22 @@ new FormModel {
 						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtSendStatsFocusLost", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
+						"gridY": 9
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "label11"
+						"text": "Button Reaction (ms)"
+						"font": #Font1
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridY": 9
+						"gridX": 9
+					} )
+					add( new FormComponent( "javax.swing.JTextField" ) {
+						name: "txtButtonReaction"
+						"font": #Font1
+						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtButtonReactionFocusLost", true ) )
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 11
 						"gridY": 9
 					} )
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
@@ -336,7 +355,7 @@ new FormModel {
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 3
 						"gridY": 11
-						"gridWidth": 5
+						"gridWidth": 9
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "label9"
@@ -353,6 +372,7 @@ new FormModel {
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
 						"gridY": 13
+						"gridWidth": 5
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "label10"
@@ -404,11 +424,12 @@ new FormModel {
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
 						"gridY": 15
+						"gridWidth": 5
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "btnPlay"
+						name: "btnSaveAndQuit"
 						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/128x128/agt_games.png" )
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/128x128/exit.png" )
 						"toolTipText": "Spiel konfigurieren"
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints LEFT
@@ -426,6 +447,7 @@ new FormModel {
 						"gridX": 7
 						"gridY": 17
 						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"gridWidth": 5
 					} )
 				}, new FormLayoutConstraints( null ) {
 					"title": "configView"

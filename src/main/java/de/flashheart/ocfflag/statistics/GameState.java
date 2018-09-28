@@ -13,44 +13,81 @@ public class GameState {
     public static final String TYPE_FARCRY = "farcry";
     public static final String TYPE_CENTERFLAG = "centerflag";
 
+    /**
+     * Hier steht der Name der Box / Bombe. Kann frei gewählt werden.
+     */
     private String bombname;
+    /**
+     * entsprechend den obigen TYPE Konstanten
+     */
     private String gametype;
+    /**
+     * State enthält immer der aktuellen Zustand. Das sind ausgewählte GameEvent Bezeichnungen, die zuletzt eingetreten sind.
+     * Nicht alle werden zu einem State. Welche das sind hängt von der jeweiligen Statistics Klasse ab.
+     */
     private String state;
+    /**
+     * die UUID ist ein automatisch errechneter Primärschlüssel für jede Box-Software die eingerichtet wird.
+     * Das RLG System geht davon aus, dass es sich wirklich um einen Primärschlüssel handelt. Obwohl man
+     * den ändern könnten. Aber dann passieren lustige Sachen, die wir nicht wollen.
+     */
     private String uuid;
+    /**
+     * jede Box nummeriert die einzelnen Matches durch indem es einen Zähler führt.
+     */
     private long matchid;
+    /**
+     * Das ist der Timestamp, an dem dieser GameState erzeugt wurde.
+     */
     private long timestamp;
+    /**
+     * Spielbeginn, Spielende (wenn schon beendet, sonst -1) und Beginn des Pausezustandes (wenn in Pause, sonst -1)
+     */
     private long timestamp_game_started;
     private long timestamp_game_paused;
     private long timestamp_game_ended;
-    private boolean bombfused;
-    private long remaining;
-    private long capturetime;
-    private long maxgametime;
+    /**
+     * die aktuelle Spielzeit. Beginnen bei 0.
+     */
     private long gametime;
+    /**
+     * Maximale Zeit, die das Spiel dauern kann. Evtl. mit potenziellen Overtimes. Es muss also nicht notwendigerweise
+     * wirklich so lange dauern. Hängt vom gametype ab.
+     */
+    private long maxgametime;
+    /**
+     * Das ist die Liste der einzelnen GameEvents, die schon stattgefunden haben und die letztlich zu diesem, aktuellen
+     * State geführt haben.
+     */
     private List<GameEvent> gameEvents;
-    private String zoneid; // for timezone handling
+    /**
+     * Das hier habe zur korrekten Weiterverarbeitung eingebaut. Die Zeiten beziehen sich natürlich immer auf die
+     * lokale Zeitzone. Ich glaube ja nicht, dass wir sobald Zeitzonen-Übergreifende Events veranstalten werden,
+     * aber wenn, dann stimmt auch die Berechnung.
+     *
+     * Das ist die Zoneid der jeweiligen Box, deren Zustand hier beschrieben wird.
+     */
+    private String zoneid;
+    /**
+     * Es spielen fast immer Farben eine Rolle. Eine Flagge leuchtet, ein Knopf wird umgelegt. usw.
+     * Damit das bei der späteren Webdarstellung direkt abgegriffen werden kann steht hier
+     * der HTML Color code als String drin. Auf mit den Textkonstanten wie WHITE, BLUE, RED usw.
+     */
     private String color;
-    private LinkedHashMap<String, Integer> teamranking;
-    private long numteams;
 
     public GameState() {
         gameEvents = new ArrayList<>();
-        teamranking = new LinkedHashMap<>();
     }
 
-    public GameState(String bombname, String gametype, String uuid, long matchid, long numteams, long maxgametime) {
+    public GameState(String bombname, String gametype, String uuid, long matchid, long maxgametime) {
         this();
-        this.numteams = numteams;
         this.state = GameEvent.PREGAME;
-        this.bombfused = false;
         this.bombname = bombname;
         this.gametype = gametype;
         this.uuid = uuid;
         this.matchid = matchid;
-        this.capturetime = 0l;
         this.maxgametime = maxgametime;
-        this.remaining = 0l;
-        this.bombfused = false;
+        this.gametime = 0l;
         this.timestamp_game_started = -1;
         this.timestamp_game_paused = -1;
         this.timestamp_game_ended = -1;
@@ -123,28 +160,13 @@ public class GameState {
         this.timestamp_game_ended = timestamp_game_ended;
     }
 
-    public boolean isBombfused() {
-        return bombfused;
+
+    public long getGametime() {
+        return gametime;
     }
 
-    public void setBombfused(boolean bombfused) {
-        this.bombfused = bombfused;
-    }
-
-    public long getRemaining() {
-        return remaining;
-    }
-
-    public void setRemaining(long remaining) {
-        this.remaining = remaining;
-    }
-
-    public long getCapturetime() {
-        return capturetime;
-    }
-
-    public void setCapturetime(long capturetime) {
-        this.capturetime = capturetime;
+    public void setGametime(long gametime) {
+        this.gametime = gametime;
     }
 
     public long getMaxgametime() {
@@ -155,13 +177,6 @@ public class GameState {
         this.maxgametime = maxgametime;
     }
 
-    public long getGametime() {
-        return gametime;
-    }
-
-    public void setGametime(long gametime) {
-        this.gametime = gametime;
-    }
 
     public List<GameEvent> getGameEvents() {
         return gameEvents;
@@ -187,28 +202,12 @@ public class GameState {
         this.zoneid = zoneid;
     }
 
-    public LinkedHashMap<String, Integer> getTeamranking() {
-        return teamranking;
-    }
-
-    public void setTeamranking(LinkedHashMap<String, Integer> teamranking) {
-        this.teamranking = teamranking;
-    }
-
     public String getColor() {
         return color;
     }
 
     public void setColor(String color) {
         this.color = color;
-    }
-
-    public long getNumteams() {
-        return numteams;
-    }
-
-    public void setNumteams(long numteams) {
-        this.numteams = numteams;
     }
 
     @Override
@@ -223,17 +222,11 @@ public class GameState {
                 ", timestamp_game_started=" + timestamp_game_started +
                 ", timestamp_game_paused=" + timestamp_game_paused +
                 ", timestamp_game_ended=" + timestamp_game_ended +
-                ", bombfused=" + bombfused +
-                ", remaining=" + remaining +
-                ", capturetime=" + capturetime +
-                ", maxgametime=" + maxgametime +
                 ", gametime=" + gametime +
+                ", maxgametime=" + maxgametime +
                 ", gameEvents=" + gameEvents +
                 ", zoneid='" + zoneid + '\'' +
                 ", color='" + color + '\'' +
-                ", teamranking=" + teamranking +
-                ", numteams=" + numteams +
                 '}';
     }
-
 }

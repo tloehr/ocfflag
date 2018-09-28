@@ -31,6 +31,8 @@ import java.util.HashMap;
 
 public class Main {
 
+    private static int MAX_TEAMS;
+
 
     private static long REACTION_TIME = 3000;
     private static GpioController GPIO;
@@ -120,7 +122,7 @@ public class Main {
     private static MCP23017GpioProvider mcp23017_1 = null;
 
     private static Display7Segments4Digits display_blue, display_red, display_white, display_green, display_yellow;
-    private static MyAbstractButton button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game, button_shutdown;
+    private static MyAbstractButton button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_saveNquit, button_shutdown;
     private static MyRGBLed pole;
 
     private static MyPin ledRedButton, ledBlueButton, ledGreenButton, ledYellowButton, ledGreen, ledWhite;
@@ -164,8 +166,14 @@ public class Main {
         display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblPole(), Configs.BRIGHTNESS_WHITE);
         display_red = new Display7Segments4Digits(DISPLAY_RED, getFrameDebug().getBtnRed(), Configs.BRIGHTNESS_RED);
         display_blue = new Display7Segments4Digits(DISPLAY_BLUE, getFrameDebug().getBtnBlue(), Configs.BRIGHTNESS_BLUE);
+        MAX_TEAMS = 2; // Minimum Anzahl der Teams. Z.B. ActionCase
+
+        // Abhängig davon wieviele Displays angeschlossen sind, erlaubt die Box bis zu 4 Teams
         display_green = new Display7Segments4Digits(DISPLAY_GREEN, getFrameDebug().getBtnGreen(), Configs.BRIGHTNESS_GREEN);
         display_yellow = new Display7Segments4Digits(DISPLAY_YELLOW, getFrameDebug().getBtnYellow(), Configs.BRIGHTNESS_YELLOW);
+
+        if (display_green.isFullyUsable()) MAX_TEAMS = 3;
+        if (display_yellow.isFullyUsable()) MAX_TEAMS = 4;
 
         applicationContext.put(display_white.getName(), display_white);
         applicationContext.put(display_red.getName(), display_red);
@@ -183,7 +191,7 @@ public class Main {
         button_standby_active = new MyAbstractButton(GPIO, BUTTON_STANDBY_ACTIVE, frameDebug.getBtnSwitchMode());
         button_quit = new MyAbstractButton(null, null, frameDebug.getBtnQuit());
         button_config = new MyAbstractButton(null, null, frameDebug.getBtnConfig());
-        button_back2game = new MyAbstractButton(null, null, frameDebug.getBtnPlay());
+        button_saveNquit = new MyAbstractButton(null, null, frameDebug.getBtnSaveAndQuit());
         button_shutdown = new MyAbstractButton(GPIO, BUTTON_SHUTDOWN, 5000);
 
         pole = new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), PH_POLE);
@@ -232,7 +240,7 @@ public class Main {
         pinHandler.add(ledWhite);
 
 
-        game = new Game(display_white, display_red, display_blue, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_back2game, button_shutdown);
+        game = new Game(display_white, display_red, display_blue, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_saveNquit, button_shutdown);
         game.run();
     }
 
@@ -399,6 +407,10 @@ public class Main {
 
     }
 
+    public static int getMaxTeams() {
+        return MAX_TEAMS;
+    }
+
     public static Level getLogLevel() {
         return logLevel;
     }
@@ -411,6 +423,9 @@ public class Main {
         return frameDebug;
     }
 
+    public static long getReactionTime() {
+        return REACTION_TIME;
+    }
 
     public static Configs getConfigs() {
         return configs;

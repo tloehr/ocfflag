@@ -36,7 +36,7 @@ public class FrameDebug extends JFrame {
         initFonts();
         initFrame();
 
-        String title = "ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + "." + Main.getConfigs().getApplicationInfo("buildNumber") + " [" + Main.getConfigs().getApplicationInfo("project.build.timestamp") + "]";
+        String title = "ocfflag/actioncase " + Main.getConfigs().getApplicationInfo("my.version") + "." + Main.getConfigs().getApplicationInfo("buildNumber") + " [" + Main.getConfigs().getApplicationInfo("project.build.timestamp") + "]";
 
         logger.info(title);
         setTitle(title);
@@ -59,8 +59,6 @@ public class FrameDebug extends JFrame {
     }
 
     private void initFrame() {
-
-
         btnTestHardware.setEnabled(Tools.isArm());
 
         // kleiner Trick, damit ich nur eine Action Methode brauche
@@ -80,6 +78,11 @@ public class FrameDebug extends JFrame {
         btnBlue.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
         btnGreen.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
         btnYellow.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
+
+        pbBlue.setVisible(Main.getReactionTime() > 0);
+        pbGreen.setVisible(Main.getReactionTime() > 0);
+        pbYellow.setVisible(Main.getReactionTime() > 0);
+        pbRed.setVisible(Main.getReactionTime() > 0);
 
         lblPole.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
 
@@ -105,8 +108,13 @@ public class FrameDebug extends JFrame {
         return btnQuit;
     }
 
-    public JButton getBtnPlay() {
-        return btnPlay;
+//    public JButton getBtnPlay() {
+//        return btnPlay;
+//    }
+
+
+    public JButton getBtnSaveAndQuit() {
+        return btnSaveAndQuit;
     }
 
     public JButton getBtnConfig() {
@@ -125,9 +133,8 @@ public class FrameDebug extends JFrame {
     private void setConfigsToScreen() {
         txtFlagName.setText(Main.getConfigs().get(Configs.FLAGNAME));
         txtResturl.setText(Main.getConfigs().get(Configs.REST_URL));
-        txtResturl.setText(Main.getConfigs().get(Configs.REST_URL));
-
-
+        txtRestAuth.setText(Main.getConfigs().get(Configs.REST_AUTH));
+        txtButtonReaction.setText(Main.getConfigs().get(Configs.BUTTON_REACTION_TIME));
         txtSendStats.setText(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
         txtUUID.setText(Main.getConfigs().get(Configs.MYUUID));
     }
@@ -210,6 +217,15 @@ public class FrameDebug extends JFrame {
         Main.getConfigs().put(Configs.REST_AUTH, txtRestAuth.getText().trim());
     }
 
+    private void txtButtonReactionFocusLost(FocusEvent e) {
+        try {
+            Integer.parseInt(txtButtonReaction.getText().trim());
+            Main.getConfigs().put(Configs.BUTTON_REACTION_TIME, txtButtonReaction.getText().trim());
+        } catch (NumberFormatException nfe) {
+            txtButtonReaction.setText(Main.getConfigs().get(Configs.BUTTON_REACTION_TIME));
+        }
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -250,6 +266,8 @@ public class FrameDebug extends JFrame {
         txtRestAuth = new JTextField();
         label8 = new JLabel();
         txtSendStats = new JTextField();
+        label11 = new JLabel();
+        txtButtonReaction = new JTextField();
         panel6 = new JPanel();
         btnTestRest = new JButton();
         btnTestHardware = new JButton();
@@ -263,7 +281,7 @@ public class FrameDebug extends JFrame {
         btnBlueBrght = new JButton();
         btnGreenBrght = new JButton();
         btnYellowBrght = new JButton();
-        btnPlay = new JButton();
+        btnSaveAndQuit = new JButton();
         scrollPane1 = new JScrollPane();
         txtLog = new JTextArea();
 
@@ -432,20 +450,20 @@ public class FrameDebug extends JFrame {
             //======== configView ========
             {
                 configView.setLayout(new FormLayout(
-                    "$ugap, $lcgap, pref, $lcgap, $rgap, $lcgap, default:grow, $lcgap, $ugap",
+                    "$ugap, $lcgap, pref, $lcgap, $rgap, $lcgap, 129dlu, $ugap, center:pref, $lcgap, 124dlu, $lcgap, $ugap",
                     "2*(default, $ugap), 2*(default, $lgap), default, $rgap, default, $ugap, default, $lgap, pref, $lgap, 85dlu:grow, $lgap, default"));
 
                 //---- lblConfigTitle ----
                 lblConfigTitle.setOpaque(true);
                 lblConfigTitle.setBackground(Color.magenta);
-                lblConfigTitle.setText("OCFFlag Configs");
+                lblConfigTitle.setText("Configs (\u00c4nderungen erfordern Neustart)");
                 lblConfigTitle.setForeground(Color.white);
                 lblConfigTitle.setHorizontalAlignment(SwingConstants.CENTER);
                 lblConfigTitle.setFont(lblConfigTitle.getFont().deriveFont(lblConfigTitle.getFont().getStyle() | Font.ITALIC, 24f));
-                configView.add(lblConfigTitle, CC.xywh(3, 1, 5, 1));
+                configView.add(lblConfigTitle, CC.xywh(3, 1, 9, 1));
 
                 //---- label1 ----
-                label1.setText("Flag-Name");
+                label1.setText("System-Name");
                 label1.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label1, CC.xy(3, 3));
 
@@ -457,7 +475,7 @@ public class FrameDebug extends JFrame {
                         txtFlagNameFocusLost(e);
                     }
                 });
-                configView.add(txtFlagName, CC.xy(7, 3));
+                configView.add(txtFlagName, CC.xywh(7, 3, 5, 1));
 
                 //---- label2 ----
                 label2.setText("Rest URL");
@@ -472,7 +490,7 @@ public class FrameDebug extends JFrame {
                         txtResturlFocusLost(e);
                     }
                 });
-                configView.add(txtResturl, CC.xy(7, 5));
+                configView.add(txtResturl, CC.xywh(7, 5, 5, 1));
 
                 //---- label4 ----
                 label4.setText("Rest-Auth");
@@ -487,10 +505,10 @@ public class FrameDebug extends JFrame {
                         txtRestAuthFocusLost(e);
                     }
                 });
-                configView.add(txtRestAuth, CC.xy(7, 7));
+                configView.add(txtRestAuth, CC.xywh(7, 7, 5, 1));
 
                 //---- label8 ----
-                label8.setText("Send Stats");
+                label8.setText("Intervall Stats (ms)");
                 label8.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label8, CC.xy(3, 9));
 
@@ -503,6 +521,21 @@ public class FrameDebug extends JFrame {
                     }
                 });
                 configView.add(txtSendStats, CC.xy(7, 9));
+
+                //---- label11 ----
+                label11.setText("Button Reaction (ms)");
+                label11.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                configView.add(label11, CC.xy(9, 9));
+
+                //---- txtButtonReaction ----
+                txtButtonReaction.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtButtonReaction.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtButtonReactionFocusLost(e);
+                    }
+                });
+                configView.add(txtButtonReaction, CC.xy(11, 9));
 
                 //======== panel6 ========
                 {
@@ -524,7 +557,7 @@ public class FrameDebug extends JFrame {
                     txtFlagColor.addActionListener(e -> txtFlagColorActionPerformed(e));
                     panel6.add(txtFlagColor);
                 }
-                configView.add(panel6, CC.xywh(3, 11, 5, 1));
+                configView.add(panel6, CC.xywh(3, 11, 9, 1));
 
                 //---- label9 ----
                 label9.setText("UUID");
@@ -534,7 +567,7 @@ public class FrameDebug extends JFrame {
                 //---- txtUUID ----
                 txtUUID.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtUUID.setEditable(false);
-                configView.add(txtUUID, CC.xy(7, 13));
+                configView.add(txtUUID, CC.xywh(7, 13, 5, 1));
 
                 //---- label10 ----
                 label10.setText("Helligkeit");
@@ -580,13 +613,13 @@ public class FrameDebug extends JFrame {
                     btnYellowBrght.addActionListener(e -> btnBrghtActionPerformed(e));
                     panel4.add(btnYellowBrght);
                 }
-                configView.add(panel4, CC.xy(7, 15));
+                configView.add(panel4, CC.xywh(7, 15, 5, 1));
 
-                //---- btnPlay ----
-                btnPlay.setText(null);
-                btnPlay.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/agt_games.png")));
-                btnPlay.setToolTipText("Spiel konfigurieren");
-                configView.add(btnPlay, CC.xy(3, 17, CC.LEFT, CC.DEFAULT));
+                //---- btnSaveAndQuit ----
+                btnSaveAndQuit.setText(null);
+                btnSaveAndQuit.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/exit.png")));
+                btnSaveAndQuit.setToolTipText("Spiel konfigurieren");
+                configView.add(btnSaveAndQuit, CC.xy(3, 17, CC.LEFT, CC.DEFAULT));
 
                 //======== scrollPane1 ========
                 {
@@ -596,7 +629,7 @@ public class FrameDebug extends JFrame {
                     txtLog.setForeground(new Color(0, 255, 51));
                     scrollPane1.setViewportView(txtLog);
                 }
-                configView.add(scrollPane1, CC.xy(7, 17, CC.DEFAULT, CC.FILL));
+                configView.add(scrollPane1, CC.xywh(7, 17, 5, 1, CC.DEFAULT, CC.FILL));
             }
             mainPanel.addTab("configView", configView);
         }
@@ -708,6 +741,8 @@ public class FrameDebug extends JFrame {
     private JTextField txtRestAuth;
     private JLabel label8;
     private JTextField txtSendStats;
+    private JLabel label11;
+    private JTextField txtButtonReaction;
     private JPanel panel6;
     private JButton btnTestRest;
     private JButton btnTestHardware;
@@ -721,7 +756,7 @@ public class FrameDebug extends JFrame {
     private JButton btnBlueBrght;
     private JButton btnGreenBrght;
     private JButton btnYellowBrght;
-    private JButton btnPlay;
+    private JButton btnSaveAndQuit;
     private JScrollPane scrollPane1;
     private JTextArea txtLog;
     // JFormDesigner - End of variables declaration  //GEN-END:variables

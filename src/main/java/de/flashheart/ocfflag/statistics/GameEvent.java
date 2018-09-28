@@ -40,25 +40,23 @@ public class GameEvent {
 
     public static final String[] GAME_OVER_EVENTS = new String[]{GAME_ABORTED, GAME_OVER, EXPLODED, DEFENDED};
 
-    protected long pit;
-    protected String event;
-    protected long gametime;
-    protected long remaining;
-    protected LinkedHashMap<String, Integer> teamranking = null;
+    private long pit;
+    private String event;
+    private long gametime;
+    private LinkedHashMap<String, Integer> teamranking = null;
 
     public GameEvent() {
     }
 
-    public GameEvent(long pit, String event, long gametime, long remaining) {
-        this.pit = pit;
+    public GameEvent(String event, long gametime) {
+        this.pit = System.currentTimeMillis();
         this.event = event;
         this.gametime = gametime;
-        this.remaining = remaining;
     }
 
 
-    public GameEvent(long pit, String event, long gametime, long remaining, LinkedHashMap<String, Integer> teamranking) {
-        this(pit, event, gametime, remaining);
+    public GameEvent(String event, long gametime, LinkedHashMap<String, Integer> teamranking) {
+        this(event, gametime);
         this.teamranking = teamranking;
     }
 
@@ -86,14 +84,6 @@ public class GameEvent {
         this.gametime = gametime;
     }
 
-    public long getRemaining() {
-        return remaining;
-    }
-
-    public void setRemaining(long remaining) {
-        this.remaining = remaining;
-    }
-
     public LinkedHashMap<String, Integer> getTeamranking() {
         return teamranking;
     }
@@ -108,7 +98,6 @@ public class GameEvent {
                 "pit=" + pit +
                 ", event='" + event + '\'' +
                 ", gametime=" + gametime +
-                ", remaining=" + remaining +
                 '}';
     }
 

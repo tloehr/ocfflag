@@ -179,5 +179,13 @@ public class Display7Segments4Digits {
 
     }
 
-
+    /**
+     * Wenn das Programm nur im Simulator läuft (also nicht auf einem Raspi), dann ist das Display immer funktionstüchtig.
+     * Auf einem Raspi, darf es aber keinen Init Fehler gegeben haben. Ansonsten müssen wir es weglassen.
+     *
+     * @return
+     */
+    public boolean isFullyUsable() {
+        return !Tools.isArm() || segment != null;
+    }
 }

@@ -4,62 +4,100 @@ import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 public class Statistics implements HasLogger {
 
-    public static final String[] EVENTS_TO_STATE = new String[]{GameEvent.GAME_ABORTED, GameEvent.RESULT_BLUE_WON, GameEvent.RESULT_RED_WON, GameEvent.RESULT_YELLOW_WON, GameEvent.RESULT_GREEN_WON};
+    public static final String[] EVENTS_TO_STATE = new String[]{GameEvent.GAME_ABORTED, GameEvent.GAME_OVER};
 
 
+    private ArrayList<String> winners;
     private GameState gameState;
 //    protected LinkedHashMap<String, Integer> teams = null;
 
     private final MessageProcessor messageProcessor;
 
 
-    public Statistics(long numTeams, long maxtime) {
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    public Statistics(long maxtime) {
         messageProcessor = Main.getMessageProcessor();
-        reset(numTeams, maxtime);
+        winners = new ArrayList<>();
+        reset(maxtime);
     }
 
-    public void reset(long numTeams, long maxtime) {
-        gameState = new GameState(Main.getConfigs().get(Configs.FLAGNAME), GameState.TYPE_CENTERFLAG, Main.getConfigs().get(Configs.MYUUID), Main.getConfigs().getNextMatchID(), numTeams, maxtime);
+    public void reset(long maxtime) {
+        winners.clear();
+        gameState = new GameState(Main.getConfigs().get(Configs.FLAGNAME), GameState.TYPE_CENTERFLAG, Main.getConfigs().get(Configs.MYUUID), Main.getConfigs().getNextMatchID(), maxtime);
     }
 
-    public void updateTimers(long now, long timer, LinkedHashMap<String, Integer> rank) {
-        gameState.setGametime(timer);
-        gameState.setTeamranking(rank);
-        gameState.setTimestamp(now);
+    public void updateTimers(long remaining) {
+        gameState.setGametime(gameState.getMaxgametime() - remaining);
+        gameState.setTimestamp(System.currentTimeMillis());
     }
 
     public void sendStats() {
         messageProcessor.pushMessage(gameState);
     }
 
-    public long addEvent(GameEvent gameEvent) {
-        long now = System.currentTimeMillis();
-        updateTimers(now, gameEvent.getGametime(), gameEvent.getTeamranking());
+    public ArrayList<String> getWinners() {
+        return winners;
+    }
+
+    public long addEvent(String event, long remaining, LinkedHashMap<String, Integer> teamranking) {
+        updateTimers(remaining);
+
+        if (event.equals(GameEvent.GAME_OVER)
+                || event.equals(GameEvent.GAME_ABORTED)) {
+            gameState.setTimestamp_game_ended(gameState.getTimestamp());
+        }
+
+        if (event.equals(GameEvent.GAME_OVER)) {
+            ArrayList<String> winners = GameStateService.getWinners(teamranking);
+            if (winners.size() > 1) {
+                gameState.getGameEvents().add(new GameEvent(GameEvent.RESULT_MULTI_WINNERS, gameState.getGametime(), teamranking));
+                getLogger().info("More than one winner - very rare");
+            }
+            if (winners.contains("red")) {
+                getLogger().info("Red Team won");
+                gameState.getGameEvents().add(new GameEvent(GameEvent.RESULT_RED_WON, gameState.getGametime(), teamranking));
+            }
+            if (winners.contains("blue")) {
+                getLogger().info("Blue Team won");
+                gameState.getGameEvents().add(new GameEvent(GameEvent.RESULT_BLUE_WON, gameState.getGametime(), teamranking));
+            }
+            if (winners.contains("green")) {
+                getLogger().info("Green Team won");
+                gameState.getGameEvents().add(new GameEvent(GameEvent.RESULT_GREEN_WON, gameState.getGametime(), teamranking));
+            }
+            if (winners.contains("yellow")) {
+                getLogger().info("Yellow Team won");
+                gameState.getGameEvents().add(new GameEvent(GameEvent.RESULT_YELLOW_WON, gameState.getGametime(), teamranking));
+            }
+        }
+
+        // Und jetzt erst der eigentliche Event. Dadurch steht Game_OVER oder ABORTED immer am Schluss.
+        GameEvent gameEvent = new GameEvent(event, gameState.getGametime(), teamranking);
         gameState.getGameEvents().add(gameEvent);
 
-        if (gameEvent.getEvent().equals(GameEvent.GAME_OVER)
-                || gameEvent.getEvent().equals(GameEvent.GAME_ABORTED)) {
-            gameState.setTimestamp_game_ended(now);
-        }
-
         // Result ?
-        if (Arrays.asList(EVENTS_TO_STATE).contains(gameEvent.getEvent())) {
-            gameState.setState(gameEvent.getEvent());
+        if (Arrays.asList(EVENTS_TO_STATE).contains(event)) {
+            gameState.setState(event);
         }
 
-        if (gameEvent.getEvent().equals(GameEvent.RED_ACTIVATED)) gameState.setColor("red");
-        if (gameEvent.getEvent().equals(GameEvent.BLUE_ACTIVATED)) gameState.setColor("blue");
-        if (gameEvent.getEvent().equals(GameEvent.GREEN_ACTIVATED)) gameState.setColor("green");
-        if (gameEvent.getEvent().equals(GameEvent.YELLOW_ACTIVATED)) gameState.setColor("yellow");
+        if (event.equals(GameEvent.FLAG_NEUTRAL)) gameState.setColor("white");
+        if (event.equals(GameEvent.RED_ACTIVATED)) gameState.setColor("red");
+        if (event.equals(GameEvent.BLUE_ACTIVATED)) gameState.setColor("blue");
+        if (event.equals(GameEvent.GREEN_ACTIVATED)) gameState.setColor("green");
+        if (event.equals(GameEvent.YELLOW_ACTIVATED)) gameState.setColor("yellow");
 
         sendStats(); // jedes Ereignis wird gesendet.
 
-        return now;
+        return gameState.getTimestamp();
     }
 
 //    /**
