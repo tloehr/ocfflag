@@ -592,8 +592,8 @@ public class Game implements Runnable, HasLogger {
             if (mode == MODE_CLOCK_PREGAME) {
                 getLogger().debug("PREGAME");
                 getLogger().debug("preset_num_teams " + preset_num_teams);
-                if (preset_num_teams < 3) display_green.clear();
-                if (preset_num_teams < 4) display_yellow.clear();
+                if (display_green != null && preset_num_teams < 3) display_green.clear();
+                if (display_yellow != null && preset_num_teams < 4) display_yellow.clear();
 
 
                 if (preset_num_teams == 3) {

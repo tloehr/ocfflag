@@ -46,7 +46,7 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
                 scheme += "on," + beeptime_ms + ";off," + beeptime_ms + ";";
             }
             scheme += "on,1000;off,0";
-            pb.setValue(0);
+            if (pb != null) pb.setValue(0);
 //            pb.setString(reactiontime / 1000 + " sec");
         }
     }
@@ -70,7 +70,7 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
         getLogger().debug("button released");
         if (reactiontime > 0) Main.getPinHandler().off(Main.PH_AIRSIREN);
         holding = 0l;
-        pb.setValue(0);
+        if (pb != null) pb.setValue(0);
         reactedupon = false;
         mouseDown = false;
 
@@ -98,7 +98,7 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
 
                     getLogger().debug(progress);
 
-                    pb.setValue(progress.intValue());
+                    if (pb != null) pb.setValue(progress.intValue());
 
                     try {
                         Thread.sleep(100);

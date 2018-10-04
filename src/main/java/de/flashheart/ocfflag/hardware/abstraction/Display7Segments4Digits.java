@@ -48,7 +48,7 @@ public class Display7Segments4Digits {
         if (segment != null) segment.setBrightness(Main.getConfigs().getInt(name));
     }
 
-    public Display7Segments4Digits(int addr, JButton btnSegment, String name) throws IOException {
+    public Display7Segments4Digits(int addr, JButton btnSegment, String name) {
         this.name = name;
 
         this.btnSegment = btnSegment;
@@ -57,13 +57,14 @@ public class Display7Segments4Digits {
         if (Tools.isArm()) {
             try {
                 segment = new SevenSegment(addr, true);
-            } catch (I2CFactory.UnsupportedBusNumberException e) {
+                segment.setBrightness(Main.getConfigs().getInt(name));
+            } catch (Exception e) {
                 logger.error(e);
                 segment = null;
             }
         }
 
-        if (segment != null) segment.setBrightness(Main.getConfigs().getInt(name));
+
     }
 
     public void setColon(boolean colon) {

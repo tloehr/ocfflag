@@ -32,14 +32,10 @@ import java.util.HashMap;
 public class Main {
 
     private static int MAX_TEAMS;
-
-
     private static long REACTION_TIME = 3000;
     private static GpioController GPIO;
     private static Game game;
     private static FrameDebug frameDebug;
-
-//    private static SortedProperties config;
 
     private static Logger logger;
     private static Level logLevel = Level.DEBUG;
@@ -76,41 +72,48 @@ public class Main {
 
     // Linke Seite des JP8 Header
 
-    // Klemmleiste
-    /* btn01 */ private static final Pin BUTTON_STANDBY_ACTIVE = RaspiPin.GPIO_03;
-    /* btn02 */ private static final Pin BUTTON_PRESET_NUM_TEAMS = RaspiPin.GPIO_12;
-    /* btn03 */ private static final Pin BUTTON_PRESET_GAMETIME = RaspiPin.GPIO_13;
-    /* btn04 */ private static final Pin BUTTON_RESET = RaspiPin.GPIO_14;
-    /* btn05 */ private static final Pin BUTTON_RED = RaspiPin.GPIO_21;
-    /* btn06 */ private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
-    /* btn07 */ private static final Pin BUTTON_GREEN = RaspiPin.GPIO_23;
-    /* btn08 */ private static final Pin BUTTON_YELLOW = RaspiPin.GPIO_24;
+    // J1 External Box und P1 Display Port
+    /* btn01, P1 Display Port */ private static final Pin BUTTON_STANDBY_ACTIVE = RaspiPin.GPIO_03;
+    /* btn02, P1 Display Port */ private static final Pin BUTTON_PRESET_NUM_TEAMS = RaspiPin.GPIO_12;
+    /* btn03, P1 Display Port */ private static final Pin BUTTON_PRESET_GAMETIME = RaspiPin.GPIO_13;
+    /* btn04, P1 Display Port */ private static final Pin BUTTON_RESET = RaspiPin.GPIO_14;
+    /* btn05, J1 External Box */ private static final Pin BUTTON_RED = RaspiPin.GPIO_21;
+    /* btn06, J1 External Box */ private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
+    /* btn07, J1 External Box */ private static final Pin BUTTON_GREEN = RaspiPin.GPIO_23;
+    /* btn08, J1 External Box */ private static final Pin BUTTON_YELLOW = RaspiPin.GPIO_24;
 
-    /* btnShutdown */ private static final Pin BUTTON_SHUTDOWN = RaspiPin.GPIO_28;
+    /* btnShutdown, J1 External Box */ private static final Pin BUTTON_SHUTDOWN = RaspiPin.GPIO_28;
 
-    private static final Pin LED_RED_BUTTON = MCP23017Pin.GPIO_B0; //mf01
-    private static final Pin LED_BLUE_BUTTON = MCP23017Pin.GPIO_B1;//mf02
-    private static final Pin LED_GREEN_STATUS = MCP23017Pin.GPIO_B2; //mf03
-    private static final Pin LED_GREEN_BUTTON = MCP23017Pin.GPIO_B3; //mf04
-    private static final Pin LED_YELLOW_BUTTON = MCP23017Pin.GPIO_B4; //mf05
-    private static final Pin LED_WHITE_STATUS = MCP23017Pin.GPIO_B5; //mf06
+    // 4 Ports für ein Relais Board.
+    // Schaltet on Low oder High ?
+    /* rly01, J1 External Box */ private static final Pin RLY01 = RaspiPin.GPIO_07;
+    /* rly02, J1 External Box */ private static final Pin RLY02 = RaspiPin.GPIO_08;
+    /* rly03, J1 External Box */ private static final Pin RLY03 = RaspiPin.GPIO_02;
+    /* rly04, J1 External Box */ private static final Pin RLY04 = RaspiPin.GPIO_25;
 
-    private static final Pin RESERVE01 = MCP23017Pin.GPIO_B6;  //mf07 led1_progress_red
-    private static final Pin RESERVE02 = MCP23017Pin.GPIO_B7;  //mf08 led1_progress_yellow
-    private static final Pin RESERVE03 = MCP23017Pin.GPIO_A0;  //mf09 SIREN_START_STOP
-    private static final Pin RESERVE04 = MCP23017Pin.GPIO_A1;  //mf10 SIREN_COLOR_CHANGE / SIREN1
-    private static final Pin RESERVE05 = MCP23017Pin.GPIO_A2;  //mf11 SIREN_SHUTDOWN
-    private static final Pin RESERVE06 = MCP23017Pin.GPIO_A3;  //mf12 led1_progress_green
-    private static final Pin RESERVE07 = MCP23017Pin.GPIO_A4;  //mf13 led2_progress_red
-    private static final Pin RESERVE08 = MCP23017Pin.GPIO_A5;  //mf14 led2_progress_yellow
-    private static final Pin RESERVE09 = MCP23017Pin.GPIO_A6;  //mf15 led2_progress_green
-    private static final Pin RESERVE10 = MCP23017Pin.GPIO_A7;  //mf16
+    /* mf01, J1 External Box */ private static final Pin LED_RED_BUTTON = MCP23017Pin.GPIO_B0; //mf01
+    /* mf02, J1 External Box */ private static final Pin LED_BLUE_BUTTON = MCP23017Pin.GPIO_B1;//mf02
+    /* mf03, P1 Display Port */ private static final Pin LED_GREEN_STATUS = MCP23017Pin.GPIO_B2; //mf03
+    /* mf04, J1 External Box */ private static final Pin LED_GREEN_BUTTON = MCP23017Pin.GPIO_B3; //mf04
+    /* mf05, J1 External Box */ private static final Pin LED_YELLOW_BUTTON = MCP23017Pin.GPIO_B4; //mf05
+    /* mf06, P1 Display Port */ private static final Pin LED_WHITE_STATUS = MCP23017Pin.GPIO_B5; //mf06
 
-    // Sirenen
+    /* mf07, J1 External Box */ private static final Pin RESERVE01 = MCP23017Pin.GPIO_B6;  //mf07 led1_progress_red
+    /* mf08, J1 External Box */ private static final Pin RESERVE02 = MCP23017Pin.GPIO_B7;  //mf08 led1_progress_yellow
+    /* mf09, J1 External Box */ private static final Pin RESERVE03 = MCP23017Pin.GPIO_A0;  //mf09 SIREN_START_STOP
+    /* mf10, J1 External Box */ private static final Pin RESERVE04 = MCP23017Pin.GPIO_A1;  //mf10 SIREN_COLOR_CHANGE / SIREN1
+    /* mf11, J1 External Box */ private static final Pin RESERVE05 = MCP23017Pin.GPIO_A2;  //mf11 SIREN_SHUTDOWN
+    /* mf12, J1 External Box */ private static final Pin RESERVE06 = MCP23017Pin.GPIO_A3;  //mf12 led1_progress_green
+    /* mf13, J1 External Box */ private static final Pin RESERVE07 = MCP23017Pin.GPIO_A4;  //mf13 led2_progress_red
+    /* mf14, J1 External Box */ private static final Pin RESERVE08 = MCP23017Pin.GPIO_A5;  //mf14 led2_progress_yellow
+    /* mf15, J1 External Box */ private static final Pin RESERVE09 = MCP23017Pin.GPIO_A6;  //mf15 led2_progress_green
+
+    /* mf16, only on mainboard */ private static final Pin RESERVE10 = MCP23017Pin.GPIO_A7;  //mf16
+
+    // Sirenen über mosfets
     private static final Pin SIREN_COLOR_CHANGE = RESERVE04; //mf10
     private static final Pin SIREN_START_STOP = RESERVE03;//mf09
-//    private static final Pin SIREN3 = RaspiPin.GPIO_02; // unbenutzt
-//    private static final Pin SIREN4 = RaspiPin.GPIO_25; // unbenutzt
+
 
     // Rechte Seite des JP8 Headers
     // RGB Flagge
@@ -169,17 +172,17 @@ public class Main {
         MAX_TEAMS = 2; // Minimum Anzahl der Teams. Z.B. ActionCase
 
         // Abhängig davon wieviele Displays angeschlossen sind, erlaubt die Box bis zu 4 Teams
-        display_green = new Display7Segments4Digits(DISPLAY_GREEN, getFrameDebug().getBtnGreen(), Configs.BRIGHTNESS_GREEN);
-        display_yellow = new Display7Segments4Digits(DISPLAY_YELLOW, getFrameDebug().getBtnYellow(), Configs.BRIGHTNESS_YELLOW);
-
-        if (display_green.isFullyUsable()) MAX_TEAMS = 3;
-        if (display_yellow.isFullyUsable()) MAX_TEAMS = 4;
+//        display_green = new Display7Segments4Digits(DISPLAY_GREEN, getFrameDebug().getBtnGreen(), Configs.BRIGHTNESS_GREEN);
+//        display_yellow = new Display7Segments4Digits(DISPLAY_YELLOW, getFrameDebug().getBtnYellow(), Configs.BRIGHTNESS_YELLOW);
+//
+//        if (display_green.isFullyUsable()) MAX_TEAMS = 3;
+//        if (display_yellow.isFullyUsable()) MAX_TEAMS = 4;
 
         applicationContext.put(display_white.getName(), display_white);
         applicationContext.put(display_red.getName(), display_red);
         applicationContext.put(display_blue.getName(), display_blue);
-        applicationContext.put(display_green.getName(), display_green);
-        applicationContext.put(display_yellow.getName(), display_yellow);
+//        applicationContext.put(display_green.getName(), display_green);
+//        applicationContext.put(display_yellow.getName(), display_yellow);
 
         button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed(), REACTION_TIME, getFrameDebug().getPbRed());
         button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, getFrameDebug().getPbBlue());
@@ -370,8 +373,8 @@ public class Main {
                 display_white.clear();
                 display_blue.clear();
                 display_red.clear();
-                display_green.clear();
-                display_yellow.clear();
+                if (display_green != null) display_green.clear();
+                if (display_yellow != null) display_yellow.clear();
             } catch (IOException e) {
                 logger.error(e);
             }
