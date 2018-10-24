@@ -144,10 +144,8 @@ public class Game implements Runnable, HasLogger {
             Main.getConfigs().put(Configs.GAMETIME, preset_gametime_position);
         }
 
-//        MAX_TEAMS = Main.getConfigs().getInt(Configs.MAX_NUMBER_OF_TEAMS);
-
         SLEEP_PER_CYCLE = Long.parseLong(Main.getConfigs().get(Configs.SLEEP_PER_CYCLE));
-        preset_num_teams = Integer.min(Integer.parseInt(Main.getConfigs().get(Configs.NUMBER_OF_TEAMS)), Main.getMaxTeams());
+        preset_num_teams = Integer.min(Integer.parseInt(Main.getConfigs().get(Configs.NUMBER_OF_TEAMS)), Main.getConfigs().getInt(Configs.MAX_NUMBER_OF_TEAMS));
 
         statistics = new Statistics(preset_times[preset_gametime_position]);
 
@@ -446,11 +444,13 @@ public class Game implements Runnable, HasLogger {
 
     private void button_preset_num_teams() {
         Main.getFrameDebug().addToConfigLog("button_num_teams_pressed");
+        int max_number_of_teams = Main.getConfigs().getInt(Configs.MAX_NUMBER_OF_TEAMS);
         if (CONFIG_PAGE) return;
-        if (Main.getMaxTeams() == 2) return;
+
+        if (max_number_of_teams == 2) return;
         if (mode == MODE_CLOCK_PREGAME) {
             preset_num_teams++;
-            if (preset_num_teams > Main.getMaxTeams()) preset_num_teams = MIN_TEAMS;
+            if (preset_num_teams > max_number_of_teams) preset_num_teams = MIN_TEAMS;
             getLogger().debug("num_teams is now: " + preset_num_teams);
 //            statistics = new Statistics(preset_num_teams);
             Main.getConfigs().put(Configs.NUMBER_OF_TEAMS, preset_num_teams);
@@ -515,7 +515,7 @@ public class Game implements Runnable, HasLogger {
             lastPIT = System.currentTimeMillis();
 
             mode = MODE_CLOCK_GAME_RUNNING;
-            Main.getPinHandler().setScheme(Main.PH_AIRSIREN, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
+            Main.getPinHandler().setScheme(Main.PH_SIREN_START_STOP, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
             setDisplayToEvent();
         }
 
@@ -546,35 +546,34 @@ public class Game implements Runnable, HasLogger {
 
     private void setDisplayToEvent() {
         try {
-//            long now = System.currentTimeMillis();
             display_white.setTime(remaining);
             display_red.setTime(time_red);
             display_blue.setTime(time_blue);
 
-            if (display_green != null) {
-                if (preset_num_teams < 3) display_green.clear();
-                else display_green.setTime(time_green);
-            }
+            if (preset_num_teams < 3) display_green.clear();
+            else display_green.setTime(time_green);
 
-            if (display_yellow != null) {
-                if (preset_num_teams < 4) display_yellow.clear();
-                else display_yellow.setTime(time_yellow);
-            }
-
+            if (preset_num_teams < 4) display_yellow.clear();
+            else display_yellow.setTime(time_yellow);
 
             statistics.updateTimers(remaining);
 
             display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
             display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
             display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
-            if (display_green != null) display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
-            if (display_yellow != null) display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+            display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+            display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
 
             Main.getPinHandler().off(Main.PH_LED_RED_BTN);
             Main.getPinHandler().off(Main.PH_LED_BLUE_BTN);
             Main.getPinHandler().off(Main.PH_LED_GREEN_BTN);
             Main.getPinHandler().off(Main.PH_LED_YELLOW_BTN);
 
+            Main.getPinHandler().off(Main.KEY_FLAG_WHITE);
+            Main.getPinHandler().off(Main.KEY_FLAG_RED);
+            Main.getPinHandler().off(Main.KEY_FLAG_BLUE);
+            Main.getPinHandler().off(Main.KEY_FLAG_GREEN);
+            Main.getPinHandler().off(Main.KEY_FLAG_YELLOW);
 
             if (mode == MODE_CLOCK_PREGAME || mode == MODE_CLOCK_GAME_PAUSED) {
                 button_switch_mode.setIcon(FrameDebug.IconPlay);
@@ -587,13 +586,14 @@ public class Game implements Runnable, HasLogger {
                         new RGBScheduleElement(Color.BLACK, 1500l);
 
                 Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", pregamePoleColorScheme); //"1:" + new RGBScheduleElement(Color.WHITE));
+                Main.getPinHandler().setScheme(Main.KEY_FLAG_WHITE, "∞:on,1000;off,1000");
             }
 
             if (mode == MODE_CLOCK_PREGAME) {
                 getLogger().debug("PREGAME");
                 getLogger().debug("preset_num_teams " + preset_num_teams);
-                if (display_green != null && preset_num_teams < 3) display_green.clear();
-                if (display_yellow != null && preset_num_teams < 4) display_yellow.clear();
+                if (preset_num_teams < 3) display_green.clear();
+                if (preset_num_teams < 4) display_yellow.clear();
 
 
                 if (preset_num_teams == 3) {
@@ -655,7 +655,7 @@ public class Game implements Runnable, HasLogger {
             // hier findet die Auswertung nach dem Spielende statt.
             if (mode == MODE_CLOCK_GAME_OVER) {
 
-                Main.getPinHandler().setScheme(Main.PH_AIRSIREN, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
+                Main.getPinHandler().setScheme(Main.PH_SIREN_START_STOP, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
 
 //                LinkedHashMap<String, Integer> rank = getRank();
 //                statistics.updateTimers(remaining);
@@ -677,6 +677,7 @@ public class Game implements Runnable, HasLogger {
                         Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,1000;off,1000");
 
                     Main.getPinHandler().setScheme(Main.PH_POLE, "DRAW GAME", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_WHITE, "∞:on,1000;off,1000");
                 } else {
 
                     if (statistics.getWinners().contains("red")) {
@@ -702,6 +703,15 @@ public class Game implements Runnable, HasLogger {
                     for (String teamColor : statistics.getWinners()) {
                         winningScheme += new RGBScheduleElement(colors.get(teamColor), 250) + ";" + new RGBScheduleElement(Color.BLACK, 250) + ";";
                         text += teamColor + " ";
+
+                        if (teamColor.equalsIgnoreCase("red"))
+                            Main.getPinHandler().setScheme(Main.KEY_FLAG_RED, "∞:on,250;off,250");
+                        if (teamColor.equalsIgnoreCase("blue"))
+                            Main.getPinHandler().setScheme(Main.KEY_FLAG_BLUE, "∞:on,250;off,250");
+                        if (teamColor.equalsIgnoreCase("green"))
+                            Main.getPinHandler().setScheme(Main.KEY_FLAG_GREEN, "∞:on,250;off,250");
+                        if (teamColor.equalsIgnoreCase("yellow"))
+                            Main.getPinHandler().setScheme(Main.KEY_FLAG_YELLOW, "∞:on,250;off,250");
                     }
                     Main.getPinHandler().setScheme(Main.PH_POLE, text, winningScheme);
                 }
@@ -714,6 +724,12 @@ public class Game implements Runnable, HasLogger {
     }
 
     private void setColorsAndBlinkingSchemeAccordingToGameSituation() throws IOException {
+        Main.getPinHandler().off(Main.KEY_FLAG_WHITE);
+        Main.getPinHandler().off(Main.KEY_FLAG_RED);
+        Main.getPinHandler().off(Main.KEY_FLAG_BLUE);
+        Main.getPinHandler().off(Main.KEY_FLAG_GREEN);
+        Main.getPinHandler().off(Main.KEY_FLAG_YELLOW);
+
         if (flag.equals(GameEvent.FLAG_NEUTRAL)) {
             getLogger().info("Flag is neutral");
             Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
@@ -725,6 +741,7 @@ public class Game implements Runnable, HasLogger {
                 Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
 
             Main.getPinHandler().setScheme(Main.PH_POLE, "NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_WHITE, remaining));
+            Main.getPinHandler().setScheme(Main.KEY_FLAG_WHITE, "∞:on,500;off,500");
         } else if (flag.equals(GameEvent.RED_ACTIVATED)) {
             getLogger().info("Flag is red");
             Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,500;off,500");
@@ -736,6 +753,7 @@ public class Game implements Runnable, HasLogger {
 
             display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
             Main.getPinHandler().setScheme(Main.PH_POLE, "RED ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_RED, remaining));
+            Main.getPinHandler().setScheme(Main.KEY_FLAG_RED, "∞:on,500;off,500");
         } else if (flag.equals(GameEvent.BLUE_ACTIVATED)) {
             getLogger().info("Flag is blue");
             Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
@@ -747,6 +765,7 @@ public class Game implements Runnable, HasLogger {
 
             display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
             Main.getPinHandler().setScheme(Main.PH_POLE, "BLUE ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_BLUE, remaining));
+            Main.getPinHandler().setScheme(Main.KEY_FLAG_BLUE, "∞:on,500;off,500");
         } else if (flag.equals(GameEvent.GREEN_ACTIVATED)) {
             getLogger().info("Flag is green");
             Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
@@ -757,6 +776,7 @@ public class Game implements Runnable, HasLogger {
 
             display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
             Main.getPinHandler().setScheme(Main.PH_POLE, "GREEN ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_COLOR_GREEN, remaining));
+            Main.getPinHandler().setScheme(Main.KEY_FLAG_GREEN, "∞:on,500;off,500");
         } else if (flag.equals(GameEvent.YELLOW_ACTIVATED)) {
             getLogger().info("Flag is yellow");
             Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
@@ -766,6 +786,7 @@ public class Game implements Runnable, HasLogger {
             display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
             Color myyellow = Tools.getColor(Main.getConfigs().get(Configs.FLAG_COLOR_YELLOW));
             Main.getPinHandler().setScheme(Main.PH_POLE, "YELLOW ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(myyellow, remaining));
+            Main.getPinHandler().setScheme(Main.KEY_FLAG_YELLOW, "∞:on,500;off,500");
         }
     }
 

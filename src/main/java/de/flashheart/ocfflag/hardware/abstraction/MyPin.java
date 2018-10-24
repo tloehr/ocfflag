@@ -1,10 +1,7 @@
 package de.flashheart.ocfflag.hardware.abstraction;
 
 import com.pi4j.gpio.extension.mcp.MCP23017GpioProvider;
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.PinState;
+import com.pi4j.io.gpio.*;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.MyLED;
 import org.apache.log4j.Logger;
@@ -26,11 +23,11 @@ public class MyPin {
     private MidiChannel[] channels;
 
 
-    public MyPin(GpioController gpio, MCP23017GpioProvider gpioprovider, Pin pin, MyLED guiControlLED, String name) {
+    public MyPin(GpioController gpio, GpioProvider gpioprovider, Pin pin, MyLED guiControlLED, String name) {
         this(gpio, gpioprovider, pin, guiControlLED, name, -1, -1);
     }
 
-    public MyPin(GpioController gpio, MCP23017GpioProvider gpioprovider, Pin pin, MyLED guiControlLED, String name, int instrument, int note) {
+    public MyPin(GpioController gpio, GpioProvider gpioprovider, Pin pin, MyLED guiControlLED, String name, int instrument, int note) {
         this(gpio == null ? null : gpio.provisionDigitalOutputPin(gpioprovider, pin, PinState.LOW), guiControlLED, name, instrument, note);
     }
 
@@ -58,9 +55,9 @@ public class MyPin {
         }
     }
 
-    public MyPin(GpioController gpio, Pin pin, MyLED guiControlLED, String name) {
-        this(gpio, pin, guiControlLED, name, -1, -1);
-    }
+//    public MyPin(GpioController gpio, Pin pin, MyLED guiControlLED, String name) {
+//        this(gpio, pin, guiControlLED, name, -1, -1);
+//    }
 
     public MyPin(GpioController gpio, Pin pin, MyLED guiControlLED, String name, int instrument, int note) {
         this(gpio == null ? null : gpio.provisionDigitalOutputPin(pin, PinState.LOW), guiControlLED, name, instrument, note);

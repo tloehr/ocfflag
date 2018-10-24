@@ -187,16 +187,16 @@ public class FrameDebug extends JFrame {
         Main.getPinHandler().setScheme(Main.PH_LED_WHITE, "5:on,1000;off,1000");
 
         Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_AIRSIREN, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_SIREN_START_STOP, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Main.PH_SIREN_HOLDDOWN_BUZZER, "5:on,1000;off,1000");
 
-        Main.getPinHandler().setScheme(Main.PH_RESERVE01, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_RESERVE02, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_RESERVE05, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_RESERVE06, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_RESERVE07, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_RESERVE08, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_RESERVE09, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_RESERVE10, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Main.PH_RESERVE01, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Main.PH_RESERVE02, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Main.PH_RESERVE06, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Main.PH_RESERVE07, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Main.PH_RESERVE08, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Main.PH_RESERVE09, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Main.PH_RESERVE10, "5:on,1000;off,1000");
 
 
     }
@@ -244,6 +244,12 @@ public class FrameDebug extends JFrame {
         btnYellow = new JButton();
         ledYellowButton = new MyLED();
         pbGreen = new JProgressBar();
+        pnlFlagLEDs = new JPanel();
+        ledFlagWhite = new MyLED();
+        ledFlagRed = new MyLED();
+        ledFlagBlue = new MyLED();
+        ledFlagGreen = new MyLED();
+        ledFlagYellow = new MyLED();
         pbYellow = new JProgressBar();
         panel5 = new JPanel();
         btnConfig = new JButton();
@@ -300,12 +306,12 @@ public class FrameDebug extends JFrame {
             {
                 mainView.setLayout(new FormLayout(
                     "$rgap, $lcgap, pref, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow, $lcgap, $rgap",
-                    "$rgap, $lgap, fill:55dlu:grow, $rgap, fill:default:grow, $lgap, $rgap"));
+                    "$rgap, $lgap, fill:55dlu:grow, $rgap, pref, $lgap, $rgap"));
 
                 //======== panel1 ========
                 {
                     panel1.setLayout(new FormLayout(
-                        "default, $lcgap, pref:grow, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow, 2*($lcgap, default)",
+                        "default, $lcgap, pref, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref, 2*($lcgap, default)",
                         "fill:22dlu:grow, $lgap, fill:default, $lgap, fill:default:grow, $lgap, fill:default"));
 
                     //---- ledRedButton ----
@@ -372,6 +378,37 @@ public class FrameDebug extends JFrame {
                     //---- pbGreen ----
                     pbGreen.setStringPainted(true);
                     panel1.add(pbGreen, CC.xywh(1, 7, 3, 1, CC.DEFAULT, CC.FILL));
+
+                    //======== pnlFlagLEDs ========
+                    {
+                        pnlFlagLEDs.setLayout(new FlowLayout());
+
+                        //---- ledFlagWhite ----
+                        ledFlagWhite.setToolTipText("Yellow LED in Button");
+                        ledFlagWhite.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/led-white-off.png")));
+                        pnlFlagLEDs.add(ledFlagWhite);
+
+                        //---- ledFlagRed ----
+                        ledFlagRed.setColor(Color.red);
+                        ledFlagRed.setToolTipText("Red LED in Button");
+                        pnlFlagLEDs.add(ledFlagRed);
+
+                        //---- ledFlagBlue ----
+                        ledFlagBlue.setColor(Color.blue);
+                        ledFlagBlue.setToolTipText("Blue LED in Button");
+                        pnlFlagLEDs.add(ledFlagBlue);
+
+                        //---- ledFlagGreen ----
+                        ledFlagGreen.setColor(Color.green);
+                        ledFlagGreen.setToolTipText("Red LED in Button");
+                        pnlFlagLEDs.add(ledFlagGreen);
+
+                        //---- ledFlagYellow ----
+                        ledFlagYellow.setColor(Color.yellow);
+                        ledFlagYellow.setToolTipText("Yellow LED in Button");
+                        pnlFlagLEDs.add(ledFlagYellow);
+                    }
+                    panel1.add(pnlFlagLEDs, CC.xy(7, 7));
 
                     //---- pbYellow ----
                     pbYellow.setStringPainted(true);
@@ -464,11 +501,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label1 ----
                 label1.setText("System-Name");
-                label1.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                label1.setFont(new Font("Dialog", Font.PLAIN, 22));
                 configView.add(label1, CC.xy(3, 3));
 
                 //---- txtFlagName ----
-                txtFlagName.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtFlagName.setFont(new Font("Dialog", Font.PLAIN, 22));
                 txtFlagName.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -479,11 +516,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label2 ----
                 label2.setText("Rest URL");
-                label2.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                label2.setFont(new Font("Dialog", Font.PLAIN, 22));
                 configView.add(label2, CC.xy(3, 5));
 
                 //---- txtResturl ----
-                txtResturl.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtResturl.setFont(new Font("Dialog", Font.PLAIN, 22));
                 txtResturl.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -494,11 +531,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label4 ----
                 label4.setText("Rest-Auth");
-                label4.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                label4.setFont(new Font("Dialog", Font.PLAIN, 22));
                 configView.add(label4, CC.xy(3, 7));
 
                 //---- txtRestAuth ----
-                txtRestAuth.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtRestAuth.setFont(new Font("Dialog", Font.PLAIN, 22));
                 txtRestAuth.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -509,11 +546,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label8 ----
                 label8.setText("Intervall Stats (ms)");
-                label8.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                label8.setFont(new Font("Dialog", Font.PLAIN, 22));
                 configView.add(label8, CC.xy(3, 9));
 
                 //---- txtSendStats ----
-                txtSendStats.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtSendStats.setFont(new Font("Dialog", Font.PLAIN, 22));
                 txtSendStats.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -524,11 +561,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label11 ----
                 label11.setText("Button Reaction (ms)");
-                label11.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                label11.setFont(new Font("Dialog", Font.PLAIN, 22));
                 configView.add(label11, CC.xy(9, 9));
 
                 //---- txtButtonReaction ----
-                txtButtonReaction.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtButtonReaction.setFont(new Font("Dialog", Font.PLAIN, 22));
                 txtButtonReaction.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -543,12 +580,12 @@ public class FrameDebug extends JFrame {
 
                     //---- btnTestRest ----
                     btnTestRest.setText("Test Connection");
-                    btnTestRest.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
+                    btnTestRest.setFont(new Font("Dialog", Font.PLAIN, 20));
                     panel6.add(btnTestRest);
 
                     //---- btnTestHardware ----
                     btnTestHardware.setText("Test Hardware");
-                    btnTestHardware.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
+                    btnTestHardware.setFont(new Font("Dialog", Font.PLAIN, 20));
                     btnTestHardware.addActionListener(e -> btnTestHardwareActionPerformed(e));
                     panel6.add(btnTestHardware);
 
@@ -561,17 +598,17 @@ public class FrameDebug extends JFrame {
 
                 //---- label9 ----
                 label9.setText("UUID");
-                label9.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                label9.setFont(new Font("Dialog", Font.PLAIN, 22));
                 configView.add(label9, CC.xy(3, 13));
 
                 //---- txtUUID ----
-                txtUUID.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtUUID.setFont(new Font("Dialog", Font.PLAIN, 22));
                 txtUUID.setEditable(false);
                 configView.add(txtUUID, CC.xywh(7, 13, 5, 1));
 
                 //---- label10 ----
                 label10.setText("Helligkeit");
-                label10.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                label10.setFont(new Font("Dialog", Font.PLAIN, 22));
                 configView.add(label10, CC.xy(3, 15));
 
                 //======== panel4 ========
@@ -703,6 +740,26 @@ public class FrameDebug extends JFrame {
         return btnPresetGametimeUndo;
     }
 
+    public MyLED getLedFlagWhite() {
+        return ledFlagWhite;
+    }
+
+    public MyLED getLedFlagRed() {
+        return ledFlagRed;
+    }
+
+    public MyLED getLedFlagBlue() {
+        return ledFlagBlue;
+    }
+
+    public MyLED getLedFlagGreen() {
+        return ledFlagGreen;
+    }
+
+    public MyLED getLedFlagYellow() {
+        return ledFlagYellow;
+    }
+
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JTabbedPane mainPanel;
     private JPanel mainView;
@@ -719,6 +776,12 @@ public class FrameDebug extends JFrame {
     private JButton btnYellow;
     private MyLED ledYellowButton;
     private JProgressBar pbGreen;
+    private JPanel pnlFlagLEDs;
+    private MyLED ledFlagWhite;
+    private MyLED ledFlagRed;
+    private MyLED ledFlagBlue;
+    private MyLED ledFlagGreen;
+    private MyLED ledFlagYellow;
     private JProgressBar pbYellow;
     private JPanel panel5;
     private JButton btnConfig;

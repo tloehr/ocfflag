@@ -22,6 +22,12 @@ public class Configs {
     public static final String REST_URL = "resturl";
     public static final String REST_AUTH = "restauth";
 
+    public static final String DISPLAY_RED_I2C = "display_red_i2c";
+    public static final String DISPLAY_BLUE_I2C = "display_blue_i2c";
+    public static final String DISPLAY_YELLOW_I2C = "display_yellow_i2c";
+    public static final String DISPLAY_GREEN_I2C = "display_green_i2c";
+    public static final String DISPLAY_WHITE_I2C = "display_white_i2c";
+
 
     public static final String BUTTON_REACTION_TIME = "button_reaction_time";
 
@@ -80,6 +86,12 @@ public class Configs {
         configs.put(AIRSIREN_SIGNAL, "1:on,5000;off,1");
         configs.put(COLORCHANGE_SIREN_SIGNAL, "2:on,50;off,50");
         configs.put(GAME_TIME_LIST, "600000,900000,1200000,1800000,3600000,5400000,7200000,9000000,10800000,12600000,14400000,16200000,17999000");
+
+        configs.put(DISPLAY_RED_I2C, "0x72");
+        configs.put(DISPLAY_BLUE_I2C, "0x71");
+        configs.put(DISPLAY_WHITE_I2C, "0x73");
+        configs.put(DISPLAY_YELLOW_I2C, "0x70");
+        configs.put(DISPLAY_GREEN_I2C, "0x74");
 
         configs.put(FLAG_COLOR_WHITE, "white");
         configs.put(FLAG_COLOR_BLUE, "blue");

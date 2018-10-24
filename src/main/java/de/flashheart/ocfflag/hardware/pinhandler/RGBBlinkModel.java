@@ -129,7 +129,7 @@ public class RGBBlinkModel implements GenericBlinkModel {
             logger.debug("time announcer: " + hours + ":" + minutes + ":" + seconds);
 
 
-            if (minutes > 0) {
+            if (hours > 0 || minutes > 0) {
 
                 if (hours > 0) {
                     for (int h = 0; h < hours; h++) {

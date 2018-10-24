@@ -1,11 +1,10 @@
 package de.flashheart.ocfflag.hardware.abstraction;
 
-import com.pi4j.io.i2c.I2CFactory;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.sevensegdisplay.SevenSegment;
+import de.flashheart.ocfflag.misc.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -17,12 +16,11 @@ import java.io.IOException;
  * Inklusive der Anbindung an ein Swing Debug Frame.
  * Kann die Zeit in Millis auf die Displays umrechnen. Stunden werden auf die 4 Dots abgebildet.
  */
-public class Display7Segments4Digits {
+public class Display7Segments4Digits implements HasLogger {
     private final String name;
     JButton btnSegment = null;
     JLabel lblSegment = null;
     SevenSegment segment = null;
-    private final Logger logger = Logger.getLogger(getClass());
     private boolean colon = true;
     private long lastTimeSet = 0;
 
@@ -30,41 +28,29 @@ public class Display7Segments4Digits {
         return name;
     }
 
-    public Display7Segments4Digits(int addr, JLabel lblSegment, String name) throws IOException {
-        this.name = name;
-
+    public Display7Segments4Digits(String addr, JLabel lblSegment, String name) {
+        this(addr, name);
         this.lblSegment = lblSegment;
         btnSegment = null;
-
-        if (Tools.isArm()) {
-            try {
-                segment = new SevenSegment(addr, true);
-            } catch (I2CFactory.UnsupportedBusNumberException e) {
-                logger.error(e);
-                segment = null;
-            }
-        }
-
-        if (segment != null) segment.setBrightness(Main.getConfigs().getInt(name));
     }
 
-    public Display7Segments4Digits(int addr, JButton btnSegment, String name) {
+    private Display7Segments4Digits(String addr, String name) {
         this.name = name;
-
-        this.btnSegment = btnSegment;
-        lblSegment = null;
-
         if (Tools.isArm()) {
             try {
-                segment = new SevenSegment(addr, true);
+                segment = new SevenSegment(Integer.decode(addr), true);
                 segment.setBrightness(Main.getConfigs().getInt(name));
             } catch (Exception e) {
-                logger.error(e);
+                getLogger().error(e.getMessage());
                 segment = null;
             }
         }
+    }
 
-
+    public Display7Segments4Digits(String addr, JButton btnSegment, String name) {
+        this(addr, name);
+        this.btnSegment = btnSegment;
+        lblSegment = null;
     }
 
     public void setColon(boolean colon) {
@@ -72,7 +58,7 @@ public class Display7Segments4Digits {
         try {
             setTime(lastTimeSet);
         } catch (IOException e) {
-            logger.error(e);
+            getLogger().error(e);
         }
     }
 

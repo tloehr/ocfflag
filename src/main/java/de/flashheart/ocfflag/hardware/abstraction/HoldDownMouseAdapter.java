@@ -63,7 +63,7 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
             getLogger().debug("holding down button");
             mouseDown = true;
             holding = System.currentTimeMillis();
-            if (reactiontime > 0) Main.getPinHandler().setScheme(Main.PH_AIRSIREN, scheme);
+            if (reactiontime > 0) Main.getPinHandler().setScheme(Main.PH_SIREN_HOLDDOWN_BUZZER, scheme);
             initThread();
         }
     }
@@ -74,7 +74,7 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             getLogger().debug("button released");
-            if (reactiontime > 0) Main.getPinHandler().off(Main.PH_AIRSIREN);
+            if (reactiontime > 0) Main.getPinHandler().off(Main.PH_SIREN_HOLDDOWN_BUZZER);
             holding = 0l;
             pb.setValue(0);
             reactedupon = false;

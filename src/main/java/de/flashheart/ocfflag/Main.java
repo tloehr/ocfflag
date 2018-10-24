@@ -31,7 +31,6 @@ import java.util.HashMap;
 
 public class Main {
 
-    private static int MAX_TEAMS;
     private static long REACTION_TIME = 3000;
     private static GpioController GPIO;
     private static Game game;
@@ -48,29 +47,19 @@ public class Main {
     public static final String PH_LED_GREEN = "ledGreen";
     public static final String PH_LED_WHITE = "ledWhite";
     public static final String PH_SIREN_COLOR_CHANGE = "colorchangesiren";
-    public static final String PH_AIRSIREN = "airsiren";
+    public static final String PH_SIREN_START_STOP = "startstopsiren";
+    public static final String PH_SIREN_HOLDDOWN_BUZZER = "holddownbuzzer";
 
-    public static final String PH_RESERVE01 = "reserve01";
-    public static final String PH_RESERVE02 = "reserve02";
-    public static final String PH_RESERVE03 = "reserve03";
-    public static final String PH_RESERVE04 = "reserve04";
-    public static final String PH_RESERVE05 = "reserve05";
-    public static final String PH_RESERVE06 = "reserve06";
-    public static final String PH_RESERVE07 = "reserve07";
-    public static final String PH_RESERVE08 = "reserve08";
-    public static final String PH_RESERVE09 = "reserve09";
-    public static final String PH_RESERVE10 = "reserve10";
+    public static final String KEY_FLAG_WHITE = "flag_white";
+    public static final String KEY_FLAG_RED = "flag_red";
+    public static final String KEY_FLAG_BLUE = "flag_blue";
+    public static final String KEY_FLAG_GREEN = "flag_green";
+    public static final String KEY_FLAG_YELLOW = "flag_yellow";
 
-    // Parameter für die einzelnen PINs am Raspi sowie die I2C Adressen.
-    private static final int DISPLAY_BLUE = 0x71;
-    private static final int DISPLAY_RED = 0x72;
-    private static final int DISPLAY_WHITE = 0x70;
-    private static final int DISPLAY_YELLOW = 0x73;
-    private static final int DISPLAY_GREEN = 0x74;
-
-    private static final int MCP23017_1 = 0x20;
+    private static final int MCP23017_1 = Integer.decode("0x20");//0x20;
 
     // Linke Seite des JP8 Header
+
 
     // J1 External Box und P1 Display Port
     /* btn01, P1 Display Port */ private static final Pin BUTTON_STANDBY_ACTIVE = RaspiPin.GPIO_03;
@@ -81,57 +70,75 @@ public class Main {
     /* btn06, J1 External Box */ private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
     /* btn07, J1 External Box */ private static final Pin BUTTON_GREEN = RaspiPin.GPIO_23;
     /* btn08, J1 External Box */ private static final Pin BUTTON_YELLOW = RaspiPin.GPIO_24;
-
     /* btnShutdown, J1 External Box */ private static final Pin BUTTON_SHUTDOWN = RaspiPin.GPIO_28;
 
     // 4 Ports für ein Relais Board.
-    // Schaltet on Low oder High ?
+    // Schaltet im default bei HIGH
+    // wenn ein LOW Relais Board verwendet wird muss der Umweg über ein Darlington Array auf Masse gewählt werden
     /* rly01, J1 External Box */ private static final Pin RLY01 = RaspiPin.GPIO_07;
     /* rly02, J1 External Box */ private static final Pin RLY02 = RaspiPin.GPIO_08;
     /* rly03, J1 External Box */ private static final Pin RLY03 = RaspiPin.GPIO_02;
     /* rly04, J1 External Box */ private static final Pin RLY04 = RaspiPin.GPIO_25;
 
-    /* mf01, J1 External Box */ private static final Pin LED_RED_BUTTON = MCP23017Pin.GPIO_B0; //mf01
-    /* mf02, J1 External Box */ private static final Pin LED_BLUE_BUTTON = MCP23017Pin.GPIO_B1;//mf02
-    /* mf03, P1 Display Port */ private static final Pin LED_GREEN_STATUS = MCP23017Pin.GPIO_B2; //mf03
-    /* mf04, J1 External Box */ private static final Pin LED_GREEN_BUTTON = MCP23017Pin.GPIO_B3; //mf04
-    /* mf05, J1 External Box */ private static final Pin LED_YELLOW_BUTTON = MCP23017Pin.GPIO_B4; //mf05
-    /* mf06, P1 Display Port */ private static final Pin LED_WHITE_STATUS = MCP23017Pin.GPIO_B5; //mf06
+    // Mosfets via MCP23017
+    /* J1 External Box */ private static final Pin MF01 = MCP23017Pin.GPIO_B0;
+    /* J1 External Box */ private static final Pin MF02 = MCP23017Pin.GPIO_B1;
+    /* P1 Display Port */ private static final Pin MF03 = MCP23017Pin.GPIO_B2;
+    /* J1 External Box */ private static final Pin MF04 = MCP23017Pin.GPIO_B3;
+    /* J1 External Box */ private static final Pin MF05 = MCP23017Pin.GPIO_B4;
+    /* P1 Display Port */ private static final Pin MF06 = MCP23017Pin.GPIO_B5;
+    /* J1 External Box */ private static final Pin MF07 = MCP23017Pin.GPIO_B6;
+    /* J1 External Box */ private static final Pin MF08 = MCP23017Pin.GPIO_B7;
+    /* J1 External Box */ private static final Pin MF09 = MCP23017Pin.GPIO_A0;
+    /* J1 External Box */ private static final Pin MF10 = MCP23017Pin.GPIO_A1;
+    /* J1 External Box */ private static final Pin MF11 = MCP23017Pin.GPIO_A2;
+    /* J1 External Box */ private static final Pin MF12 = MCP23017Pin.GPIO_A3;
+    /* J1 External Box */ private static final Pin MF13 = MCP23017Pin.GPIO_A4;
+    /* J1 External Box */ private static final Pin MF14 = MCP23017Pin.GPIO_A5;
+    /* J1 External Box */ private static final Pin MF15 = MCP23017Pin.GPIO_A6;
+    /* on mainboard */ private static final Pin MF16 = MCP23017Pin.GPIO_A7;
 
-    /* mf07, J1 External Box */ private static final Pin RESERVE01 = MCP23017Pin.GPIO_B6;  //mf07 led1_progress_red
-    /* mf08, J1 External Box */ private static final Pin RESERVE02 = MCP23017Pin.GPIO_B7;  //mf08 led1_progress_yellow
-    /* mf09, J1 External Box */ private static final Pin RESERVE03 = MCP23017Pin.GPIO_A0;  //mf09 SIREN_START_STOP
-    /* mf10, J1 External Box */ private static final Pin RESERVE04 = MCP23017Pin.GPIO_A1;  //mf10 SIREN_COLOR_CHANGE / SIREN1
-    /* mf11, J1 External Box */ private static final Pin RESERVE05 = MCP23017Pin.GPIO_A2;  //mf11 SIREN_SHUTDOWN
-    /* mf12, J1 External Box */ private static final Pin RESERVE06 = MCP23017Pin.GPIO_A3;  //mf12 led1_progress_green
-    /* mf13, J1 External Box */ private static final Pin RESERVE07 = MCP23017Pin.GPIO_A4;  //mf13 led2_progress_red
-    /* mf14, J1 External Box */ private static final Pin RESERVE08 = MCP23017Pin.GPIO_A5;  //mf14 led2_progress_yellow
-    /* mf15, J1 External Box */ private static final Pin RESERVE09 = MCP23017Pin.GPIO_A6;  //mf15 led2_progress_green
+    private static HashMap<String, Pin> mapPins;
 
-    /* mf16, only on mainboard */ private static final Pin RESERVE10 = MCP23017Pin.GPIO_A7;  //mf16
+    private static final Pin LED_RED_BUTTON = MF01;
+    private static final Pin LED_BLUE_BUTTON = MF02;
+    private static final Pin LED_GREEN_BUTTON = MF04;
+    private static final Pin LED_YELLOW_BUTTON = MF05;
+    private static final Pin LED_WHITE_STATUS = MF06;
+    private static final Pin LED_GREEN_STATUS = MF03;
 
-    // Sirenen über mosfets
-    private static final Pin SIREN_COLOR_CHANGE = RESERVE04; //mf10
-    private static final Pin SIREN_START_STOP = RESERVE03;//mf09
+    private static final Pin SIREN_COLOR_CHANGE = MF01;
+    /* mf09, J1 External Box */ private static final Pin SIREN_START_STOP = RLY01;//MCP23017Pin.GPIO_A0;
+    private static final Pin SIREN_HOLDOWN_BUZZER = MF07;
 
 
     // Rechte Seite des JP8 Headers
-    // RGB Flagge
+    // RGB Flagge, das muss direkt auf den Raspi gelegt werden, nicht über den MCP23017,
+    // sonst funktioniert das PWM nicht.
     // RJ45
     /* rgb-red   */ private static final Pin POLE_RGB_RED = RaspiPin.GPIO_01;
     /* rgb-green */ private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_04;
     /* rgb-blue  */ private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_05;
 
+    // falls wir keine RGB Flagge benutzen
+    private static final Pin LED_FLAG_WHITE = MF08;
+    private static final Pin LED_FLAG_RED = MF09;
+    private static final Pin LED_FLAG_BLUE = MF10;
+    private static final Pin LED_FLAG_GREEN = MF11;
+    private static final Pin LED_FLAG_YELLOW = MF12;
+
     private static MCP23017GpioProvider mcp23017_1 = null;
 
+    // Interne Hardware Abstraktion.
     private static Display7Segments4Digits display_blue, display_red, display_white, display_green, display_yellow;
     private static MyAbstractButton button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_saveNquit, button_shutdown;
     private static MyRGBLed pole;
 
     private static MyPin ledRedButton, ledBlueButton, ledGreenButton, ledYellowButton, ledGreen, ledWhite;
+//    private static MyPin flagWhite, flagRed, flagBlue, flagGreen, flagYellow;
 
     // diese pins werden noch nicht verwendet, sind aber in der Hardware bereits vorbereitet.
-    private static MyPin reserve01, reserve02, reserve05, reserve06, reserve07, reserve08, reserve09, reserve10;
+//    private static MyPin reserve02, reserve06, reserve07, reserve08, reserve09, reserve10;
 
     private static PinHandler pinHandler; // One handler, to rule them all...
     private static Configs configs;
@@ -166,23 +173,18 @@ public class Main {
     private static void initGameSystem() throws I2CFactory.UnsupportedBusNumberException, IOException {
         // die internal names auf den Brightness Key zu setzen ist ein kleiner Trick. Die namen müssen und eindeutig sein
         // so kann das Display7Segment4Digits direkt die Helligkeit aus den configs lesen
-        display_white = new Display7Segments4Digits(DISPLAY_WHITE, getFrameDebug().getLblPole(), Configs.BRIGHTNESS_WHITE);
-        display_red = new Display7Segments4Digits(DISPLAY_RED, getFrameDebug().getBtnRed(), Configs.BRIGHTNESS_RED);
-        display_blue = new Display7Segments4Digits(DISPLAY_BLUE, getFrameDebug().getBtnBlue(), Configs.BRIGHTNESS_BLUE);
-        MAX_TEAMS = 2; // Minimum Anzahl der Teams. Z.B. ActionCase
 
-        // Abhängig davon wieviele Displays angeschlossen sind, erlaubt die Box bis zu 4 Teams
-//        display_green = new Display7Segments4Digits(DISPLAY_GREEN, getFrameDebug().getBtnGreen(), Configs.BRIGHTNESS_GREEN);
-//        display_yellow = new Display7Segments4Digits(DISPLAY_YELLOW, getFrameDebug().getBtnYellow(), Configs.BRIGHTNESS_YELLOW);
-//
-//        if (display_green.isFullyUsable()) MAX_TEAMS = 3;
-//        if (display_yellow.isFullyUsable()) MAX_TEAMS = 4;
+        display_white = new Display7Segments4Digits(configs.get(Configs.DISPLAY_WHITE_I2C), getFrameDebug().getLblPole(), Configs.BRIGHTNESS_WHITE);
+        display_red = new Display7Segments4Digits(configs.get(Configs.DISPLAY_RED_I2C), getFrameDebug().getBtnRed(), Configs.BRIGHTNESS_RED);
+        display_blue = new Display7Segments4Digits(configs.get(Configs.DISPLAY_BLUE_I2C), getFrameDebug().getBtnBlue(), Configs.BRIGHTNESS_BLUE);
+        display_green = new Display7Segments4Digits(configs.get(Configs.DISPLAY_GREEN_I2C), getFrameDebug().getBtnGreen(), Configs.BRIGHTNESS_GREEN);
+        display_yellow = new Display7Segments4Digits(configs.get(Configs.DISPLAY_YELLOW_I2C), getFrameDebug().getBtnYellow(), Configs.BRIGHTNESS_YELLOW);
 
         applicationContext.put(display_white.getName(), display_white);
         applicationContext.put(display_red.getName(), display_red);
         applicationContext.put(display_blue.getName(), display_blue);
-//        applicationContext.put(display_green.getName(), display_green);
-//        applicationContext.put(display_yellow.getName(), display_yellow);
+        applicationContext.put(display_green.getName(), display_green);
+        applicationContext.put(display_yellow.getName(), display_yellow);
 
         button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed(), REACTION_TIME, getFrameDebug().getPbRed());
         button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, getFrameDebug().getPbBlue());
@@ -207,21 +209,13 @@ public class Main {
         ledGreen = new MyPin(GPIO, mcp23017_1, LED_GREEN_STATUS, frameDebug.getLedStandbyActive(), PH_LED_GREEN);
         ledWhite = new MyPin(GPIO, mcp23017_1, LED_WHITE_STATUS, frameDebug.getLedStatsSent(), PH_LED_WHITE);
 
-        reserve01 = new MyPin(GPIO, mcp23017_1, RESERVE01, null, PH_RESERVE01);
-        reserve02 = new MyPin(GPIO, mcp23017_1, RESERVE02, null, PH_RESERVE02);
-        reserve05 = new MyPin(GPIO, mcp23017_1, RESERVE05, null, PH_RESERVE05);
-        reserve06 = new MyPin(GPIO, mcp23017_1, RESERVE06, null, PH_RESERVE06);
-        reserve07 = new MyPin(GPIO, mcp23017_1, RESERVE07, null, PH_RESERVE07);
-        reserve08 = new MyPin(GPIO, mcp23017_1, RESERVE08, null, PH_RESERVE08);
-        reserve09 = new MyPin(GPIO, mcp23017_1, RESERVE09, null, PH_RESERVE09);
-        reserve10 = new MyPin(GPIO, mcp23017_1, RESERVE10, null, PH_RESERVE10);
+        logger.debug(SIREN_COLOR_CHANGE.getProvider());
+        logger.debug(SIREN_START_STOP.getProvider());
 
-//        pinHandler.add(new MyPin(GPIO, SIREN_START_STOP, null, PH_AIRSIREN, 50, 90));
-//        pinHandler.add(new MyPin(GPIO, SIREN_COLOR_CHANGE, null, PH_SIREN_COLOR_CHANGE, 70, 60));
-        //pinHandler.add(reserve01);
 
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, SIREN_COLOR_CHANGE, null, PH_SIREN_COLOR_CHANGE, 50, 90)); // mf08
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, SIREN_START_STOP, null, PH_AIRSIREN, 70, 60)); // mf09
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, SIREN_COLOR_CHANGE, null, PH_SIREN_COLOR_CHANGE, 50, 90));
+        pinHandler.add(new MyPin(GPIO, SIREN_START_STOP, null, PH_SIREN_START_STOP, 70, 60));
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, SIREN_HOLDOWN_BUZZER, null, PH_SIREN_HOLDDOWN_BUZZER, 70, 30));
 
         pinHandler.add(pole);
         pinHandler.add(ledRedButton);
@@ -230,18 +224,15 @@ public class Main {
         pinHandler.add(ledYellowButton);
 
 
-        pinHandler.add(reserve01);
-        pinHandler.add(reserve02);
-        pinHandler.add(reserve05);
-        pinHandler.add(reserve06);
-        pinHandler.add(reserve07);
-        pinHandler.add(reserve08);
-        pinHandler.add(reserve09);
-        pinHandler.add(reserve10);
-
         pinHandler.add(ledGreen);
         pinHandler.add(ledWhite);
 
+
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_FLAG_WHITE, frameDebug.getLedFlagWhite(), KEY_FLAG_WHITE));
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_FLAG_RED, frameDebug.getLedFlagRed(), KEY_FLAG_RED));
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_FLAG_BLUE, frameDebug.getLedFlagBlue(), KEY_FLAG_BLUE));
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_FLAG_GREEN, frameDebug.getLedFlagGreen(), KEY_FLAG_GREEN));
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_FLAG_YELLOW, frameDebug.getLedFlagYellow(), KEY_FLAG_YELLOW));
 
         game = new Game(display_white, display_red, display_blue, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_saveNquit, button_shutdown);
         game.run();
@@ -263,6 +254,8 @@ public class Main {
      */
 
     private static void initBaseSystem(String[] args) throws InterruptedException, IOException {
+        mapPins = new HashMap<>();
+
         System.setProperty("logs", Tools.getWorkingPath());
         Logger.getRootLogger().setLevel(logLevel);
         logger = Logger.getLogger("Main");
@@ -291,7 +284,6 @@ public class Main {
                 " |____/ |_/_/   \\_\\_| \\_\\|_| |___|_| \\_|\\____|  \\___/ \\____|_|   |_|   |_|\\__,_|\\__, |\n" +
                 "                                                                                |___/ ");
         logger.info(title);
-
 
         /***
          *       ____                                          _   _     _               ___        _   _
@@ -408,11 +400,28 @@ public class Main {
         SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
         SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);
 
+        mapPins.put("mf01", MF01);
+        mapPins.put("mf02", MF02);
+        mapPins.put("mf03", MF03);
+        mapPins.put("mf04", MF04);
+        mapPins.put("mf05", MF05);
+        mapPins.put("mf06", MF06);
+        mapPins.put("mf07", MF07);
+        mapPins.put("mf08", MF08);
+        mapPins.put("mf09", MF09);
+        mapPins.put("mf10", MF10);
+        mapPins.put("mf11", MF11);
+        mapPins.put("mf12", MF12);
+        mapPins.put("mf13", MF13);
+        mapPins.put("mf14", MF14);
+        mapPins.put("mf15", MF15);
+        mapPins.put("mf16", MF16);
+
     }
 
-    public static int getMaxTeams() {
-        return MAX_TEAMS;
-    }
+//    public static int getMaxTeams() {
+//        return MAX_TEAMS;
+//    }
 
     public static Level getLogLevel() {
         return logLevel;
