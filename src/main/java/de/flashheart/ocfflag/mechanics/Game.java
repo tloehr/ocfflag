@@ -745,7 +745,6 @@ public class Game implements Runnable, HasLogger {
         } else if (flag.equals(GameEvent.RED_ACTIVATED)) {
             getLogger().info("Flag is red");
             Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,500;off,500");
-
             if (preset_num_teams >= 3)
                 Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "∞:on,500;off,500");
             if (preset_num_teams >= 4)
@@ -757,7 +756,6 @@ public class Game implements Runnable, HasLogger {
         } else if (flag.equals(GameEvent.BLUE_ACTIVATED)) {
             getLogger().info("Flag is blue");
             Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
-
             if (preset_num_teams >= 3)
                 Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "∞:on,500;off,500");
             if (preset_num_teams >= 4)
@@ -770,7 +768,6 @@ public class Game implements Runnable, HasLogger {
             getLogger().info("Flag is green");
             Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "∞:on,500;off,500");
             Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "∞:on,500;off,500");
-
             if (preset_num_teams >= 4)
                 Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "∞:on,500;off,500");
 

@@ -57,6 +57,7 @@ public class Main {
     public static final String KEY_FLAG_YELLOW = "flag_yellow";
 
     private static final int MCP23017_1 = Integer.decode("0x20");//0x20;
+    // GPIO_08 und GPIO_09 NICHT verwenden. Sind die I2C Ports
 
     // Linke Seite des JP8 Header
 
@@ -76,7 +77,7 @@ public class Main {
     // Schaltet im default bei HIGH
     // wenn ein LOW Relais Board verwendet wird muss der Umweg über ein Darlington Array auf Masse gewählt werden
     /* rly01, J1 External Box */ private static final Pin RLY01 = RaspiPin.GPIO_07;
-    /* rly02, J1 External Box */ private static final Pin RLY02 = RaspiPin.GPIO_08;
+    /* rly02, J1 External Box */ private static final Pin RLY02 = RaspiPin.GPIO_00;
     /* rly03, J1 External Box */ private static final Pin RLY03 = RaspiPin.GPIO_02;
     /* rly04, J1 External Box */ private static final Pin RLY04 = RaspiPin.GPIO_25;
 
@@ -107,9 +108,9 @@ public class Main {
     private static final Pin LED_WHITE_STATUS = MF06;
     private static final Pin LED_GREEN_STATUS = MF03;
 
-    private static final Pin SIREN_COLOR_CHANGE = MF01;
-    /* mf09, J1 External Box */ private static final Pin SIREN_START_STOP = RLY01;//MCP23017Pin.GPIO_A0;
-    private static final Pin SIREN_HOLDOWN_BUZZER = MF07;
+    private static final Pin SIREN_START_STOP = RLY01;
+    private static final Pin SIREN_COLOR_CHANGE = RLY02;
+    private static final Pin SIREN_HOLDOWN_BUZZER = MF15; //MCP23017
 
 
     // Rechte Seite des JP8 Headers
@@ -120,7 +121,7 @@ public class Main {
     /* rgb-green */ private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_04;
     /* rgb-blue  */ private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_05;
 
-    // falls wir keine RGB Flagge benutzen
+    // zusätzlich zur RGB Flagge
     private static final Pin LED_FLAG_WHITE = MF08;
     private static final Pin LED_FLAG_RED = MF09;
     private static final Pin LED_FLAG_BLUE = MF10;
@@ -130,15 +131,24 @@ public class Main {
     private static MCP23017GpioProvider mcp23017_1 = null;
 
     // Interne Hardware Abstraktion.
-    private static Display7Segments4Digits display_blue, display_red, display_white, display_green, display_yellow;
-    private static MyAbstractButton button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_saveNquit, button_shutdown;
-    private static MyRGBLed pole;
+    private static Display7Segments4Digits display_blue;
+    private static Display7Segments4Digits display_red;
+    private static Display7Segments4Digits display_white;
+    private static Display7Segments4Digits display_green;
+    private static Display7Segments4Digits display_yellow;
 
-    private static MyPin ledRedButton, ledBlueButton, ledGreenButton, ledYellowButton, ledGreen, ledWhite;
-//    private static MyPin flagWhite, flagRed, flagBlue, flagGreen, flagYellow;
-
-    // diese pins werden noch nicht verwendet, sind aber in der Hardware bereits vorbereitet.
-//    private static MyPin reserve02, reserve06, reserve07, reserve08, reserve09, reserve10;
+    private static MyAbstractButton button_blue;
+    private static MyAbstractButton button_red;
+    private static MyAbstractButton button_green;
+    private static MyAbstractButton button_yellow;
+    private static MyAbstractButton button_reset;
+    private static MyAbstractButton button_standby_active;
+    private static MyAbstractButton button_preset_num_teams;
+    private static MyAbstractButton button_preset_gametime;
+    private static MyAbstractButton button_quit;
+    private static MyAbstractButton button_config;
+    private static MyAbstractButton button_saveNquit;
+    private static MyAbstractButton button_shutdown;
 
     private static PinHandler pinHandler; // One handler, to rule them all...
     private static Configs configs;
@@ -186,6 +196,7 @@ public class Main {
         applicationContext.put(display_green.getName(), display_green);
         applicationContext.put(display_yellow.getName(), display_yellow);
 
+
         button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed(), REACTION_TIME, getFrameDebug().getPbRed());
         button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, getFrameDebug().getPbBlue());
         button_green = new MyAbstractButton(GPIO, BUTTON_GREEN, frameDebug.getBtnGreen(), REACTION_TIME, getFrameDebug().getPbGreen());
@@ -199,40 +210,49 @@ public class Main {
         button_saveNquit = new MyAbstractButton(null, null, frameDebug.getBtnSaveAndQuit());
         button_shutdown = new MyAbstractButton(GPIO, BUTTON_SHUTDOWN, 5000);
 
-        pole = new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), PH_POLE);
-
-        ledRedButton = new MyPin(GPIO, mcp23017_1, LED_RED_BUTTON, frameDebug.getLedRedButton(), PH_LED_RED_BTN);
-        ledBlueButton = new MyPin(GPIO, mcp23017_1, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), PH_LED_BLUE_BTN);
-        ledGreenButton = new MyPin(GPIO, mcp23017_1, LED_GREEN_BUTTON, frameDebug.getLedGreenButton(), PH_LED_GREEN_BTN);
-        ledYellowButton = new MyPin(GPIO, mcp23017_1, LED_YELLOW_BUTTON, frameDebug.getLedYellowButton(), PH_LED_YELLOW_BTN);
-
-        ledGreen = new MyPin(GPIO, mcp23017_1, LED_GREEN_STATUS, frameDebug.getLedStandbyActive(), PH_LED_GREEN);
-        ledWhite = new MyPin(GPIO, mcp23017_1, LED_WHITE_STATUS, frameDebug.getLedStatsSent(), PH_LED_WHITE);
-
-        logger.debug(SIREN_COLOR_CHANGE.getProvider());
-        logger.debug(SIREN_START_STOP.getProvider());
-
-
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, SIREN_COLOR_CHANGE, null, PH_SIREN_COLOR_CHANGE, 50, 90));
-        pinHandler.add(new MyPin(GPIO, SIREN_START_STOP, null, PH_SIREN_START_STOP, 70, 60));
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, SIREN_HOLDOWN_BUZZER, null, PH_SIREN_HOLDDOWN_BUZZER, 70, 30));
-
-        pinHandler.add(pole);
-        pinHandler.add(ledRedButton);
-        pinHandler.add(ledBlueButton);
-        pinHandler.add(ledGreenButton);
-        pinHandler.add(ledYellowButton);
-
-
-        pinHandler.add(ledGreen);
-        pinHandler.add(ledWhite);
-
-
+        pinHandler.add(new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), PH_POLE));
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_RED_BUTTON, frameDebug.getLedRedButton(), PH_LED_RED_BTN));
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), PH_LED_BLUE_BTN));
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_GREEN_BUTTON, frameDebug.getLedGreenButton(), PH_LED_GREEN_BTN));
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_YELLOW_BUTTON, frameDebug.getLedYellowButton(), PH_LED_YELLOW_BTN));
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_GREEN_STATUS, frameDebug.getLedStandbyActive(), PH_LED_GREEN));
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_WHITE_STATUS, frameDebug.getLedStatsSent(), PH_LED_WHITE));
         pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_FLAG_WHITE, frameDebug.getLedFlagWhite(), KEY_FLAG_WHITE));
         pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_FLAG_RED, frameDebug.getLedFlagRed(), KEY_FLAG_RED));
         pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_FLAG_BLUE, frameDebug.getLedFlagBlue(), KEY_FLAG_BLUE));
         pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_FLAG_GREEN, frameDebug.getLedFlagGreen(), KEY_FLAG_GREEN));
         pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_FLAG_YELLOW, frameDebug.getLedFlagYellow(), KEY_FLAG_YELLOW));
+
+        pinHandler.add(new MyPin(GPIO, mcp23017_1, SIREN_HOLDOWN_BUZZER, null, PH_SIREN_HOLDDOWN_BUZZER, 70, 30));
+        pinHandler.add(new MyPin(GPIO, SIREN_COLOR_CHANGE, null, PH_SIREN_COLOR_CHANGE, 50, 90));
+        pinHandler.add(new MyPin(GPIO, SIREN_START_STOP, null, PH_SIREN_START_STOP, 70, 60));
+
+
+        /**
+         * TEST ROUTINE START
+
+         Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, null, "∞:on,250;off,500");
+         Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, null, "∞:on,250;off,500");
+         Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, null, "∞:on,250;off,500");
+         Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, null, "∞:on,250;off,500");
+         Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,250;off,500");
+         Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:on,250;off,500");
+         Main.getPinHandler().setScheme(Main.KEY_FLAG_WHITE, null, "∞:on,250;off,500");
+         Main.getPinHandler().setScheme(Main.KEY_FLAG_RED, null, "∞:on,250;off,500");
+         Main.getPinHandler().setScheme(Main.KEY_FLAG_BLUE, null, "∞:on,250;off,500");
+         Main.getPinHandler().setScheme(Main.KEY_FLAG_GREEN, null, "∞:on,250;off,500");
+         Main.getPinHandler().setScheme(Main.KEY_FLAG_YELLOW, null, "∞:on,250;off,500");
+         Main.getPinHandler().setScheme(Main.PH_SIREN_HOLDDOWN_BUZZER, null, "∞:on,250;off,500");
+         Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, null, "∞:on,250;off,500");
+         Main.getPinHandler().setScheme(Main.PH_SIREN_START_STOP, null, "∞:on,250;off,500");
+
+         * TEST ROUTINE END
+         */
+
+//        dis
+//        display_white.setTime(System.currentTimeMillis());
+//        display_red.setTime(System.currentTimeMillis());
+//        display_blue.setTime(System.currentTimeMillis());
 
         game = new Game(display_white, display_red, display_blue, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_saveNquit, button_shutdown);
         game.run();
@@ -365,8 +385,8 @@ public class Main {
                 display_white.clear();
                 display_blue.clear();
                 display_red.clear();
-                if (display_green != null) display_green.clear();
-                if (display_yellow != null) display_yellow.clear();
+//                if (display_green != null) display_green.clear();
+//                if (display_yellow != null) display_yellow.clear();
             } catch (IOException e) {
                 logger.error(e);
             }
