@@ -24,10 +24,13 @@ public class Statistics implements HasLogger {
         return gameState;
     }
 
+    /**
+     * @param maxtime maximum gametime in minutes
+     */
     public Statistics(long maxtime) {
         messageProcessor = Main.getMessageProcessor();
         winners = new ArrayList<>();
-        reset(maxtime);
+        reset(maxtime * 60000);
     }
 
     public void reset(long maxtime) {

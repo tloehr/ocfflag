@@ -2,8 +2,10 @@ package de.flashheart.ocfflag.hardware.pinhandler;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.abstraction.MyPin;
+import de.flashheart.ocfflag.misc.Configs;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.ArrayList;
 
@@ -104,6 +106,62 @@ public class PinBlinkModel implements GenericBlinkModel {
         }
 
         pin.setToolTipText(textScheme);
+    }
+
+
+    /**
+     * Erstellt ein Blinkkschema für die Flagge, mit der sich die restliche Spielzeit ablesen lässt.
+     *
+     * @param time
+     * @return
+     */
+    public static String getGametimeBlinkingScheme(long time) {
+        String scheme = PinHandler.FOREVER + ":";
+        Logger logger = Logger.getLogger(RGBBlinkModel.class);
+
+        if (Main.getConfigs().is(Configs.TIME_ANNOUNCER)) {
+            DateTime remainingTime = new DateTime(time, DateTimeZone.UTC);
+
+            int minutes = remainingTime.getMinuteOfHour();
+            int seconds = remainingTime.getSecondOfMinute();
+            int hours = remainingTime.getHourOfDay();
+
+            int tenminutes = minutes / 10;
+            int remminutes = minutes - tenminutes * 10; // restliche Minuten ausrechnen
+
+            logger.debug("time announcer: " + hours + ":" + minutes + ":" + seconds);
+
+            if (hours > 0 || minutes > 0) {
+
+                if (hours > 0) {
+                    for (int h = 0; h < hours; h++) {
+                        scheme += new PinScheduleEvent("on", 1000l) + ";" + new PinScheduleEvent("off", 250l) + ";";
+                    }
+                }
+
+                if (tenminutes > 0) {
+                    for (int tm = 0; tm < tenminutes; tm++) {
+                        scheme += new PinScheduleEvent("on", 625l) + ";" + new PinScheduleEvent("off", 250l) + ";";
+                    }
+                }
+
+                if (remminutes > 0) {
+                    for (int rm = 0; rm < remminutes; rm++) {
+                        scheme += new PinScheduleEvent("on", 250l) + ";" + new PinScheduleEvent("off", 250l) + ";";
+                    }
+                }
+
+                scheme += new PinScheduleEvent("off", 2500l) + ";";
+
+            } else {
+                scheme += new PinScheduleEvent("on", 100l) + ";" + new PinScheduleEvent("off", 250l) + ";";
+            }
+        } else {
+            logger.debug("no time announcer");
+            scheme += new PinScheduleEvent("on", 1000l) + ";" + new PinScheduleEvent("off", 1000l) + ";";
+        }
+        logger.debug(scheme);
+        return scheme;
     }
 
 
