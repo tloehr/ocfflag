@@ -26,6 +26,7 @@ import java.io.IOException;
 public class FrameDebug extends JFrame {
     private final Logger logger = Logger.getLogger(getClass());
     private Font font;
+    private Font font2;
     public static final Icon IconPlay = new ImageIcon(FrameDebug.class.getResource("/artwork/128x128/player_play.png"));
     public static final Icon IconPause = new ImageIcon(FrameDebug.class.getResource("/artwork/128x128/player_pause.png"));
     public static final Icon IconGametime = new ImageIcon(FrameDebug.class.getResource("/artwork/128x128/clock.png"));
@@ -84,7 +85,7 @@ public class FrameDebug extends JFrame {
         pbYellow.setVisible(Main.getReactionTime() > 0);
         pbRed.setVisible(Main.getReactionTime() > 0);
 
-        lblPole.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
+        lblPole.setFont(font2.deriveFont(80f).deriveFont(Font.BOLD));
 
         setTab(0);
         if (Tools.isArm()) setExtendedState(MAXIMIZED_BOTH);
@@ -93,6 +94,7 @@ public class FrameDebug extends JFrame {
     private void initFonts() {
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/DSEG14Classic-Regular.ttf"));
+            font2 = new JLabel().getFont();
         } catch (Exception e) {
             logger.fatal(e);
             System.exit(1);

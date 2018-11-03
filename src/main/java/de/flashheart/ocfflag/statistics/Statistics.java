@@ -60,7 +60,7 @@ public class Statistics implements HasLogger {
         }
 
         if (event.equals(GameEvent.GAME_OVER)) {
-            ArrayList<String> winners = GameStateService.getWinners(teamranking);
+            winners = GameStateService.getWinners(teamranking);
             if (winners.size() > 1) {
                 gameState.getGameEvents().add(new GameEvent(GameEvent.RESULT_MULTI_WINNERS, gameState.getGametime(), teamranking));
                 getLogger().info("More than one winner - very rare");

@@ -24,6 +24,22 @@ public class Display7Segments4Digits implements HasLogger {
     private boolean colon = true;
     private long lastTimeSet = 0;
 
+    public boolean isFourDigitsOnly() {
+        return fourDigitsOnly;
+    }
+
+    /**
+     * Falls bei der Bildschirmdarstellung die vollständige Zeit angezeigt werden soll. Dann kann man das hier umstellen.
+     * Gilt nicht für die echten 7-Segment Anzeigen.
+     *
+     * @param fourDigitsOnly
+     */
+    public void setFourDigitsOnly(boolean fourDigitsOnly) {
+        this.fourDigitsOnly = fourDigitsOnly;
+    }
+
+    private boolean fourDigitsOnly = true;
+
     public String getName() {
         return name;
     }
@@ -77,7 +93,6 @@ public class Display7Segments4Digits implements HasLogger {
         lastTimeSet = time;
 
         DateTime dateTime = new DateTime(time, DateTimeZone.UTC);
-//        logger.debug(name+": "+dateTime.toString());
         int hours = dateTime.getHourOfDay();
 
 
@@ -87,17 +102,17 @@ public class Display7Segments4Digits implements HasLogger {
         String strSeconds = textTime.charAt(2) + (hours >= 2 ? "." : "")
                 + textTime.charAt(3) + (hours >= 1 ? "." : "");
 
+        String commonTimeFormat = dateTime.toString("HH:mm:ss");
+
         // Bildschirm Darstellung
         if (lblSegment != null) {
-            lblSegment.setToolTipText(dateTime.toString("HH:mm:ss"));
-            String t = strMinutes + (colon ? ":" : " ") + strSeconds;
-            lblSegment.setText(t);
+            lblSegment.setToolTipText(commonTimeFormat);
+            lblSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : commonTimeFormat);
         }
 
         if (btnSegment != null) {
-            btnSegment.setToolTipText(dateTime.toString("HH:mm:ss"));
-            String t = strMinutes + (colon ? ":" : " ") + strSeconds;
-            btnSegment.setText(t);
+            btnSegment.setToolTipText(commonTimeFormat);
+            btnSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : commonTimeFormat);
         }
 
         // Hardware 7Segment

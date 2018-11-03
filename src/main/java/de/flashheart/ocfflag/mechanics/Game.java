@@ -588,9 +588,26 @@ public class Game implements Runnable, HasLogger {
                         new RGBScheduleElement(Color.BLACK, 1500l);
 
                 Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", pregamePoleColorScheme); //"1:" + new RGBScheduleElement(Color.WHITE));
-                Main.getPinHandler().setScheme(Main.KEY_FLAG_WHITE, "∞:on,350;off,3700");
-                Main.getPinHandler().setScheme(Main.KEY_FLAG_RED, "∞:off,350;on,350;off,3350");
-                Main.getPinHandler().setScheme(Main.KEY_FLAG_BLUE, "∞:off,700;on,350;off,3000");
+
+
+                if (preset_num_teams == 3) {
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_WHITE, "∞:on,350;off,4050");
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_RED, "∞:off,350;on,350;off,3700");
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_BLUE, "∞:off,700;on,350;off,3350");
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_GREEN, "∞:off,1050;on,350;off,3000");
+                } else if (preset_num_teams == 4) {
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_WHITE, "∞:on,350;off,4400");
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_RED, "∞:off,350;on,350;off,4050");
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_BLUE, "∞:off,700;on,350;off,3700");
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_GREEN, "∞:off,1050;on,350;off,3350");
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_YELLOW, "∞:off,1400;on,350;off,3000");
+                } else {
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_WHITE, "∞:on,350;off,3700");
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_RED, "∞:off,350;on,350;off,3350");
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_BLUE, "∞:off,700;on,350;off,3000");
+                }
+
+
             }
 
             if (mode == MODE_CLOCK_PREGAME) {
@@ -661,8 +678,6 @@ public class Game implements Runnable, HasLogger {
 
                 Main.getPinHandler().setScheme(Main.PH_SIREN_START_STOP, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
 
-//                LinkedHashMap<String, Integer> rank = getRank();
-//                statistics.updateTimers(remaining);
 
                 if (GameStateService.isDrawgame(statistics.getGameState())) {
                     getLogger().info("Draw Game");

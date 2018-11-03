@@ -185,6 +185,8 @@ public class Main {
         // so kann das Display7Segment4Digits direkt die Helligkeit aus den configs lesen
 
         display_white = new Display7Segments4Digits(configs.get(Configs.DISPLAY_WHITE_I2C), getFrameDebug().getLblPole(), Configs.BRIGHTNESS_WHITE);
+        display_white.setFourDigitsOnly(false);
+
         display_red = new Display7Segments4Digits(configs.get(Configs.DISPLAY_RED_I2C), getFrameDebug().getBtnRed(), Configs.BRIGHTNESS_RED);
         display_blue = new Display7Segments4Digits(configs.get(Configs.DISPLAY_BLUE_I2C), getFrameDebug().getBtnBlue(), Configs.BRIGHTNESS_BLUE);
         display_green = new Display7Segments4Digits(configs.get(Configs.DISPLAY_GREEN_I2C), getFrameDebug().getBtnGreen(), Configs.BRIGHTNESS_GREEN);
