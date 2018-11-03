@@ -22,4 +22,9 @@ public class PinScheduleEvent {
     public long getDuration() {
         return duration;
     }
+
+    @Override
+    public String toString() {
+        return (isOn() ? "on" : "off") + "," + duration;
+    }
 }

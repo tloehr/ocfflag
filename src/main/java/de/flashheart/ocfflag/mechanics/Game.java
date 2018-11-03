@@ -706,6 +706,7 @@ public class Game implements Runnable, HasLogger {
                     String text = "Winning Team(s): ";
                     for (String teamColor : statistics.getWinners()) {
                         winningScheme += new RGBScheduleElement(colors.get(teamColor), 250) + ";" + new RGBScheduleElement(Color.BLACK, 250) + ";";
+
                         text += teamColor + " ";
 
                         if (teamColor.equalsIgnoreCase("red"))

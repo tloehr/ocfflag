@@ -208,7 +208,7 @@ public class Main {
         button_quit = new MyAbstractButton(null, null, frameDebug.getBtnQuit());
         button_config = new MyAbstractButton(null, null, frameDebug.getBtnConfig());
         button_saveNquit = new MyAbstractButton(null, null, frameDebug.getBtnSaveAndQuit());
-        button_shutdown = new MyAbstractButton(GPIO, BUTTON_SHUTDOWN, 5000);
+        button_shutdown = new MyAbstractButton(GPIO, BUTTON_SHUTDOWN, 0);
 
         pinHandler.add(new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), PH_POLE));
         pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_RED_BUTTON, frameDebug.getLedRedButton(), PH_LED_RED_BTN));
