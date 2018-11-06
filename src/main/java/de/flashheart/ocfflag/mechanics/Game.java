@@ -314,6 +314,12 @@ public class Game implements Runnable, HasLogger {
 
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (!flag.equals(GameEvent.RED_ACTIVATED)) {
+
+//                button_blue.setEnabled(true);
+//                button_red.setEnabled(false);
+//                button_green.setEnabled(preset_num_teams >= 3);
+//                button_yellow.setEnabled(preset_num_teams >= 4);
+
                 lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.RED_ACTIVATED;
                 Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
@@ -334,7 +340,14 @@ public class Game implements Runnable, HasLogger {
         Main.getFrameDebug().addToConfigLog("button_blue_pressed");
         if (CONFIG_PAGE) return;
         if (mode == MODE_CLOCK_GAME_RUNNING) {
+
             if (!flag.equals(GameEvent.BLUE_ACTIVATED)) {
+
+//                button_blue.setEnabled(false);
+//                button_red.setEnabled(true);
+//                button_green.setEnabled(preset_num_teams >= 3);
+//                button_yellow.setEnabled(preset_num_teams >= 4);
+
                 lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.BLUE_ACTIVATED;
                 Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
@@ -357,6 +370,12 @@ public class Game implements Runnable, HasLogger {
         }
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (!flag.equals(GameEvent.GREEN_ACTIVATED)) {
+
+//                button_blue.setEnabled(true);
+//                button_red.setEnabled(true);
+//                button_green.setEnabled(false);
+//                button_yellow.setEnabled(preset_num_teams >= 4);
+
                 lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.GREEN_ACTIVATED;
                 Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
@@ -380,6 +399,12 @@ public class Game implements Runnable, HasLogger {
         }
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (!flag.equals(GameEvent.YELLOW_ACTIVATED)) {
+
+//                button_blue.setEnabled(true);
+//                button_red.setEnabled(true);
+//                button_green.setEnabled(true);
+//                button_yellow.setEnabled(false);
+
                 lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.YELLOW_ACTIVATED;
                 Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
@@ -454,7 +479,6 @@ public class Game implements Runnable, HasLogger {
             preset_num_teams++;
             if (preset_num_teams > max_number_of_teams) preset_num_teams = MIN_TEAMS;
             getLogger().debug("num_teams is now: " + preset_num_teams);
-//            statistics = new Statistics(preset_num_teams);
             Main.getConfigs().put(Configs.NUMBER_OF_TEAMS, preset_num_teams);
             reset_timers();
         } else {
@@ -592,19 +616,19 @@ public class Game implements Runnable, HasLogger {
 
                 if (preset_num_teams == 3) {
                     Main.getPinHandler().setScheme(Main.KEY_FLAG_WHITE, "∞:on,350;off,4050");
-                    Main.getPinHandler().setScheme(Main.KEY_FLAG_RED, "∞:off,350;on,350;off,3700");
-                    Main.getPinHandler().setScheme(Main.KEY_FLAG_BLUE, "∞:off,700;on,350;off,3350");
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_BLUE, "∞:off,350;on,350;off,3700");
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_RED, "∞:off,700;on,350;off,3350");
                     Main.getPinHandler().setScheme(Main.KEY_FLAG_GREEN, "∞:off,1050;on,350;off,3000");
                 } else if (preset_num_teams == 4) {
                     Main.getPinHandler().setScheme(Main.KEY_FLAG_WHITE, "∞:on,350;off,4400");
-                    Main.getPinHandler().setScheme(Main.KEY_FLAG_RED, "∞:off,350;on,350;off,4050");
-                    Main.getPinHandler().setScheme(Main.KEY_FLAG_BLUE, "∞:off,700;on,350;off,3700");
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_BLUE, "∞:off,350;on,350;off,4050");
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_RED, "∞:off,700;on,350;off,3700");
                     Main.getPinHandler().setScheme(Main.KEY_FLAG_GREEN, "∞:off,1050;on,350;off,3350");
                     Main.getPinHandler().setScheme(Main.KEY_FLAG_YELLOW, "∞:off,1400;on,350;off,3000");
                 } else {
                     Main.getPinHandler().setScheme(Main.KEY_FLAG_WHITE, "∞:on,350;off,3700");
-                    Main.getPinHandler().setScheme(Main.KEY_FLAG_RED, "∞:off,350;on,350;off,3350");
-                    Main.getPinHandler().setScheme(Main.KEY_FLAG_BLUE, "∞:off,700;on,350;off,3000");
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_BLUE, "∞:off,350;on,350;off,3350");
+                    Main.getPinHandler().setScheme(Main.KEY_FLAG_RED, "∞:off,700;on,350;off,3000");
                 }
 
 
@@ -613,9 +637,14 @@ public class Game implements Runnable, HasLogger {
             if (mode == MODE_CLOCK_PREGAME) {
                 getLogger().debug("PREGAME");
                 getLogger().debug("preset_num_teams " + preset_num_teams);
+
+//                button_blue.setEnabled(true);
+//                button_red.setEnabled(true);
+//                button_green.setEnabled(preset_num_teams >= 3);
+//                button_yellow.setEnabled(preset_num_teams >= 4);
+
                 if (preset_num_teams < 3) display_green.clear();
                 if (preset_num_teams < 4) display_yellow.clear();
-
 
                 if (preset_num_teams == 3) {
                     Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, null, "∞:on,250;off,500");

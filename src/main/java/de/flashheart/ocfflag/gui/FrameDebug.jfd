@@ -1,4 +1,4 @@
-JFDML JFormDesigner: "6.0.4.0.167" Java: "1.8.0_152-release" encoding: "UTF-8"
+JFDML JFormDesigner: "7.0.0.0.82" Java: "1.8.0_152-release" encoding: "UTF-8"
 
 new FormModel {
 	contentType: "form/swing"
@@ -130,14 +130,14 @@ new FormModel {
 								"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/48x48/led-white-off.png" )
 							} )
 							add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-								name: "ledFlagRed"
-								"color": sfield java.awt.Color red
-								"toolTipText": "Red LED in Button"
-							} )
-							add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
 								name: "ledFlagBlue"
 								"color": sfield java.awt.Color blue
 								"toolTipText": "Blue LED in Button"
+							} )
+							add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
+								name: "ledFlagRed"
+								"color": sfield java.awt.Color red
+								"toolTipText": "Red LED in Button"
 							} )
 							add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
 								name: "ledFlagGreen"
@@ -267,7 +267,7 @@ new FormModel {
 				} )
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 					"$columnSpecs": "unrelgap, labelcompgap, pref, labelcompgap, relgap, labelcompgap, 129dlu, unrelgap, center:pref, labelcompgap, 124dlu, labelcompgap, unrelgap"
-					"$rowSpecs": "default, unrelgap, default, unrelgap, default, linegap, default, linegap, default, relgap, default, unrelgap, default, linegap, pref, linegap, 85dlu:grow, linegap, default"
+					"$rowSpecs": "default, unrelgap, default, unrelgap, default, linegap, default, linegap, default, linegap, default, relgap, default, unrelgap, default, linegap, pref, linegap, 85dlu:grow, linegap, default"
 				} ) {
 					name: "configView"
 					add( new FormComponent( "javax.swing.JLabel" ) {
@@ -314,31 +314,81 @@ new FormModel {
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
 						"gridY": 5
-						"gridWidth": 5
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "label4"
 						"text": "Rest-Auth"
 						"font": #Font1
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 7
-						"gridX": 3
+						"gridY": 5
+						"gridX": 9
 					} )
 					add( new FormComponent( "javax.swing.JTextField" ) {
 						name: "txtRestAuth"
 						"font": #Font1
 						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtRestAuthFocusLost", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 11
+						"gridY": 5
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "label3"
+						"text": "Start/Stop Signal"
+						"font": #Font1
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridY": 7
+						"gridX": 3
+					} )
+					add( new FormComponent( "javax.swing.JTextField" ) {
+						name: "txtStartStopSiren"
+						"font": #Font1
+						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtStartStopSirenFocusLost", true ) )
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
 						"gridY": 7
-						"gridWidth": 5
+						"gridWidth": 3
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnTestStartStop"
+						"text": "Test Siren"
+						"font": &Font2 new java.awt.Font( "Dialog", 0, 20 )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnTestStartStopActionPerformed", true ) )
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 11
+						"gridY": 7
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "label5"
+						"text": "ColChange Signal"
+						"font": #Font1
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridY": 9
+						"gridX": 3
+					} )
+					add( new FormComponent( "javax.swing.JTextField" ) {
+						name: "txtColChangeSiren"
+						"font": #Font1
+						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtColChangeSirenFocusLost", true ) )
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 7
+						"gridY": 9
+						"gridWidth": 3
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnTestColChange"
+						"text": "Test Siren"
+						"font": #Font2
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnTestColChangeActionPerformed", true ) )
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 11
+						"gridY": 9
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "label8"
 						"text": "Intervall Stats (ms)"
 						"font": #Font1
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 9
+						"gridY": 11
 						"gridX": 3
 					} )
 					add( new FormComponent( "javax.swing.JTextField" ) {
@@ -347,14 +397,14 @@ new FormModel {
 						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtSendStatsFocusLost", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
-						"gridY": 9
+						"gridY": 11
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "label11"
 						"text": "Button Reaction (ms)"
 						"font": #Font1
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 9
+						"gridY": 11
 						"gridX": 9
 					} )
 					add( new FormComponent( "javax.swing.JTextField" ) {
@@ -363,14 +413,14 @@ new FormModel {
 						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtButtonReactionFocusLost", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 11
-						"gridY": 9
+						"gridY": 11
 					} )
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
 						name: "panel6"
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnTestRest"
 							"text": "Test Connection"
-							"font": &Font2 new java.awt.Font( "Dialog", 0, 20 )
+							"font": #Font2
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnTestHardware"
@@ -385,7 +435,7 @@ new FormModel {
 						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 3
-						"gridY": 11
+						"gridY": 13
 						"gridWidth": 9
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
@@ -393,7 +443,7 @@ new FormModel {
 						"text": "UUID"
 						"font": #Font1
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 13
+						"gridY": 15
 						"gridX": 3
 					} )
 					add( new FormComponent( "javax.swing.JTextField" ) {
@@ -402,7 +452,7 @@ new FormModel {
 						"editable": false
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
-						"gridY": 13
+						"gridY": 15
 						"gridWidth": 5
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
@@ -410,7 +460,7 @@ new FormModel {
 						"text": "Helligkeit"
 						"font": #Font1
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 15
+						"gridY": 17
 						"gridX": 3
 					} )
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
@@ -454,7 +504,7 @@ new FormModel {
 						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
-						"gridY": 15
+						"gridY": 17
 						"gridWidth": 5
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
@@ -464,7 +514,7 @@ new FormModel {
 						"toolTipText": "Spiel konfigurieren"
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints LEFT
-						"gridY": 17
+						"gridY": 19
 						"gridX": 3
 					} )
 					add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
@@ -476,7 +526,7 @@ new FormModel {
 						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
-						"gridY": 17
+						"gridY": 19
 						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 						"gridWidth": 5
 					} )

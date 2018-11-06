@@ -139,6 +139,8 @@ public class FrameDebug extends JFrame {
         txtButtonReaction.setText(Main.getConfigs().get(Configs.BUTTON_REACTION_TIME));
         txtSendStats.setText(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
         txtUUID.setText(Main.getConfigs().get(Configs.MYUUID));
+        txtStartStopSiren.setText(Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
+        txtColChangeSiren.setText(Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
     }
 
     private void txtFlagNameFocusLost(FocusEvent e) {
@@ -228,6 +230,22 @@ public class FrameDebug extends JFrame {
         }
     }
 
+    private void txtStartStopSirenFocusLost(FocusEvent e) {
+        Main.getConfigs().put(Configs.AIRSIREN_SIGNAL, txtStartStopSiren.getText().trim());
+    }
+
+    private void btnTestStartStopActionPerformed(ActionEvent e) {
+        Main.getPinHandler().setScheme(Main.PH_SIREN_START_STOP, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
+    }
+
+    private void btnTestColChangeActionPerformed(ActionEvent e) {
+        Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
+    }
+
+    private void txtColChangeSirenFocusLost(FocusEvent e) {
+        Main.getConfigs().put(Configs.COLORCHANGE_SIREN_SIGNAL, txtColChangeSiren.getText().trim());
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -248,8 +266,8 @@ public class FrameDebug extends JFrame {
         pbGreen = new JProgressBar();
         pnlFlagLEDs = new JPanel();
         ledFlagWhite = new MyLED();
-        ledFlagRed = new MyLED();
         ledFlagBlue = new MyLED();
+        ledFlagRed = new MyLED();
         ledFlagGreen = new MyLED();
         ledFlagYellow = new MyLED();
         pbYellow = new JProgressBar();
@@ -272,6 +290,12 @@ public class FrameDebug extends JFrame {
         txtResturl = new JTextField();
         label4 = new JLabel();
         txtRestAuth = new JTextField();
+        label3 = new JLabel();
+        txtStartStopSiren = new JTextField();
+        btnTestStartStop = new JButton();
+        label5 = new JLabel();
+        txtColChangeSiren = new JTextField();
+        btnTestColChange = new JButton();
         label8 = new JLabel();
         txtSendStats = new JTextField();
         label11 = new JLabel();
@@ -390,15 +414,15 @@ public class FrameDebug extends JFrame {
                         ledFlagWhite.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/led-white-off.png")));
                         pnlFlagLEDs.add(ledFlagWhite);
 
-                        //---- ledFlagRed ----
-                        ledFlagRed.setColor(Color.red);
-                        ledFlagRed.setToolTipText("Red LED in Button");
-                        pnlFlagLEDs.add(ledFlagRed);
-
                         //---- ledFlagBlue ----
                         ledFlagBlue.setColor(Color.blue);
                         ledFlagBlue.setToolTipText("Blue LED in Button");
                         pnlFlagLEDs.add(ledFlagBlue);
+
+                        //---- ledFlagRed ----
+                        ledFlagRed.setColor(Color.red);
+                        ledFlagRed.setToolTipText("Red LED in Button");
+                        pnlFlagLEDs.add(ledFlagRed);
 
                         //---- ledFlagGreen ----
                         ledFlagGreen.setColor(Color.green);
@@ -490,7 +514,7 @@ public class FrameDebug extends JFrame {
             {
                 configView.setLayout(new FormLayout(
                     "$ugap, $lcgap, pref, $lcgap, $rgap, $lcgap, 129dlu, $ugap, center:pref, $lcgap, 124dlu, $lcgap, $ugap",
-                    "2*(default, $ugap), 2*(default, $lgap), default, $rgap, default, $ugap, default, $lgap, pref, $lgap, 85dlu:grow, $lgap, default"));
+                    "2*(default, $ugap), 3*(default, $lgap), default, $rgap, default, $ugap, default, $lgap, pref, $lgap, 85dlu:grow, $lgap, default"));
 
                 //---- lblConfigTitle ----
                 lblConfigTitle.setOpaque(true);
@@ -503,11 +527,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label1 ----
                 label1.setText("System-Name");
-                label1.setFont(new Font("Dialog", Font.PLAIN, 22));
+                label1.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label1, CC.xy(3, 3));
 
                 //---- txtFlagName ----
-                txtFlagName.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtFlagName.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtFlagName.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -518,63 +542,105 @@ public class FrameDebug extends JFrame {
 
                 //---- label2 ----
                 label2.setText("Rest URL");
-                label2.setFont(new Font("Dialog", Font.PLAIN, 22));
+                label2.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label2, CC.xy(3, 5));
 
                 //---- txtResturl ----
-                txtResturl.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtResturl.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtResturl.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtResturlFocusLost(e);
                     }
                 });
-                configView.add(txtResturl, CC.xywh(7, 5, 5, 1));
+                configView.add(txtResturl, CC.xy(7, 5));
 
                 //---- label4 ----
                 label4.setText("Rest-Auth");
-                label4.setFont(new Font("Dialog", Font.PLAIN, 22));
-                configView.add(label4, CC.xy(3, 7));
+                label4.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                configView.add(label4, CC.xy(9, 5));
 
                 //---- txtRestAuth ----
-                txtRestAuth.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtRestAuth.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtRestAuth.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtRestAuthFocusLost(e);
                     }
                 });
-                configView.add(txtRestAuth, CC.xywh(7, 7, 5, 1));
+                configView.add(txtRestAuth, CC.xy(11, 5));
+
+                //---- label3 ----
+                label3.setText("Start/Stop Signal");
+                label3.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                configView.add(label3, CC.xy(3, 7));
+
+                //---- txtStartStopSiren ----
+                txtStartStopSiren.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtStartStopSiren.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtStartStopSirenFocusLost(e);
+                    }
+                });
+                configView.add(txtStartStopSiren, CC.xywh(7, 7, 3, 1));
+
+                //---- btnTestStartStop ----
+                btnTestStartStop.setText("Test Siren");
+                btnTestStartStop.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
+                btnTestStartStop.addActionListener(e -> btnTestStartStopActionPerformed(e));
+                configView.add(btnTestStartStop, CC.xy(11, 7));
+
+                //---- label5 ----
+                label5.setText("ColChange Signal");
+                label5.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                configView.add(label5, CC.xy(3, 9));
+
+                //---- txtColChangeSiren ----
+                txtColChangeSiren.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtColChangeSiren.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtColChangeSirenFocusLost(e);
+                    }
+                });
+                configView.add(txtColChangeSiren, CC.xywh(7, 9, 3, 1));
+
+                //---- btnTestColChange ----
+                btnTestColChange.setText("Test Siren");
+                btnTestColChange.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
+                btnTestColChange.addActionListener(e -> btnTestColChangeActionPerformed(e));
+                configView.add(btnTestColChange, CC.xy(11, 9));
 
                 //---- label8 ----
                 label8.setText("Intervall Stats (ms)");
-                label8.setFont(new Font("Dialog", Font.PLAIN, 22));
-                configView.add(label8, CC.xy(3, 9));
+                label8.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                configView.add(label8, CC.xy(3, 11));
 
                 //---- txtSendStats ----
-                txtSendStats.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtSendStats.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtSendStats.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtSendStatsFocusLost(e);
                     }
                 });
-                configView.add(txtSendStats, CC.xy(7, 9));
+                configView.add(txtSendStats, CC.xy(7, 11));
 
                 //---- label11 ----
                 label11.setText("Button Reaction (ms)");
-                label11.setFont(new Font("Dialog", Font.PLAIN, 22));
-                configView.add(label11, CC.xy(9, 9));
+                label11.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                configView.add(label11, CC.xy(9, 11));
 
                 //---- txtButtonReaction ----
-                txtButtonReaction.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtButtonReaction.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtButtonReaction.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtButtonReactionFocusLost(e);
                     }
                 });
-                configView.add(txtButtonReaction, CC.xy(11, 9));
+                configView.add(txtButtonReaction, CC.xy(11, 11));
 
                 //======== panel6 ========
                 {
@@ -582,12 +648,12 @@ public class FrameDebug extends JFrame {
 
                     //---- btnTestRest ----
                     btnTestRest.setText("Test Connection");
-                    btnTestRest.setFont(new Font("Dialog", Font.PLAIN, 20));
+                    btnTestRest.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
                     panel6.add(btnTestRest);
 
                     //---- btnTestHardware ----
                     btnTestHardware.setText("Test Hardware");
-                    btnTestHardware.setFont(new Font("Dialog", Font.PLAIN, 20));
+                    btnTestHardware.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
                     btnTestHardware.addActionListener(e -> btnTestHardwareActionPerformed(e));
                     panel6.add(btnTestHardware);
 
@@ -596,22 +662,22 @@ public class FrameDebug extends JFrame {
                     txtFlagColor.addActionListener(e -> txtFlagColorActionPerformed(e));
                     panel6.add(txtFlagColor);
                 }
-                configView.add(panel6, CC.xywh(3, 11, 9, 1));
+                configView.add(panel6, CC.xywh(3, 13, 9, 1));
 
                 //---- label9 ----
                 label9.setText("UUID");
-                label9.setFont(new Font("Dialog", Font.PLAIN, 22));
-                configView.add(label9, CC.xy(3, 13));
+                label9.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                configView.add(label9, CC.xy(3, 15));
 
                 //---- txtUUID ----
-                txtUUID.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtUUID.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtUUID.setEditable(false);
-                configView.add(txtUUID, CC.xywh(7, 13, 5, 1));
+                configView.add(txtUUID, CC.xywh(7, 15, 5, 1));
 
                 //---- label10 ----
                 label10.setText("Helligkeit");
-                label10.setFont(new Font("Dialog", Font.PLAIN, 22));
-                configView.add(label10, CC.xy(3, 15));
+                label10.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                configView.add(label10, CC.xy(3, 17));
 
                 //======== panel4 ========
                 {
@@ -652,13 +718,13 @@ public class FrameDebug extends JFrame {
                     btnYellowBrght.addActionListener(e -> btnBrghtActionPerformed(e));
                     panel4.add(btnYellowBrght);
                 }
-                configView.add(panel4, CC.xywh(7, 15, 5, 1));
+                configView.add(panel4, CC.xywh(7, 17, 5, 1));
 
                 //---- btnSaveAndQuit ----
                 btnSaveAndQuit.setText(null);
                 btnSaveAndQuit.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/exit.png")));
                 btnSaveAndQuit.setToolTipText("Spiel konfigurieren");
-                configView.add(btnSaveAndQuit, CC.xy(3, 17, CC.LEFT, CC.DEFAULT));
+                configView.add(btnSaveAndQuit, CC.xy(3, 19, CC.LEFT, CC.DEFAULT));
 
                 //======== scrollPane1 ========
                 {
@@ -668,7 +734,7 @@ public class FrameDebug extends JFrame {
                     txtLog.setForeground(new Color(0, 255, 51));
                     scrollPane1.setViewportView(txtLog);
                 }
-                configView.add(scrollPane1, CC.xywh(7, 17, 5, 1, CC.DEFAULT, CC.FILL));
+                configView.add(scrollPane1, CC.xywh(7, 19, 5, 1, CC.DEFAULT, CC.FILL));
             }
             mainPanel.addTab("configView", configView);
         }
@@ -780,8 +846,8 @@ public class FrameDebug extends JFrame {
     private JProgressBar pbGreen;
     private JPanel pnlFlagLEDs;
     private MyLED ledFlagWhite;
-    private MyLED ledFlagRed;
     private MyLED ledFlagBlue;
+    private MyLED ledFlagRed;
     private MyLED ledFlagGreen;
     private MyLED ledFlagYellow;
     private JProgressBar pbYellow;
@@ -804,6 +870,12 @@ public class FrameDebug extends JFrame {
     private JTextField txtResturl;
     private JLabel label4;
     private JTextField txtRestAuth;
+    private JLabel label3;
+    private JTextField txtStartStopSiren;
+    private JButton btnTestStartStop;
+    private JLabel label5;
+    private JTextField txtColChangeSiren;
+    private JButton btnTestColChange;
     private JLabel label8;
     private JTextField txtSendStats;
     private JLabel label11;

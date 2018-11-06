@@ -81,6 +81,9 @@ public class PinBlinkModel implements GenericBlinkModel {
     public void setScheme(String scheme) {
 
 
+        // REGEX Checking ((\d+)|inf):((on,(\d+));(off,(\d+))|(off,(\d+));(on,(\d+))|(off,(\d+)))*
+        
+
         onOffScheme.clear();
 
         //logger.debug("new scheme for pin: " + pin.getName() + " : " + scheme);
