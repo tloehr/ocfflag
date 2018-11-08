@@ -1,5 +1,7 @@
 package de.flashheart.ocfflag.misc;
 
+import com.pi4j.io.gpio.Pin;
+import com.pi4j.io.gpio.RaspiPin;
 import de.flashheart.ocfflag.Main;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -56,6 +58,18 @@ public class Configs {
     public static final String FLAG_COLOR_GREEN = "flag_color_green";
     public static final String FLAG_COLOR_YELLOW = "flag_color_yellow";
 
+
+    // KEYS: Zuordnung zu den GPIOs
+    public static final String BUTTON_STANDBY_ACTIVE = "button_standby_active";
+    public static final String BUTTON_PRESET_NUM_TEAMS = "button_preset_num_teams";
+    public static final String BUTTON_PRESET_GAMETIME = "button_preset_gametime";
+    public static final String BUTTON_RESET = "button_reset";
+    public static final String BUTTON_RED = "button_red";
+    public static final String BUTTON_BLUE = "button_blue";
+    public static final String BUTTON_GREEN = "button_green";
+    public static final String BUTTON_YELLOW = "button_yellow";
+    public static final String BUTTON_SHUTDOWN = "button_shutdown";
+
     public Configs() throws IOException {
         configs = new SortedProperties(); // Einstellungen, die verändert werden
         applicationContext = new Properties(); // inhalte der application.properties (von Maven)
@@ -70,6 +84,22 @@ public class Configs {
 
         configs.put(NUMBER_OF_TEAMS, "2");
         configs.put(MAX_NUMBER_OF_TEAMS, "4");
+
+
+        // Hardware Defaults
+        // Buttons benutzen immer den Raspi GPIO Provider
+        configs.put(BUTTON_STANDBY_ACTIVE, "GPIO 3");
+        configs.put(BUTTON_PRESET_NUM_TEAMS, "GPIO 12");
+        configs.put(BUTTON_PRESET_GAMETIME, "GPIO 13");
+        configs.put(BUTTON_RESET, "GPIO 14");
+        configs.put(BUTTON_RED, "GPIO 21");
+        configs.put(BUTTON_BLUE, "GPIO 22");
+        configs.put(BUTTON_GREEN, "GPIO 23");
+        configs.put(BUTTON_YELLOW, "GPIO 24");
+        configs.put(BUTTON_SHUTDOWN, "GPIO 28");
+
+        // Alle anderen den MCP23017
+
 
 
         configs.put(REST_URL, "http://localhost:8090/rest/gamestate/create");

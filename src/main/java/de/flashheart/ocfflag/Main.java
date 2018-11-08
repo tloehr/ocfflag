@@ -40,6 +40,7 @@ public class Main {
     private static Level logLevel = Level.DEBUG;
 
     public static final String PH_POLE = "flagPole";
+
     public static final String PH_LED_RED_BTN = "ledRedButton";
     public static final String PH_LED_BLUE_BTN = "ledBlueButton";
     public static final String PH_LED_GREEN_BTN = "ledGreenButton";
@@ -63,15 +64,15 @@ public class Main {
 
 
     // J1 External Box und P1 Display Port
-    /* btn01, P1 Display Port */ private static final Pin BUTTON_STANDBY_ACTIVE = RaspiPin.GPIO_03;
-    /* btn02, P1 Display Port */ private static final Pin BUTTON_PRESET_NUM_TEAMS = RaspiPin.GPIO_12;
-    /* btn03, P1 Display Port */ private static final Pin BUTTON_PRESET_GAMETIME = RaspiPin.GPIO_13;
-    /* btn04, P1 Display Port */ private static final Pin BUTTON_RESET = RaspiPin.GPIO_14;
-    /* btn05, J1 External Box */ private static final Pin BUTTON_RED = RaspiPin.GPIO_21;
-    /* btn06, J1 External Box */ private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
-    /* btn07, J1 External Box */ private static final Pin BUTTON_GREEN = RaspiPin.GPIO_23;
-    /* btn08, J1 External Box */ private static final Pin BUTTON_YELLOW = RaspiPin.GPIO_24;
-    /* btnShutdown, J1 External Box */ private static final Pin BUTTON_SHUTDOWN = RaspiPin.GPIO_28;
+//    /* btn01, P1 Display Port */ private static final Pin BUTTON_STANDBY_ACTIVE = RaspiPin.GPIO_03;
+//    /* btn02, P1 Display Port */ private static final Pin BUTTON_PRESET_NUM_TEAMS = RaspiPin.GPIO_12;
+//    /* btn03, P1 Display Port */ private static final Pin BUTTON_PRESET_GAMETIME = RaspiPin.GPIO_13;
+//    /* btn04, P1 Display Port */ private static final Pin BUTTON_RESET = RaspiPin.GPIO_14;
+//    /* btn05, J1 External Box */ private static final Pin BUTTON_RED = RaspiPin.GPIO_21;
+//    /* btn06, J1 External Box */ private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
+//    /* btn07, J1 External Box */ private static final Pin BUTTON_GREEN = RaspiPin.GPIO_23;
+//    /* btn08, J1 External Box */ private static final Pin BUTTON_YELLOW = RaspiPin.GPIO_24;
+//    /* btnShutdown, J1 External Box */ private static final Pin BUTTON_SHUTDOWN = RaspiPin.GPIO_28;
 
     // 4 Ports für ein Relais Board.
     // Schaltet im default bei HIGH
@@ -155,7 +156,6 @@ public class Main {
 
     private static MessageProcessor messageProcessor;
 
-
     private static final HashMap<String, Object> applicationContext = new HashMap<>();
 
     public static MessageProcessor getMessageProcessor() {
@@ -199,20 +199,21 @@ public class Main {
         applicationContext.put(display_yellow.getName(), display_yellow);
 
 
-        button_red = new MyAbstractButton(GPIO, BUTTON_RED, frameDebug.getBtnRed(), REACTION_TIME, getFrameDebug().getPbRed());
-        button_blue = new MyAbstractButton(GPIO, BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, getFrameDebug().getPbBlue());
-        button_green = new MyAbstractButton(GPIO, BUTTON_GREEN, frameDebug.getBtnGreen(), REACTION_TIME, getFrameDebug().getPbGreen());
-        button_yellow = new MyAbstractButton(GPIO, BUTTON_YELLOW, frameDebug.getBtnYellow(), REACTION_TIME, getFrameDebug().getPbYellow());
-        button_reset = new MyAbstractButton(GPIO, BUTTON_RESET, frameDebug.getBtnReset());
-        button_preset_num_teams = new MyAbstractButton(GPIO, BUTTON_PRESET_NUM_TEAMS, frameDebug.getBtnPresetNumTeams());
-        button_preset_gametime = new MyAbstractButton(GPIO, BUTTON_PRESET_GAMETIME, frameDebug.getBtnPresetGametime());
-        button_standby_active = new MyAbstractButton(GPIO, BUTTON_STANDBY_ACTIVE, frameDebug.getBtnSwitchMode());
+        button_red = new MyAbstractButton(GPIO, Configs.BUTTON_RED, frameDebug.getBtnRed(), REACTION_TIME, getFrameDebug().getPbRed());
+        button_blue = new MyAbstractButton(GPIO, Configs.BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, getFrameDebug().getPbBlue());
+        button_green = new MyAbstractButton(GPIO, Configs.BUTTON_GREEN, frameDebug.getBtnGreen(), REACTION_TIME, getFrameDebug().getPbGreen());
+        button_yellow = new MyAbstractButton(GPIO, Configs.BUTTON_YELLOW, frameDebug.getBtnYellow(), REACTION_TIME, getFrameDebug().getPbYellow());
+        button_reset = new MyAbstractButton(GPIO, Configs.BUTTON_RESET, frameDebug.getBtnReset(), 0l, null);
+        button_preset_num_teams = new MyAbstractButton(GPIO, Configs.BUTTON_PRESET_NUM_TEAMS, frameDebug.getBtnPresetNumTeams(), 0l, null);
+        button_preset_gametime = new MyAbstractButton(GPIO, Configs.BUTTON_PRESET_GAMETIME, frameDebug.getBtnPresetGametime(), 0l, null);
+        button_standby_active = new MyAbstractButton(GPIO, Configs.BUTTON_STANDBY_ACTIVE, frameDebug.getBtnSwitchMode(), 0l, null);
         button_quit = new MyAbstractButton(null, null, frameDebug.getBtnQuit());
         button_config = new MyAbstractButton(null, null, frameDebug.getBtnConfig());
         button_saveNquit = new MyAbstractButton(null, null, frameDebug.getBtnSaveAndQuit());
-        button_shutdown = new MyAbstractButton(GPIO, BUTTON_SHUTDOWN, 0);
+        button_shutdown = new MyAbstractButton(GPIO, Configs.BUTTON_SHUTDOWN, null, 0, null);
 
         pinHandler.add(new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), PH_POLE));
+
         pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_RED_BUTTON, frameDebug.getLedRedButton(), PH_LED_RED_BTN));
         pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), PH_LED_BLUE_BTN));
         pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_GREEN_BUTTON, frameDebug.getLedGreenButton(), PH_LED_GREEN_BTN));
@@ -247,7 +248,6 @@ public class Main {
          Main.getPinHandler().setScheme(Main.PH_SIREN_HOLDDOWN_BUZZER, null, "∞:on,250;off,500");
          Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, null, "∞:on,250;off,500");
          Main.getPinHandler().setScheme(Main.PH_SIREN_START_STOP, null, "∞:on,250;off,500");
-
          * TEST ROUTINE END
          */
 
@@ -438,6 +438,7 @@ public class Main {
         mapPins.put("mf14", MF14);
         mapPins.put("mf15", MF15);
         mapPins.put("mf16", MF16);
+
 
     }
 

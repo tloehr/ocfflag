@@ -2,6 +2,7 @@ package de.flashheart.ocfflag.hardware.abstraction;
 
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
+import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.HasLogger;
 
 import javax.swing.*;
@@ -21,6 +22,7 @@ public class MyAbstractButton implements HasLogger {
     private ActionListener actionListener;
     private final GpioPinDigitalInput hardwareButton;
     private final JButton guiButton;
+    private HoldDownMouseAdapter holdDownMouseAdapter;
 
     public MyAbstractButton(GpioController gpio, Pin pin, long reactiontime) {
         this(gpio, pin, null, reactiontime, null);
@@ -37,7 +39,10 @@ public class MyAbstractButton implements HasLogger {
         hardwareButton = gpio == null ? null : gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
         if (hardwareButton != null) hardwareButton.setDebounce(DEBOUNCE);
         this.guiButton = guiButton;
+    }
 
+    public MyAbstractButton(GpioController gpio, String configsKeyForPin, JButton guiButton, long reactionTime, JProgressBar pb) {
+        this(gpio, RaspiPin.getPinByName(Main.getConfigs().get(configsKeyForPin)), guiButton, reactionTime, pb);
     }
 
     public void setVisible(boolean visible) {
@@ -46,6 +51,10 @@ public class MyAbstractButton implements HasLogger {
         }
     }
 
+    public void setEnabled(boolean enabled) {
+        if (holdDownMouseAdapter != null) holdDownMouseAdapter.setEnabled(enabled);
+        if (guiButton != null) guiButton.setEnabled(enabled);
+    }
 
     public void setIcon(Icon icon) {
         if (guiButton != null) guiButton.setIcon(icon);
@@ -56,7 +65,9 @@ public class MyAbstractButton implements HasLogger {
             if (reactiontime == 0) {
                 guiButton.addActionListener(actionListener);
             } else {
-                guiButton.addMouseListener(new HoldDownMouseAdapter(reactiontime, actionListener, guiButton, pb));
+                if (holdDownMouseAdapter == null)
+                    holdDownMouseAdapter = new HoldDownMouseAdapter(reactiontime, actionListener, guiButton, pb);
+                guiButton.addMouseListener(holdDownMouseAdapter);
             }
         }
 

@@ -14,6 +14,8 @@ import java.util.ArrayList;
  * Created by tloehr on 14.07.16.
  */
 public class PinBlinkModel implements GenericBlinkModel {
+    public static final String SCHEME_TEST_REGEX = "^(\\d+|∞):(((on|off){1},\\d+)+(;((on|off){1},\\d+))*)$";
+
 
     MyPin pin;
     private ArrayList<PinScheduleEvent> onOffScheme;
@@ -81,7 +83,9 @@ public class PinBlinkModel implements GenericBlinkModel {
     public void setScheme(String scheme) {
 
 
-        // REGEX Checking ((\d+)|inf):((on,(\d+));(off,(\d+))|(off,(\d+));(on,(\d+))|(off,(\d+)))*
+
+//        if (!scheme.matches(SCHEME_TEST_REGEX)) return;
+
         
 
         onOffScheme.clear();
@@ -166,6 +170,8 @@ public class PinBlinkModel implements GenericBlinkModel {
         logger.debug(scheme);
         return scheme;
     }
+
+
 
 
 }

@@ -171,84 +171,38 @@ public class Game implements Runnable, HasLogger {
     }
 
     private void initGame() {
-//        Main.getMessageProcessor().addListener(this);
-
         button_blue.addActionListener(e -> {
             getLogger().debug("GUI_button_blue");
             button_blue_pressed();
         });
-//        button_blue.addGPIOListener((GpioPinListenerDigital) event -> {
-//            if (event.getState() != PinState.LOW) return;
-//            getLogger().debug("GPIO__button_blue");
-//            button_blue_pressed();
-//        });
-
         button_red.addActionListener(e -> {
             getLogger().debug("GUI_button_red");
             button_red_pressed();
         });
-//        button_red.addGPIOListener((GpioPinListenerDigital) event -> {
-//            if (event.getState() != PinState.LOW) return;
-//            getLogger().debug("GPIO_button_blue");
-//            button_red_pressed();
-//        });
-
         button_yellow.addActionListener(e -> {
             getLogger().debug("GUI_button_yellow");
             button_yellow_pressed();
         });
-//        button_yellow.addGPIOListener((GpioPinListenerDigital) event -> {
-//            if (event.getState() != PinState.LOW) return;
-//            getLogger().debug("GPIO__button_yellow");
-//            button_yellow_pressed();
-//        });
-
         button_green.addActionListener(e -> {
             getLogger().debug("GUI_button_green");
             button_green_pressed();
         });
-//        button_green.addGPIOListener((GpioPinListenerDigital) event -> {
-//            if (event.getState() != PinState.LOW) return;
-//            getLogger().debug("GPIO_button_green");
-//            button_green_pressed();
-//        });
-
         button_reset.addActionListener(e -> {
             getLogger().debug("GUI_button_undo_reset");
             button_undo_reset_pressed();
         });
-//        button_reset.addGPIOListener((GpioPinListenerDigital) event -> {
-//            if (event.getState() != PinState.LOW) return;
-//            getLogger().debug("GPIO_button_undo_reset");
-//            button_undo_reset_pressed();
-//        });
         button_preset_num_teams.addActionListener(e -> {
             getLogger().debug("GUI_button_preset_num_teams");
             button_preset_num_teams();
         });
-//        button_preset_num_teams.addGPIOListener((GpioPinListenerDigital) event -> {
-//            if (event.getState() != PinState.LOW) return;
-//            getLogger().debug("GPIO_button_preset_num_teams");
-//            button_preset_num_teams();
-//        });
         button_preset_gametime.addActionListener(e -> {
             getLogger().debug("GUI_button_preset_gametime / UNDO");
             button_gametime_pressed();
         });
-//        button_preset_gametime.addGPIOListener((GpioPinListenerDigital) event -> {
-//            if (event.getState() != PinState.LOW) return;
-//            getLogger().debug("GPIO_button_preset_gametime / UNDO");
-//            button_gametime_pressed();
-//        });
         button_switch_mode.addActionListener(e -> {
             getLogger().debug("GUI_button_switch_mode");
             buttonStandbyRunningPressed();
         });
-//        button_switch_mode.addGPIOListener((GpioPinListenerDigital) event -> {
-//            if (event.getState() != PinState.LOW) return;
-//            getLogger().debug("GPIO_button_switch_mode");
-//            buttonStandbyRunningPressed();
-//        });
         button_quit.addActionListener(e -> {
             getLogger().debug("GUI_button_quit");
             button_quit_pressed();
@@ -315,10 +269,10 @@ public class Game implements Runnable, HasLogger {
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (!flag.equals(GameEvent.RED_ACTIVATED)) {
 
-//                button_blue.setEnabled(true);
-//                button_red.setEnabled(false);
-//                button_green.setEnabled(preset_num_teams >= 3);
-//                button_yellow.setEnabled(preset_num_teams >= 4);
+                button_blue.setEnabled(true);
+                button_red.setEnabled(false);
+                button_green.setEnabled(preset_num_teams >= 3);
+                button_yellow.setEnabled(preset_num_teams >= 4);
 
                 lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.RED_ACTIVATED;
@@ -343,10 +297,10 @@ public class Game implements Runnable, HasLogger {
 
             if (!flag.equals(GameEvent.BLUE_ACTIVATED)) {
 
-//                button_blue.setEnabled(false);
-//                button_red.setEnabled(true);
-//                button_green.setEnabled(preset_num_teams >= 3);
-//                button_yellow.setEnabled(preset_num_teams >= 4);
+                button_blue.setEnabled(false);
+                button_red.setEnabled(true);
+                button_green.setEnabled(preset_num_teams >= 3);
+                button_yellow.setEnabled(preset_num_teams >= 4);
 
                 lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.BLUE_ACTIVATED;
@@ -371,10 +325,10 @@ public class Game implements Runnable, HasLogger {
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (!flag.equals(GameEvent.GREEN_ACTIVATED)) {
 
-//                button_blue.setEnabled(true);
-//                button_red.setEnabled(true);
-//                button_green.setEnabled(false);
-//                button_yellow.setEnabled(preset_num_teams >= 4);
+                button_blue.setEnabled(true);
+                button_red.setEnabled(true);
+                button_green.setEnabled(false);
+                button_yellow.setEnabled(preset_num_teams >= 4);
 
                 lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.GREEN_ACTIVATED;
@@ -400,10 +354,10 @@ public class Game implements Runnable, HasLogger {
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (!flag.equals(GameEvent.YELLOW_ACTIVATED)) {
 
-//                button_blue.setEnabled(true);
-//                button_red.setEnabled(true);
-//                button_green.setEnabled(true);
-//                button_yellow.setEnabled(false);
+                button_blue.setEnabled(true);
+                button_red.setEnabled(true);
+                button_green.setEnabled(true);
+                button_yellow.setEnabled(false);
 
                 lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.YELLOW_ACTIVATED;
@@ -611,7 +565,7 @@ public class Game implements Runnable, HasLogger {
                         (preset_num_teams >= 4 ? new RGBScheduleElement(Configs.FLAG_COLOR_YELLOW, 500l) + ";" : "") +
                         new RGBScheduleElement(Color.BLACK, 1500l);
 
-                Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", pregamePoleColorScheme); //"1:" + new RGBScheduleElement(Color.WHITE));
+                Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", pregamePoleColorScheme);
 
 
                 if (preset_num_teams == 3) {
@@ -638,10 +592,10 @@ public class Game implements Runnable, HasLogger {
                 getLogger().debug("PREGAME");
                 getLogger().debug("preset_num_teams " + preset_num_teams);
 
-//                button_blue.setEnabled(true);
-//                button_red.setEnabled(true);
-//                button_green.setEnabled(preset_num_teams >= 3);
-//                button_yellow.setEnabled(preset_num_teams >= 4);
+                button_blue.setEnabled(true);
+                button_red.setEnabled(true);
+                button_green.setEnabled(preset_num_teams >= 3);
+                button_yellow.setEnabled(preset_num_teams >= 4);
 
                 if (preset_num_teams < 3) display_green.clear();
                 if (preset_num_teams < 4) display_yellow.clear();

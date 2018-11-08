@@ -418,20 +418,26 @@ new FormModel {
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
 						name: "panel6"
 						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnTestRest"
-							"text": "Test Connection"
-							"font": #Font2
-						} )
-						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnTestHardware"
 							"text": "Test Hardware"
 							"font": #Font2
 							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnTestHardwareActionPerformed", true ) )
 						} )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "btnTestRest"
+							"text": "Test Connection"
+							"font": #Font2
+						} )
 						add( new FormComponent( "javax.swing.JTextField" ) {
 							name: "txtFlagColor"
 							"text": "#ff8000"
 							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "txtFlagColorActionPerformed", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "btnStopAllSirens"
+							"text": "Stop Sirens"
+							"font": #Font2
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnStopAllSirensActionPerformed", true ) )
 						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 3

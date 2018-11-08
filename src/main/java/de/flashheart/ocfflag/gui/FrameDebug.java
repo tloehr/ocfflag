@@ -8,6 +8,7 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
+import de.flashheart.ocfflag.hardware.pinhandler.PinBlinkModel;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Logger;
@@ -231,7 +232,13 @@ public class FrameDebug extends JFrame {
     }
 
     private void txtStartStopSirenFocusLost(FocusEvent e) {
-        Main.getConfigs().put(Configs.AIRSIREN_SIGNAL, txtStartStopSiren.getText().trim());
+        if (!txtStartStopSiren.getText().matches(PinBlinkModel.SCHEME_TEST_REGEX)) {
+            txtStartStopSiren.setText(Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
+        } else {
+            Main.getConfigs().put(Configs.AIRSIREN_SIGNAL, txtStartStopSiren.getText().trim());
+        }
+
+
     }
 
     private void btnTestStartStopActionPerformed(ActionEvent e) {
@@ -243,7 +250,17 @@ public class FrameDebug extends JFrame {
     }
 
     private void txtColChangeSirenFocusLost(FocusEvent e) {
-        Main.getConfigs().put(Configs.COLORCHANGE_SIREN_SIGNAL, txtColChangeSiren.getText().trim());
+        if (!txtColChangeSiren.getText().matches(PinBlinkModel.SCHEME_TEST_REGEX)) {
+            txtColChangeSiren.setText(Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
+        } else {
+            Main.getConfigs().put(Configs.COLORCHANGE_SIREN_SIGNAL, txtColChangeSiren.getText().trim());
+        }
+    }
+
+    private void btnStopAllSirensActionPerformed(ActionEvent e) {
+        Main.getPinHandler().off(Main.PH_SIREN_COLOR_CHANGE);
+        Main.getPinHandler().off(Main.PH_SIREN_START_STOP);
+        Main.getPinHandler().off(Main.PH_SIREN_HOLDDOWN_BUZZER);
     }
 
 
@@ -301,9 +318,10 @@ public class FrameDebug extends JFrame {
         label11 = new JLabel();
         txtButtonReaction = new JTextField();
         panel6 = new JPanel();
-        btnTestRest = new JButton();
         btnTestHardware = new JButton();
+        btnTestRest = new JButton();
         txtFlagColor = new JTextField();
+        btnStopAllSirens = new JButton();
         label9 = new JLabel();
         txtUUID = new JTextField();
         label10 = new JLabel();
@@ -646,21 +664,27 @@ public class FrameDebug extends JFrame {
                 {
                     panel6.setLayout(new BoxLayout(panel6, BoxLayout.X_AXIS));
 
-                    //---- btnTestRest ----
-                    btnTestRest.setText("Test Connection");
-                    btnTestRest.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
-                    panel6.add(btnTestRest);
-
                     //---- btnTestHardware ----
                     btnTestHardware.setText("Test Hardware");
                     btnTestHardware.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
                     btnTestHardware.addActionListener(e -> btnTestHardwareActionPerformed(e));
                     panel6.add(btnTestHardware);
 
+                    //---- btnTestRest ----
+                    btnTestRest.setText("Test Connection");
+                    btnTestRest.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
+                    panel6.add(btnTestRest);
+
                     //---- txtFlagColor ----
                     txtFlagColor.setText("#ff8000");
                     txtFlagColor.addActionListener(e -> txtFlagColorActionPerformed(e));
                     panel6.add(txtFlagColor);
+
+                    //---- btnStopAllSirens ----
+                    btnStopAllSirens.setText("Stop Sirens");
+                    btnStopAllSirens.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
+                    btnStopAllSirens.addActionListener(e -> btnStopAllSirensActionPerformed(e));
+                    panel6.add(btnStopAllSirens);
                 }
                 configView.add(panel6, CC.xywh(3, 13, 9, 1));
 
@@ -881,9 +905,10 @@ public class FrameDebug extends JFrame {
     private JLabel label11;
     private JTextField txtButtonReaction;
     private JPanel panel6;
-    private JButton btnTestRest;
     private JButton btnTestHardware;
+    private JButton btnTestRest;
     private JTextField txtFlagColor;
+    private JButton btnStopAllSirens;
     private JLabel label9;
     private JTextField txtUUID;
     private JLabel label10;

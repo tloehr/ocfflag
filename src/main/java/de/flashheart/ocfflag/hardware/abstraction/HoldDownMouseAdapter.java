@@ -29,6 +29,7 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
 
     private String scheme = "1:on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,2000;off,0";
     private int beeptime_ms = 50;
+    private boolean enabled = true;
 
     public HoldDownMouseAdapter(long reactiontime, ActionListener actionListener, Object source, JProgressBar pb) {
         this.reactiontime = reactiontime;
@@ -54,10 +55,18 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
 
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     @Override
     public void mousePressed(MouseEvent e) {
         if (!Main.getGame().isGameRunning()) return;
+        if (!enabled) return;
         
         if (e.getButton() == MouseEvent.BUTTON1) {
             getLogger().debug("holding down button");
@@ -117,33 +126,33 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
         }
     }
 
-    private void initBeeperTimes() {
-           if (reactiontime > 0) {
-               beeperTimes = new ArrayList<>();
-               BigDecimal sumTimes = BigDecimal.ZERO;
-
-               for (int i = 0; i < 10; i++) {
-                   beeperTimes.add(new BigDecimal(500).multiply(BigDecimal.ONE.divide(new BigDecimal(i + 1), 4, RoundingMode.HALF_UP)));
-                   sumTimes = sumTimes.add(beeperTimes.get(i));
-               }
-
-               BigDecimal scale = new BigDecimal(reactiontime).divide(sumTimes, 4, RoundingMode.HALF_UP);
-
-               for (int i = 0; i < 10; i++) {
-                   beeperTimes.set(i, beeperTimes.get(i).multiply(scale).divide(new BigDecimal(2), 6, RoundingMode.HALF_UP));
-               }
-
-
-               scheme = "1:";
-
-               for (int i = 0; i < 10; i++) {
-                   scheme += "on," + beeperTimes.get(i).intValue() + ";off," + beeperTimes.get(i).intValue() + ";";
-               }
-               scheme += "on,1000;off,0";
-           }
-
-
-       }
+//    private void initBeeperTimes() {
+//           if (reactiontime > 0) {
+//               beeperTimes = new ArrayList<>();
+//               BigDecimal sumTimes = BigDecimal.ZERO;
+//
+//               for (int i = 0; i < 10; i++) {
+//                   beeperTimes.add(new BigDecimal(500).multiply(BigDecimal.ONE.divide(new BigDecimal(i + 1), 4, RoundingMode.HALF_UP)));
+//                   sumTimes = sumTimes.add(beeperTimes.get(i));
+//               }
+//
+//               BigDecimal scale = new BigDecimal(reactiontime).divide(sumTimes, 4, RoundingMode.HALF_UP);
+//
+//               for (int i = 0; i < 10; i++) {
+//                   beeperTimes.set(i, beeperTimes.get(i).multiply(scale).divide(new BigDecimal(2), 6, RoundingMode.HALF_UP));
+//               }
+//
+//
+//               scheme = "1:";
+//
+//               for (int i = 0; i < 10; i++) {
+//                   scheme += "on," + beeperTimes.get(i).intValue() + ";off," + beeperTimes.get(i).intValue() + ";";
+//               }
+//               scheme += "on,1000;off,0";
+//           }
+//
+//
+//       }
 
 
 }
