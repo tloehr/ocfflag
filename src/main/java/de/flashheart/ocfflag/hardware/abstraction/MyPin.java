@@ -1,7 +1,10 @@
 package de.flashheart.ocfflag.hardware.abstraction;
 
 import com.pi4j.gpio.extension.mcp.MCP23017GpioProvider;
-import com.pi4j.io.gpio.*;
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioPinDigitalOutput;
+import com.pi4j.io.gpio.Pin;
+import com.pi4j.io.gpio.PinState;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.MyLED;
 import org.apache.log4j.Logger;
@@ -23,24 +26,27 @@ public class MyPin {
     private MidiChannel[] channels;
 
 
-    public MyPin(GpioController gpio, GpioProvider gpioprovider, Pin pin, MyLED guiControlLED, String name) {
-        this(gpio, gpioprovider, pin, guiControlLED, name, -1, -1);
+    public MyPin(GpioController gpio, String name, MyLED guiControlLED) {
+        this(gpio, name, guiControlLED, -1, -1);
     }
 
-    public MyPin(GpioController gpio, GpioProvider gpioprovider, Pin pin, MyLED guiControlLED, String name, int instrument, int note) {
-        this(gpio == null ? null : gpio.provisionDigitalOutputPin(gpioprovider, pin, PinState.LOW), guiControlLED, name, instrument, note);
-    }
-
-    private MyPin(GpioPinDigitalOutput outputPin, MyLED guiControlLED, String name, int instrument, int note) {
+    public MyPin(GpioController gpio, String name, MyLED guiControlLED, int instrument, int note) {
         this.name = name;
         this.guiControlLED = guiControlLED;
-        this.outputPin = outputPin;
-        if (outputPin != null) outputPin.setState(PinState.LOW);
         this.note = note;
 
-        // Die Tonerzeugung ist nur zum Testen auf normalen Rechnern
-        // und nicht auf dem RASPI. Da muss keine Rechenzeit verschwendet werden.
-        if (Main.getGPIO() == null) {
+        if (gpio != null) {
+            Pin pin = (Pin) Main.getApplicationContext().get(Main.getConfigs().get("name"));
+            if (pin.getProvider().equalsIgnoreCase(MCP23017GpioProvider.NAME)) {
+                this.outputPin = gpio.provisionDigitalOutputPin((MCP23017GpioProvider) Main.getApplicationContext().get("mcp23017_1"), pin, PinState.LOW);
+            } else {
+                this.outputPin = gpio.provisionDigitalOutputPin(pin, PinState.LOW);
+            }
+            if (outputPin != null) outputPin.setState(PinState.LOW);
+        } else {
+            this.outputPin = null;
+            // Die Tonerzeugung ist nur zum Testen auf normalen Rechnern
+            // und nicht auf dem RASPI. Da muss keine Rechenzeit verschwendet werden.
             try {
                 if (instrument > 0) {
                     synthesizer = MidiSystem.getSynthesizer();
@@ -53,14 +59,6 @@ public class MyPin {
                 synthesizer = null;
             }
         }
-    }
-
-//    public MyPin(GpioController gpio, Pin pin, MyLED guiControlLED, String name) {
-//        this(gpio, pin, guiControlLED, name, -1, -1);
-//    }
-
-    public MyPin(GpioController gpio, Pin pin, MyLED guiControlLED, String name, int instrument, int note) {
-        this(gpio == null ? null : gpio.provisionDigitalOutputPin(pin, PinState.LOW), guiControlLED, name, instrument, note);
     }
 
     public String getName() {

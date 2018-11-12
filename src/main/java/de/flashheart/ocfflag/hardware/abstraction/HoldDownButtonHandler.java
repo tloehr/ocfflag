@@ -4,6 +4,7 @@ import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;
 
 import javax.swing.*;
@@ -32,6 +33,7 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
 
     private String scheme = "1:on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,2000;off,0";
     private int beeptime_ms = 50;
+    private boolean enabled = true;
 
     public HoldDownButtonHandler(long reactiontime, ActionListener actionListener, Object source, JProgressBar pb) {
         this.reactiontime = reactiontime;
@@ -47,18 +49,26 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
             }
             scheme += "on,1000;off,0";
             if (pb != null) pb.setValue(0);
-//            pb.setString(reactiontime / 1000 + " sec");
         }
     }
+
+    public boolean isEnabled() {
+           return enabled;
+       }
+
+       public void setEnabled(boolean enabled) {
+           this.enabled = enabled;
+       }
 
 
     public void buttonPressed() {
         if (!Main.getGame().isGameRunning()) return;
-
+        if (!enabled) return;
+        
         getLogger().debug("holding down button");
         mouseDown = true;
         holding = System.currentTimeMillis();
-        if (reactiontime > 0) Main.getPinHandler().setScheme(Main.PH_SIREN_HOLDDOWN_BUZZER, scheme);
+        if (reactiontime > 0) Main.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, scheme);
         initThread();
     }
 
@@ -66,9 +76,8 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
     public void buttonReleased() {
         if (!Main.getGame().isGameRunning()) return;
 
-
         getLogger().debug("button released");
-        if (reactiontime > 0) Main.getPinHandler().off(Main.PH_SIREN_HOLDDOWN_BUZZER);
+        if (reactiontime > 0) Main.getPinHandler().off(Configs.OUT_HOLDDOWN_BUZZER);
         holding = 0l;
         if (pb != null) pb.setValue(0);
         reactedupon = false;

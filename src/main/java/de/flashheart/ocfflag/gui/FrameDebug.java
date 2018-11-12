@@ -184,24 +184,24 @@ public class FrameDebug extends JFrame {
 
         Main.getPinHandler().off();
 
-        Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_LED_GREEN, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_LED_WHITE, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_LED_WHITE, "5:on,1000;off,1000");
 
-        Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_SIREN_START_STOP, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Main.PH_SIREN_HOLDDOWN_BUZZER, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_SIREN_COLOR_CHANGE, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, "5:on,1000;off,1000");
 
-//        Main.getPinHandler().setScheme(Main.PH_RESERVE01, "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme(Main.PH_RESERVE02, "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme(Main.PH_RESERVE06, "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme(Main.PH_RESERVE07, "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme(Main.PH_RESERVE08, "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme(Main.PH_RESERVE09, "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme(Main.PH_RESERVE10, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Configs.OUT_RESERVE01, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Configs.OUT_RESERVE02, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Configs.OUT_RESERVE06, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Configs.OUT_RESERVE07, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Configs.OUT_RESERVE08, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Configs.OUT_RESERVE09, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Configs.OUT_RESERVE10, "5:on,1000;off,1000");
 
 
     }
@@ -211,7 +211,7 @@ public class FrameDebug extends JFrame {
 //                new RGBScheduleElement(Color.BLUE, 500l) +
 //                new RGBScheduleElement(Color.BLACK, 500l);
 //        logger.debug(pregamePoleColorScheme);
-//        Main.getPinHandler().setScheme(Main.PH_POLE, "Flagge", pregamePoleColorScheme);
+//        Main.getPinHandler().setScheme(Configs.OUT_POLE, "Flagge", pregamePoleColorScheme);
     }
 
     private void txtResturlFocusLost(FocusEvent e) {
@@ -242,11 +242,11 @@ public class FrameDebug extends JFrame {
     }
 
     private void btnTestStartStopActionPerformed(ActionEvent e) {
-        Main.getPinHandler().setScheme(Main.PH_SIREN_START_STOP, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
+        Main.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
     }
 
     private void btnTestColChangeActionPerformed(ActionEvent e) {
-        Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
+        Main.getPinHandler().setScheme(Configs.OUT_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
     }
 
     private void txtColChangeSirenFocusLost(FocusEvent e) {
@@ -258,9 +258,9 @@ public class FrameDebug extends JFrame {
     }
 
     private void btnStopAllSirensActionPerformed(ActionEvent e) {
-        Main.getPinHandler().off(Main.PH_SIREN_COLOR_CHANGE);
-        Main.getPinHandler().off(Main.PH_SIREN_START_STOP);
-        Main.getPinHandler().off(Main.PH_SIREN_HOLDDOWN_BUZZER);
+        Main.getPinHandler().off(Configs.OUT_SIREN_COLOR_CHANGE);
+        Main.getPinHandler().off(Configs.OUT_SIREN_START_STOP);
+        Main.getPinHandler().off(Configs.OUT_HOLDDOWN_BUZZER);
     }
 
 

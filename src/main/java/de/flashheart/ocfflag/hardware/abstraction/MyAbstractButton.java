@@ -23,6 +23,7 @@ public class MyAbstractButton implements HasLogger {
     private final GpioPinDigitalInput hardwareButton;
     private final JButton guiButton;
     private HoldDownMouseAdapter holdDownMouseAdapter;
+    private HoldDownButtonHandler holdDownButtonHandler;
 
     public MyAbstractButton(GpioController gpio, Pin pin, long reactiontime) {
         this(gpio, pin, null, reactiontime, null);
@@ -35,7 +36,7 @@ public class MyAbstractButton implements HasLogger {
     public MyAbstractButton(GpioController gpio, Pin pin, JButton guiButton, long reactiontime, JProgressBar pb) {
         this.reactiontime = reactiontime;
         this.pb = pb;
-        this.actionListener = actionListener;
+//        this.actionListener = actionListener;
         hardwareButton = gpio == null ? null : gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
         if (hardwareButton != null) hardwareButton.setDebounce(DEBOUNCE);
         this.guiButton = guiButton;
@@ -53,6 +54,7 @@ public class MyAbstractButton implements HasLogger {
 
     public void setEnabled(boolean enabled) {
         if (holdDownMouseAdapter != null) holdDownMouseAdapter.setEnabled(enabled);
+        if (holdDownButtonHandler != null) holdDownButtonHandler.setEnabled(enabled);
         if (guiButton != null) guiButton.setEnabled(enabled);
     }
 
@@ -78,18 +80,20 @@ public class MyAbstractButton implements HasLogger {
                     actionListener.actionPerformed(new ActionEvent(this, 1, "action!"));
                 });
             } else {
-                hardwareButton.addListener(new HoldDownButtonHandler(reactiontime, actionListener, guiButton, pb));
+                if (holdDownButtonHandler == null)
+                    holdDownButtonHandler = new HoldDownButtonHandler(reactiontime, actionListener, guiButton, pb);
+                hardwareButton.addListener(holdDownButtonHandler);
             }
         }
     }
 
-
-    public boolean isLow() {
-        return hardwareButton != null ? hardwareButton.isLow() : false;
-    }
-
-    public boolean isHigh() {
-        return hardwareButton != null ? hardwareButton.isHigh() : false;
-    }
+//
+//    public boolean isLow() {
+//        return hardwareButton != null ? hardwareButton.isLow() : false;
+//    }
+//
+//    public boolean isHigh() {
+//        return hardwareButton != null ? hardwareButton.isHigh() : false;
+//    }
 
 }

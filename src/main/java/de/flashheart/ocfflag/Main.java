@@ -39,23 +39,12 @@ public class Main {
     private static Logger logger;
     private static Level logLevel = Level.DEBUG;
 
-    public static final String PH_POLE = "flagPole";
+//    public static final String PH_POLE = "flagPole";
+//
+//    public static final String PH_SIREN_COLOR_CHANGE = "colorchangesiren";
+//    public static final String PH_SIREN_START_STOP = "startstopsiren";
+//    public static final String PH_SIREN_HOLDDOWN_BUZZER = "holddownbuzzer";
 
-    public static final String PH_LED_RED_BTN = "ledRedButton";
-    public static final String PH_LED_BLUE_BTN = "ledBlueButton";
-    public static final String PH_LED_GREEN_BTN = "ledGreenButton";
-    public static final String PH_LED_YELLOW_BTN = "ledYellowButton";
-    public static final String PH_LED_GREEN = "ledGreen";
-    public static final String PH_LED_WHITE = "ledWhite";
-    public static final String PH_SIREN_COLOR_CHANGE = "colorchangesiren";
-    public static final String PH_SIREN_START_STOP = "startstopsiren";
-    public static final String PH_SIREN_HOLDDOWN_BUZZER = "holddownbuzzer";
-
-    public static final String KEY_FLAG_WHITE = "flag_white";
-    public static final String KEY_FLAG_RED = "flag_red";
-    public static final String KEY_FLAG_BLUE = "flag_blue";
-    public static final String KEY_FLAG_GREEN = "flag_green";
-    public static final String KEY_FLAG_YELLOW = "flag_yellow";
 
     private static final int MCP23017_1 = Integer.decode("0x20");//0x20;
     // GPIO_08 und GPIO_09 NICHT verwenden. Sind die I2C Ports
@@ -99,35 +88,33 @@ public class Main {
     /* J1 External Box */ private static final Pin MF14 = MCP23017Pin.GPIO_A5;
     /* J1 External Box */ private static final Pin MF15 = MCP23017Pin.GPIO_A6;
     /* on mainboard */ private static final Pin MF16 = MCP23017Pin.GPIO_A7;
-
-    private static HashMap<String, Pin> mapPins;
-
-    private static final Pin LED_RED_BUTTON = MF01;
-    private static final Pin LED_BLUE_BUTTON = MF02;
-    private static final Pin LED_GREEN_BUTTON = MF04;
-    private static final Pin LED_YELLOW_BUTTON = MF05;
-    private static final Pin LED_WHITE_STATUS = MF06;
-    private static final Pin LED_GREEN_STATUS = MF03;
+//
+//    private static final Pin LED_RED_BUTTON = MF01;
+//    private static final Pin LED_BLUE_BUTTON = MF02;
+//    private static final Pin LED_GREEN_BUTTON = MF04;
+//    private static final Pin LED_YELLOW_BUTTON = MF05;
+//    private static final Pin LED_WHITE_STATUS = MF06;
+//    private static final Pin LED_GREEN_STATUS = MF03;
+//    // zusätzlich zur RGB Flagge
+//    private static final Pin LED_FLAG_WHITE = MF08;
+//    private static final Pin LED_FLAG_RED = MF09;
+//    private static final Pin LED_FLAG_BLUE = MF10;
+//    private static final Pin LED_FLAG_GREEN = MF11;
+//    private static final Pin LED_FLAG_YELLOW = MF12;
 
     private static final Pin SIREN_START_STOP = RLY01;
     private static final Pin SIREN_COLOR_CHANGE = RLY02;
-    private static final Pin SIREN_HOLDOWN_BUZZER = MF15; //MCP23017
+    private static final Pin SIREN_HOLDOWN_BUZZER = MF15;
 
 
     // Rechte Seite des JP8 Headers
     // RGB Flagge, das muss direkt auf den Raspi gelegt werden, nicht über den MCP23017,
     // sonst funktioniert das PWM nicht.
     // RJ45
+    // ist hardgecoded. Kann nicht verändert werden.
     /* rgb-red   */ private static final Pin POLE_RGB_RED = RaspiPin.GPIO_01;
     /* rgb-green */ private static final Pin POLE_RGB_GREEN = RaspiPin.GPIO_04;
     /* rgb-blue  */ private static final Pin POLE_RGB_BLUE = RaspiPin.GPIO_05;
-
-    // zusätzlich zur RGB Flagge
-    private static final Pin LED_FLAG_WHITE = MF08;
-    private static final Pin LED_FLAG_RED = MF09;
-    private static final Pin LED_FLAG_BLUE = MF10;
-    private static final Pin LED_FLAG_GREEN = MF11;
-    private static final Pin LED_FLAG_YELLOW = MF12;
 
     private static MCP23017GpioProvider mcp23017_1 = null;
 
@@ -160,6 +147,10 @@ public class Main {
 
     public static MessageProcessor getMessageProcessor() {
         return messageProcessor;
+    }
+
+    public static HashMap<String, Object> getApplicationContext() {
+        return applicationContext;
     }
 
     public static void main(String[] args) throws Exception {
@@ -198,6 +189,8 @@ public class Main {
         applicationContext.put(display_green.getName(), display_green);
         applicationContext.put(display_yellow.getName(), display_yellow);
 
+        applicationContext.put("mcp23017_1", mcp23017_1);
+
 
         button_red = new MyAbstractButton(GPIO, Configs.BUTTON_RED, frameDebug.getBtnRed(), REACTION_TIME, getFrameDebug().getPbRed());
         button_blue = new MyAbstractButton(GPIO, Configs.BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, getFrameDebug().getPbBlue());
@@ -212,23 +205,23 @@ public class Main {
         button_saveNquit = new MyAbstractButton(null, null, frameDebug.getBtnSaveAndQuit());
         button_shutdown = new MyAbstractButton(GPIO, Configs.BUTTON_SHUTDOWN, null, 0, null);
 
-        pinHandler.add(new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), PH_POLE));
+        pinHandler.add(new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), Configs.OUT_RGB_FLAG));
 
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_RED_BUTTON, frameDebug.getLedRedButton(), PH_LED_RED_BTN));
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_BLUE_BUTTON, frameDebug.getLedBlueButton(), PH_LED_BLUE_BTN));
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_GREEN_BUTTON, frameDebug.getLedGreenButton(), PH_LED_GREEN_BTN));
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_YELLOW_BUTTON, frameDebug.getLedYellowButton(), PH_LED_YELLOW_BTN));
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_GREEN_STATUS, frameDebug.getLedStandbyActive(), PH_LED_GREEN));
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_WHITE_STATUS, frameDebug.getLedStatsSent(), PH_LED_WHITE));
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_FLAG_WHITE, frameDebug.getLedFlagWhite(), KEY_FLAG_WHITE));
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_FLAG_RED, frameDebug.getLedFlagRed(), KEY_FLAG_RED));
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_FLAG_BLUE, frameDebug.getLedFlagBlue(), KEY_FLAG_BLUE));
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_FLAG_GREEN, frameDebug.getLedFlagGreen(), KEY_FLAG_GREEN));
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, LED_FLAG_YELLOW, frameDebug.getLedFlagYellow(), KEY_FLAG_YELLOW));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_RED_BTN, frameDebug.getLedRedButton()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_BLUE_BTN, frameDebug.getLedBlueButton()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_YELLOW_BTN, frameDebug.getLedGreenButton()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_GREEN_BTN, frameDebug.getLedYellowButton()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_GREEN, frameDebug.getLedStandbyActive()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_WHITE, frameDebug.getLedStatsSent()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_FLAG_WHITE, frameDebug.getLedFlagWhite()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_FLAG_RED, frameDebug.getLedFlagRed()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_FLAG_BLUE, frameDebug.getLedFlagBlue()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_FLAG_GREEN, frameDebug.getLedFlagGreen()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_FLAG_YELLOW, frameDebug.getLedFlagYellow()));
 
-        pinHandler.add(new MyPin(GPIO, mcp23017_1, SIREN_HOLDOWN_BUZZER, null, PH_SIREN_HOLDDOWN_BUZZER, 70, 30));
-        pinHandler.add(new MyPin(GPIO, SIREN_COLOR_CHANGE, null, PH_SIREN_COLOR_CHANGE, 50, 90));
-        pinHandler.add(new MyPin(GPIO, SIREN_START_STOP, null, PH_SIREN_START_STOP, 70, 60));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_HOLDDOWN_BUZZER, null, 70, 30));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_SIREN_COLOR_CHANGE, null, 50, 90));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_SIREN_START_STOP, null, 70, 60));
 
 
         /**
@@ -276,7 +269,6 @@ public class Main {
      */
 
     private static void initBaseSystem(String[] args) throws InterruptedException, IOException {
-        mapPins = new HashMap<>();
 
         System.setProperty("logs", Tools.getWorkingPath());
         Logger.getRootLogger().setLevel(logLevel);
@@ -422,24 +414,26 @@ public class Main {
         SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
         SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);
 
-        mapPins.put("mf01", MF01);
-        mapPins.put("mf02", MF02);
-        mapPins.put("mf03", MF03);
-        mapPins.put("mf04", MF04);
-        mapPins.put("mf05", MF05);
-        mapPins.put("mf06", MF06);
-        mapPins.put("mf07", MF07);
-        mapPins.put("mf08", MF08);
-        mapPins.put("mf09", MF09);
-        mapPins.put("mf10", MF10);
-        mapPins.put("mf11", MF11);
-        mapPins.put("mf12", MF12);
-        mapPins.put("mf13", MF13);
-        mapPins.put("mf14", MF14);
-        mapPins.put("mf15", MF15);
-        mapPins.put("mf16", MF16);
-
-
+        applicationContext.put("mf01", MF01);
+        applicationContext.put("mf02", MF02);
+        applicationContext.put("mf03", MF03);
+        applicationContext.put("mf04", MF04);
+        applicationContext.put("mf05", MF05);
+        applicationContext.put("mf06", MF06);
+        applicationContext.put("mf07", MF07);
+        applicationContext.put("mf08", MF08);
+        applicationContext.put("mf09", MF09);
+        applicationContext.put("mf10", MF10);
+        applicationContext.put("mf11", MF11);
+        applicationContext.put("mf12", MF12);
+        applicationContext.put("mf13", MF13);
+        applicationContext.put("mf14", MF14);
+        applicationContext.put("mf15", MF15);
+        applicationContext.put("mf16", MF16);
+        applicationContext.put("rly01", RLY01);
+        applicationContext.put("rly02", RLY02);
+        applicationContext.put("rly03", RLY03);
+        applicationContext.put("rly04", RLY04);
     }
 
 //    public static int getMaxTeams() {

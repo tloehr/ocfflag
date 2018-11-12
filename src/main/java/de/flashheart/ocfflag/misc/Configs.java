@@ -1,7 +1,6 @@
 package de.flashheart.ocfflag.misc;
 
 import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.RaspiPin;
 import de.flashheart.ocfflag.Main;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -52,11 +51,11 @@ public class Configs {
 
     public static final String APPCONTEXT_NOGPIO = "appctx_nogpio";
 
-    public static final String FLAG_COLOR_WHITE = "flag_color_white";
-    public static final String FLAG_COLOR_BLUE = "flag_color_blue";
-    public static final String FLAG_COLOR_RED = "flag_color_red";
-    public static final String FLAG_COLOR_GREEN = "flag_color_green";
-    public static final String FLAG_COLOR_YELLOW = "flag_color_yellow";
+    public static final String FLAG_RGB_WHITE = "flag_rgb_white";
+    public static final String FLAG_RGB_BLUE = "flag_rgb_blue";
+    public static final String FLAG_RGB_RED = "flag_rgb_red";
+    public static final String FLAG_RGB_GREEN = "flag_rgb_green";
+    public static final String FLAG_RGB_YELLOW = "flag_rgb_yellow";
 
 
     // KEYS: Zuordnung zu den GPIOs
@@ -69,6 +68,28 @@ public class Configs {
     public static final String BUTTON_GREEN = "button_green";
     public static final String BUTTON_YELLOW = "button_yellow";
     public static final String BUTTON_SHUTDOWN = "button_shutdown";
+
+    // und zu den Mosfets
+    public static final String OUT_LED_RED_BTN = "ledRedButton";
+    public static final String OUT_LED_BLUE_BTN = "ledBlueButton";
+    public static final String OUT_LED_GREEN_BTN = "ledGreenButton";
+    public static final String OUT_LED_YELLOW_BTN = "ledYellowButton";
+    public static final String OUT_LED_GREEN = "ledGreen";
+    public static final String OUT_LED_WHITE = "ledWhite";
+    public static final String OUT_FLAG_WHITE = "flag_white";
+    public static final String OUT_FLAG_RED = "flag_red";
+    public static final String OUT_FLAG_BLUE = "flag_blue";
+    public static final String OUT_FLAG_GREEN = "flag_green";
+    public static final String OUT_FLAG_YELLOW = "flag_yellow";
+
+    public static final String OUT_SIREN_START_STOP = "siren_start_stop";
+    public static final String OUT_SIREN_COLOR_CHANGE = "siren_color_change";
+    public static final String OUT_HOLDDOWN_BUZZER  = "siren_holddown_buzzer";
+
+    public static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = "siren_to_announce_the_color_change";
+
+    // nur für die RGB Flagge als Key für den PinHandler. Habs hier hin gepackt, damit das einheitlich ist.
+    public static final String OUT_RGB_FLAG  = "rgbflag";
 
     public Configs() throws IOException {
         configs = new SortedProperties(); // Einstellungen, die verändert werden
@@ -98,9 +119,25 @@ public class Configs {
         configs.put(BUTTON_YELLOW, "GPIO 24");
         configs.put(BUTTON_SHUTDOWN, "GPIO 28");
 
+        configs.put(BUTTON_SHUTDOWN, "GPIO 28");
+
         // Alle anderen den MCP23017
 
+        configs.put(OUT_LED_RED_BTN, "mf01");
+        configs.put(OUT_LED_BLUE_BTN, "mf02");
+        configs.put(OUT_LED_GREEN_BTN, "mf04");
+        configs.put(OUT_LED_YELLOW_BTN, "mf05");
+        configs.put(OUT_LED_GREEN, "mf06");
+        configs.put(OUT_LED_WHITE, "mf03");
+        configs.put(OUT_FLAG_WHITE, "mf08");
+        configs.put(OUT_FLAG_RED, "mf09");
+        configs.put(OUT_FLAG_BLUE, "mf10");
+        configs.put(OUT_FLAG_GREEN, "mf11");
+        configs.put(OUT_FLAG_YELLOW, "mf12");
 
+        configs.put(OUT_SIREN_START_STOP, "rly01");
+        configs.put(OUT_SIREN_COLOR_CHANGE, "rly02");
+        configs.put(OUT_HOLDDOWN_BUZZER, "mf15");
 
         configs.put(REST_URL, "http://localhost:8090/rest/gamestate/create");
         configs.put(REST_AUTH, "Torsten:test1234");
@@ -123,11 +160,13 @@ public class Configs {
         configs.put(DISPLAY_YELLOW_I2C, "0x70");
         configs.put(DISPLAY_GREEN_I2C, "0x74");
 
-        configs.put(FLAG_COLOR_WHITE, "white");
-        configs.put(FLAG_COLOR_BLUE, "blue");
-        configs.put(FLAG_COLOR_GREEN, "green");
-        configs.put(FLAG_COLOR_RED, "red");
-        configs.put(FLAG_COLOR_YELLOW, "#ff8000");
+        configs.put(FLAG_RGB_WHITE, "white");
+        configs.put(FLAG_RGB_BLUE, "blue");
+        configs.put(FLAG_RGB_GREEN, "green");
+        configs.put(FLAG_RGB_RED, "red");
+        configs.put(FLAG_RGB_YELLOW, "#ff8000");
+
+        configs.put(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, OUT_SIREN_START_STOP); // to override the use of the color change siren. if we only have ONE siren to signal both events
 
         // configdatei einlesen
         loadConfigs();

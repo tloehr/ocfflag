@@ -1,6 +1,7 @@
 package de.flashheart.ocfflag.hardware.abstraction;
 
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;
 
 import javax.swing.*;
@@ -21,7 +22,6 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
     volatile private boolean reactedupon = false;
     volatile private long holding = 0l;
     private final long reactiontime;
-    //    private final Action action;
     private final ActionListener actionListener;
     private final Object source;
     private final JProgressBar pb;
@@ -46,8 +46,6 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
             scheme += "on,1000;off,0";
             pb.setValue(0);
             pb.setString(reactiontime/1000+" sec");
-//            pb.setMinimum(0);
-//            pb.setMaximum(new Long(reactiontime).intValue());
         }
 
         // zu beginn soll das beepen 250ms lang sein, und dann immer kürzer bis auf 50ms.
@@ -72,7 +70,7 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
             getLogger().debug("holding down button");
             mouseDown = true;
             holding = System.currentTimeMillis();
-            if (reactiontime > 0) Main.getPinHandler().setScheme(Main.PH_SIREN_HOLDDOWN_BUZZER, scheme);
+            if (reactiontime > 0) Main.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, scheme);
             initThread();
         }
     }
@@ -83,7 +81,7 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             getLogger().debug("button released");
-            if (reactiontime > 0) Main.getPinHandler().off(Main.PH_SIREN_HOLDDOWN_BUZZER);
+            if (reactiontime > 0) Main.getPinHandler().off(Configs.OUT_HOLDDOWN_BUZZER);
             holding = 0l;
             pb.setValue(0);
             reactedupon = false;
@@ -126,33 +124,6 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
         }
     }
 
-//    private void initBeeperTimes() {
-//           if (reactiontime > 0) {
-//               beeperTimes = new ArrayList<>();
-//               BigDecimal sumTimes = BigDecimal.ZERO;
-//
-//               for (int i = 0; i < 10; i++) {
-//                   beeperTimes.add(new BigDecimal(500).multiply(BigDecimal.ONE.divide(new BigDecimal(i + 1), 4, RoundingMode.HALF_UP)));
-//                   sumTimes = sumTimes.add(beeperTimes.get(i));
-//               }
-//
-//               BigDecimal scale = new BigDecimal(reactiontime).divide(sumTimes, 4, RoundingMode.HALF_UP);
-//
-//               for (int i = 0; i < 10; i++) {
-//                   beeperTimes.set(i, beeperTimes.get(i).multiply(scale).divide(new BigDecimal(2), 6, RoundingMode.HALF_UP));
-//               }
-//
-//
-//               scheme = "1:";
-//
-//               for (int i = 0; i < 10; i++) {
-//                   scheme += "on," + beeperTimes.get(i).intValue() + ";off," + beeperTimes.get(i).intValue() + ";";
-//               }
-//               scheme += "on,1000;off,0";
-//           }
-//
-//
-//       }
 
 
 }
