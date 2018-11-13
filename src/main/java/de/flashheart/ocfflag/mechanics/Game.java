@@ -100,7 +100,7 @@ public class Game implements Runnable, HasLogger {
     private int preset_num_teams = 2; // Reihenfolge: red, blue, green, yellow
     private boolean CONFIG_PAGE = false;
     private boolean resetGame = false;
-    
+
     public Game(Display7Segments4Digits display_white,
                 Display7Segments4Digits display_red,
                 Display7Segments4Digits display_blue,
@@ -218,15 +218,14 @@ public class Game implements Runnable, HasLogger {
             getLogger().debug("GPIO_button_shutdown DOWN");
             Main.prepareShutdown();
             try {
-                String line = "nohup /bin/sh /home/pi/shutdown.sh &";
+                String line = Main.getConfigs().get(Configs.SHUTDOWN_COMMAND_LINE);
                 CommandLine commandLine = CommandLine.parse(line);
                 DefaultExecutor executor = new DefaultExecutor();
+                Main.prepareShutdown();
                 executor.setExitValue(1);
                 executor.execute(commandLine);
-                Thread.sleep(5000);
+//                Thread.sleep(5000);
             } catch (IOException e) {
-                getLogger().error(e);
-            } catch (InterruptedException e) {
                 getLogger().error(e);
             }
         });
@@ -558,30 +557,31 @@ public class Game implements Runnable, HasLogger {
                 button_switch_mode.setIcon(FrameDebug.IconPlay);
 
                 String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
-                        new RGBScheduleElement(Configs.FLAG_RGB_RED, 500l) + ";" +
-                        new RGBScheduleElement(Configs.FLAG_RGB_BLUE, 500l) + ";" +
-                        (preset_num_teams >= 3 ? new RGBScheduleElement(Configs.FLAG_RGB_GREEN, 500l) + ";" : "") +
-                        (preset_num_teams >= 4 ? new RGBScheduleElement(Configs.FLAG_RGB_YELLOW, 500l) + ";" : "") +
-                        new RGBScheduleElement(Color.BLACK, 1500l);
+                        new RGBScheduleElement(Configs.FLAG_RGB_WHITE, 350l) + ";" +
+                        new RGBScheduleElement(Configs.FLAG_RGB_RED, 350l) + ";" +
+                        new RGBScheduleElement(Configs.FLAG_RGB_BLUE, 350l) + ";" +
+                        (preset_num_teams >= 3 ? new RGBScheduleElement(Configs.FLAG_RGB_GREEN, 3500l) + ";" : "") +
+                        (preset_num_teams >= 4 ? new RGBScheduleElement(Configs.FLAG_RGB_YELLOW, 350l) + ";" : "") +
+                        new RGBScheduleElement(Color.BLACK, 3000l);
 
                 Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "Flagge", pregamePoleColorScheme);
 
 
                 if (preset_num_teams == 3) {
                     Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "∞:on,350;off,4050");
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "∞:off,350;on,350;off,3700");
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:off,700;on,350;off,3350");
+                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:off,350;on,350;off,3700");
+                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "∞:off,700;on,350;off,3350");
                     Main.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, "∞:off,1050;on,350;off,3000");
                 } else if (preset_num_teams == 4) {
                     Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "∞:on,350;off,4400");
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "∞:off,350;on,350;off,4050");
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:off,700;on,350;off,3700");
+                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:off,350;on,350;off,4050");
+                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "∞:off,700;on,350;off,3700");
                     Main.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, "∞:off,1050;on,350;off,3350");
                     Main.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, "∞:off,1400;on,350;off,3000");
                 } else {
                     Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "∞:on,350;off,3700");
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "∞:off,350;on,350;off,3350");
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:off,700;on,350;off,3000");
+                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:off,350;on,350;off,3350");
+                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "∞:off,700;on,350;off,3000");
                 }
 
 

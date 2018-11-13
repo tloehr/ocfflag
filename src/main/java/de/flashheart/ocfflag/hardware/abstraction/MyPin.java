@@ -7,6 +7,7 @@ import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.MyLED;
+import de.flashheart.ocfflag.misc.HasLogger;
 import org.apache.log4j.Logger;
 
 import javax.sound.midi.MidiChannel;
@@ -16,7 +17,7 @@ import javax.sound.midi.Synthesizer;
 /**
  * Created by tloehr on 07.06.15.
  */
-public class MyPin {
+public class MyPin implements HasLogger {
     private final Logger logger = Logger.getLogger(getClass());
     private final GpioPinDigitalOutput outputPin;
     private final String name;
@@ -36,8 +37,9 @@ public class MyPin {
         this.note = note;
 
         if (gpio != null) {
-            Pin pin = (Pin) Main.getApplicationContext().get(Main.getConfigs().get("name"));
-            if (pin.getProvider().equalsIgnoreCase(MCP23017GpioProvider.NAME)) {
+            Pin pin = (Pin) Main.getApplicationContext().get(Main.getConfigs().get(name));
+
+            if (pin.getProvider().equals(MCP23017GpioProvider.NAME)) {
                 this.outputPin = gpio.provisionDigitalOutputPin((MCP23017GpioProvider) Main.getApplicationContext().get("mcp23017_1"), pin, PinState.LOW);
             } else {
                 this.outputPin = gpio.provisionDigitalOutputPin(pin, PinState.LOW);
