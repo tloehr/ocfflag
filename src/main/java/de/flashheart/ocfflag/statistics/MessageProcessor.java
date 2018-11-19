@@ -1,5 +1,6 @@
 package de.flashheart.ocfflag.statistics;
 
+import de.flashheart.GameState;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.events.StatsSentEvent;
 import de.flashheart.ocfflag.gui.events.StatsSentListener;

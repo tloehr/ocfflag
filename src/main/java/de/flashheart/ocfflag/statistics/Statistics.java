@@ -1,5 +1,7 @@
 package de.flashheart.ocfflag.statistics;
 
+import de.flashheart.GameEvent;
+import de.flashheart.GameState;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;

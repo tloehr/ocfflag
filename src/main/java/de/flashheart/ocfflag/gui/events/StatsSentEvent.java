@@ -1,6 +1,7 @@
 package de.flashheart.ocfflag.gui.events;
 
-import de.flashheart.ocfflag.statistics.GameState;
+
+import de.flashheart.GameState;
 
 import java.util.EventObject;
 

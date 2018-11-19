@@ -1,5 +1,6 @@
 package de.flashheart.ocfflag.statistics;
 
+import de.flashheart.GameState;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;

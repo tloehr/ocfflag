@@ -108,6 +108,13 @@
             <artifactId>spring-boot-starter-data-rest</artifactId>
             <version>RELEASE</version>
         </dependency>
+        <!--local libs-->
+        <!-- mvn install:install-file -Dfile=/Users/tloehr/Documents/IdeaProjects/rlgutils/target/rlgutils-1.0.1-RELEASE.jar -DgroupId=de.flashheart -DartifactId=rlgutils -Dversion=1.0.1-RELEASE -Dpackaging=jar -->
+        <dependency>
+            <groupId>de.flashheart</groupId>
+            <artifactId>rlgutils</artifactId>
+            <version>1.0.1-RELEASE</version>
+        </dependency>
     </dependencies>
 
     <scm>

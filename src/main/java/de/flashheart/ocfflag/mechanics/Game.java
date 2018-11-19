@@ -1,5 +1,6 @@
 package de.flashheart.ocfflag.mechanics;
 
+import de.flashheart.GameEvent;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
@@ -12,7 +13,6 @@ import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
-import de.flashheart.ocfflag.statistics.GameEvent;
 import de.flashheart.ocfflag.statistics.GameStateService;
 import de.flashheart.ocfflag.statistics.Statistics;
 import org.apache.commons.exec.CommandLine;
@@ -44,14 +44,9 @@ public class Game implements Runnable, HasLogger {
     private final int SAVEPOINT_RESET = 2;
     private final int SAVEPOINT_CURRENT = 3;
 
-//    private final int[] SAVEPOINT_SELECTIONS = new int[]{SAVEPOINT_PREVIOUS, SAVEPOINT_CURRENT, SAVEPOINT_RESET};
-
-
     private final int MIN_TEAMS = 2;
 
     private int mode = MODE_CLOCK_PREGAME;
-//    private int running_match_id = 0;
-
     private String flag = GameEvent.FLAG_NEUTRAL;
 
     private final Display7Segments4Digits display_blue;
@@ -100,7 +95,7 @@ public class Game implements Runnable, HasLogger {
     private int preset_num_teams = 2; // Reihenfolge: red, blue, green, yellow
     private boolean CONFIG_PAGE = false;
     private boolean resetGame = false;
-    
+
     public Game(Display7Segments4Digits display_white,
                 Display7Segments4Digits display_red,
                 Display7Segments4Digits display_blue,
@@ -268,11 +263,6 @@ public class Game implements Runnable, HasLogger {
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (!flag.equals(GameEvent.RED_ACTIVATED)) {
 
-                button_blue.setEnabled(true);
-                button_red.setEnabled(false);
-                button_green.setEnabled(preset_num_teams >= 3);
-                button_yellow.setEnabled(preset_num_teams >= 4);
-
                 lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.RED_ACTIVATED;
                 Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
@@ -296,11 +286,6 @@ public class Game implements Runnable, HasLogger {
 
             if (!flag.equals(GameEvent.BLUE_ACTIVATED)) {
 
-                button_blue.setEnabled(false);
-                button_red.setEnabled(true);
-                button_green.setEnabled(preset_num_teams >= 3);
-                button_yellow.setEnabled(preset_num_teams >= 4);
-
                 lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.BLUE_ACTIVATED;
                 Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
@@ -323,11 +308,6 @@ public class Game implements Runnable, HasLogger {
         }
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (!flag.equals(GameEvent.GREEN_ACTIVATED)) {
-
-                button_blue.setEnabled(true);
-                button_red.setEnabled(true);
-                button_green.setEnabled(false);
-                button_yellow.setEnabled(preset_num_teams >= 4);
 
                 lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.GREEN_ACTIVATED;
@@ -353,11 +333,6 @@ public class Game implements Runnable, HasLogger {
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (!flag.equals(GameEvent.YELLOW_ACTIVATED)) {
 
-                button_blue.setEnabled(true);
-                button_red.setEnabled(true);
-                button_green.setEnabled(true);
-                button_yellow.setEnabled(false);
-
                 lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.YELLOW_ACTIVATED;
                 Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
@@ -376,6 +351,7 @@ public class Game implements Runnable, HasLogger {
         if (CONFIG_PAGE) return;
 
 
+        // hier wird auch ein evtl. UNDO direkt abgearbeitet
         if (mode == MODE_CLOCK_GAME_PAUSED) {
             getLogger().info("IN PAUSE MODE - Trying to UNDO");
 
@@ -413,11 +389,6 @@ public class Game implements Runnable, HasLogger {
             time_yellow = savePoint.getTime_yellow();
             setDisplayToEvent();
         }
-
-//        if (mode == MODE_CLOCK_PREGAME) {
-//            Main.getMessageProcessor().toggleFtpDisabled();
-//            setDisplayToEvent();
-//        }
 
 
     }
@@ -584,17 +555,11 @@ public class Game implements Runnable, HasLogger {
                     Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:off,700;on,350;off,3000");
                 }
 
-
             }
 
             if (mode == MODE_CLOCK_PREGAME) {
                 getLogger().debug("PREGAME");
                 getLogger().debug("preset_num_teams " + preset_num_teams);
-
-                button_blue.setEnabled(true);
-                button_red.setEnabled(true);
-                button_green.setEnabled(preset_num_teams >= 3);
-                button_yellow.setEnabled(preset_num_teams >= 4);
 
                 if (preset_num_teams < 3) display_green.clear();
                 if (preset_num_teams < 4) display_yellow.clear();
@@ -620,24 +585,13 @@ public class Game implements Runnable, HasLogger {
 
                 Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN, null, "∞:on,1000;off,1000");
 
-//                if (Main.getMessageProcessor().isFTPworking())
-//                    Main.getPinHandler().setScheme(Configs.OUT_LED_WHITE, null, "∞:on,1000;off,1000");
-//                else Main.getPinHandler().off(Configs.OUT_LED_WHITE);
-
-
             }
 
             if (mode == MODE_CLOCK_GAME_PAUSED) {
                 getLogger().debug("PAUSED");
                 display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                 Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN, null, "∞:on,500;off,500");
-//
-//                if (Main.getMessageProcessor().isFTPworking())
-//                    Main.getPinHandler().setScheme(Configs.OUT_LED_WHITE, null, "∞:on,500;off,500");
-//                else Main.getPinHandler().off(Configs.OUT_LED_WHITE);
-
                 setColorsAndBlinkingSchemeAccordingToGameSituation();
-
             }
 
             if (mode == MODE_CLOCK_GAME_RUNNING) {
@@ -744,6 +698,12 @@ public class Game implements Runnable, HasLogger {
 
             Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
             Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+
+            button_blue.setEnabled(true);
+            button_red.setEnabled(true);
+            button_green.setEnabled(preset_num_teams >= 3);
+            button_yellow.setEnabled(preset_num_teams >= 4);
+
         } else if (flag.equals(GameEvent.RED_ACTIVATED)) {
             getLogger().info("Flag is red");
             Main.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "∞:on,500;off,500");
@@ -755,6 +715,12 @@ public class Game implements Runnable, HasLogger {
             display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
             Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "RED ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
             Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+
+            button_blue.setEnabled(true);
+            button_red.setEnabled(false);
+            button_green.setEnabled(preset_num_teams >= 3);
+            button_yellow.setEnabled(preset_num_teams >= 4);
+
         } else if (flag.equals(GameEvent.BLUE_ACTIVATED)) {
             getLogger().info("Flag is blue");
             Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,500;off,500");
@@ -766,6 +732,12 @@ public class Game implements Runnable, HasLogger {
             display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
             Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "BLUE ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
             Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+
+            button_blue.setEnabled(false);
+            button_red.setEnabled(true);
+            button_green.setEnabled(preset_num_teams >= 3);
+            button_yellow.setEnabled(preset_num_teams >= 4);
+
         } else if (flag.equals(GameEvent.GREEN_ACTIVATED)) {
             getLogger().info("Flag is green");
             Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,500;off,500");
@@ -776,6 +748,12 @@ public class Game implements Runnable, HasLogger {
             display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
             Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "GREEN ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
             Main.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+
+            button_blue.setEnabled(true);
+            button_red.setEnabled(true);
+            button_green.setEnabled(false);
+            button_yellow.setEnabled(preset_num_teams >= 4);
+
         } else if (flag.equals(GameEvent.YELLOW_ACTIVATED)) {
             getLogger().info("Flag is yellow");
             Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,500;off,500");
@@ -786,6 +764,12 @@ public class Game implements Runnable, HasLogger {
             Color myyellow = Tools.getColor(Main.getConfigs().get(Configs.FLAG_RGB_YELLOW));
             Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "YELLOW ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(myyellow, remaining));
             Main.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+
+            button_blue.setEnabled(true);
+            button_red.setEnabled(true);
+            button_green.setEnabled(true);
+            button_yellow.setEnabled(false);
+            
         }
     }
 
