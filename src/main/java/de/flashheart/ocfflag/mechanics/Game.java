@@ -720,6 +720,7 @@ public class Game implements Runnable, HasLogger {
             button_red.setEnabled(false);
             button_green.setEnabled(preset_num_teams >= 3);
             button_yellow.setEnabled(preset_num_teams >= 4);
+            
 
         } else if (flag.equals(GameEvent.BLUE_ACTIVATED)) {
             getLogger().info("Flag is blue");
