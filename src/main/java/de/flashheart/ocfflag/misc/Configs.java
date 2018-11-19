@@ -11,6 +11,7 @@ import java.util.Properties;
 import java.util.UUID;
 
 public class Configs {
+    public static final String SHUTDOWN_COMMAND_LINE ="shutdown_cmd_line";
     private final SortedProperties configs;
     private final Properties applicationContext;
     private final Logger logger = Logger.getLogger(getClass());
@@ -117,9 +118,7 @@ public class Configs {
         configs.put(BUTTON_BLUE, "GPIO 22");
         configs.put(BUTTON_GREEN, "GPIO 23");
         configs.put(BUTTON_YELLOW, "GPIO 24");
-        configs.put(BUTTON_SHUTDOWN, "GPIO 28");
-
-        configs.put(BUTTON_SHUTDOWN, "GPIO 28");
+        configs.put(BUTTON_SHUTDOWN, "GPIO 25"); // Bei RASPI2 muss es der GPIO25 sein, beim RASPI3 der GPIO28. Sehr seltsam.
 
         // Alle anderen den MCP23017
 
@@ -165,6 +164,7 @@ public class Configs {
         configs.put(FLAG_RGB_GREEN, "green");
         configs.put(FLAG_RGB_RED, "red");
         configs.put(FLAG_RGB_YELLOW, "#ff8000");
+        configs.put(SHUTDOWN_COMMAND_LINE, "sudo nohup /bin/sh /home/pi/ocfflag/shutdown.sh &");
 
         configs.put(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, OUT_SIREN_START_STOP); // to override the use of the color change siren. if we only have ONE siren to signal both events
 

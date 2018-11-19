@@ -379,8 +379,8 @@ public class Main {
                 display_white.clear();
                 display_blue.clear();
                 display_red.clear();
-//                if (display_green != null) display_green.clear();
-//                if (display_yellow != null) display_yellow.clear();
+                if (display_green != null) display_green.clear();
+                if (display_yellow != null) display_yellow.clear();
             } catch (IOException e) {
                 logger.error(e);
             }
