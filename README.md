@@ -12,4 +12,5 @@ In it's current state the system implements a centerflag / chessclock style for 
 
 And in hardware:
 
-![OCFFlag-Screenshot](https://www.flashheart.de/lib/exe/fetch.php/de:rlg:ocf20:ocfflag-01.png)
+![OCFFlag-Screenshot2](https://www.flashheart.de/lib/exe/fetch.php/de:rlg:ocf20:ocfflag-01.png)
+
