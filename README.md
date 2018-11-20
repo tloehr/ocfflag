@@ -9,3 +9,7 @@ It runs on every machine with a JDK. On a raspi it activates the ports so that b
 In it's current state the system implements a centerflag / chessclock style for paintball or airsoft matches.
 
 ![OCFFlag-Screenshot](https://www.flashheart.de/lib/exe/fetch.php/de:blog:ocfflag-121-154.png)
+
+And in hardware:
+
+![OCFFlag-Screenshot](https://www.flashheart.de/lib/exe/fetch.php/de:rlg:ocf20:ocfflag-01.png| width=200)
