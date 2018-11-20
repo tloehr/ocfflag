@@ -1,4 +1,4 @@
-# ocfflag
+# ocfflag / actioncase
 
 OCF-Flag is a software to run the new OCF-Flag 2.0 paintball gaming system.
 
