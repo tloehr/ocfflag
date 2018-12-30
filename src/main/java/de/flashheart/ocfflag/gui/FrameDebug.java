@@ -8,6 +8,7 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
+import de.flashheart.ocfflag.hardware.abstraction.MyPin;
 import de.flashheart.ocfflag.hardware.pinhandler.PinBlinkModel;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
@@ -126,6 +127,7 @@ public class FrameDebug extends JFrame {
 
     private void mainPanelStateChanged(ChangeEvent e) {
         if (mainPanel.getSelectedIndex() == 1) {
+            Main.getPinHandler().off();
             setConfigsToScreen();
         } else {
             btnSwitchMode.requestFocus(); // nur damit die FocusLost ziehen von der Configseite. Ansonsten sinnlos.
@@ -189,16 +191,33 @@ public class FrameDebug extends JFrame {
 
         Main.getPinHandler().off();
 
+
+
         Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "5:on,1000;off,1000");
         Main.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "5:on,1000;off,1000");
         Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "5:on,1000;off,1000");
         Main.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "5:on,1000;off,1000");
+
         Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN, "5:on,1000;off,1000");
         Main.getPinHandler().setScheme(Configs.OUT_LED_WHITE, "5:on,1000;off,1000");
+
+        Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "5:on,1000;off,1000");
 
         Main.getPinHandler().setScheme(Configs.OUT_SIREN_COLOR_CHANGE, "5:on,1000;off,1000");
         Main.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, "5:on,1000;off,1000");
         Main.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, "5:on,1000;off,1000");
+
+        Main.getPinHandler().setScheme(Configs.OUT_MF07, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_MF13, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_MF14, "5:on,1000;off,1000");
+        Main.getPinHandler().setScheme(Configs.OUT_MF16, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme("mf13", "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme("mf14", "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme("mf16", "5:on,1000;off,1000");
 
     }
 

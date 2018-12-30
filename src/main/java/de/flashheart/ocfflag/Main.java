@@ -224,6 +224,16 @@ public class Main {
         pinHandler.add(new MyPin(GPIO, Configs.OUT_SIREN_START_STOP, null, 70, 60));
 
 
+        // for test reasons only
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_MF07, null));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_MF13, null));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_MF14, null));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_MF16, null));
+//        pinHandler.add(new MyPin(GPIO, "mf13", null));
+//        pinHandler.add(new MyPin(GPIO, "mf14", null));
+//        pinHandler.add(new MyPin(GPIO, "mf16", null));
+
+
         /**
          * TEST ROUTINE START
 

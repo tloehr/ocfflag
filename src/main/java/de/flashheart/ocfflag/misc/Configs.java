@@ -59,7 +59,7 @@ public class Configs {
     public static final String FLAG_RGB_YELLOW = "flag_rgb_yellow";
 
 
-    // KEYS: Zuordnung zu den GPIOs
+    // Buttons: Zuordnung zu den GPIOs
     public static final String BUTTON_STANDBY_ACTIVE = "button_standby_active";
     public static final String BUTTON_PRESET_NUM_TEAMS = "button_preset_num_teams";
     public static final String BUTTON_PRESET_GAMETIME = "button_preset_gametime";
@@ -86,6 +86,20 @@ public class Configs {
     public static final String OUT_SIREN_START_STOP = "siren_start_stop";
     public static final String OUT_SIREN_COLOR_CHANGE = "siren_color_change";
     public static final String OUT_HOLDDOWN_BUZZER  = "siren_holddown_buzzer";
+
+    // Test reasons
+    public static final String OUT_MF07  = "out_mf07";
+    public static final String OUT_MF13  = "out_mf13";
+    public static final String OUT_MF14  = "out_mf14";
+    public static final String OUT_MF16  = "out_mf16";
+
+
+
+    //        Main.getPinHandler().setScheme("mf07", "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme("mf13", "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme("mf14", "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme("mf16", "5:on,1000;off,1000");
+
 
     public static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = "siren_to_announce_the_color_change";
 
@@ -137,6 +151,12 @@ public class Configs {
         configs.put(OUT_SIREN_START_STOP, "rly01");
         configs.put(OUT_SIREN_COLOR_CHANGE, "rly02");
         configs.put(OUT_HOLDDOWN_BUZZER, "mf15");
+
+        // TEST REASONS
+        configs.put(OUT_MF07, "mf07");
+        configs.put(OUT_MF13, "mf13");
+        configs.put(OUT_MF14, "mf14");
+        configs.put(OUT_MF16, "mf16");
 
         configs.put(REST_URL, "http://localhost:8090/rest/gamestate/create");
         configs.put(REST_AUTH, "Torsten:test1234");
