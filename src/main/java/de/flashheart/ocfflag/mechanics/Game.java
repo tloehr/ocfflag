@@ -531,7 +531,7 @@ public class Game implements Runnable, HasLogger {
                         new RGBScheduleElement(Configs.FLAG_RGB_WHITE, 350l) + ";" +
                         new RGBScheduleElement(Configs.FLAG_RGB_RED, 350l) + ";" +
                         new RGBScheduleElement(Configs.FLAG_RGB_BLUE, 350l) + ";" +
-                        (preset_num_teams >= 3 ? new RGBScheduleElement(Configs.FLAG_RGB_GREEN, 3500l) + ";" : "") +
+                        (preset_num_teams >= 3 ? new RGBScheduleElement(Configs.FLAG_RGB_GREEN, 350l) + ";" : "") +
                         (preset_num_teams >= 4 ? new RGBScheduleElement(Configs.FLAG_RGB_YELLOW, 350l) + ";" : "") +
                         new RGBScheduleElement(Color.BLACK, 3000l);
 

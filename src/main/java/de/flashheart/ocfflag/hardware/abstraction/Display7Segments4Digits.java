@@ -140,10 +140,15 @@ public class Display7Segments4Digits implements HasLogger {
     public void setText(String text) throws IOException {
         if (text.length() != 4) throw new IOException("this is display has exactly 4 digits. string has wrong size.");
 
-        colon = !colon;
+        colon = false;
 
-        if (lblSegment != null)
+        if (lblSegment != null) {
             lblSegment.setText(StringUtils.left(text, 2) + (colon ? ":" : " ") + StringUtils.right(text, 2));
+        }
+
+        if (btnSegment != null) {
+            btnSegment.setText(StringUtils.left(text, 2) + (colon ? ":" : " ") + StringUtils.right(text, 2));
+        }
         if (segment != null) fullDisplay(text.split(""));
     }
 

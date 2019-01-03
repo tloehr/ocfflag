@@ -39,29 +39,8 @@ public class Main {
     private static Logger logger;
     private static Level logLevel = Level.DEBUG;
 
-//    public static final String PH_POLE = "flagPole";
-//
-//    public static final String PH_SIREN_COLOR_CHANGE = "colorchangesiren";
-//    public static final String PH_SIREN_START_STOP = "startstopsiren";
-//    public static final String PH_SIREN_HOLDDOWN_BUZZER = "holddownbuzzer";
-
-
     private static final int MCP23017_1 = Integer.decode("0x20");//0x20;
     // GPIO_08 und GPIO_09 NICHT verwenden. Sind die I2C Ports
-
-    // Linke Seite des JP8 Header
-
-
-    // J1 External Box und P1 Display Port
-//    /* btn01, P1 Display Port */ private static final Pin BUTTON_STANDBY_ACTIVE = RaspiPin.GPIO_03;
-//    /* btn02, P1 Display Port */ private static final Pin BUTTON_PRESET_NUM_TEAMS = RaspiPin.GPIO_12;
-//    /* btn03, P1 Display Port */ private static final Pin BUTTON_PRESET_GAMETIME = RaspiPin.GPIO_13;
-//    /* btn04, P1 Display Port */ private static final Pin BUTTON_RESET = RaspiPin.GPIO_14;
-//    /* btn05, J1 External Box */ private static final Pin BUTTON_RED = RaspiPin.GPIO_21;
-//    /* btn06, J1 External Box */ private static final Pin BUTTON_BLUE = RaspiPin.GPIO_22;
-//    /* btn07, J1 External Box */ private static final Pin BUTTON_GREEN = RaspiPin.GPIO_23;
-//    /* btn08, J1 External Box */ private static final Pin BUTTON_YELLOW = RaspiPin.GPIO_24;
-//    /* btnShutdown, J1 External Box */ private static final Pin BUTTON_SHUTDOWN = RaspiPin.GPIO_28;
 
     // 4 Ports für ein Relais Board.
     // Schaltet im default bei HIGH
@@ -88,19 +67,6 @@ public class Main {
     /* J1 External Box */ private static final Pin MF14 = MCP23017Pin.GPIO_A5;
     /* J1 External Box */ private static final Pin MF15 = MCP23017Pin.GPIO_A6;
     /* on mainboard */ private static final Pin MF16 = MCP23017Pin.GPIO_A7;
-//
-//    private static final Pin LED_RED_BUTTON = MF01;
-//    private static final Pin LED_BLUE_BUTTON = MF02;
-//    private static final Pin LED_GREEN_BUTTON = MF04;
-//    private static final Pin LED_YELLOW_BUTTON = MF05;
-//    private static final Pin LED_WHITE_STATUS = MF06;
-//    private static final Pin LED_GREEN_STATUS = MF03;
-//    // zusätzlich zur RGB Flagge
-//    private static final Pin LED_FLAG_WHITE = MF08;
-//    private static final Pin LED_FLAG_RED = MF09;
-//    private static final Pin LED_FLAG_BLUE = MF10;
-//    private static final Pin LED_FLAG_GREEN = MF11;
-//    private static final Pin LED_FLAG_YELLOW = MF12;
 
     private static final Pin SIREN_START_STOP = RLY01;
     private static final Pin SIREN_COLOR_CHANGE = RLY02;
@@ -145,6 +111,9 @@ public class Main {
 
     private static final HashMap<String, Object> applicationContext = new HashMap<>();
 
+    private static boolean ignore_gpio; // ignore gpios, even when running on raspi
+    private static boolean dev_mode; // show develop mode functions
+
     public static MessageProcessor getMessageProcessor() {
         return messageProcessor;
     }
@@ -175,20 +144,18 @@ public class Main {
         // die internal names auf den Brightness Key zu setzen ist ein kleiner Trick. Die namen müssen und eindeutig sein
         // so kann das Display7Segment4Digits direkt die Helligkeit aus den configs lesen
 
-        display_white = new Display7Segments4Digits(configs.get(Configs.DISPLAY_WHITE_I2C), getFrameDebug().getLblPole(), Configs.BRIGHTNESS_WHITE);
-        display_white.setFourDigitsOnly(false);
 
-        display_red = new Display7Segments4Digits(configs.get(Configs.DISPLAY_RED_I2C), getFrameDebug().getBtnRed(), Configs.BRIGHTNESS_RED);
-        display_blue = new Display7Segments4Digits(configs.get(Configs.DISPLAY_BLUE_I2C), getFrameDebug().getBtnBlue(), Configs.BRIGHTNESS_BLUE);
-        display_green = new Display7Segments4Digits(configs.get(Configs.DISPLAY_GREEN_I2C), getFrameDebug().getBtnGreen(), Configs.BRIGHTNESS_GREEN);
-        display_yellow = new Display7Segments4Digits(configs.get(Configs.DISPLAY_YELLOW_I2C), getFrameDebug().getBtnYellow(), Configs.BRIGHTNESS_YELLOW);
+        display_white = new Display7Segments4Digits(configs.get(Configs.DISPLAY_WHITE_I2C), getFrameDebug().getLblPole(), Configs.DISPLAY_WHITE_I2C);
+        display_red = new Display7Segments4Digits(configs.get(Configs.DISPLAY_RED_I2C), getFrameDebug().getBtnRed(), Configs.DISPLAY_RED_I2C);
+        display_blue = new Display7Segments4Digits(configs.get(Configs.DISPLAY_BLUE_I2C), getFrameDebug().getBtnBlue(), Configs.DISPLAY_BLUE_I2C);
+        display_green = new Display7Segments4Digits(configs.get(Configs.DISPLAY_GREEN_I2C), getFrameDebug().getBtnGreen(), Configs.DISPLAY_GREEN_I2C);
+        display_yellow = new Display7Segments4Digits(configs.get(Configs.DISPLAY_YELLOW_I2C), getFrameDebug().getBtnYellow(), Configs.DISPLAY_YELLOW_I2C);
 
         applicationContext.put(display_white.getName(), display_white);
         applicationContext.put(display_red.getName(), display_red);
         applicationContext.put(display_blue.getName(), display_blue);
         applicationContext.put(display_green.getName(), display_green);
         applicationContext.put(display_yellow.getName(), display_yellow);
-
         applicationContext.put("mcp23017_1", mcp23017_1);
 
 
@@ -209,8 +176,8 @@ public class Main {
 
         pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_RED_BTN, frameDebug.getLedRedButton()));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_BLUE_BTN, frameDebug.getLedBlueButton()));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_YELLOW_BTN, frameDebug.getLedGreenButton()));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_GREEN_BTN, frameDebug.getLedYellowButton()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_YELLOW_BTN, frameDebug.getLedYellowButton()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_GREEN_BTN, frameDebug.getLedGreenButton()));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_GREEN, frameDebug.getLedStandbyActive()));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_WHITE, frameDebug.getLedStatsSent()));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_FLAG_WHITE, frameDebug.getLedFlagWhite()));
@@ -223,41 +190,11 @@ public class Main {
         pinHandler.add(new MyPin(GPIO, Configs.OUT_SIREN_COLOR_CHANGE, null, 50, 90));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_SIREN_START_STOP, null, 70, 60));
 
-
         // for test reasons only
         pinHandler.add(new MyPin(GPIO, Configs.OUT_MF07, null));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_MF13, null));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_MF14, null));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_MF16, null));
-//        pinHandler.add(new MyPin(GPIO, "mf13", null));
-//        pinHandler.add(new MyPin(GPIO, "mf14", null));
-//        pinHandler.add(new MyPin(GPIO, "mf16", null));
-
-
-        /**
-         * TEST ROUTINE START
-
-         Main.getPinHandler().setScheme(Main.PH_LED_RED_BTN, null, "∞:on,250;off,500");
-         Main.getPinHandler().setScheme(Main.PH_LED_BLUE_BTN, null, "∞:on,250;off,500");
-         Main.getPinHandler().setScheme(Main.PH_LED_GREEN_BTN, null, "∞:on,250;off,500");
-         Main.getPinHandler().setScheme(Main.PH_LED_YELLOW_BTN, null, "∞:on,250;off,500");
-         Main.getPinHandler().setScheme(Main.PH_LED_GREEN, null, "∞:on,250;off,500");
-         Main.getPinHandler().setScheme(Main.PH_LED_WHITE, null, "∞:on,250;off,500");
-         Main.getPinHandler().setScheme(Main.KEY_FLAG_WHITE, null, "∞:on,250;off,500");
-         Main.getPinHandler().setScheme(Main.KEY_FLAG_RED, null, "∞:on,250;off,500");
-         Main.getPinHandler().setScheme(Main.KEY_FLAG_BLUE, null, "∞:on,250;off,500");
-         Main.getPinHandler().setScheme(Main.KEY_FLAG_GREEN, null, "∞:on,250;off,500");
-         Main.getPinHandler().setScheme(Main.KEY_FLAG_YELLOW, null, "∞:on,250;off,500");
-         Main.getPinHandler().setScheme(Main.PH_SIREN_HOLDDOWN_BUZZER, null, "∞:on,250;off,500");
-         Main.getPinHandler().setScheme(Main.PH_SIREN_COLOR_CHANGE, null, "∞:on,250;off,500");
-         Main.getPinHandler().setScheme(Main.PH_SIREN_START_STOP, null, "∞:on,250;off,500");
-         * TEST ROUTINE END
-         */
-
-//        dis
-//        display_white.setTime(System.currentTimeMillis());
-//        display_red.setTime(System.currentTimeMillis());
-//        display_blue.setTime(System.currentTimeMillis());
 
         game = new Game(display_white, display_red, display_blue, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_saveNquit, button_shutdown);
         game.run();
@@ -320,7 +257,8 @@ public class Main {
         Options opts = new Options();
         opts.addOption("h", "help", false, Tools.xx("cmdline.help.description"));
         opts.addOption("v", "version", false, Tools.xx("cmdline.version.description"));
-        opts.addOption("n", "nogpio", false, Tools.xx("cmdline.nogpio.description"));
+        opts.addOption("n", "ignoregpio", false, Tools.xx("cmdline.ignoregpio.description"));
+        opts.addOption("d", "devmode", false, Tools.xx("cmdline.devmode.description"));
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cl = null;
@@ -364,11 +302,16 @@ public class Main {
             System.exit(0);
         }
 
-        if (cl.hasOption("n")) {
-            applicationContext.put(Configs.APPCONTEXT_NOGPIO, Boolean.TRUE);
-        } else {
-            applicationContext.put(Configs.APPCONTEXT_NOGPIO, System.getProperty("os.arch").toLowerCase().indexOf("arm") >= 0 ? Boolean.FALSE : Boolean.TRUE);
-        }
+        ignore_gpio = cl.hasOption("n");
+        dev_mode = cl.hasOption("d");
+
+//        if (cl.hasOption("n")) {
+//            applicationContext.put(Configs.APPCONTEXT_NOGPIO, Boolean.TRUE);
+//        } else {
+//            applicationContext.put(Configs.APPCONTEXT_NOGPIO, System.getProperty("os.arch").toLowerCase().indexOf("arm") >= 0 ? Boolean.FALSE : Boolean.TRUE);
+//        }
+//
+
 
         REACTION_TIME = configs.getLong(Configs.BUTTON_REACTION_TIME);
 
@@ -468,5 +411,13 @@ public class Main {
 
     public static Configs getConfigs() {
         return configs;
+    }
+
+    public static boolean isIgnore_gpio() {
+        return ignore_gpio;
+    }
+
+    public static boolean isDev_mode() {
+        return dev_mode;
     }
 }

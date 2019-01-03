@@ -50,8 +50,6 @@ public class Configs {
 
     public static final String TIME_ANNOUNCER = "time_announcer"; // schaltet das Blinken gemäß der Restspielzeit ein oder aus.
 
-    public static final String APPCONTEXT_NOGPIO = "appctx_nogpio";
-
     public static final String FLAG_RGB_WHITE = "flag_rgb_white";
     public static final String FLAG_RGB_BLUE = "flag_rgb_blue";
     public static final String FLAG_RGB_RED = "flag_rgb_red";

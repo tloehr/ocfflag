@@ -17,9 +17,7 @@ import org.apache.log4j.Logger;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.*;
 import java.io.IOException;
 
 /**
@@ -29,6 +27,7 @@ public class FrameDebug extends JFrame {
     private final Logger logger = Logger.getLogger(getClass());
     private Font font;
     private Font font2;
+    private JDialog testDlg;
     public static final Icon IconPlay = new ImageIcon(FrameDebug.class.getResource("/artwork/128x128/player_play.png"));
     public static final Icon IconPause = new ImageIcon(FrameDebug.class.getResource("/artwork/128x128/player_pause.png"));
     public static final Icon IconGametime = new ImageIcon(FrameDebug.class.getResource("/artwork/128x128/clock.png"));
@@ -62,20 +61,7 @@ public class FrameDebug extends JFrame {
     }
 
     private void initFrame() {
-        btnTestHardware.setEnabled(Tools.isArm());
-
-        // kleiner Trick, damit ich nur eine Action Methode brauche
-        btnWhiteBrght.setName(Configs.BRIGHTNESS_WHITE);
-        btnRedBrght.setName(Configs.BRIGHTNESS_RED);
-        btnBlueBrght.setName(Configs.BRIGHTNESS_BLUE);
-        btnGreenBrght.setName(Configs.BRIGHTNESS_GREEN);
-        btnYellowBrght.setName(Configs.BRIGHTNESS_YELLOW);
-
-        btnWhiteBrght.setText(Main.getConfigs().get(Configs.BRIGHTNESS_WHITE));
-        btnRedBrght.setText(Main.getConfigs().get(Configs.BRIGHTNESS_RED));
-        btnBlueBrght.setText(Main.getConfigs().get(Configs.BRIGHTNESS_BLUE));
-        btnGreenBrght.setText(Main.getConfigs().get(Configs.BRIGHTNESS_GREEN));
-        btnYellowBrght.setText(Main.getConfigs().get(Configs.BRIGHTNESS_YELLOW));
+        btnTestDialog.setVisible(Main.isDev_mode());
 
         btnRed.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
         btnBlue.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
@@ -187,39 +173,6 @@ public class FrameDebug extends JFrame {
 
     }
 
-    private void btnTestHardwareActionPerformed(ActionEvent e) {
-
-        Main.getPinHandler().off();
-
-
-
-        Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "5:on,1000;off,1000");
-
-        Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_LED_WHITE, "5:on,1000;off,1000");
-
-        Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "5:on,1000;off,1000");
-
-        Main.getPinHandler().setScheme(Configs.OUT_SIREN_COLOR_CHANGE, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, "5:on,1000;off,1000");
-
-        Main.getPinHandler().setScheme(Configs.OUT_MF07, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_MF13, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_MF14, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_MF16, "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme("mf13", "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme("mf14", "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme("mf16", "5:on,1000;off,1000");
-
-    }
 
     private void txtFlagColorActionPerformed(ActionEvent e) {
 //        String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
@@ -280,6 +233,20 @@ public class FrameDebug extends JFrame {
         Main.getPinHandler().off(Configs.OUT_HOLDDOWN_BUZZER);
     }
 
+    private void btnTestDialogActionPerformed(ActionEvent e) {
+        if (testDlg != null) return;
+        testDlg = new DlgTest(this);
+        testDlg.setModal(false);
+        testDlg.setVisible(true);
+        testDlg.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                super.windowClosed(e);
+                testDlg = null;
+            }
+        });
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -311,6 +278,7 @@ public class FrameDebug extends JFrame {
         panel3 = new JPanel();
         ledStandbyActive = new MyLED();
         ledStatsSent = new MyLED();
+        btnTestDialog = new JButton();
         panel2 = new JPanel();
         btnPresetNumTeams = new JButton();
         btnReset = new JButton();
@@ -324,30 +292,20 @@ public class FrameDebug extends JFrame {
         txtResturl = new JTextField();
         label4 = new JLabel();
         txtRestAuth = new JTextField();
+        btnTestRest = new JButton();
         label3 = new JLabel();
         txtStartStopSiren = new JTextField();
         btnTestStartStop = new JButton();
         label5 = new JLabel();
         txtColChangeSiren = new JTextField();
         btnTestColChange = new JButton();
+        btnStopAllSirens = new JButton();
         label8 = new JLabel();
         txtSendStats = new JTextField();
         label11 = new JLabel();
         txtButtonReaction = new JTextField();
-        panel6 = new JPanel();
-        btnTestHardware = new JButton();
-        btnTestRest = new JButton();
-        txtFlagColor = new JTextField();
-        btnStopAllSirens = new JButton();
         label9 = new JLabel();
         txtUUID = new JTextField();
-        label10 = new JLabel();
-        panel4 = new JPanel();
-        btnWhiteBrght = new JButton();
-        btnRedBrght = new JButton();
-        btnBlueBrght = new JButton();
-        btnGreenBrght = new JButton();
-        btnYellowBrght = new JButton();
         btnSaveAndQuit = new JButton();
         scrollPane1 = new JScrollPane();
         txtLog = new JTextArea();
@@ -507,6 +465,11 @@ public class FrameDebug extends JFrame {
                         //---- ledStatsSent ----
                         ledStatsSent.setToolTipText("Internet Statistik gesendet");
                         panel3.add(ledStatsSent);
+
+                        //---- btnTestDialog ----
+                        btnTestDialog.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/analyze.png")));
+                        btnTestDialog.addActionListener(e -> btnTestDialogActionPerformed(e));
+                        panel3.add(btnTestDialog);
                     }
                     panel5.add(panel3, CC.xy(1, 5, CC.CENTER, CC.DEFAULT));
                 }
@@ -549,7 +512,7 @@ public class FrameDebug extends JFrame {
             {
                 configView.setLayout(new FormLayout(
                     "$ugap, $lcgap, pref, $lcgap, $rgap, $lcgap, 129dlu, $ugap, center:pref, $lcgap, 124dlu, $lcgap, $ugap",
-                    "2*(default, $ugap), 3*(default, $lgap), default, $rgap, default, $ugap, default, $lgap, pref, $lgap, 85dlu:grow, $lgap, default"));
+                    "2*(default, $ugap), 5*(default, $lgap), default, $ugap, default, $lgap, 85dlu:grow, $lgap, default"));
 
                 //---- lblConfigTitle ----
                 lblConfigTitle.setOpaque(true);
@@ -562,11 +525,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label1 ----
                 label1.setText("System-Name");
-                label1.setFont(new Font("Dialog", Font.PLAIN, 22));
+                label1.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label1, CC.xy(3, 3));
 
                 //---- txtFlagName ----
-                txtFlagName.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtFlagName.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtFlagName.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -577,11 +540,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label2 ----
                 label2.setText("Rest URL");
-                label2.setFont(new Font("Dialog", Font.PLAIN, 22));
+                label2.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label2, CC.xy(3, 5));
 
                 //---- txtResturl ----
-                txtResturl.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtResturl.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtResturl.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -592,11 +555,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label4 ----
                 label4.setText("Rest-Auth");
-                label4.setFont(new Font("Dialog", Font.PLAIN, 22));
+                label4.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 configView.add(label4, CC.xy(9, 5));
 
                 //---- txtRestAuth ----
-                txtRestAuth.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtRestAuth.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtRestAuth.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -605,161 +568,98 @@ public class FrameDebug extends JFrame {
                 });
                 configView.add(txtRestAuth, CC.xy(11, 5));
 
+                //---- btnTestRest ----
+                btnTestRest.setText("Test Connection");
+                btnTestRest.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
+                configView.add(btnTestRest, CC.xywh(7, 7, 5, 1));
+
                 //---- label3 ----
                 label3.setText("Start/Stop Signal");
-                label3.setFont(new Font("Dialog", Font.PLAIN, 22));
-                configView.add(label3, CC.xy(3, 7));
+                label3.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                configView.add(label3, CC.xy(3, 9));
 
                 //---- txtStartStopSiren ----
-                txtStartStopSiren.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtStartStopSiren.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtStartStopSiren.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtStartStopSirenFocusLost(e);
                     }
                 });
-                configView.add(txtStartStopSiren, CC.xywh(7, 7, 3, 1));
+                configView.add(txtStartStopSiren, CC.xywh(7, 9, 3, 1));
 
                 //---- btnTestStartStop ----
                 btnTestStartStop.setText("Test Siren");
-                btnTestStartStop.setFont(new Font("Dialog", Font.PLAIN, 20));
+                btnTestStartStop.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
                 btnTestStartStop.addActionListener(e -> btnTestStartStopActionPerformed(e));
-                configView.add(btnTestStartStop, CC.xy(11, 7));
+                configView.add(btnTestStartStop, CC.xy(11, 9));
 
                 //---- label5 ----
                 label5.setText("ColChange Signal");
-                label5.setFont(new Font("Dialog", Font.PLAIN, 22));
-                configView.add(label5, CC.xy(3, 9));
+                label5.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                configView.add(label5, CC.xy(3, 11));
 
                 //---- txtColChangeSiren ----
-                txtColChangeSiren.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtColChangeSiren.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtColChangeSiren.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtColChangeSirenFocusLost(e);
                     }
                 });
-                configView.add(txtColChangeSiren, CC.xywh(7, 9, 3, 1));
+                configView.add(txtColChangeSiren, CC.xywh(7, 11, 3, 1));
 
                 //---- btnTestColChange ----
                 btnTestColChange.setText("Test Siren");
-                btnTestColChange.setFont(new Font("Dialog", Font.PLAIN, 20));
+                btnTestColChange.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
                 btnTestColChange.addActionListener(e -> btnTestColChangeActionPerformed(e));
-                configView.add(btnTestColChange, CC.xy(11, 9));
+                configView.add(btnTestColChange, CC.xy(11, 11));
+
+                //---- btnStopAllSirens ----
+                btnStopAllSirens.setText("Stop Sirens");
+                btnStopAllSirens.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
+                btnStopAllSirens.addActionListener(e -> btnStopAllSirensActionPerformed(e));
+                configView.add(btnStopAllSirens, CC.xywh(7, 13, 5, 1));
 
                 //---- label8 ----
                 label8.setText("Intervall Stats (ms)");
-                label8.setFont(new Font("Dialog", Font.PLAIN, 22));
-                configView.add(label8, CC.xy(3, 11));
+                label8.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                configView.add(label8, CC.xy(3, 15));
 
                 //---- txtSendStats ----
-                txtSendStats.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtSendStats.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtSendStats.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtSendStatsFocusLost(e);
                     }
                 });
-                configView.add(txtSendStats, CC.xy(7, 11));
+                configView.add(txtSendStats, CC.xy(7, 15));
 
                 //---- label11 ----
                 label11.setText("Button Reaction (ms)");
-                label11.setFont(new Font("Dialog", Font.PLAIN, 22));
-                configView.add(label11, CC.xy(9, 11));
+                label11.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                configView.add(label11, CC.xy(9, 15));
 
                 //---- txtButtonReaction ----
-                txtButtonReaction.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtButtonReaction.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtButtonReaction.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtButtonReactionFocusLost(e);
                     }
                 });
-                configView.add(txtButtonReaction, CC.xy(11, 11));
-
-                //======== panel6 ========
-                {
-                    panel6.setLayout(new BoxLayout(panel6, BoxLayout.X_AXIS));
-
-                    //---- btnTestHardware ----
-                    btnTestHardware.setText("Test Hardware");
-                    btnTestHardware.setFont(new Font("Dialog", Font.PLAIN, 20));
-                    btnTestHardware.addActionListener(e -> btnTestHardwareActionPerformed(e));
-                    panel6.add(btnTestHardware);
-
-                    //---- btnTestRest ----
-                    btnTestRest.setText("Test Connection");
-                    btnTestRest.setFont(new Font("Dialog", Font.PLAIN, 20));
-                    panel6.add(btnTestRest);
-
-                    //---- txtFlagColor ----
-                    txtFlagColor.setText("#ff8000");
-                    txtFlagColor.addActionListener(e -> txtFlagColorActionPerformed(e));
-                    panel6.add(txtFlagColor);
-
-                    //---- btnStopAllSirens ----
-                    btnStopAllSirens.setText("Stop Sirens");
-                    btnStopAllSirens.setFont(new Font("Dialog", Font.PLAIN, 20));
-                    btnStopAllSirens.addActionListener(e -> btnStopAllSirensActionPerformed(e));
-                    panel6.add(btnStopAllSirens);
-                }
-                configView.add(panel6, CC.xywh(3, 13, 9, 1));
+                configView.add(txtButtonReaction, CC.xy(11, 15));
 
                 //---- label9 ----
                 label9.setText("UUID");
-                label9.setFont(new Font("Dialog", Font.PLAIN, 22));
-                configView.add(label9, CC.xy(3, 15));
+                label9.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                configView.add(label9, CC.xy(3, 17));
 
                 //---- txtUUID ----
-                txtUUID.setFont(new Font("Dialog", Font.PLAIN, 22));
+                txtUUID.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
                 txtUUID.setEditable(false);
-                configView.add(txtUUID, CC.xywh(7, 15, 5, 1));
-
-                //---- label10 ----
-                label10.setText("Helligkeit");
-                label10.setFont(new Font("Dialog", Font.PLAIN, 22));
-                configView.add(label10, CC.xy(3, 17));
-
-                //======== panel4 ========
-                {
-                    panel4.setLayout(new GridLayout(1, 0, 5, 0));
-
-                    //---- btnWhiteBrght ----
-                    btnWhiteBrght.setText("text");
-                    btnWhiteBrght.setForeground(new Color(153, 153, 153));
-                    btnWhiteBrght.setToolTipText("wei\u00df");
-                    btnWhiteBrght.addActionListener(e -> btnBrghtActionPerformed(e));
-                    panel4.add(btnWhiteBrght);
-
-                    //---- btnRedBrght ----
-                    btnRedBrght.setText("text");
-                    btnRedBrght.setForeground(Color.red);
-                    btnRedBrght.setToolTipText("rot");
-                    btnRedBrght.addActionListener(e -> btnBrghtActionPerformed(e));
-                    panel4.add(btnRedBrght);
-
-                    //---- btnBlueBrght ----
-                    btnBlueBrght.setText("text");
-                    btnBlueBrght.setForeground(Color.blue);
-                    btnBlueBrght.setToolTipText("blau");
-                    btnBlueBrght.addActionListener(e -> btnBrghtActionPerformed(e));
-                    panel4.add(btnBlueBrght);
-
-                    //---- btnGreenBrght ----
-                    btnGreenBrght.setText("text");
-                    btnGreenBrght.setForeground(new Color(0, 153, 102));
-                    btnGreenBrght.setToolTipText("gr\u00fcn");
-                    btnGreenBrght.addActionListener(e -> btnBrghtActionPerformed(e));
-                    panel4.add(btnGreenBrght);
-
-                    //---- btnYellowBrght ----
-                    btnYellowBrght.setText("text");
-                    btnYellowBrght.setForeground(new Color(204, 204, 0));
-                    btnYellowBrght.setToolTipText("gelb");
-                    btnYellowBrght.addActionListener(e -> btnBrghtActionPerformed(e));
-                    panel4.add(btnYellowBrght);
-                }
-                configView.add(panel4, CC.xywh(7, 17, 5, 1));
+                configView.add(txtUUID, CC.xywh(7, 17, 5, 1));
 
                 //---- btnSaveAndQuit ----
                 btnSaveAndQuit.setText(null);
@@ -898,6 +798,7 @@ public class FrameDebug extends JFrame {
     private JPanel panel3;
     private MyLED ledStandbyActive;
     private MyLED ledStatsSent;
+    private JButton btnTestDialog;
     private JPanel panel2;
     private JButton btnPresetNumTeams;
     private JButton btnReset;
@@ -911,30 +812,20 @@ public class FrameDebug extends JFrame {
     private JTextField txtResturl;
     private JLabel label4;
     private JTextField txtRestAuth;
+    private JButton btnTestRest;
     private JLabel label3;
     private JTextField txtStartStopSiren;
     private JButton btnTestStartStop;
     private JLabel label5;
     private JTextField txtColChangeSiren;
     private JButton btnTestColChange;
+    private JButton btnStopAllSirens;
     private JLabel label8;
     private JTextField txtSendStats;
     private JLabel label11;
     private JTextField txtButtonReaction;
-    private JPanel panel6;
-    private JButton btnTestHardware;
-    private JButton btnTestRest;
-    private JTextField txtFlagColor;
-    private JButton btnStopAllSirens;
     private JLabel label9;
     private JTextField txtUUID;
-    private JLabel label10;
-    private JPanel panel4;
-    private JButton btnWhiteBrght;
-    private JButton btnRedBrght;
-    private JButton btnBlueBrght;
-    private JButton btnGreenBrght;
-    private JButton btnYellowBrght;
     private JButton btnSaveAndQuit;
     private JScrollPane scrollPane1;
     private JTextArea txtLog;
