@@ -5,6 +5,7 @@ import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.misc.HasLogger;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.io.IOException;
  * I2C Required for this one
  * https://github.com/OlivierLD/raspberry-pi4j-samples/blob/master/SevenSegDisplay/src/sevensegdisplay/LEDBackPack.java
  */
-public class LEDBackPack {
+public class LEDBackPack implements HasLogger {
     /*
     Prompt> sudo i2cdetect -y 1
          0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
@@ -28,7 +29,6 @@ public class LEDBackPack {
      */
     // This next addresses is returned by "sudo i2cdetect -y 1", see above.
     public final static int LEDBACKPACK_ADDRESS = 0x70;
-    private final Logger logger = Logger.getLogger(getClass());
     private boolean verbose = false;
 
     private I2CBus bus;
@@ -62,12 +62,12 @@ public class LEDBackPack {
         this.verbose = v;
         try {
             // Get i2c bus
-            bus = I2CFactory.getInstance(I2CBus.BUS_1); // Depends onthe RasPI version
-            logger.debug("Connected to bus. OK.");
+            bus = I2CFactory.getInstance(I2CBus.BUS_1); // Depends on the RasPI version
+//            getLogger().debug("Connected to bus. OK.");
 
             // Get device itself
             ledBackpack = bus.getDevice(address);
-            logger.debug("Connected to device. OK.");
+//            getLogger().debug("Connected to device. OK.");
 
             //Turn the oscillator on
             ledBackpack.write(HT16K33_REGISTER_SYSTEM_SETUP | 0x01, (byte) 0x00);
@@ -78,7 +78,9 @@ public class LEDBackPack {
             // Clear the screen
             this.clear();
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            getLogger().error(ioe.getMessage());
+            throw new I2CFactory.UnsupportedBusNumberException();
+//            ioe.printStackTrace();
         }
     }
 

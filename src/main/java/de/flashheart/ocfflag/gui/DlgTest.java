@@ -77,9 +77,11 @@ public class DlgTest extends JDialog {
         Main.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, "5:on,1000;off,1000");
         Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "5:on,1000;off,1000");
 
-//        Main.getPinHandler().setScheme(Configs.OUT_SIREN_COLOR_CHANGE, "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, "5:on,1000;off,1000");
+        if (cbSirens.isSelected()) {
+            Main.getPinHandler().setScheme(Configs.OUT_SIREN_COLOR_CHANGE, "5:on,1000;off,1000");
+            Main.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, "5:on,1000;off,1000");
+            Main.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, "5:on,1000;off,1000");
+        }
 
         Main.getPinHandler().setScheme(Configs.OUT_MF07, "5:on,1000;off,1000");
         Main.getPinHandler().setScheme(Configs.OUT_MF13, "5:on,1000;off,1000");
@@ -123,6 +125,7 @@ public class DlgTest extends JDialog {
         panel6 = new JPanel();
         btnTestHardware = new JButton();
         txtFlagColor = new JTextField();
+        cbSirens = new JCheckBox();
         panel1 = new JPanel();
         cmbI2C = new JComboBox();
         hSpacer1 = new JPanel(null);
@@ -159,7 +162,7 @@ public class DlgTest extends JDialog {
 
                     //---- btnTestHardware ----
                     btnTestHardware.setText("Test Hardware");
-                    btnTestHardware.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
+                    btnTestHardware.setFont(new Font("Dialog", Font.PLAIN, 20));
                     btnTestHardware.addActionListener(e -> btnTestHardwareActionPerformed(e));
                     panel6.add(btnTestHardware);
 
@@ -167,6 +170,11 @@ public class DlgTest extends JDialog {
                     txtFlagColor.setText("#ff8000");
                     txtFlagColor.addActionListener(e -> txtFlagColorActionPerformed(e));
                     panel6.add(txtFlagColor);
+
+                    //---- cbSirens ----
+                    cbSirens.setText("include sirens");
+                    cbSirens.setSelected(true);
+                    panel6.add(cbSirens);
                 }
                 testView.add(panel6, CC.xy(1, 1));
 
@@ -178,7 +186,7 @@ public class DlgTest extends JDialog {
 
                     //---- txtDisplay ----
                     txtDisplay.setText("YEAH");
-                    txtDisplay.setFont(new Font(Font.DIALOG, Font.PLAIN, 16));
+                    txtDisplay.setFont(new Font("Dialog", Font.PLAIN, 16));
                     panel1.add(txtDisplay);
                     panel1.add(hSpacer2);
 
@@ -255,6 +263,7 @@ public class DlgTest extends JDialog {
     private JPanel panel6;
     private JButton btnTestHardware;
     private JTextField txtFlagColor;
+    private JCheckBox cbSirens;
     private JPanel panel1;
     private JComboBox cmbI2C;
     private JPanel hSpacer1;

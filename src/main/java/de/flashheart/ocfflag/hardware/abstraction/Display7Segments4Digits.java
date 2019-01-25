@@ -54,10 +54,12 @@ public class Display7Segments4Digits implements HasLogger {
         this.name = name;
         if (Tools.isArm()) {
             try {
+                getLogger().debug(Integer.decode(addr).toString());
                 segment = new SevenSegment(Integer.decode(addr), true);
-                segment.setBrightness(Main.getConfigs().getInt(name));
+//                segment.setBrightness(Main.getConfigs().getInt(name));
             } catch (Exception e) {
                 getLogger().warn(e.getMessage());
+                getLogger().warn("can't find display at " + addr + ". will be ignored.");
                 segment = null;
             }
         }

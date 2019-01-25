@@ -525,11 +525,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label1 ----
                 label1.setText("System-Name");
-                label1.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                label1.setFont(new Font("Dialog", Font.PLAIN, 22));
                 configView.add(label1, CC.xy(3, 3));
 
                 //---- txtFlagName ----
-                txtFlagName.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtFlagName.setFont(new Font("Dialog", Font.PLAIN, 22));
                 txtFlagName.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -540,11 +540,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label2 ----
                 label2.setText("Rest URL");
-                label2.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                label2.setFont(new Font("Dialog", Font.PLAIN, 22));
                 configView.add(label2, CC.xy(3, 5));
 
                 //---- txtResturl ----
-                txtResturl.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtResturl.setFont(new Font("Dialog", Font.PLAIN, 22));
                 txtResturl.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -555,11 +555,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label4 ----
                 label4.setText("Rest-Auth");
-                label4.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                label4.setFont(new Font("Dialog", Font.PLAIN, 22));
                 configView.add(label4, CC.xy(9, 5));
 
                 //---- txtRestAuth ----
-                txtRestAuth.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtRestAuth.setFont(new Font("Dialog", Font.PLAIN, 22));
                 txtRestAuth.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -570,16 +570,16 @@ public class FrameDebug extends JFrame {
 
                 //---- btnTestRest ----
                 btnTestRest.setText("Test Connection");
-                btnTestRest.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
+                btnTestRest.setFont(new Font("Dialog", Font.PLAIN, 20));
                 configView.add(btnTestRest, CC.xywh(7, 7, 5, 1));
 
                 //---- label3 ----
                 label3.setText("Start/Stop Signal");
-                label3.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                label3.setFont(new Font("Dialog", Font.PLAIN, 22));
                 configView.add(label3, CC.xy(3, 9));
 
                 //---- txtStartStopSiren ----
-                txtStartStopSiren.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtStartStopSiren.setFont(new Font("Dialog", Font.PLAIN, 22));
                 txtStartStopSiren.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -590,17 +590,17 @@ public class FrameDebug extends JFrame {
 
                 //---- btnTestStartStop ----
                 btnTestStartStop.setText("Test Siren");
-                btnTestStartStop.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
+                btnTestStartStop.setFont(new Font("Dialog", Font.PLAIN, 20));
                 btnTestStartStop.addActionListener(e -> btnTestStartStopActionPerformed(e));
                 configView.add(btnTestStartStop, CC.xy(11, 9));
 
                 //---- label5 ----
                 label5.setText("ColChange Signal");
-                label5.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                label5.setFont(new Font("Dialog", Font.PLAIN, 22));
                 configView.add(label5, CC.xy(3, 11));
 
                 //---- txtColChangeSiren ----
-                txtColChangeSiren.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtColChangeSiren.setFont(new Font("Dialog", Font.PLAIN, 22));
                 txtColChangeSiren.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -611,23 +611,23 @@ public class FrameDebug extends JFrame {
 
                 //---- btnTestColChange ----
                 btnTestColChange.setText("Test Siren");
-                btnTestColChange.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
+                btnTestColChange.setFont(new Font("Dialog", Font.PLAIN, 20));
                 btnTestColChange.addActionListener(e -> btnTestColChangeActionPerformed(e));
                 configView.add(btnTestColChange, CC.xy(11, 11));
 
                 //---- btnStopAllSirens ----
                 btnStopAllSirens.setText("Stop Sirens");
-                btnStopAllSirens.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
+                btnStopAllSirens.setFont(new Font("Dialog", Font.PLAIN, 20));
                 btnStopAllSirens.addActionListener(e -> btnStopAllSirensActionPerformed(e));
                 configView.add(btnStopAllSirens, CC.xywh(7, 13, 5, 1));
 
                 //---- label8 ----
                 label8.setText("Intervall Stats (ms)");
-                label8.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                label8.setFont(new Font("Dialog", Font.PLAIN, 22));
                 configView.add(label8, CC.xy(3, 15));
 
                 //---- txtSendStats ----
-                txtSendStats.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtSendStats.setFont(new Font("Dialog", Font.PLAIN, 22));
                 txtSendStats.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -638,11 +638,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label11 ----
                 label11.setText("Button Reaction (ms)");
-                label11.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                label11.setFont(new Font("Dialog", Font.PLAIN, 22));
                 configView.add(label11, CC.xy(9, 15));
 
                 //---- txtButtonReaction ----
-                txtButtonReaction.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtButtonReaction.setFont(new Font("Dialog", Font.PLAIN, 22));
                 txtButtonReaction.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {
@@ -653,11 +653,11 @@ public class FrameDebug extends JFrame {
 
                 //---- label9 ----
                 label9.setText("UUID");
-                label9.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                label9.setFont(new Font("Dialog", Font.PLAIN, 22));
                 configView.add(label9, CC.xy(3, 17));
 
                 //---- txtUUID ----
-                txtUUID.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
+                txtUUID.setFont(new Font("Dialog", Font.PLAIN, 22));
                 txtUUID.setEditable(false);
                 configView.add(txtUUID, CC.xywh(7, 17, 5, 1));
 
