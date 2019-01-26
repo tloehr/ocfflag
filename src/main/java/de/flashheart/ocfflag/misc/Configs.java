@@ -182,6 +182,14 @@ public class Configs {
         configs.put(FLAG_RGB_GREEN, "green");
         configs.put(FLAG_RGB_RED, "red");
         configs.put(FLAG_RGB_YELLOW, "#ff8000");
+        //todo: mit ins Installationspaket
+        /**
+         * shutdown.sh
+         * #! /bin/bash
+         * kill -15 `pidof java`
+         * sleep 5s
+         * shutdown -h now
+         */
         configs.put(SHUTDOWN_COMMAND_LINE, "sudo nohup /bin/sh /home/pi/ocfflag/shutdown.sh &");
 
         configs.put(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, OUT_SIREN_START_STOP); // to override the use of the color change siren. if we only have ONE siren to signal both events
