@@ -162,7 +162,7 @@ public class DlgTest extends JDialog {
 
                     //---- btnTestHardware ----
                     btnTestHardware.setText("Test Hardware");
-                    btnTestHardware.setFont(new Font("Dialog", Font.PLAIN, 20));
+                    btnTestHardware.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
                     btnTestHardware.addActionListener(e -> btnTestHardwareActionPerformed(e));
                     panel6.add(btnTestHardware);
 
@@ -186,7 +186,7 @@ public class DlgTest extends JDialog {
 
                     //---- txtDisplay ----
                     txtDisplay.setText("YEAH");
-                    txtDisplay.setFont(new Font("Dialog", Font.PLAIN, 16));
+                    txtDisplay.setFont(new Font(Font.DIALOG, Font.PLAIN, 16));
                     panel1.add(txtDisplay);
                     panel1.add(hSpacer2);
 
