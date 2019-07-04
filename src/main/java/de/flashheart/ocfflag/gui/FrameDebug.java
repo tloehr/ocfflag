@@ -250,7 +250,6 @@ public class FrameDebug extends JFrame {
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        mainPanel = new JTabbedPane();
         mainView = new JPanel();
         panel1 = new JPanel();
         ledRedButton = new MyLED();
@@ -273,7 +272,6 @@ public class FrameDebug extends JFrame {
         ledFlagYellow = new MyLED();
         pbYellow = new JProgressBar();
         panel5 = new JPanel();
-        btnConfig = new JButton();
         btnQuit = new JButton();
         panel3 = new JPanel();
         ledStandbyActive = new MyLED();
@@ -281,35 +279,10 @@ public class FrameDebug extends JFrame {
         btnTestDialog = new JButton();
         panel2 = new JPanel();
         btnPresetNumTeams = new JButton();
-        btnReset = new JButton();
-        textField1 = new JTextField();
         btnSwitchMode = new JButton();
+        btnReset = new JButton();
         btnPresetGametimeUndo = new JButton();
-        configView = new JPanel();
-        lblConfigTitle = new JLabel();
-        label1 = new JLabel();
-        txtFlagName = new JTextField();
-        label2 = new JLabel();
-        txtResturl = new JTextField();
-        label4 = new JLabel();
-        txtRestAuth = new JTextField();
-        btnTestRest = new JButton();
-        label3 = new JLabel();
-        txtStartStopSiren = new JTextField();
-        btnTestStartStop = new JButton();
-        label5 = new JLabel();
-        txtColChangeSiren = new JTextField();
-        btnTestColChange = new JButton();
-        btnStopAllSirens = new JButton();
-        label8 = new JLabel();
-        txtSendStats = new JTextField();
-        label11 = new JLabel();
-        txtButtonReaction = new JTextField();
-        label9 = new JLabel();
-        txtUUID = new JTextField();
-        btnSaveAndQuit = new JButton();
-        scrollPane1 = new JScrollPane();
-        txtLog = new JTextArea();
+        panel4 = new JPanel();
 
         //======== this ========
         setTitle("OCF-Flag 1.0.0.0");
@@ -317,377 +290,198 @@ public class FrameDebug extends JFrame {
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 
-        //======== mainPanel ========
+        //======== mainView ========
         {
-            mainPanel.setEnabled(false);
-            mainPanel.addChangeListener(e -> mainPanelStateChanged(e));
+            mainView.setLayout(new FormLayout(
+                "$rgap, $lcgap, pref, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow, $lcgap, $rgap",
+                "$rgap, $lgap, fill:55dlu:grow, $rgap, pref, $lgap, $rgap"));
 
-            //======== mainView ========
+            //======== panel1 ========
             {
-                mainView.setLayout(new FormLayout(
-                    "$rgap, $lcgap, pref, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref:grow, $lcgap, $rgap",
-                    "$rgap, $lgap, fill:55dlu:grow, $rgap, pref, $lgap, $rgap"));
+                panel1.setLayout(new FormLayout(
+                    "default, $lcgap, pref, $lcgap, $ugap, $lcgap, 162dlu:grow, $lcgap, $ugap, $lcgap, pref, $lcgap, default",
+                    "fill:22dlu:grow, $lgap, fill:default, $lgap, fill:default:grow, $lgap, fill:default"));
 
-                //======== panel1 ========
+                //---- ledRedButton ----
+                ledRedButton.setColor(Color.red);
+                ledRedButton.setToolTipText("Red LED in Button");
+                panel1.add(ledRedButton, CC.xy(1, 1));
+
+                //---- btnRed ----
+                btnRed.setText("Red");
+                btnRed.setForeground(Color.red);
+                btnRed.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
+                panel1.add(btnRed, CC.xy(3, 1));
+
+                //---- lblPole ----
+                lblPole.setOpaque(true);
+                lblPole.setBackground(Color.white);
+                lblPole.setText("Flagge");
+                lblPole.setForeground(Color.black);
+                lblPole.setHorizontalAlignment(SwingConstants.CENTER);
+                lblPole.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
+                panel1.add(lblPole, CC.xywh(7, 1, 1, 5));
+
+                //---- btnBlue ----
+                btnBlue.setText("Blue");
+                btnBlue.setForeground(Color.blue);
+                btnBlue.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
+                panel1.add(btnBlue, CC.xy(11, 1, CC.FILL, CC.DEFAULT));
+
+                //---- ledBlueButton ----
+                ledBlueButton.setColor(Color.blue);
+                ledBlueButton.setToolTipText("Blue LED in Button");
+                panel1.add(ledBlueButton, CC.xy(13, 1));
+
+                //---- pbRed ----
+                pbRed.setStringPainted(true);
+                panel1.add(pbRed, CC.xywh(1, 3, 3, 1, CC.DEFAULT, CC.FILL));
+
+                //---- pbBlue ----
+                pbBlue.setStringPainted(true);
+                panel1.add(pbBlue, CC.xywh(11, 3, 3, 1, CC.DEFAULT, CC.FILL));
+
+                //---- ledGreenButton ----
+                ledGreenButton.setColor(Color.green);
+                ledGreenButton.setToolTipText("Red LED in Button");
+                panel1.add(ledGreenButton, CC.xy(1, 5));
+
+                //---- btnGreen ----
+                btnGreen.setText("Green");
+                btnGreen.setForeground(new Color(18, 110, 12));
+                btnGreen.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
+                panel1.add(btnGreen, CC.xy(3, 5));
+
+                //---- btnYellow ----
+                btnYellow.setText("Yellow");
+                btnYellow.setForeground(new Color(210, 199, 27));
+                btnYellow.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
+                panel1.add(btnYellow, CC.xy(11, 5, CC.FILL, CC.DEFAULT));
+
+                //---- ledYellowButton ----
+                ledYellowButton.setColor(Color.yellow);
+                ledYellowButton.setToolTipText("Yellow LED in Button");
+                panel1.add(ledYellowButton, CC.xy(13, 5));
+
+                //---- pbGreen ----
+                pbGreen.setStringPainted(true);
+                panel1.add(pbGreen, CC.xywh(1, 7, 3, 1, CC.DEFAULT, CC.FILL));
+
+                //======== pnlFlagLEDs ========
                 {
-                    panel1.setLayout(new FormLayout(
-                        "default, $lcgap, pref, $lcgap, $ugap, $lcgap, 62dlu:grow, $lcgap, $ugap, $lcgap, pref, 2*($lcgap, default)",
-                        "fill:22dlu:grow, $lgap, fill:default, $lgap, fill:default:grow, $lgap, fill:default"));
+                    pnlFlagLEDs.setLayout(new FlowLayout());
 
-                    //---- ledRedButton ----
-                    ledRedButton.setColor(Color.red);
-                    ledRedButton.setToolTipText("Red LED in Button");
-                    panel1.add(ledRedButton, CC.xy(1, 1));
+                    //---- ledFlagWhite ----
+                    ledFlagWhite.setToolTipText("Yellow LED in Button");
+                    ledFlagWhite.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/led-white-off.png")));
+                    pnlFlagLEDs.add(ledFlagWhite);
 
-                    //---- btnRed ----
-                    btnRed.setText("Red");
-                    btnRed.setForeground(Color.red);
-                    btnRed.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 36));
-                    panel1.add(btnRed, CC.xy(3, 1));
+                    //---- ledFlagRed ----
+                    ledFlagRed.setColor(Color.red);
+                    ledFlagRed.setToolTipText("Red LED in Button");
+                    pnlFlagLEDs.add(ledFlagRed);
 
-                    //---- lblPole ----
-                    lblPole.setOpaque(true);
-                    lblPole.setBackground(Color.white);
-                    lblPole.setText("Flagge");
-                    lblPole.setForeground(Color.black);
-                    lblPole.setHorizontalAlignment(SwingConstants.CENTER);
-                    lblPole.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 36));
-                    panel1.add(lblPole, CC.xywh(7, 1, 1, 5));
+                    //---- ledFlagBlue ----
+                    ledFlagBlue.setColor(Color.blue);
+                    ledFlagBlue.setToolTipText("Blue LED in Button");
+                    pnlFlagLEDs.add(ledFlagBlue);
 
-                    //---- btnBlue ----
-                    btnBlue.setText("Blue");
-                    btnBlue.setForeground(Color.blue);
-                    btnBlue.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 36));
-                    panel1.add(btnBlue, CC.xy(11, 1, CC.FILL, CC.DEFAULT));
+                    //---- ledFlagGreen ----
+                    ledFlagGreen.setColor(Color.green);
+                    ledFlagGreen.setToolTipText("Red LED in Button");
+                    pnlFlagLEDs.add(ledFlagGreen);
 
-                    //---- ledBlueButton ----
-                    ledBlueButton.setColor(Color.blue);
-                    ledBlueButton.setToolTipText("Blue LED in Button");
-                    panel1.add(ledBlueButton, CC.xy(15, 1));
-
-                    //---- pbRed ----
-                    pbRed.setStringPainted(true);
-                    panel1.add(pbRed, CC.xywh(1, 3, 3, 1, CC.DEFAULT, CC.FILL));
-
-                    //---- pbBlue ----
-                    pbBlue.setStringPainted(true);
-                    panel1.add(pbBlue, CC.xy(11, 3, CC.DEFAULT, CC.FILL));
-
-                    //---- ledGreenButton ----
-                    ledGreenButton.setColor(Color.green);
-                    ledGreenButton.setToolTipText("Red LED in Button");
-                    panel1.add(ledGreenButton, CC.xy(1, 5));
-
-                    //---- btnGreen ----
-                    btnGreen.setText("Green");
-                    btnGreen.setForeground(new Color(18, 110, 12));
-                    btnGreen.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 36));
-                    panel1.add(btnGreen, CC.xy(3, 5));
-
-                    //---- btnYellow ----
-                    btnYellow.setText("Yellow");
-                    btnYellow.setForeground(new Color(210, 199, 27));
-                    btnYellow.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 36));
-                    panel1.add(btnYellow, CC.xy(11, 5, CC.FILL, CC.DEFAULT));
-
-                    //---- ledYellowButton ----
-                    ledYellowButton.setColor(Color.yellow);
-                    ledYellowButton.setToolTipText("Yellow LED in Button");
-                    panel1.add(ledYellowButton, CC.xy(15, 5));
-
-                    //---- pbGreen ----
-                    pbGreen.setStringPainted(true);
-                    panel1.add(pbGreen, CC.xywh(1, 7, 3, 1, CC.DEFAULT, CC.FILL));
-
-                    //======== pnlFlagLEDs ========
-                    {
-                        pnlFlagLEDs.setLayout(new FlowLayout());
-
-                        //---- ledFlagWhite ----
-                        ledFlagWhite.setToolTipText("Yellow LED in Button");
-                        ledFlagWhite.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/led-white-off.png")));
-                        pnlFlagLEDs.add(ledFlagWhite);
-
-                        //---- ledFlagRed ----
-                        ledFlagRed.setColor(Color.red);
-                        ledFlagRed.setToolTipText("Red LED in Button");
-                        pnlFlagLEDs.add(ledFlagRed);
-
-                        //---- ledFlagBlue ----
-                        ledFlagBlue.setColor(Color.blue);
-                        ledFlagBlue.setToolTipText("Blue LED in Button");
-                        pnlFlagLEDs.add(ledFlagBlue);
-
-                        //---- ledFlagGreen ----
-                        ledFlagGreen.setColor(Color.green);
-                        ledFlagGreen.setToolTipText("Red LED in Button");
-                        pnlFlagLEDs.add(ledFlagGreen);
-
-                        //---- ledFlagYellow ----
-                        ledFlagYellow.setColor(Color.yellow);
-                        ledFlagYellow.setToolTipText("Yellow LED in Button");
-                        pnlFlagLEDs.add(ledFlagYellow);
-                    }
-                    panel1.add(pnlFlagLEDs, CC.xy(7, 7));
-
-                    //---- pbYellow ----
-                    pbYellow.setStringPainted(true);
-                    panel1.add(pbYellow, CC.xy(11, 7, CC.DEFAULT, CC.FILL));
+                    //---- ledFlagYellow ----
+                    ledFlagYellow.setColor(Color.yellow);
+                    ledFlagYellow.setToolTipText("Yellow LED in Button");
+                    pnlFlagLEDs.add(ledFlagYellow);
                 }
-                mainView.add(panel1, CC.xywh(3, 3, 9, 1));
+                panel1.add(pnlFlagLEDs, CC.xy(7, 7));
 
-                //======== panel5 ========
-                {
-                    panel5.setLayout(new FormLayout(
-                        "pref",
-                        "default, $lgap, fill:default:grow, $ugap, default"));
-
-                    //---- btnConfig ----
-                    btnConfig.setText(null);
-                    btnConfig.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/configure.png")));
-                    btnConfig.setToolTipText("Spiel konfigurieren");
-                    panel5.add(btnConfig, CC.xy(1, 1, CC.FILL, CC.DEFAULT));
-
-                    //---- btnQuit ----
-                    btnQuit.setText(null);
-                    btnQuit.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/exit.png")));
-                    btnQuit.setToolTipText("Programm beenden");
-                    panel5.add(btnQuit, CC.xy(1, 3, CC.FILL, CC.DEFAULT));
-
-                    //======== panel3 ========
-                    {
-                        panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
-
-                        //---- ledStandbyActive ----
-                        ledStandbyActive.setColor(Color.green);
-                        ledStandbyActive.setToolTipText("Red LED in Button");
-                        panel3.add(ledStandbyActive);
-
-                        //---- ledStatsSent ----
-                        ledStatsSent.setToolTipText("Internet Statistik gesendet");
-                        panel3.add(ledStatsSent);
-
-                        //---- btnTestDialog ----
-                        btnTestDialog.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/analyze.png")));
-                        btnTestDialog.addActionListener(e -> btnTestDialogActionPerformed(e));
-                        panel3.add(btnTestDialog);
-                    }
-                    panel5.add(panel3, CC.xy(1, 5, CC.CENTER, CC.DEFAULT));
-                }
-                mainView.add(panel5, CC.xy(3, 5));
-
-                //======== panel2 ========
-                {
-                    panel2.setLayout(new FormLayout(
-                        "3*(default:grow)",
-                        "fill:default:grow, $lgap, fill:default:grow"));
-
-                    //---- btnPresetNumTeams ----
-                    btnPresetNumTeams.setText(null);
-                    btnPresetNumTeams.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/add_group.png")));
-                    panel2.add(btnPresetNumTeams, CC.xy(1, 1, CC.FILL, CC.FILL));
-
-                    //---- btnReset ----
-                    btnReset.setText(null);
-                    btnReset.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/reload.png")));
-                    btnReset.setToolTipText("Reset/Undo");
-                    panel2.add(btnReset, CC.xy(2, 1, CC.FILL, CC.FILL));
-
-                    //---- textField1 ----
-                    textField1.setColumns(16);
-                    textField1.setText(" OCF-Flag 2.0");
-                    textField1.setFont(new Font("Courier New", Font.PLAIN, 12));
-                    panel2.add(textField1, CC.xy(3, 1));
-
-                    //---- btnSwitchMode ----
-                    btnSwitchMode.setText(null);
-                    btnSwitchMode.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/player_play.png")));
-                    btnSwitchMode.setToolTipText("Standby / Active");
-                    panel2.add(btnSwitchMode, CC.xy(1, 3, CC.FILL, CC.FILL));
-
-                    //---- btnPresetGametimeUndo ----
-                    btnPresetGametimeUndo.setText(null);
-                    btnPresetGametimeUndo.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/clock.png")));
-                    btnPresetGametimeUndo.setToolTipText("Preset Gametime");
-                    panel2.add(btnPresetGametimeUndo, CC.xy(2, 3, CC.FILL, CC.FILL));
-                }
-                mainView.add(panel2, CC.xywh(7, 5, 5, 1, CC.FILL, CC.FILL));
+                //---- pbYellow ----
+                pbYellow.setStringPainted(true);
+                panel1.add(pbYellow, CC.xywh(11, 7, 3, 1, CC.DEFAULT, CC.FILL));
             }
-            mainPanel.addTab("mainView", mainView);
+            mainView.add(panel1, CC.xywh(3, 3, 9, 1));
 
-            //======== configView ========
+            //======== panel5 ========
             {
-                configView.setLayout(new FormLayout(
-                    "$ugap, $lcgap, pref, $lcgap, $rgap, $lcgap, 129dlu, $ugap, center:pref, $lcgap, 124dlu, $lcgap, $ugap",
-                    "2*(default, $ugap), 5*(default, $lgap), default, $ugap, default, $lgap, 85dlu:grow, $lgap, default"));
+                panel5.setLayout(new FormLayout(
+                    "pref",
+                    "default, $lgap, fill:default:grow, $ugap, default"));
 
-                //---- lblConfigTitle ----
-                lblConfigTitle.setOpaque(true);
-                lblConfigTitle.setBackground(Color.magenta);
-                lblConfigTitle.setText("Configs (\u00c4nderungen erfordern Neustart)");
-                lblConfigTitle.setForeground(Color.white);
-                lblConfigTitle.setHorizontalAlignment(SwingConstants.CENTER);
-                lblConfigTitle.setFont(lblConfigTitle.getFont().deriveFont(lblConfigTitle.getFont().getStyle() | Font.ITALIC, 24f));
-                configView.add(lblConfigTitle, CC.xywh(3, 1, 9, 1));
+                //---- btnQuit ----
+                btnQuit.setText(null);
+                btnQuit.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/exit.png")));
+                btnQuit.setToolTipText("Programm beenden");
+                panel5.add(btnQuit, CC.xy(1, 3, CC.FILL, CC.DEFAULT));
 
-                //---- label1 ----
-                label1.setText("System-Name");
-                label1.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                configView.add(label1, CC.xy(3, 3));
-
-                //---- txtFlagName ----
-                txtFlagName.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                txtFlagName.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtFlagNameFocusLost(e);
-                    }
-                });
-                configView.add(txtFlagName, CC.xywh(7, 3, 5, 1));
-
-                //---- label2 ----
-                label2.setText("Rest URL");
-                label2.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                configView.add(label2, CC.xy(3, 5));
-
-                //---- txtResturl ----
-                txtResturl.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                txtResturl.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtResturlFocusLost(e);
-                    }
-                });
-                configView.add(txtResturl, CC.xy(7, 5));
-
-                //---- label4 ----
-                label4.setText("Rest-Auth");
-                label4.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                configView.add(label4, CC.xy(9, 5));
-
-                //---- txtRestAuth ----
-                txtRestAuth.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                txtRestAuth.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtRestAuthFocusLost(e);
-                    }
-                });
-                configView.add(txtRestAuth, CC.xy(11, 5));
-
-                //---- btnTestRest ----
-                btnTestRest.setText("Test Connection");
-                btnTestRest.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
-                configView.add(btnTestRest, CC.xywh(7, 7, 5, 1));
-
-                //---- label3 ----
-                label3.setText("Start/Stop Signal");
-                label3.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                configView.add(label3, CC.xy(3, 9));
-
-                //---- txtStartStopSiren ----
-                txtStartStopSiren.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                txtStartStopSiren.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtStartStopSirenFocusLost(e);
-                    }
-                });
-                configView.add(txtStartStopSiren, CC.xywh(7, 9, 3, 1));
-
-                //---- btnTestStartStop ----
-                btnTestStartStop.setText("Test Siren");
-                btnTestStartStop.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
-                btnTestStartStop.addActionListener(e -> btnTestStartStopActionPerformed(e));
-                configView.add(btnTestStartStop, CC.xy(11, 9));
-
-                //---- label5 ----
-                label5.setText("ColChange Signal");
-                label5.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                configView.add(label5, CC.xy(3, 11));
-
-                //---- txtColChangeSiren ----
-                txtColChangeSiren.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                txtColChangeSiren.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtColChangeSirenFocusLost(e);
-                    }
-                });
-                configView.add(txtColChangeSiren, CC.xywh(7, 11, 3, 1));
-
-                //---- btnTestColChange ----
-                btnTestColChange.setText("Test Siren");
-                btnTestColChange.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
-                btnTestColChange.addActionListener(e -> btnTestColChangeActionPerformed(e));
-                configView.add(btnTestColChange, CC.xy(11, 11));
-
-                //---- btnStopAllSirens ----
-                btnStopAllSirens.setText("Stop Sirens");
-                btnStopAllSirens.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
-                btnStopAllSirens.addActionListener(e -> btnStopAllSirensActionPerformed(e));
-                configView.add(btnStopAllSirens, CC.xywh(7, 13, 5, 1));
-
-                //---- label8 ----
-                label8.setText("Intervall Stats (ms)");
-                label8.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                configView.add(label8, CC.xy(3, 15));
-
-                //---- txtSendStats ----
-                txtSendStats.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                txtSendStats.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtSendStatsFocusLost(e);
-                    }
-                });
-                configView.add(txtSendStats, CC.xy(7, 15));
-
-                //---- label11 ----
-                label11.setText("Button Reaction (ms)");
-                label11.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                configView.add(label11, CC.xy(9, 15));
-
-                //---- txtButtonReaction ----
-                txtButtonReaction.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                txtButtonReaction.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtButtonReactionFocusLost(e);
-                    }
-                });
-                configView.add(txtButtonReaction, CC.xy(11, 15));
-
-                //---- label9 ----
-                label9.setText("UUID");
-                label9.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                configView.add(label9, CC.xy(3, 17));
-
-                //---- txtUUID ----
-                txtUUID.setFont(new Font(Font.DIALOG, Font.PLAIN, 22));
-                txtUUID.setEditable(false);
-                configView.add(txtUUID, CC.xywh(7, 17, 5, 1));
-
-                //---- btnSaveAndQuit ----
-                btnSaveAndQuit.setText(null);
-                btnSaveAndQuit.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/exit.png")));
-                btnSaveAndQuit.setToolTipText("Spiel konfigurieren");
-                configView.add(btnSaveAndQuit, CC.xy(3, 19, CC.LEFT, CC.DEFAULT));
-
-                //======== scrollPane1 ========
+                //======== panel3 ========
                 {
+                    panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
 
-                    //---- txtLog ----
-                    txtLog.setBackground(Color.black);
-                    txtLog.setForeground(new Color(0, 255, 51));
-                    scrollPane1.setViewportView(txtLog);
+                    //---- ledStandbyActive ----
+                    ledStandbyActive.setColor(Color.green);
+                    ledStandbyActive.setToolTipText("Red LED in Button");
+                    panel3.add(ledStandbyActive);
+
+                    //---- ledStatsSent ----
+                    ledStatsSent.setToolTipText("Internet Statistik gesendet");
+                    panel3.add(ledStatsSent);
+
+                    //---- btnTestDialog ----
+                    btnTestDialog.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/analyze.png")));
+                    btnTestDialog.addActionListener(e -> btnTestDialogActionPerformed(e));
+                    panel3.add(btnTestDialog);
                 }
-                configView.add(scrollPane1, CC.xywh(7, 19, 5, 1, CC.DEFAULT, CC.FILL));
+                panel5.add(panel3, CC.xy(1, 5, CC.CENTER, CC.DEFAULT));
             }
-            mainPanel.addTab("configView", configView);
+            mainView.add(panel5, CC.xy(3, 5));
+
+            //======== panel2 ========
+            {
+                panel2.setLayout(new FormLayout(
+                    "4*(pref), default:grow, $lcgap, default, $lcgap",
+                    "fill:default:grow, $lgap, fill:default:grow"));
+
+                //---- btnPresetNumTeams ----
+                btnPresetNumTeams.setText("A");
+                btnPresetNumTeams.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/add_group.png")));
+                btnPresetNumTeams.setVerticalTextPosition(SwingConstants.BOTTOM);
+                btnPresetNumTeams.setHorizontalTextPosition(SwingConstants.CENTER);
+                btnPresetNumTeams.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                panel2.add(btnPresetNumTeams, CC.xywh(1, 1, 1, 3, CC.FILL, CC.FILL));
+
+                //---- btnSwitchMode ----
+                btnSwitchMode.setText(null);
+                btnSwitchMode.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/player_play.png")));
+                btnSwitchMode.setToolTipText("Standby / Active");
+                panel2.add(btnSwitchMode, CC.xywh(2, 1, 1, 3, CC.FILL, CC.FILL));
+
+                //---- btnReset ----
+                btnReset.setText(null);
+                btnReset.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/reload.png")));
+                btnReset.setToolTipText("Reset/Undo");
+                panel2.add(btnReset, CC.xywh(3, 1, 1, 3, CC.FILL, CC.FILL));
+
+                //---- btnPresetGametimeUndo ----
+                btnPresetGametimeUndo.setText(null);
+                btnPresetGametimeUndo.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/clock.png")));
+                btnPresetGametimeUndo.setToolTipText("Preset Gametime");
+                panel2.add(btnPresetGametimeUndo, CC.xywh(4, 1, 1, 3, CC.FILL, CC.FILL));
+
+                //======== panel4 ========
+                {
+                    panel4.setLayout(new FormLayout(
+                        "default, $lcgap, default",
+                        "2*(default, $lgap), default"));
+                }
+                panel2.add(panel4, CC.xywh(5, 1, 1, 3));
+            }
+            mainView.add(panel2, CC.xywh(7, 5, 5, 1, CC.FILL, CC.FILL));
         }
-        contentPane.add(mainPanel);
-        setSize(1050, 700);
+        contentPane.add(mainView);
+        setSize(800, 470);
         setLocationRelativeTo(null);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -777,7 +571,6 @@ public class FrameDebug extends JFrame {
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JTabbedPane mainPanel;
     private JPanel mainView;
     private JPanel panel1;
     private MyLED ledRedButton;
@@ -800,7 +593,6 @@ public class FrameDebug extends JFrame {
     private MyLED ledFlagYellow;
     private JProgressBar pbYellow;
     private JPanel panel5;
-    private JButton btnConfig;
     private JButton btnQuit;
     private JPanel panel3;
     private MyLED ledStandbyActive;
@@ -808,34 +600,9 @@ public class FrameDebug extends JFrame {
     private JButton btnTestDialog;
     private JPanel panel2;
     private JButton btnPresetNumTeams;
-    private JButton btnReset;
-    private JTextField textField1;
     private JButton btnSwitchMode;
+    private JButton btnReset;
     private JButton btnPresetGametimeUndo;
-    private JPanel configView;
-    private JLabel lblConfigTitle;
-    private JLabel label1;
-    private JTextField txtFlagName;
-    private JLabel label2;
-    private JTextField txtResturl;
-    private JLabel label4;
-    private JTextField txtRestAuth;
-    private JButton btnTestRest;
-    private JLabel label3;
-    private JTextField txtStartStopSiren;
-    private JButton btnTestStartStop;
-    private JLabel label5;
-    private JTextField txtColChangeSiren;
-    private JButton btnTestColChange;
-    private JButton btnStopAllSirens;
-    private JLabel label8;
-    private JTextField txtSendStats;
-    private JLabel label11;
-    private JTextField txtButtonReaction;
-    private JLabel label9;
-    private JTextField txtUUID;
-    private JButton btnSaveAndQuit;
-    private JScrollPane scrollPane1;
-    private JTextArea txtLog;
+    private JPanel panel4;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

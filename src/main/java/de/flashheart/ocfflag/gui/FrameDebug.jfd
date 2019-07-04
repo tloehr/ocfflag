@@ -9,491 +9,269 @@ new FormModel {
 			"defaultCloseOperation": 3
 			"$locationPolicy": 1
 			"$sizePolicy": 1
-			add( new FormContainer( "javax.swing.JTabbedPane", new FormLayoutManager( class javax.swing.JTabbedPane ) ) {
-				name: "mainPanel"
-				"enabled": false
-				addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "mainPanelStateChanged", true ) )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+				"$columnSpecs": "relgap, labelcompgap, pref, labelcompgap, unrelgap, labelcompgap, 62dlu:grow, labelcompgap, unrelgap, labelcompgap, pref:grow, labelcompgap, relgap"
+				"$rowSpecs": "relgap, linegap, fill:55dlu:grow, relgap, pref, linegap, relgap"
+			} ) {
+				name: "mainView"
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-					"$columnSpecs": "relgap, labelcompgap, pref, labelcompgap, unrelgap, labelcompgap, 62dlu:grow, labelcompgap, unrelgap, labelcompgap, pref:grow, labelcompgap, relgap"
-					"$rowSpecs": "relgap, linegap, fill:55dlu:grow, relgap, pref, linegap, relgap"
+					"$columnSpecs": "default, labelcompgap, pref, labelcompgap, unrelgap, labelcompgap, 162dlu:grow, labelcompgap, unrelgap, labelcompgap, pref, labelcompgap, default"
+					"$rowSpecs": "fill:22dlu:grow, linegap, fill:default, linegap, fill:default:grow, linegap, fill:default"
 				} ) {
-					name: "mainView"
-					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-						"$columnSpecs": "default, labelcompgap, pref, labelcompgap, unrelgap, labelcompgap, 62dlu:grow, labelcompgap, unrelgap, labelcompgap, pref, labelcompgap, default, labelcompgap, default"
-						"$rowSpecs": "fill:22dlu:grow, linegap, fill:default, linegap, fill:default:grow, linegap, fill:default"
-					} ) {
-						name: "panel1"
-						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-							name: "ledRedButton"
-							"color": sfield java.awt.Color red
-							"toolTipText": "Red LED in Button"
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) )
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnRed"
-							"text": "Red"
-							"foreground": sfield java.awt.Color red
-							"font": &Font0 new java.awt.Font( "DSEG7 Classic", 3, 36 )
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridX": 3
-						} )
-						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "lblPole"
-							"opaque": true
-							"background": sfield java.awt.Color white
-							"text": "Flagge"
-							"foreground": sfield java.awt.Color black
-							"horizontalAlignment": 0
-							"font": new java.awt.Font( "DSEG7 Classic", 3, 36 )
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridX": 7
-							"gridHeight": 5
-						} )
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnBlue"
-							"text": "Blue"
-							"foreground": sfield java.awt.Color blue
-							"font": #Font0
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-							"gridX": 11
-						} )
-						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-							name: "ledBlueButton"
-							"color": sfield java.awt.Color blue
-							"toolTipText": "Blue LED in Button"
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridX": 15
-						} )
-						add( new FormComponent( "javax.swing.JProgressBar" ) {
-							name: "pbRed"
-							"stringPainted": true
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridY": 3
-							"gridWidth": 3
-							"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-						} )
-						add( new FormComponent( "javax.swing.JProgressBar" ) {
-							name: "pbBlue"
-							"stringPainted": true
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridY": 3
-							"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-							"gridX": 11
-						} )
-						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-							name: "ledGreenButton"
-							"color": sfield java.awt.Color green
-							"toolTipText": "Red LED in Button"
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridY": 5
-						} )
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnGreen"
-							"text": "Green"
-							"foreground": new java.awt.Color( 18, 110, 12, 255 )
-							"font": #Font0
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridX": 3
-							"gridY": 5
-						} )
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnYellow"
-							"text": "Yellow"
-							"foreground": new java.awt.Color( 210, 199, 27, 255 )
-							"font": #Font0
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-							"gridY": 5
-							"gridX": 11
-						} )
-						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-							name: "ledYellowButton"
-							"color": sfield java.awt.Color yellow
-							"toolTipText": "Yellow LED in Button"
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridY": 5
-							"gridX": 15
-						} )
-						add( new FormComponent( "javax.swing.JProgressBar" ) {
-							name: "pbGreen"
-							"stringPainted": true
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridY": 7
-							"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-							"gridWidth": 3
-						} )
-						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
-							name: "pnlFlagLEDs"
-							add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-								name: "ledFlagWhite"
-								"toolTipText": "Yellow LED in Button"
-								"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/48x48/led-white-off.png" )
-							} )
-							add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-								name: "ledFlagRed"
-								"color": sfield java.awt.Color red
-								"toolTipText": "Red LED in Button"
-							} )
-							add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-								name: "ledFlagBlue"
-								"color": sfield java.awt.Color blue
-								"toolTipText": "Blue LED in Button"
-							} )
-							add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-								name: "ledFlagGreen"
-								"color": sfield java.awt.Color green
-								"toolTipText": "Red LED in Button"
-							} )
-							add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-								name: "ledFlagYellow"
-								"color": sfield java.awt.Color yellow
-								"toolTipText": "Yellow LED in Button"
-							} )
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridX": 7
-							"gridY": 7
-						} )
-						add( new FormComponent( "javax.swing.JProgressBar" ) {
-							name: "pbYellow"
-							"stringPainted": true
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridY": 7
-							"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-							"gridX": 11
-						} )
+					name: "panel1"
+					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
+						name: "ledRedButton"
+						"color": sfield java.awt.Color red
+						"toolTipText": "Red LED in Button"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnRed"
+						"text": "Red"
+						"foreground": sfield java.awt.Color red
+						"font": new java.awt.Font( "Dialog", 3, 24 )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 3
-						"gridY": 3
-						"gridWidth": 9
 					} )
-					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-						"$columnSpecs": "pref"
-						"$rowSpecs": "default, linegap, fill:default:grow, unrelgap, default"
-					} ) {
-						name: "panel5"
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnConfig"
-							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/128x128/configure.png" )
-							"toolTipText": "Spiel konfigurieren"
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-						} )
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnQuit"
-							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/128x128/exit.png" )
-							"toolTipText": "Programm beenden"
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-							"gridY": 3
-						} )
-						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
-							name: "panel3"
-							add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-								name: "ledStandbyActive"
-								"color": sfield java.awt.Color green
-								"toolTipText": "Red LED in Button"
-							} )
-							add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
-								name: "ledStatsSent"
-								"toolTipText": "Internet Statistik gesendet"
-							} )
-							add( new FormComponent( "javax.swing.JButton" ) {
-								name: "btnTestDialog"
-								"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/analyze.png" )
-								addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnTestDialogActionPerformed", true ) )
-							} )
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridY": 5
-							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints CENTER
-						} )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 3
-						"gridY": 5
-					} )
-					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-						"$columnSpecs": "default:grow, default:grow, default:grow"
-						"$rowSpecs": "fill:default:grow, linegap, fill:default:grow"
-					} ) {
-						name: "panel2"
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnPresetNumTeams"
-							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/128x128/add_group.png" )
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridX": 1
-							"gridY": 1
-							"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-						} )
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnReset"
-							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/128x128/reload.png" )
-							"toolTipText": "Reset/Undo"
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridX": 2
-							"gridY": 1
-							"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-						} )
-						add( new FormComponent( "javax.swing.JTextField" ) {
-							name: "textField1"
-							"columns": 16
-							"text": " OCF-Flag 2.0"
-							"font": new java.awt.Font( "Courier New", 0, 12 )
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridX": 3
-							"gridY": 1
-						} )
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnSwitchMode"
-							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/128x128/player_play.png" )
-							"toolTipText": "Standby / Active"
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridY": 3
-							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-							"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-						} )
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnPresetGametimeUndo"
-							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/128x128/clock.png" )
-							"toolTipText": "Preset Gametime"
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-							"gridX": 2
-							"gridY": 3
-							"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-							"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-						} )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 5
-						"gridX": 7
-						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-						"gridWidth": 5
-					} )
-				}, new FormLayoutConstraints( null ) {
-					"title": "mainView"
-				} )
-				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-					"$columnSpecs": "unrelgap, labelcompgap, pref, labelcompgap, relgap, labelcompgap, 129dlu, unrelgap, center:pref, labelcompgap, 124dlu, labelcompgap, unrelgap"
-					"$rowSpecs": "default, unrelgap, default, unrelgap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, unrelgap, default, linegap, 85dlu:grow, linegap, default"
-				} ) {
-					name: "configView"
 					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "lblConfigTitle"
+						name: "lblPole"
 						"opaque": true
-						"background": sfield java.awt.Color magenta
-						"text": "Configs (Änderungen erfordern Neustart)"
-						"foreground": sfield java.awt.Color white
+						"background": sfield java.awt.Color white
+						"text": "Flagge"
+						"foreground": sfield java.awt.Color black
 						"horizontalAlignment": 0
-						"font": new com.jformdesigner.model.SwingDerivedFont( null, 2, 24, true )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridWidth": 9
-						"gridX": 3
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "label1"
-						"text": "System-Name"
-						"font": &Font1 new java.awt.Font( "Dialog", 0, 22 )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 3
-						"gridX": 3
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtFlagName"
-						"font": #Font1
-						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtFlagNameFocusLost", true ) )
+						"font": new java.awt.Font( "Dialog", 3, 24 )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
-						"gridY": 3
-						"gridWidth": 5
+						"gridHeight": 5
 					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "label2"
-						"text": "Rest URL"
-						"font": #Font1
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnBlue"
+						"text": "Blue"
+						"foreground": sfield java.awt.Color blue
+						"font": new java.awt.Font( "Dialog", 3, 24 )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 5
-						"gridX": 3
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtResturl"
-						"font": #Font1
-						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtResturlFocusLost", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 7
-						"gridY": 5
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "label4"
-						"text": "Rest-Auth"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 5
-						"gridX": 9
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtRestAuth"
-						"font": #Font1
-						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtRestAuthFocusLost", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 						"gridX": 11
+					} )
+					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
+						name: "ledBlueButton"
+						"color": sfield java.awt.Color blue
+						"toolTipText": "Blue LED in Button"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 13
+					} )
+					add( new FormComponent( "javax.swing.JProgressBar" ) {
+						name: "pbRed"
+						"stringPainted": true
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridY": 3
+						"gridWidth": 3
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+					} )
+					add( new FormComponent( "javax.swing.JProgressBar" ) {
+						name: "pbBlue"
+						"stringPainted": true
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridY": 3
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"gridX": 11
+						"gridWidth": 3
+					} )
+					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
+						name: "ledGreenButton"
+						"color": sfield java.awt.Color green
+						"toolTipText": "Red LED in Button"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridY": 5
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "btnTestRest"
-						"text": "Test Connection"
-						"font": &Font2 new java.awt.Font( "Dialog", 0, 20 )
+						name: "btnGreen"
+						"text": "Green"
+						"foreground": new java.awt.Color( 18, 110, 12, 255 )
+						"font": &Font0 new java.awt.Font( "Dialog", 3, 24 )
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 3
+						"gridY": 5
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnYellow"
+						"text": "Yellow"
+						"foreground": new java.awt.Color( 210, 199, 27, 255 )
+						"font": #Font0
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"gridY": 5
+						"gridX": 11
+					} )
+					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
+						name: "ledYellowButton"
+						"color": sfield java.awt.Color yellow
+						"toolTipText": "Yellow LED in Button"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridY": 5
+						"gridX": 13
+					} )
+					add( new FormComponent( "javax.swing.JProgressBar" ) {
+						name: "pbGreen"
+						"stringPainted": true
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridY": 7
-						"gridX": 7
-						"gridWidth": 5
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "label3"
-						"text": "Start/Stop Signal"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 9
-						"gridX": 3
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtStartStopSiren"
-						"font": #Font1
-						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtStartStopSirenFocusLost", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 7
-						"gridY": 9
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 						"gridWidth": 3
 					} )
-					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "btnTestStartStop"
-						"text": "Test Siren"
-						"font": #Font2
-						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnTestStartStopActionPerformed", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 11
-						"gridY": 9
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "label5"
-						"text": "ColChange Signal"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 11
-						"gridX": 3
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtColChangeSiren"
-						"font": #Font1
-						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtColChangeSirenFocusLost", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 7
-						"gridY": 11
-						"gridWidth": 3
-					} )
-					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "btnTestColChange"
-						"text": "Test Siren"
-						"font": #Font2
-						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnTestColChangeActionPerformed", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 11
-						"gridY": 11
-					} )
-					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "btnStopAllSirens"
-						"text": "Stop Sirens"
-						"font": #Font2
-						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnStopAllSirensActionPerformed", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 13
-						"gridX": 7
-						"gridWidth": 5
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "label8"
-						"text": "Intervall Stats (ms)"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 15
-						"gridX": 3
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtSendStats"
-						"font": #Font1
-						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtSendStatsFocusLost", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 7
-						"gridY": 15
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "label11"
-						"text": "Button Reaction (ms)"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 15
-						"gridX": 9
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtButtonReaction"
-						"font": #Font1
-						addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtButtonReactionFocusLost", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 11
-						"gridY": 15
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "label9"
-						"text": "UUID"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 17
-						"gridX": 3
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtUUID"
-						"font": #Font1
-						"editable": false
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 7
-						"gridY": 17
-						"gridWidth": 5
-					} )
-					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "btnSaveAndQuit"
-						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/128x128/exit.png" )
-						"toolTipText": "Spiel konfigurieren"
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints LEFT
-						"gridY": 19
-						"gridX": 3
-					} )
-					add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-						name: "scrollPane1"
-						add( new FormComponent( "javax.swing.JTextArea" ) {
-							name: "txtLog"
-							"background": sfield java.awt.Color black
-							"foreground": new java.awt.Color( 0, 255, 51, 255 )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+						name: "pnlFlagLEDs"
+						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
+							name: "ledFlagWhite"
+							"toolTipText": "Yellow LED in Button"
+							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/48x48/led-white-off.png" )
+						} )
+						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
+							name: "ledFlagRed"
+							"color": sfield java.awt.Color red
+							"toolTipText": "Red LED in Button"
+						} )
+						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
+							name: "ledFlagBlue"
+							"color": sfield java.awt.Color blue
+							"toolTipText": "Blue LED in Button"
+						} )
+						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
+							name: "ledFlagGreen"
+							"color": sfield java.awt.Color green
+							"toolTipText": "Red LED in Button"
+						} )
+						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
+							name: "ledFlagYellow"
+							"color": sfield java.awt.Color yellow
+							"toolTipText": "Yellow LED in Button"
 						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 7
-						"gridY": 19
-						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-						"gridWidth": 5
+						"gridY": 7
 					} )
-				}, new FormLayoutConstraints( null ) {
-					"title": "configView"
+					add( new FormComponent( "javax.swing.JProgressBar" ) {
+						name: "pbYellow"
+						"stringPainted": true
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridY": 7
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"gridX": 11
+						"gridWidth": 3
+					} )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 3
+					"gridY": 3
+					"gridWidth": 9
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+					"$columnSpecs": "pref"
+					"$rowSpecs": "default, linegap, fill:default:grow, unrelgap, default"
+				} ) {
+					name: "panel5"
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnQuit"
+						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/exit.png" )
+						"toolTipText": "Programm beenden"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"gridY": 3
+					} )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
+						name: "panel3"
+						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
+							name: "ledStandbyActive"
+							"color": sfield java.awt.Color green
+							"toolTipText": "Red LED in Button"
+						} )
+						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
+							name: "ledStatsSent"
+							"toolTipText": "Internet Statistik gesendet"
+						} )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "btnTestDialog"
+							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/analyze.png" )
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnTestDialogActionPerformed", true ) )
+						} )
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridY": 5
+						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints CENTER
+					} )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 3
+					"gridY": 5
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+					"$columnSpecs": "pref, pref, pref, pref, default:grow, labelcompgap, default, labelcompgap"
+					"$rowSpecs": "fill:default:grow, linegap, fill:default:grow"
+				} ) {
+					name: "panel2"
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnPresetNumTeams"
+						"text": "A"
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/add_group.png" )
+						"verticalTextPosition": 3
+						"horizontalTextPosition": 0
+						"font": new java.awt.Font( "Dialog", 1, 24 )
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"gridHeight": 3
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnSwitchMode"
+						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/player_play.png" )
+						"toolTipText": "Standby / Active"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"gridX": 2
+						"gridHeight": 3
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnReset"
+						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/reload.png" )
+						"toolTipText": "Reset/Undo"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 3
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"gridHeight": 3
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnPresetGametimeUndo"
+						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/clock.png" )
+						"toolTipText": "Preset Gametime"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 4
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"gridHeight": 3
+					} )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+						"$columnSpecs": "default, labelcompgap, default"
+						"$rowSpecs": "default, linegap, default, linegap, default"
+					} ) {
+						name: "panel4"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 5
+						"gridHeight": 3
+					} )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridY": 5
+					"gridX": 7
+					"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+					"gridWidth": 5
 				} )
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 10 )
-			"size": new java.awt.Dimension( 1050, 700 )
+			"size": new java.awt.Dimension( 800, 470 )
 		} )
 	}
 }
