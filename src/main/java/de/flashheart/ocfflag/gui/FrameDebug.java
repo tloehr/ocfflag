@@ -282,8 +282,9 @@ public class FrameDebug extends JFrame {
         panel2 = new JPanel();
         btnPresetNumTeams = new JButton();
         btnReset = new JButton();
-        btnPresetGametimeUndo = new JButton();
+        textField1 = new JTextField();
         btnSwitchMode = new JButton();
+        btnPresetGametimeUndo = new JButton();
         configView = new JPanel();
         lblConfigTitle = new JLabel();
         label1 = new JLabel();
@@ -492,17 +493,23 @@ public class FrameDebug extends JFrame {
                     btnReset.setToolTipText("Reset/Undo");
                     panel2.add(btnReset, CC.xy(2, 1, CC.FILL, CC.FILL));
 
-                    //---- btnPresetGametimeUndo ----
-                    btnPresetGametimeUndo.setText(null);
-                    btnPresetGametimeUndo.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/clock.png")));
-                    btnPresetGametimeUndo.setToolTipText("Preset Gametime");
-                    panel2.add(btnPresetGametimeUndo, CC.xy(3, 1, CC.FILL, CC.FILL));
+                    //---- textField1 ----
+                    textField1.setColumns(16);
+                    textField1.setText(" OCF-Flag 2.0");
+                    textField1.setFont(new Font("Courier New", Font.PLAIN, 12));
+                    panel2.add(textField1, CC.xy(3, 1));
 
                     //---- btnSwitchMode ----
                     btnSwitchMode.setText(null);
                     btnSwitchMode.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/player_play.png")));
                     btnSwitchMode.setToolTipText("Standby / Active");
-                    panel2.add(btnSwitchMode, CC.xywh(1, 3, 3, 1, CC.FILL, CC.FILL));
+                    panel2.add(btnSwitchMode, CC.xy(1, 3, CC.FILL, CC.FILL));
+
+                    //---- btnPresetGametimeUndo ----
+                    btnPresetGametimeUndo.setText(null);
+                    btnPresetGametimeUndo.setIcon(new ImageIcon(getClass().getResource("/artwork/128x128/clock.png")));
+                    btnPresetGametimeUndo.setToolTipText("Preset Gametime");
+                    panel2.add(btnPresetGametimeUndo, CC.xy(2, 3, CC.FILL, CC.FILL));
                 }
                 mainView.add(panel2, CC.xywh(7, 5, 5, 1, CC.FILL, CC.FILL));
             }
@@ -680,7 +687,7 @@ public class FrameDebug extends JFrame {
             mainPanel.addTab("configView", configView);
         }
         contentPane.add(mainPanel);
-        setSize(980, 640);
+        setSize(1050, 700);
         setLocationRelativeTo(null);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -802,8 +809,9 @@ public class FrameDebug extends JFrame {
     private JPanel panel2;
     private JButton btnPresetNumTeams;
     private JButton btnReset;
-    private JButton btnPresetGametimeUndo;
+    private JTextField textField1;
     private JButton btnSwitchMode;
+    private JButton btnPresetGametimeUndo;
     private JPanel configView;
     private JLabel lblConfigTitle;
     private JLabel label1;

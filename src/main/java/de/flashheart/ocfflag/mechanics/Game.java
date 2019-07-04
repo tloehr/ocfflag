@@ -349,46 +349,49 @@ public class Game implements Runnable, HasLogger {
         Main.getFrameDebug().addToConfigLog("button_undo_reset_pressed");
         if (CONFIG_PAGE) return;
 
-
-        // hier wird auch ein evtl. UNDO direkt abgearbeitet
-        if (mode == MODE_CLOCK_GAME_PAUSED) {
-            getLogger().info("IN PAUSE MODE - Trying to UNDO");
-
-            SELECTED_SAVEPOINT++;
-            if (SELECTED_SAVEPOINT > 3) SELECTED_SAVEPOINT = 1;
-            // kein vorheriger vorhanden. Daher geht das nicht. Dann nur RESET oder CURRENT.
-            if (lastState == null && SELECTED_SAVEPOINT == 1) SELECTED_SAVEPOINT++;
-            SavePoint savePoint = null;
-            resetGame = false;
-            switch (SELECTED_SAVEPOINT) {
-                case SAVEPOINT_RESET: {
-                    savePoint = resetState;
-                    resetGame = true;
-                    break;
-                }
-                case SAVEPOINT_PREVIOUS: {
-                    savePoint = lastState;
-                    break;
-                }
-                case SAVEPOINT_CURRENT: {
-                    savePoint = currentState;
-                    break;
-                }
-                default: {
-                    savePoint = null;
-                }
-            }
-
-            flag = savePoint.getFlag();
-            remaining = savePoint.getTime();
-            time_red = savePoint.getTime_red();
-            time_blue = savePoint.getTime_blue();
-            // spielt keine Rolle ob es diese Teams gibt. Sind dann sowieso 0l;
-            time_green = savePoint.getTime_green();
-            time_yellow = savePoint.getTime_yellow();
-            setDisplayToEvent();
+        // Ein Druck auf die Undo Taste setzt das Spiel sofort in den Pause Modus.
+        if (mode == MODE_CLOCK_GAME_RUNNING) {
+            buttonStandbyRunningPressed();
         }
 
+        // hier wird auch ein evtl. UNDO direkt abgearbeitet
+
+        getLogger().info("Trying to UNDO");
+
+
+        SELECTED_SAVEPOINT++;
+        if (SELECTED_SAVEPOINT > 3) SELECTED_SAVEPOINT = 1;
+        // kein vorheriger vorhanden. Daher geht das nicht. Dann nur RESET oder CURRENT.
+        if (lastState == null && SELECTED_SAVEPOINT == 1) SELECTED_SAVEPOINT++;
+        SavePoint savePoint;
+        resetGame = false;
+        switch (SELECTED_SAVEPOINT) {
+            case SAVEPOINT_RESET: {
+                savePoint = resetState;
+                resetGame = true;
+                break;
+            }
+            case SAVEPOINT_PREVIOUS: {
+                savePoint = lastState;
+                break;
+            }
+            case SAVEPOINT_CURRENT: {
+                savePoint = currentState;
+                break;
+            }
+            default: {
+                savePoint = null;
+            }
+        }
+
+        flag = savePoint.getFlag();
+        remaining = savePoint.getTime();
+        time_red = savePoint.getTime_red();
+        time_blue = savePoint.getTime_blue();
+        // spielt keine Rolle ob es diese Teams gibt. Sind dann sowieso 0l;
+        time_green = savePoint.getTime_green();
+        time_yellow = savePoint.getTime_yellow();
+        setDisplayToEvent();
 
     }
 
@@ -720,7 +723,7 @@ public class Game implements Runnable, HasLogger {
             button_red.setEnabled(false);
             button_green.setEnabled(preset_num_teams >= 3);
             button_yellow.setEnabled(preset_num_teams >= 4);
-            
+
 
         } else if (flag.equals(GameEvent.BLUE_ACTIVATED)) {
             getLogger().info("Flag is blue");
@@ -770,7 +773,7 @@ public class Game implements Runnable, HasLogger {
             button_red.setEnabled(true);
             button_green.setEnabled(true);
             button_yellow.setEnabled(false);
-            
+
         }
     }
 
@@ -841,7 +844,7 @@ public class Game implements Runnable, HasLogger {
                         }
                     }
 
-                    // Zeit zum entpsrechenden Team addieren.
+                    // Zeit zum entsprechenden Team addieren.
                     if (flag.equals(GameEvent.RED_ACTIVATED)) {
                         time_red += diff;
                         if (changeColorBlinking) {
