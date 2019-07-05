@@ -171,6 +171,26 @@ public class Tools {
         return sb.toString();
     }
 
+    // https://stackoverflow.com/questions/3760152/split-string-to-equal-length-substrings-in-java
+    public static String[] splitInParts(String s, int partLength) {
+        int len = s.length();
+
+        // Number of parts
+        int nparts = (len + partLength - 1) / partLength;
+        String parts[] = new String[nparts];
+
+        // Break into parts
+        int offset = 0;
+        int i = 0;
+        while (i < nparts) {
+            parts[i] = s.substring(offset, Math.min(offset + partLength, len));
+            offset += partLength;
+            i++;
+        }
+
+        return parts;
+    }
+
     /**
      * Creates a Color object according to the names of the Java color constants.
      * A HTML color string like "62A9FF" may also be used. Please remove the leading "#".
@@ -224,4 +244,20 @@ public class Tools {
         }
         return color;
     }
+
+    public static String left(String text, int size) {
+        return left(text, size, "...");
+    }
+
+    public static String left(String text, int size, String abrev) {
+        //        OPDE.debug("IN: " + text);
+        int originalLaenge = text.length();
+        int max = Math.min(size, originalLaenge);
+        text = text.substring(0, max);
+        if (max < originalLaenge) {
+            text += abrev;
+        }
+        return text;
+    }
+
 }

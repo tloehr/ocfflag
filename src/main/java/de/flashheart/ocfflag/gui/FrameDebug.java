@@ -7,6 +7,7 @@ package de.flashheart.ocfflag.gui;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.hardware.abstraction.*;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyPin;
 import de.flashheart.ocfflag.hardware.pinhandler.PinBlinkModel;
@@ -28,10 +29,10 @@ public class FrameDebug extends JFrame {
     private Font font;
     private Font font2;
     private JDialog testDlg;
-    public static final Icon IconPlay = new ImageIcon(FrameDebug.class.getResource("/artwork/128x128/player_play.png"));
-    public static final Icon IconPause = new ImageIcon(FrameDebug.class.getResource("/artwork/128x128/player_pause.png"));
-    public static final Icon IconGametime = new ImageIcon(FrameDebug.class.getResource("/artwork/128x128/clock.png"));
-    public static final Icon IconUNDO = new ImageIcon(FrameDebug.class.getResource("/artwork/128x128/reload.png"));
+    public static final Icon IconPlay = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/player_play.png"));
+    public static final Icon IconPause = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/player_pause.png"));
+    public static final Icon IconGametime = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/clock.png"));
+    public static final Icon IconUNDO = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/reload.png"));
 
     public FrameDebug() {
         initComponents();
@@ -60,6 +61,10 @@ public class FrameDebug extends JFrame {
         return pbYellow;
     }
 
+    public JPanel getLcd_panel() {
+        return lcd_panel;
+    }
+
     private void initFrame() {
         btnTestDialog.setVisible(Main.isDev_mode());
 
@@ -75,7 +80,6 @@ public class FrameDebug extends JFrame {
 
         lblPole.setFont(font2.deriveFont(80f).deriveFont(Font.BOLD));
 
-        setTab(0);
         if (Tools.isArm()) setExtendedState(MAXIMIZED_BOTH);
     }
 
@@ -89,148 +93,8 @@ public class FrameDebug extends JFrame {
         }
     }
 
-    public void setTab(int tab) {
-        mainPanel.setSelectedIndex(tab);
-    }
-
-
     public JButton getBtnQuit() {
         return btnQuit;
-    }
-
-//    public JButton getBtnPlay() {
-//        return btnPlay;
-//    }
-
-
-    public JButton getBtnSaveAndQuit() {
-        return btnSaveAndQuit;
-    }
-
-    public JButton getBtnConfig() {
-        return btnConfig;
-    }
-
-    private void mainPanelStateChanged(ChangeEvent e) {
-        if (mainPanel.getSelectedIndex() == 1) {
-            Main.getPinHandler().off();
-            setConfigsToScreen();
-        } else {
-            btnSwitchMode.requestFocus(); // nur damit die FocusLost ziehen von der Configseite. Ansonsten sinnlos.
-//            lblFlagname.setText(Main.getConfigs().get(Configs.FLAGNAME)); // falls der sich geändert hat
-        }
-    }
-
-    private void setConfigsToScreen() {
-        txtFlagName.setText(Main.getConfigs().get(Configs.FLAGNAME));
-        txtResturl.setText(Main.getConfigs().get(Configs.REST_URL));
-        txtRestAuth.setText(Main.getConfigs().get(Configs.REST_AUTH));
-        txtButtonReaction.setText(Main.getConfigs().get(Configs.BUTTON_REACTION_TIME));
-        txtSendStats.setText(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
-        txtUUID.setText(Main.getConfigs().get(Configs.MYUUID));
-        txtStartStopSiren.setText(Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
-        txtColChangeSiren.setText(Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
-    }
-
-    private void txtFlagNameFocusLost(FocusEvent e) {
-        String flagname = txtFlagName.getText().trim();
-        Main.getConfigs().put(Configs.FLAGNAME, flagname);
-    }
-
-    public void addToConfigLog(String text) {
-        if (mainPanel.getSelectedIndex() != 1) return;
-        SwingUtilities.invokeLater(() -> {
-            txtLog.append(text + "\n");
-            revalidate();
-            repaint();
-        });
-
-    }
-
-    private void txtSendStatsFocusLost(FocusEvent e) {
-        try {
-            Integer.parseInt(txtSendStats.getText().trim());
-            Main.getConfigs().put(Configs.MIN_STAT_SEND_TIME, txtSendStats.getText().trim());
-        } catch (NumberFormatException nfe) {
-            txtSendStats.setText(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
-        }
-    }
-
-
-    private void btnBrghtActionPerformed(ActionEvent e) {
-        JButton source = (JButton) e.getSource();
-        String name = source.getName();
-        int brightness = Main.getConfigs().getInt(name) + 1;
-        if (brightness > 15) brightness = 1;
-        Main.getConfigs().put(name, brightness);
-        source.setText(Integer.toString(brightness));
-
-        try {
-            ((Display7Segments4Digits) Main.getFromContext(name)).setBlinkRate(brightness);
-        } catch (IOException e1) {
-            logger.error(e1);
-        }
-
-    }
-
-
-    private void txtFlagColorActionPerformed(ActionEvent e) {
-//        String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
-//                new RGBScheduleElement(Color.BLUE, 500l) +
-//                new RGBScheduleElement(Color.BLACK, 500l);
-//        logger.debug(pregamePoleColorScheme);
-//        Main.getPinHandler().setScheme(Configs.OUT_POLE, "Flagge", pregamePoleColorScheme);
-    }
-
-    private void txtResturlFocusLost(FocusEvent e) {
-        Main.getConfigs().put(Configs.REST_URL, txtResturl.getText().trim());
-    }
-
-    private void txtRestAuthFocusLost(FocusEvent e) {
-        Main.getConfigs().put(Configs.REST_AUTH, txtRestAuth.getText().trim());
-    }
-
-    private void txtButtonReactionFocusLost(FocusEvent e) {
-        try {
-            Integer.parseInt(txtButtonReaction.getText().trim());
-            Main.getConfigs().put(Configs.BUTTON_REACTION_TIME, txtButtonReaction.getText().trim());
-        } catch (NumberFormatException nfe) {
-            txtButtonReaction.setText(Main.getConfigs().get(Configs.BUTTON_REACTION_TIME));
-        }
-    }
-
-    private void txtStartStopSirenFocusLost(FocusEvent e) {
-        if (!txtStartStopSiren.getText().trim().matches(PinBlinkModel.SCHEME_TEST_REGEX)) {
-            txtStartStopSiren.setText(Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
-            addToConfigLog("Start/Stop Schema ist falsch. Wird zurückgesetzt.");
-        } else {
-            Main.getConfigs().put(Configs.AIRSIREN_SIGNAL, txtStartStopSiren.getText().trim());
-        }
-
-
-    }
-
-    private void btnTestStartStopActionPerformed(ActionEvent e) {
-        Main.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, Main.getConfigs().get(Configs.AIRSIREN_SIGNAL));
-    }
-
-    private void btnTestColChangeActionPerformed(ActionEvent e) {
-        Main.getPinHandler().setScheme(Configs.OUT_SIREN_COLOR_CHANGE, Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
-    }
-
-    private void txtColChangeSirenFocusLost(FocusEvent e) {
-        if (!txtColChangeSiren.getText().trim().matches(PinBlinkModel.SCHEME_TEST_REGEX)) {
-            txtColChangeSiren.setText(Main.getConfigs().get(Configs.COLORCHANGE_SIREN_SIGNAL));
-            addToConfigLog("Color Change Schema ist falsch. Wird zurückgesetzt.");
-        } else {
-            Main.getConfigs().put(Configs.COLORCHANGE_SIREN_SIGNAL, txtColChangeSiren.getText().trim());
-        }
-    }
-
-    private void btnStopAllSirensActionPerformed(ActionEvent e) {
-        Main.getPinHandler().off(Configs.OUT_SIREN_COLOR_CHANGE);
-        Main.getPinHandler().off(Configs.OUT_SIREN_START_STOP);
-        Main.getPinHandler().off(Configs.OUT_HOLDDOWN_BUZZER);
     }
 
     private void btnTestDialogActionPerformed(ActionEvent e) {
@@ -246,7 +110,6 @@ public class FrameDebug extends JFrame {
             }
         });
     }
-
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -282,7 +145,7 @@ public class FrameDebug extends JFrame {
         btnSwitchMode = new JButton();
         btnReset = new JButton();
         btnPresetGametimeUndo = new JButton();
-        panel4 = new JPanel();
+        lcd_panel = new JPanel();
 
         //======== this ========
         setTitle("OCF-Flag 1.0.0.0");
@@ -441,7 +304,7 @@ public class FrameDebug extends JFrame {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                    "4*(pref), default:grow, $lcgap, default, $lcgap",
+                    "4*(pref), $ugap, default:grow, $lcgap, default, $lcgap",
                     "fill:default:grow, $lgap, fill:default:grow"));
 
                 //---- btnPresetNumTeams ----
@@ -470,13 +333,11 @@ public class FrameDebug extends JFrame {
                 btnPresetGametimeUndo.setToolTipText("Preset Gametime");
                 panel2.add(btnPresetGametimeUndo, CC.xywh(4, 1, 1, 3, CC.FILL, CC.FILL));
 
-                //======== panel4 ========
+                //======== lcd_panel ========
                 {
-                    panel4.setLayout(new FormLayout(
-                        "default, $lcgap, default",
-                        "2*(default, $lgap), default"));
+                    lcd_panel.setLayout(new BoxLayout(lcd_panel, BoxLayout.PAGE_AXIS));
                 }
-                panel2.add(panel4, CC.xywh(5, 1, 1, 3));
+                panel2.add(lcd_panel, CC.xywh(6, 1, 3, 3));
             }
             mainView.add(panel2, CC.xywh(7, 5, 5, 1, CC.FILL, CC.FILL));
         }
@@ -603,6 +464,6 @@ public class FrameDebug extends JFrame {
     private JButton btnSwitchMode;
     private JButton btnReset;
     private JButton btnPresetGametimeUndo;
-    private JPanel panel4;
+    private JPanel lcd_panel;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -97,7 +97,6 @@ public class Display7Segments4Digits implements HasLogger {
         DateTime dateTime = new DateTime(time, DateTimeZone.UTC);
         int hours = dateTime.getHourOfDay();
 
-
         String textTime = dateTime.toString("mmss");
         String strMinutes = textTime.charAt(0) + (hours == 4 ? "." : "")
                 + textTime.charAt(1) + (hours >= 3 ? "." : "");
@@ -156,9 +155,9 @@ public class Display7Segments4Digits implements HasLogger {
 
     public void clear() throws IOException {
         if (lblSegment != null)
-            lblSegment.setText("no team");
+            lblSegment.setText("--");
         if (btnSegment != null)
-            btnSegment.setText("no team");
+            btnSegment.setText("--");
         if (segment == null) return;
         segment.clear();
     }

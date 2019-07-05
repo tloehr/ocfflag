@@ -5,6 +5,7 @@ import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
+import de.flashheart.ocfflag.hardware.abstraction.MyLCD;
 import de.flashheart.ocfflag.hardware.pinhandler.PinBlinkModel;
 import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
 import de.flashheart.ocfflag.hardware.pinhandler.RGBBlinkModel;
@@ -22,10 +23,7 @@ import org.joda.time.DateTimeZone;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -38,11 +36,14 @@ public class Game implements Runnable, HasLogger {
     private final int MODE_CLOCK_GAME_RUNNING = 1;
     private final int MODE_CLOCK_GAME_PAUSED = 2;
     private final int MODE_CLOCK_GAME_OVER = 3;
+    private final String MODES[] = new String[]{"Spiel-Vorbereitung", "Spiel läuft", "PAUSE", "GAME OVER"};
 
     private final int SAVEPOINT_NONE = 0;
     private final int SAVEPOINT_PREVIOUS = 1;
     private final int SAVEPOINT_RESET = 2;
     private final int SAVEPOINT_CURRENT = 3;
+    private final String SAVEPOINTS[] = new String[]{"", "SPIELZUG ZURÜCK", "RESET", "KEINE ÄNDERUNG"};
+
 
     private final int MIN_TEAMS = 2;
 
@@ -56,8 +57,6 @@ public class Game implements Runnable, HasLogger {
     private final Display7Segments4Digits display_yellow;
 
     private final MyAbstractButton button_quit;
-    private final MyAbstractButton button_config;
-    private final MyAbstractButton button_saveNquit;
     private final MyAbstractButton button_shutdown;
     private final MyAbstractButton button_preset_num_teams;
     private final MyAbstractButton button_preset_gametime;
@@ -67,6 +66,8 @@ public class Game implements Runnable, HasLogger {
     private final MyAbstractButton button_yellow;
     private final MyAbstractButton button_reset;
     private final MyAbstractButton button_switch_mode;
+
+    private final MyLCD lcd_display;
 
     private final Thread thread;
     private long SLEEP_PER_CYCLE = 500;
@@ -110,8 +111,6 @@ public class Game implements Runnable, HasLogger {
                 MyAbstractButton button_preset_num_teams,
                 MyAbstractButton button_preset_gametime,
                 MyAbstractButton button_quit,
-                MyAbstractButton button_config,
-                MyAbstractButton button_saveNquit,
                 MyAbstractButton button_shutdown
     ) {
         this.display_green = display_green;
@@ -121,8 +120,6 @@ public class Game implements Runnable, HasLogger {
         this.button_preset_num_teams = button_preset_num_teams;
         this.button_preset_gametime = button_preset_gametime;
         this.button_quit = button_quit;
-        this.button_config = button_config;
-        this.button_saveNquit = button_saveNquit;
         this.button_shutdown = button_shutdown;
         thread = new Thread(this);
         this.display_blue = display_blue;
@@ -132,6 +129,8 @@ public class Game implements Runnable, HasLogger {
         this.button_red = button_red;
         this.button_reset = button_reset;
         this.button_switch_mode = button_switch_mode;
+
+        this.lcd_display = (MyLCD) Main.getApplicationContext().get("lcd_display");
 
         preset_gametime_position = Integer.parseInt(Main.getConfigs().get(Configs.GAMETIME));
         preset_times = Main.getConfigs().getGameTimes();
@@ -201,14 +200,6 @@ public class Game implements Runnable, HasLogger {
             getLogger().debug("GUI_button_quit");
             button_quit_pressed();
         });
-        button_config.addActionListener(e -> {
-            getLogger().debug("GUI_button_config");
-            button_config_pressed();
-        });
-        button_saveNquit.addActionListener(e -> {
-            getLogger().debug("GUI_button_back2game");
-            button_saveNquit_pressed();
-        });
         button_shutdown.addActionListener(event -> {
             getLogger().debug("GPIO_button_shutdown DOWN");
             Main.prepareShutdown();
@@ -229,26 +220,6 @@ public class Game implements Runnable, HasLogger {
         reset_timers();
     }
 
-    private void button_saveNquit_pressed() {
-        CONFIG_PAGE = false;
-
-        System.exit(0);
-
-//
-//        reset_timers();
-//        Main.getFrameDebug().setTab(0);
-    }
-
-    private void button_config_pressed() {
-
-        if (mode != MODE_CLOCK_GAME_RUNNING) {
-            reset_timers();
-            Main.getFrameDebug().setTab(1);
-            CONFIG_PAGE = true;
-        } else {
-            getLogger().debug("GAME RUNNING: IGNORED");
-        }
-    }
 
     private void button_quit_pressed() {
 //        if (mode != MODE_CLOCK_PREGAME) return;
@@ -256,7 +227,7 @@ public class Game implements Runnable, HasLogger {
     }
 
     private void button_red_pressed() {
-        Main.getFrameDebug().addToConfigLog("button_red_pressed");
+        getLogger().debug("button_red_pressed");
         if (CONFIG_PAGE) return;
 
         if (mode == MODE_CLOCK_GAME_RUNNING) {
@@ -279,7 +250,7 @@ public class Game implements Runnable, HasLogger {
 
 
     private void button_blue_pressed() {
-        Main.getFrameDebug().addToConfigLog("button_blue_pressed");
+        getLogger().debug("button_blue_pressed");
         if (CONFIG_PAGE) return;
         if (mode == MODE_CLOCK_GAME_RUNNING) {
 
@@ -299,7 +270,7 @@ public class Game implements Runnable, HasLogger {
     }
 
     private void button_green_pressed() {
-        Main.getFrameDebug().addToConfigLog("button_green_pressed");
+        getLogger().debug("button_green_pressed");
         if (CONFIG_PAGE) return;
         if (preset_num_teams < 3) {
             getLogger().debug("NO GREEN TEAM: ignoring");
@@ -323,7 +294,7 @@ public class Game implements Runnable, HasLogger {
     }
 
     private void button_yellow_pressed() {
-        Main.getFrameDebug().addToConfigLog("button_yellow_pressed");
+        getLogger().debug("button_yellow_pressed");
         if (CONFIG_PAGE) return;
         if (preset_num_teams < 4) {
             getLogger().debug("NO YELLOW TEAM: ignoring");
@@ -346,7 +317,7 @@ public class Game implements Runnable, HasLogger {
     }
 
     private void button_undo_reset_pressed() {
-        Main.getFrameDebug().addToConfigLog("button_undo_reset_pressed");
+        getLogger().debug("button_undo_reset_pressed");
         if (CONFIG_PAGE) return;
 
         // Ein Druck auf die Undo Taste setzt das Spiel sofort in den Pause Modus.
@@ -396,7 +367,7 @@ public class Game implements Runnable, HasLogger {
     }
 
     private void button_preset_num_teams() {
-        Main.getFrameDebug().addToConfigLog("button_num_teams_pressed");
+        getLogger().debug("button_num_teams_pressed");
         int max_number_of_teams = Main.getConfigs().getInt(Configs.MAX_NUMBER_OF_TEAMS);
         if (CONFIG_PAGE) return;
 
@@ -413,7 +384,7 @@ public class Game implements Runnable, HasLogger {
     }
 
     private void button_gametime_pressed() {
-        Main.getFrameDebug().addToConfigLog("button_gametime_pressed");
+        getLogger().debug("button_gametime_pressed");
         if (CONFIG_PAGE) return;
         if (mode == MODE_CLOCK_PREGAME) {
             preset_gametime_position++;
@@ -426,7 +397,7 @@ public class Game implements Runnable, HasLogger {
     }
 
     private void buttonStandbyRunningPressed() {
-        Main.getFrameDebug().addToConfigLog("button_Standby_Active_pressed");
+        getLogger().debug("button_Standby_Active_pressed");
         long now = System.currentTimeMillis();
         if (CONFIG_PAGE) return;
         if (mode == MODE_CLOCK_GAME_RUNNING) {
@@ -498,6 +469,8 @@ public class Game implements Runnable, HasLogger {
 
     private void setDisplayToEvent() {
         try {
+            writeLCD();
+
             display_white.setTime(remaining);
             display_red.setTime(time_red);
             display_blue.setTime(time_blue);
@@ -636,6 +609,7 @@ public class Game implements Runnable, HasLogger {
 
                     Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "DRAW GAME", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                     Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "∞:on,1000;off,1000");
+                    writeLCDFor2TeamsGameOver(null);
                 } else {
 
                     if (statistics.getWinners().contains("red")) {
@@ -673,6 +647,7 @@ public class Game implements Runnable, HasLogger {
                             Main.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, "∞:on,250;off,250");
                     }
                     Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, text, winningScheme);
+                    writeLCDFor2TeamsGameOver(statistics.getWinners());
                 }
             }
 
@@ -874,6 +849,7 @@ public class Game implements Runnable, HasLogger {
                         }
                     }
 
+                    writeLCD();
                     display_white.setTime(remaining);
                     display_red.setTime(time_red);
                     display_blue.setTime(time_blue);
@@ -901,6 +877,66 @@ public class Game implements Runnable, HasLogger {
                 System.exit(1);
             }
         }
+    }
+
+    private void writeLCDFor2Teams() {
+        String format = "H:mm:ss";
+        if (preset_times[preset_gametime_position] <= 60) {
+            format = "mm:ss";
+        }
+
+        String redmarker = flag.equals(GameEvent.RED_ACTIVATED) ? "**" : "";
+        String bluemarker = flag.equals(GameEvent.BLUE_ACTIVATED) ? "**" : "";
+
+//        String savepoint = SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS ? "" : "";
+
+        lcd_display.setLine(1, "Zeit " + new DateTime(remaining, DateTimeZone.UTC).toString(format));
+        lcd_display.setLine(2, redmarker + "Rot" + redmarker + " " + new DateTime(time_red, DateTimeZone.UTC).toString(format));
+        lcd_display.setLine(3, bluemarker + "Blau" + bluemarker + " " + new DateTime(time_blue, DateTimeZone.UTC).toString(format));
+
+        if (mode == MODE_CLOCK_GAME_PAUSED) {
+            lcd_display.setLine(4, SAVEPOINTS[SELECTED_SAVEPOINT]);
+        } else {
+            lcd_display.setLine(4, MODES[mode]);
+        }
+
+
+    }
+
+    private void writeLCDFor2TeamsGameOver(ArrayList<String> winners) {
+        String format = "H:mm:ss";
+        if (preset_times[preset_gametime_position] <= 60) {
+            format = "mm:ss";
+        }
+
+        //        String savepoint = SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS ? "" : "";
+        String winner = "";
+        if (winners != null) {
+            if (winners.size() == 1) {
+                winner = (winners.get(0).equals("red") ? "ROT" : "BLAU") + " hat gewonnen";
+            } else {
+                winner = "** Unentschieden **";
+            }
+        } else {
+            winner = "** Unentschieden **";
+        }
+
+        lcd_display.setLine(1, winner);
+        lcd_display.setLine(2, "Rot" + " " + new DateTime(time_red, DateTimeZone.UTC).toString(format));
+        lcd_display.setLine(3, "Blau" + " " + new DateTime(time_blue, DateTimeZone.UTC).toString(format));
+        lcd_display.setLine(4, "");
+
+    }
+
+    private void writeLCD() {
+        writeLCDFor2Teams();
+
+//        String text = "Time:" + new DateTime(remaining, DateTimeZone.UTC).toString("H:mm:ss") + " ";
+//        text += "R>" + new DateTime(time_red, DateTimeZone.UTC).toString("H:mm:ss")+ " ";
+//        text += "B>" + new DateTime(time_blue, DateTimeZone.UTC).toString("H:mm:ss");
+//        if (preset_num_teams >= 3) text += " G>" + new DateTime(time_green, DateTimeZone.UTC).toString("H:mm:ss");
+//        if (preset_num_teams >= 4) text += " Y>" + new DateTime(time_yellow, DateTimeZone.UTC).toString("H:mm:ss");
+//        lcd_display.setText(text);
     }
 
     public boolean isGameRunning() {

@@ -10,10 +10,7 @@ import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
 import com.pi4j.wiringpi.SoftPwm;
 import de.flashheart.ocfflag.gui.FrameDebug;
-import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
-import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
-import de.flashheart.ocfflag.hardware.abstraction.MyPin;
-import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
+import de.flashheart.ocfflag.hardware.abstraction.*;
 import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
 import de.flashheart.ocfflag.mechanics.Game;
 import de.flashheart.ocfflag.misc.Configs;
@@ -100,9 +97,9 @@ public class Main {
     private static MyAbstractButton button_preset_num_teams;
     private static MyAbstractButton button_preset_gametime;
     private static MyAbstractButton button_quit;
-    private static MyAbstractButton button_config;
-    private static MyAbstractButton button_saveNquit;
     private static MyAbstractButton button_shutdown;
+
+    private static MyLCD lcd_display;
 
     private static PinHandler pinHandler; // One handler, to rule them all...
     private static Configs configs;
@@ -158,7 +155,6 @@ public class Main {
         applicationContext.put(display_yellow.getName(), display_yellow);
         applicationContext.put("mcp23017_1", mcp23017_1);
 
-
         button_red = new MyAbstractButton(GPIO, Configs.BUTTON_RED, frameDebug.getBtnRed(), REACTION_TIME, getFrameDebug().getPbRed());
         button_blue = new MyAbstractButton(GPIO, Configs.BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, getFrameDebug().getPbBlue());
         button_green = new MyAbstractButton(GPIO, Configs.BUTTON_GREEN, frameDebug.getBtnGreen(), REACTION_TIME, getFrameDebug().getPbGreen());
@@ -168,9 +164,10 @@ public class Main {
         button_preset_gametime = new MyAbstractButton(GPIO, Configs.BUTTON_PRESET_GAMETIME, frameDebug.getBtnPresetGametime(), 0l, null);
         button_standby_active = new MyAbstractButton(GPIO, Configs.BUTTON_STANDBY_ACTIVE, frameDebug.getBtnSwitchMode(), 0l, null);
         button_quit = new MyAbstractButton(null, null, frameDebug.getBtnQuit());
-        button_config = new MyAbstractButton(null, null, frameDebug.getBtnConfig());
-        button_saveNquit = new MyAbstractButton(null, null, frameDebug.getBtnSaveAndQuit());
         button_shutdown = new MyAbstractButton(GPIO, Configs.BUTTON_SHUTDOWN, null, 0, null);
+
+        lcd_display = new MyLCD(frameDebug.getLcd_panel(), MyLCD.LCD2004);
+        applicationContext.put("lcd_display", lcd_display);
 
         pinHandler.add(new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), Configs.OUT_RGB_FLAG));
 
@@ -196,7 +193,7 @@ public class Main {
         pinHandler.add(new MyPin(GPIO, Configs.OUT_MF14, null));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_MF16, null));
 
-        game = new Game(display_white, display_red, display_blue, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_config, button_saveNquit, button_shutdown);
+        game = new Game(display_white, display_red, display_blue, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_shutdown);
         game.run();
     }
 
