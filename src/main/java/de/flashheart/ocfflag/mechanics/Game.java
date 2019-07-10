@@ -160,6 +160,7 @@ public class Game implements Runnable, HasLogger {
 
 
         initGame();
+        thread.start();
 
     }
 

@@ -166,7 +166,8 @@ public class Main {
         button_quit = new MyAbstractButton(null, null, frameDebug.getBtnQuit());
         button_shutdown = new MyAbstractButton(GPIO, Configs.BUTTON_SHUTDOWN, null, 0, null);
 
-        lcd_display = new MyLCD(frameDebug.getLcd_panel(), MyLCD.LCD2004);
+        lcd_display = new MyLCD(frameDebug.getLcd_panel(), 20, 4);
+
         applicationContext.put("lcd_display", lcd_display);
 
         pinHandler.add(new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), Configs.OUT_RGB_FLAG));
@@ -194,7 +195,7 @@ public class Main {
         pinHandler.add(new MyPin(GPIO, Configs.OUT_MF16, null));
 
         game = new Game(display_white, display_red, display_blue, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_shutdown);
-        game.run();
+        
     }
 
     public static Game getGame() {
