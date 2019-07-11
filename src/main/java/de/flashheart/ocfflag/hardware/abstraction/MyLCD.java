@@ -5,34 +5,35 @@ import de.flashheart.ocfflag.misc.Tools;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 
 // bad design. nicht mit active machen sondern einfach die seiten löschen
 public class MyLCD implements Runnable, HasLogger {
-    private final int MAXPAGES = 3;
     private final int cols, rows;
     private final JPanel panel;
     private final Thread thread;
+    private final int SECONDS_PER_PAGE = 3;
 
     private final ArrayList<LCDPage> pages;
     private final ArrayList<JLabel> linelist; // für die GUI Darstellung
     private int active_page;
     private long loopcounter = 0;
     private int prev_page = 0;
+    private ReentrantLock lock;
 
     public MyLCD(JPanel panel) {
         this(panel, 20, 4);
     }
 
     public MyLCD(JPanel panel, int cols, int rows) {
+        lock = new ReentrantLock();
         this.cols = cols;
         this.rows = rows;
         thread = new Thread(this);
         linelist = new ArrayList<>(rows);
-        pages = new ArrayList<>(MAXPAGES);
-        for (int p = 0; p < MAXPAGES; p++){
-            pages.add(new LCDPage());
-        }
-        active_page = 0;
+        pages = new ArrayList<>();
+        pages.add(new LCDPage()); // there is always one page.
+        active_page = 1;
 
         this.panel = panel;
 
@@ -46,74 +47,140 @@ public class MyLCD implements Runnable, HasLogger {
         thread.start();
     }
 
-    public void setActive_page(int active_page) throws IndexOutOfBoundsException {
-        if (active_page < 0 || active_page >= MAXPAGES)
-            throw new IndexOutOfBoundsException("Illegal Display Page");
+    public void reset() {
+        lock.lock();
+        try {
+            pages.clear();
+            pages.add(new LCDPage()); // there is always one page.
+            active_page = 1;
+            clear(active_page);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void selectPage(int active_page) {
+        if (active_page < 1 || active_page > pages.size()) return;
         this.active_page = active_page;
-        pages.get(active_page).setActive(true);
         page_to_display();
     }
 
-    private void inc_page(){
+    /**
+     * Fügt eine neue Seite hinzu und setzt diese auch direkt auf Active.
+     */
+    public void addPage() {
+        lock.lock();
+        try {
+            pages.add(new LCDPage());
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * löscht die aktuelle Seite. Eine Seite bleibt immer stehen.
+     */
+    public void deletePage() {
+        if (pages.size() == 1) return;
+
+        lock.lock();
+        try {
+            pages.remove(active_page - 1);
+            active_page = 1;
+            page_to_display();
+        } finally {
+            lock.unlock();
+        }
+
+
+    }
+
+    private void inc_page() {
         prev_page = active_page;
         active_page++;
-        if (active_page >= MAXPAGES) active_page = 0;
+        if (active_page > pages.size()) active_page = 1;
     }
 
     private void page_to_display() {
-        LCDPage currentPage = pages.get(active_page);
-        if (!currentPage.isActive()) return;
+        LCDPage currentPage = pages.get(active_page - 1);
         for (int r = 0; r < rows; r++) {
-            linelist.get(r).setText(currentPage.getLine(r));
-        }
+                        linelist.get(r).setText(currentPage.getLine(r));
+                    }
+//        SwingUtilities.invokeLater(() -> { // Swing Tricks
+//
+////            panel.revalidate();
+////            panel.repaint();
+//        });
         //todo real LCD setter
     }
 
-    private void clearPage(){
-        pages.get(active_page).clear();
+    private void clearPage() {
+        pages.get(active_page - 1).clear();
 
     }
 
-    public void setText(String text) {
+    /**
+     * setzt einen Text in das Display. Kümmert sich selbst um den Zeilenumbruch
+     *
+     * @param text
+     */
+    public void setText(int page, String text) {
+        if (page < 1 || page > pages.size()) return;
         String[] strings = Tools.splitInParts(text, cols);
         int maxrows = Math.min(rows, strings.length);
 
-        clear();
+        clear(page);
         for (int l = 1; l <= maxrows; l++) {
-            setLine(l, strings[l - 1]);
+            setLine(page - 1, l, strings[l - 1]);
         }
 
     }
 
-    public void setLine(int line, String text) {
-        linelist.get(line - 1).setText(Tools.left(text, cols, ""));
+    /**
+     * @param page 1..pages.size()
+     * @param line 1..rows
+     * @param text
+     */
+    public void setLine(int page, int line, String text) {
+        if (page < 1 || page > pages.size()) return;
+        pages.get(page - 1).lines.set(line - 1, Tools.left(text, cols, ""));
+//        linelist.get(line - 1).setText(Tools.left(text, cols, ""));
         // todo lcd text
     }
 
-    public void clear() {
+    public void clear(int page) {
+        if (page < 1 || page > pages.size()) return;
         for (int l = 1; l <= rows; l++) {
-            setLine(l, "");
+            setLine(page - 1, l, "");
         }
     }
 
 
     @Override
     public void run() {
+
         while (!thread.isInterrupted()) {
             try {
+                lock.lock();
+                try {
+                    if (loopcounter % (10 * SECONDS_PER_PAGE) == 0) { // jede Sekunde
+                        inc_page();
+                    }
 
-                loopcounter++;
+                    if (active_page != prev_page) {
+                        page_to_display();
+                    }
 
-                if (loopcounter % 10 == 0){ // jede Sekunde
-                    inc_page();
+
+                } catch (Exception ex) {
+                    getLogger().error(ex);
+                } finally {
+                    lock.unlock();
                 }
-
-                if (active_page != prev_page){
-                    page_to_display();
-                }
-
                 Thread.sleep(100);
+                loopcounter++;
             } catch (InterruptedException ie) {
+
 
             }
         }

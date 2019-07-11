@@ -31,8 +31,10 @@ import java.util.stream.Collectors;
  */
 public class Game implements Runnable, HasLogger {
 
+    private static final String GAMEMODE = "OCF-Flag CenterFlag Conquest";
+
     private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getConfigs().get(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
-    private final int MODE_CLOCK_PREGAME = 0;
+    private final int MODE_PREPARE_GAME = 0;
     private final int MODE_CLOCK_GAME_RUNNING = 1;
     private final int MODE_CLOCK_GAME_PAUSED = 2;
     private final int MODE_CLOCK_GAME_OVER = 3;
@@ -47,7 +49,7 @@ public class Game implements Runnable, HasLogger {
 
     private final int MIN_TEAMS = 2;
 
-    private int mode = MODE_CLOCK_PREGAME;
+    private int mode = MODE_PREPARE_GAME;
     private String flag = GameEvent.FLAG_NEUTRAL;
 
     private final Display7Segments4Digits display_blue;
@@ -217,13 +219,15 @@ public class Game implements Runnable, HasLogger {
             }
         });
 
-        mode = MODE_CLOCK_PREGAME;
+        mode = MODE_PREPARE_GAME;
+        lcd_display.reset();
+        lcd_display.addPage(); // Seite für Zeiten
         reset_timers();
     }
 
 
     private void button_quit_pressed() {
-//        if (mode != MODE_CLOCK_PREGAME) return;
+//        if (mode != MODE_PREPARE_GAME) return;
         System.exit(0);
     }
 
@@ -373,7 +377,7 @@ public class Game implements Runnable, HasLogger {
         if (CONFIG_PAGE) return;
 
         if (max_number_of_teams == 2) return;
-        if (mode == MODE_CLOCK_PREGAME) {
+        if (mode == MODE_PREPARE_GAME) {
             preset_num_teams++;
             if (preset_num_teams > max_number_of_teams) preset_num_teams = MIN_TEAMS;
             getLogger().debug("num_teams is now: " + preset_num_teams);
@@ -387,7 +391,7 @@ public class Game implements Runnable, HasLogger {
     private void button_gametime_pressed() {
         getLogger().debug("button_gametime_pressed");
         if (CONFIG_PAGE) return;
-        if (mode == MODE_CLOCK_PREGAME) {
+        if (mode == MODE_PREPARE_GAME) {
             preset_gametime_position++;
             if (preset_gametime_position > preset_times.length - 1) preset_gametime_position = 0;
             Main.getConfigs().put(Configs.GAMETIME, preset_gametime_position);
@@ -433,7 +437,7 @@ public class Game implements Runnable, HasLogger {
             }
         } else if (mode == MODE_CLOCK_GAME_OVER) {
             reset_timers();
-        } else if (mode == MODE_CLOCK_PREGAME) {
+        } else if (mode == MODE_PREPARE_GAME) {
 
             lastStatsSent = statistics.addEvent(GameEvent.FLAG_NEUTRAL, remaining, getRank());
             lastPIT = System.currentTimeMillis();
@@ -450,7 +454,7 @@ public class Game implements Runnable, HasLogger {
         resetGame = false;
         currentState = null;
         lastState = null;
-        mode = MODE_CLOCK_PREGAME;
+        mode = MODE_PREPARE_GAME;
         min_stat_sent_time = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
 
         remaining = preset_times[preset_gametime_position] * 60000; // die preset_times sind in Minuten. Daher * 60000, weil wir millis brauchen
@@ -501,7 +505,7 @@ public class Game implements Runnable, HasLogger {
             Main.getPinHandler().off(Configs.OUT_FLAG_GREEN);
             Main.getPinHandler().off(Configs.OUT_FLAG_YELLOW);
 
-            if (mode == MODE_CLOCK_PREGAME || mode == MODE_CLOCK_GAME_PAUSED) {
+            if (mode == MODE_PREPARE_GAME || mode == MODE_CLOCK_GAME_PAUSED) {
                 button_switch_mode.setIcon(FrameDebug.IconPlay);
 
                 String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
@@ -534,7 +538,7 @@ public class Game implements Runnable, HasLogger {
 
             }
 
-            if (mode == MODE_CLOCK_PREGAME) {
+            if (mode == MODE_PREPARE_GAME) {
                 getLogger().debug("PREGAME");
                 getLogger().debug("preset_num_teams " + preset_num_teams);
 
@@ -891,17 +895,16 @@ public class Game implements Runnable, HasLogger {
 
 //        String savepoint = SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS ? "" : "";
 
-        lcd_display.setLine(1, "Zeit " + new DateTime(remaining, DateTimeZone.UTC).toString(format));
-        lcd_display.setLine(2, redmarker + "Rot" + redmarker + " " + new DateTime(time_red, DateTimeZone.UTC).toString(format));
-        lcd_display.setLine(3, bluemarker + "Blau" + bluemarker + " " + new DateTime(time_blue, DateTimeZone.UTC).toString(format));
+        lcd_display.setLine(2, 1, "Zeit " + new DateTime(remaining, DateTimeZone.UTC).toString(format));
+        lcd_display.setLine(2, 2, redmarker + "Rot" + redmarker + " " + new DateTime(time_red, DateTimeZone.UTC).toString(format));
+        lcd_display.setLine(2, 3, bluemarker + "Blau" + bluemarker + " " + new DateTime(time_blue, DateTimeZone.UTC).toString(format));
+
 
         if (mode == MODE_CLOCK_GAME_PAUSED) {
-            lcd_display.setLine(4, SAVEPOINTS[SELECTED_SAVEPOINT]);
+            lcd_display.setLine(2, 4, SAVEPOINTS[SELECTED_SAVEPOINT]);
         } else {
-            lcd_display.setLine(4, MODES[mode]);
+            lcd_display.setLine(2, 4, "");
         }
-
-
     }
 
     private void writeLCDFor2TeamsGameOver(ArrayList<String> winners) {
@@ -922,14 +925,19 @@ public class Game implements Runnable, HasLogger {
             winner = "** Unentschieden **";
         }
 
-        lcd_display.setLine(1, winner);
-        lcd_display.setLine(2, "Rot" + " " + new DateTime(time_red, DateTimeZone.UTC).toString(format));
-        lcd_display.setLine(3, "Blau" + " " + new DateTime(time_blue, DateTimeZone.UTC).toString(format));
-        lcd_display.setLine(4, "");
+        lcd_display.setLine(2, 1, winner);
+        lcd_display.setLine(2, 2, "Rot" + " " + new DateTime(time_red, DateTimeZone.UTC).toString(format));
+        lcd_display.setLine(2, 3, "Blau" + " " + new DateTime(time_blue, DateTimeZone.UTC).toString(format));
+        lcd_display.setLine(2, 4, "");
 
     }
 
     private void writeLCD() {
+
+        lcd_display.setLine(1, 1, "OCF-Flag 2.1");
+        lcd_display.setLine(1, 2, MODES[mode]);
+        lcd_display.selectPage(1);
+
         writeLCDFor2Teams();
 
 //        String text = "Time:" + new DateTime(remaining, DateTimeZone.UTC).toString("H:mm:ss") + " ";
