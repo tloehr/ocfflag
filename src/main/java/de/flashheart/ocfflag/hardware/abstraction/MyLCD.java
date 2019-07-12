@@ -12,7 +12,7 @@ public class MyLCD implements Runnable, HasLogger {
     private final int cols, rows;
     private final JPanel panel;
     private final Thread thread;
-    private final int SECONDS_PER_PAGE = 3;
+    private final int SECONDS_PER_PAGE = 2;
 
     private final ArrayList<LCDPage> pages;
     private final ArrayList<JLabel> linelist; // für die GUI Darstellung
@@ -80,18 +80,17 @@ public class MyLCD implements Runnable, HasLogger {
     /**
      * löscht die aktuelle Seite. Eine Seite bleibt immer stehen.
      */
-    public void deletePage() {
+    public void deletePage(int page) {
         if (pages.size() == 1) return;
 
         lock.lock();
         try {
-            pages.remove(active_page - 1);
+            pages.remove(page - 1);
             active_page = 1;
             page_to_display();
         } finally {
             lock.unlock();
         }
-
 
     }
 

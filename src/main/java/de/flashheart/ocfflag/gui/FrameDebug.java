@@ -39,7 +39,7 @@ public class FrameDebug extends JFrame {
         initFonts();
         initFrame();
 
-        String title = "ocfflag/actioncase " + Main.getConfigs().getApplicationInfo("my.version") + "." + Main.getConfigs().getApplicationInfo("buildNumber") + " [" + Main.getConfigs().getApplicationInfo("project.build.timestamp") + "]";
+        String title = "ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + "." + Main.getConfigs().getApplicationInfo("buildNumber") + " [" + Main.getConfigs().getApplicationInfo("project.build.timestamp") + "]";
 
         logger.info(title);
         setTitle(title);

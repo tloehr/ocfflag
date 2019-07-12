@@ -20,10 +20,14 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -81,6 +85,9 @@ public class Game implements Runnable, HasLogger {
     private int lastMinuteToChangeTimeblinking;
     private int SELECTED_SAVEPOINT = SAVEPOINT_NONE;
     private SavePoint currentState, lastState, resetState;
+    private String title = "ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + "." + Main.getConfigs().getApplicationInfo("buildNumber");
+    private String lcd_time_format;
+
     /**
      * In der methode run() wird in regelmässigen Abständen die Restspielzeit remaining neu berechnet. Dabei rechnen
      * wir bei jedem Durchgang die abgelaufene Zeit seit dem letzten Mal aus. Das machen wir mittels der Variable
@@ -96,7 +103,6 @@ public class Game implements Runnable, HasLogger {
     private Long[] preset_times;
     private int preset_gametime_position = 0;
     private int preset_num_teams = 2; // Reihenfolge: red, blue, green, yellow
-    private boolean CONFIG_PAGE = false;
     private boolean resetGame = false;
 
     public Game(Display7Segments4Digits display_white,
@@ -140,6 +146,7 @@ public class Game implements Runnable, HasLogger {
             preset_gametime_position = 0;
             Main.getConfigs().put(Configs.GAMETIME, preset_gametime_position);
         }
+
 
         SLEEP_PER_CYCLE = Long.parseLong(Main.getConfigs().get(Configs.SLEEP_PER_CYCLE));
         preset_num_teams = Integer.min(Integer.parseInt(Main.getConfigs().get(Configs.NUMBER_OF_TEAMS)), Main.getConfigs().getInt(Configs.MAX_NUMBER_OF_TEAMS));
@@ -219,9 +226,7 @@ public class Game implements Runnable, HasLogger {
             }
         });
 
-        mode = MODE_PREPARE_GAME;
-        lcd_display.reset();
-        lcd_display.addPage(); // Seite für Zeiten
+
         reset_timers();
     }
 
@@ -233,7 +238,7 @@ public class Game implements Runnable, HasLogger {
 
     private void button_red_pressed() {
         getLogger().debug("button_red_pressed");
-        if (CONFIG_PAGE) return;
+
 
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (!flag.equals(GameEvent.RED_ACTIVATED)) {
@@ -256,7 +261,7 @@ public class Game implements Runnable, HasLogger {
 
     private void button_blue_pressed() {
         getLogger().debug("button_blue_pressed");
-        if (CONFIG_PAGE) return;
+
         if (mode == MODE_CLOCK_GAME_RUNNING) {
 
             if (!flag.equals(GameEvent.BLUE_ACTIVATED)) {
@@ -276,7 +281,7 @@ public class Game implements Runnable, HasLogger {
 
     private void button_green_pressed() {
         getLogger().debug("button_green_pressed");
-        if (CONFIG_PAGE) return;
+
         if (preset_num_teams < 3) {
             getLogger().debug("NO GREEN TEAM: ignoring");
             return;
@@ -300,7 +305,7 @@ public class Game implements Runnable, HasLogger {
 
     private void button_yellow_pressed() {
         getLogger().debug("button_yellow_pressed");
-        if (CONFIG_PAGE) return;
+
         if (preset_num_teams < 4) {
             getLogger().debug("NO YELLOW TEAM: ignoring");
             return;
@@ -323,7 +328,8 @@ public class Game implements Runnable, HasLogger {
 
     private void button_undo_reset_pressed() {
         getLogger().debug("button_undo_reset_pressed");
-        if (CONFIG_PAGE) return;
+
+        if (mode == MODE_PREPARE_GAME) return;
 
         // Ein Druck auf die Undo Taste setzt das Spiel sofort in den Pause Modus.
         if (mode == MODE_CLOCK_GAME_RUNNING) {
@@ -374,7 +380,7 @@ public class Game implements Runnable, HasLogger {
     private void button_preset_num_teams() {
         getLogger().debug("button_num_teams_pressed");
         int max_number_of_teams = Main.getConfigs().getInt(Configs.MAX_NUMBER_OF_TEAMS);
-        if (CONFIG_PAGE) return;
+
 
         if (max_number_of_teams == 2) return;
         if (mode == MODE_PREPARE_GAME) {
@@ -390,7 +396,7 @@ public class Game implements Runnable, HasLogger {
 
     private void button_gametime_pressed() {
         getLogger().debug("button_gametime_pressed");
-        if (CONFIG_PAGE) return;
+
         if (mode == MODE_PREPARE_GAME) {
             preset_gametime_position++;
             if (preset_gametime_position > preset_times.length - 1) preset_gametime_position = 0;
@@ -404,13 +410,14 @@ public class Game implements Runnable, HasLogger {
     private void buttonStandbyRunningPressed() {
         getLogger().debug("button_Standby_Active_pressed");
         long now = System.currentTimeMillis();
-        if (CONFIG_PAGE) return;
+
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             SELECTED_SAVEPOINT = SAVEPOINT_NONE;
             standbyStartedAt = System.currentTimeMillis();
             mode = MODE_CLOCK_GAME_PAUSED;
             lastStatsSent = statistics.addEvent(GameEvent.PAUSING, remaining, getRank());
             currentState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
+            lcd_display.addPage(); // Für die Ausgabe des Savepoints
             setDisplayToEvent();
         } else if (mode == MODE_CLOCK_GAME_PAUSED) {
             // lastPIT neu berechnen und anpassen
@@ -433,6 +440,7 @@ public class Game implements Runnable, HasLogger {
                     lastStatsSent = statistics.addEvent(flag, remaining, getRank());
                     lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 }
+                lcd_display.deletePage(3); // brauchen wir dann erstmal nicht mehr
                 setDisplayToEvent();
             }
         } else if (mode == MODE_CLOCK_GAME_OVER) {
@@ -451,10 +459,19 @@ public class Game implements Runnable, HasLogger {
 
     private void reset_timers() {
         flag = GameEvent.FLAG_NEUTRAL;
+        lcd_time_format = "H:mm:ss";
+        if (preset_times[preset_gametime_position] <= 60) {
+            lcd_time_format = "mm:ss";
+        }
         resetGame = false;
         currentState = null;
         lastState = null;
         mode = MODE_PREPARE_GAME;
+        mode = MODE_PREPARE_GAME;
+        lcd_display.reset();
+        lcd_display.addPage(); // Seite für Zeiten
+        lcd_display.selectPage(1);
+
         min_stat_sent_time = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
 
         remaining = preset_times[preset_gametime_position] * 60000; // die preset_times sind in Minuten. Daher * 60000, weil wir millis brauchen
@@ -614,7 +631,7 @@ public class Game implements Runnable, HasLogger {
 
                     Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "DRAW GAME", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                     Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "∞:on,1000;off,1000");
-                    writeLCDFor2TeamsGameOver(null);
+                    writeLCDFor2TeamsGameOver();
                 } else {
 
                     if (statistics.getWinners().contains("red")) {
@@ -652,7 +669,7 @@ public class Game implements Runnable, HasLogger {
                             Main.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, "∞:on,250;off,250");
                     }
                     Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, text, winningScheme);
-                    writeLCDFor2TeamsGameOver(statistics.getWinners());
+                    writeLCDFor2TeamsGameOver();
                 }
             }
 
@@ -884,61 +901,63 @@ public class Game implements Runnable, HasLogger {
         }
     }
 
-    private void writeLCDFor2Teams() {
-        String format = "H:mm:ss";
-        if (preset_times[preset_gametime_position] <= 60) {
-            format = "mm:ss";
-        }
+    private void writeLCDFor20x04() {
+
 
         String redmarker = flag.equals(GameEvent.RED_ACTIVATED) ? "**" : "";
         String bluemarker = flag.equals(GameEvent.BLUE_ACTIVATED) ? "**" : "";
+        String greenmarker = flag.equals(GameEvent.GREEN_ACTIVATED) ? "**" : "";
+        String yellowmarker = flag.equals(GameEvent.YELLOW_ACTIVATED) ? "**" : "";
 
 //        String savepoint = SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS ? "" : "";
 
-        lcd_display.setLine(2, 1, "Zeit " + new DateTime(remaining, DateTimeZone.UTC).toString(format));
-        lcd_display.setLine(2, 2, redmarker + "Rot" + redmarker + " " + new DateTime(time_red, DateTimeZone.UTC).toString(format));
-        lcd_display.setLine(2, 3, bluemarker + "Blau" + bluemarker + " " + new DateTime(time_blue, DateTimeZone.UTC).toString(format));
 
+        lcd_display.setLine(2, 1, redmarker + "Rot" + redmarker + " " + new DateTime(time_red, DateTimeZone.UTC).toString(lcd_time_format));
+        lcd_display.setLine(2, 2, bluemarker + "Blau" + bluemarker + " " + new DateTime(time_blue, DateTimeZone.UTC).toString(lcd_time_format));
+        lcd_display.setLine(2, 3, preset_num_teams >= 3 ? greenmarker + "Grün" + greenmarker + " " + new DateTime(time_green, DateTimeZone.UTC).toString(lcd_time_format) : "");
+        lcd_display.setLine(2, 4, preset_num_teams >= 4 ? yellowmarker + "Gelb" + yellowmarker + " " + new DateTime(time_yellow, DateTimeZone.UTC).toString(lcd_time_format) : "");
 
-        if (mode == MODE_CLOCK_GAME_PAUSED) {
-            lcd_display.setLine(2, 4, SAVEPOINTS[SELECTED_SAVEPOINT]);
-        } else {
-            lcd_display.setLine(2, 4, "");
-        }
     }
 
-    private void writeLCDFor2TeamsGameOver(ArrayList<String> winners) {
-        String format = "H:mm:ss";
-        if (preset_times[preset_gametime_position] <= 60) {
-            format = "mm:ss";
-        }
+    private void writeLCDFor2TeamsGameOver() {
 
-        //        String savepoint = SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS ? "" : "";
-        String winner = "";
-        if (winners != null) {
-            if (winners.size() == 1) {
-                winner = (winners.get(0).equals("red") ? "ROT" : "BLAU") + " hat gewonnen";
-            } else {
-                winner = "** Unentschieden **";
-            }
+        lcd_display.addPage();
+
+        if (preset_num_teams == 2 && statistics.getWinners().size() > 1) {
+            lcd_display.setLine(2, 1, "** UNENTSCHIEDEN **");
+            lcd_display.setLine(2, 2, "");
+            lcd_display.setLine(2, 3, "");
         } else {
-            winner = "** Unentschieden **";
+            lcd_display.setLine(2, 1, statistics.getWinners().size() > 1 ? "Die Gewinner sind" : "Der Gewinner ist");
+            lcd_display.setLine(2, 2, statistics.getWinners().size() > 1 ? "Die Teams" : "Das Team");
+            lcd_display.setLine(2, 3, statistics.getWinners().toString());
         }
 
-        lcd_display.setLine(2, 1, winner);
-        lcd_display.setLine(2, 2, "Rot" + " " + new DateTime(time_red, DateTimeZone.UTC).toString(format));
-        lcd_display.setLine(2, 3, "Blau" + " " + new DateTime(time_blue, DateTimeZone.UTC).toString(format));
+
         lcd_display.setLine(2, 4, "");
+
+        lcd_display.setLine(3, 1, "Rot" + " " + new DateTime(time_red, DateTimeZone.UTC).toString(lcd_time_format));
+        lcd_display.setLine(3, 2, "Blau" + " " + new DateTime(time_blue, DateTimeZone.UTC).toString(lcd_time_format));
+        lcd_display.setLine(3, 3, preset_num_teams >= 3 ? "Grün" + " " + new DateTime(time_green, DateTimeZone.UTC).toString(lcd_time_format) : "");
+        lcd_display.setLine(3, 4, preset_num_teams >= 4 ? "Gelb" + " " + new DateTime(time_yellow, DateTimeZone.UTC).toString(lcd_time_format) : "");
+
 
     }
 
     private void writeLCD() {
 
-        lcd_display.setLine(1, 1, "OCF-Flag 2.1");
-        lcd_display.setLine(1, 2, MODES[mode]);
-        lcd_display.selectPage(1);
+        lcd_display.setLine(1, 1, title);
+        lcd_display.setLine(1, 2, DateTime.now().toString(DateTimeFormat.shortDateTime()));
+        lcd_display.setLine(1, 3, "Restzeit " + new DateTime(remaining, DateTimeZone.UTC).toString(lcd_time_format));
+        lcd_display.setLine(1, 4, MODES[mode]);
 
-        writeLCDFor2Teams();
+        if (mode == MODE_CLOCK_GAME_PAUSED) {
+            lcd_display.setLine(3, 4, SAVEPOINTS[SELECTED_SAVEPOINT]);
+        }
+
+//        lcd_display.selectPage(1);
+
+        writeLCDFor20x04();
 
 //        String text = "Time:" + new DateTime(remaining, DateTimeZone.UTC).toString("H:mm:ss") + " ";
 //        text += "R>" + new DateTime(time_red, DateTimeZone.UTC).toString("H:mm:ss")+ " ";
