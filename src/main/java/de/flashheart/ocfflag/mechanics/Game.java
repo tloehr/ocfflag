@@ -5,7 +5,6 @@ import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
-import de.flashheart.ocfflag.hardware.abstraction.MyLCD;
 import de.flashheart.ocfflag.hardware.pinhandler.PinBlinkModel;
 import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
 import de.flashheart.ocfflag.hardware.pinhandler.RGBBlinkModel;
@@ -20,7 +19,6 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
 
 import java.awt.*;
 import java.io.IOException;
@@ -73,7 +71,7 @@ public class Game implements Runnable, HasLogger {
     private final MyAbstractButton button_reset;
     private final MyAbstractButton button_switch_mode;
 
-    private final MyLCD lcd_display;
+//    private final MyLCD lcd_display;
 
     private final Thread thread;
     private long SLEEP_PER_CYCLE = 500;
@@ -138,7 +136,7 @@ public class Game implements Runnable, HasLogger {
         this.button_reset = button_reset;
         this.button_switch_mode = button_switch_mode;
 
-        this.lcd_display = (MyLCD) Main.getApplicationContext().get("lcd_display");
+//        this.lcd_display = (MyLCD) Main.getApplicationContext().get("lcd_display");
 
         preset_gametime_position = Integer.parseInt(Main.getConfigs().get(Configs.GAMETIME));
         preset_times = Main.getConfigs().getGameTimes();
@@ -417,7 +415,7 @@ public class Game implements Runnable, HasLogger {
             mode = MODE_CLOCK_GAME_PAUSED;
             lastStatsSent = statistics.addEvent(GameEvent.PAUSING, remaining, getRank());
             currentState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
-            lcd_display.addPage(); // Für die Ausgabe des Savepoints
+//            lcd_display.addPage(); // Für die Ausgabe des Savepoints
             setDisplayToEvent();
         } else if (mode == MODE_CLOCK_GAME_PAUSED) {
             // lastPIT neu berechnen und anpassen
@@ -440,7 +438,7 @@ public class Game implements Runnable, HasLogger {
                     lastStatsSent = statistics.addEvent(flag, remaining, getRank());
                     lastState = new SavePoint(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 }
-                lcd_display.deletePage(3); // brauchen wir dann erstmal nicht mehr
+//                lcd_display.deletePage(3); // brauchen wir dann erstmal nicht mehr
                 setDisplayToEvent();
             }
         } else if (mode == MODE_CLOCK_GAME_OVER) {
@@ -468,9 +466,9 @@ public class Game implements Runnable, HasLogger {
         lastState = null;
         mode = MODE_PREPARE_GAME;
         mode = MODE_PREPARE_GAME;
-        lcd_display.reset();
-        lcd_display.addPage(); // Seite für Zeiten
-        lcd_display.selectPage(1);
+//        lcd_display.reset();
+//        lcd_display.addPage(); // Seite für Zeiten
+//        lcd_display.selectPage(1);
 
         min_stat_sent_time = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
 
@@ -491,7 +489,7 @@ public class Game implements Runnable, HasLogger {
 
     private void setDisplayToEvent() {
         try {
-            writeLCD();
+//            writeLCD();
 
             display_white.setTime(remaining);
             display_red.setTime(time_red);
@@ -631,7 +629,7 @@ public class Game implements Runnable, HasLogger {
 
                     Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "DRAW GAME", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                     Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "∞:on,1000;off,1000");
-                    writeLCDFor2TeamsGameOver();
+//                    writeLCDFor2TeamsGameOver();
                 } else {
 
                     if (statistics.getWinners().contains("red")) {
@@ -669,7 +667,7 @@ public class Game implements Runnable, HasLogger {
                             Main.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, "∞:on,250;off,250");
                     }
                     Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, text, winningScheme);
-                    writeLCDFor2TeamsGameOver();
+//                    writeLCDFor2TeamsGameOver();
                 }
             }
 
@@ -871,7 +869,7 @@ public class Game implements Runnable, HasLogger {
                         }
                     }
 
-                    writeLCD();
+//                    writeLCD();
                     display_white.setTime(remaining);
                     display_red.setTime(time_red);
                     display_blue.setTime(time_blue);
@@ -901,71 +899,71 @@ public class Game implements Runnable, HasLogger {
         }
     }
 
-    private void writeLCDFor20x04() {
-
-
-        String redmarker = flag.equals(GameEvent.RED_ACTIVATED) ? "**" : "";
-        String bluemarker = flag.equals(GameEvent.BLUE_ACTIVATED) ? "**" : "";
-        String greenmarker = flag.equals(GameEvent.GREEN_ACTIVATED) ? "**" : "";
-        String yellowmarker = flag.equals(GameEvent.YELLOW_ACTIVATED) ? "**" : "";
-
-//        String savepoint = SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS ? "" : "";
-
-
-        lcd_display.setLine(2, 1, redmarker + "Rot" + redmarker + " " + new DateTime(time_red, DateTimeZone.UTC).toString(lcd_time_format));
-        lcd_display.setLine(2, 2, bluemarker + "Blau" + bluemarker + " " + new DateTime(time_blue, DateTimeZone.UTC).toString(lcd_time_format));
-        lcd_display.setLine(2, 3, preset_num_teams >= 3 ? greenmarker + "Grün" + greenmarker + " " + new DateTime(time_green, DateTimeZone.UTC).toString(lcd_time_format) : "");
-        lcd_display.setLine(2, 4, preset_num_teams >= 4 ? yellowmarker + "Gelb" + yellowmarker + " " + new DateTime(time_yellow, DateTimeZone.UTC).toString(lcd_time_format) : "");
-
-    }
-
-    private void writeLCDFor2TeamsGameOver() {
-
-        lcd_display.addPage();
-
-        if (preset_num_teams == 2 && statistics.getWinners().size() > 1) {
-            lcd_display.setLine(2, 1, "** UNENTSCHIEDEN **");
-            lcd_display.setLine(2, 2, "");
-            lcd_display.setLine(2, 3, "");
-        } else {
-            lcd_display.setLine(2, 1, statistics.getWinners().size() > 1 ? "Die Gewinner sind" : "Der Gewinner ist");
-            lcd_display.setLine(2, 2, statistics.getWinners().size() > 1 ? "Die Teams" : "Das Team");
-            lcd_display.setLine(2, 3, statistics.getWinners().toString());
-        }
-
-
-        lcd_display.setLine(2, 4, "");
-
-        lcd_display.setLine(3, 1, "Rot" + " " + new DateTime(time_red, DateTimeZone.UTC).toString(lcd_time_format));
-        lcd_display.setLine(3, 2, "Blau" + " " + new DateTime(time_blue, DateTimeZone.UTC).toString(lcd_time_format));
-        lcd_display.setLine(3, 3, preset_num_teams >= 3 ? "Grün" + " " + new DateTime(time_green, DateTimeZone.UTC).toString(lcd_time_format) : "");
-        lcd_display.setLine(3, 4, preset_num_teams >= 4 ? "Gelb" + " " + new DateTime(time_yellow, DateTimeZone.UTC).toString(lcd_time_format) : "");
-
-
-    }
-
-    private void writeLCD() {
-
-        lcd_display.setLine(1, 1, title);
-        lcd_display.setLine(1, 2, DateTime.now().toString(DateTimeFormat.shortDateTime()));
-        lcd_display.setLine(1, 3, "Restzeit " + new DateTime(remaining, DateTimeZone.UTC).toString(lcd_time_format));
-        lcd_display.setLine(1, 4, MODES[mode]);
-
-        if (mode == MODE_CLOCK_GAME_PAUSED) {
-            lcd_display.setLine(3, 4, SAVEPOINTS[SELECTED_SAVEPOINT]);
-        }
-
-//        lcd_display.selectPage(1);
-
-        writeLCDFor20x04();
-
-//        String text = "Time:" + new DateTime(remaining, DateTimeZone.UTC).toString("H:mm:ss") + " ";
-//        text += "R>" + new DateTime(time_red, DateTimeZone.UTC).toString("H:mm:ss")+ " ";
-//        text += "B>" + new DateTime(time_blue, DateTimeZone.UTC).toString("H:mm:ss");
-//        if (preset_num_teams >= 3) text += " G>" + new DateTime(time_green, DateTimeZone.UTC).toString("H:mm:ss");
-//        if (preset_num_teams >= 4) text += " Y>" + new DateTime(time_yellow, DateTimeZone.UTC).toString("H:mm:ss");
-//        lcd_display.setText(text);
-    }
+//    private void writeLCDFor20x04() {
+//
+//
+//        String redmarker = flag.equals(GameEvent.RED_ACTIVATED) ? "**" : "";
+//        String bluemarker = flag.equals(GameEvent.BLUE_ACTIVATED) ? "**" : "";
+//        String greenmarker = flag.equals(GameEvent.GREEN_ACTIVATED) ? "**" : "";
+//        String yellowmarker = flag.equals(GameEvent.YELLOW_ACTIVATED) ? "**" : "";
+//
+////        String savepoint = SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS ? "" : "";
+//
+//
+//        lcd_display.setLine(2, 1, redmarker + "Rot" + redmarker + " " + new DateTime(time_red, DateTimeZone.UTC).toString(lcd_time_format));
+//        lcd_display.setLine(2, 2, bluemarker + "Blau" + bluemarker + " " + new DateTime(time_blue, DateTimeZone.UTC).toString(lcd_time_format));
+//        lcd_display.setLine(2, 3, preset_num_teams >= 3 ? greenmarker + "Grün" + greenmarker + " " + new DateTime(time_green, DateTimeZone.UTC).toString(lcd_time_format) : "");
+//        lcd_display.setLine(2, 4, preset_num_teams >= 4 ? yellowmarker + "Gelb" + yellowmarker + " " + new DateTime(time_yellow, DateTimeZone.UTC).toString(lcd_time_format) : "");
+//
+//    }
+//
+//    private void writeLCDFor2TeamsGameOver() {
+//
+//        lcd_display.addPage();
+//
+//        if (preset_num_teams == 2 && statistics.getWinners().size() > 1) {
+//            lcd_display.setLine(2, 1, "** UNENTSCHIEDEN **");
+//            lcd_display.setLine(2, 2, "");
+//            lcd_display.setLine(2, 3, "");
+//        } else {
+//            lcd_display.setLine(2, 1, statistics.getWinners().size() > 1 ? "Die Gewinner sind" : "Der Gewinner ist");
+//            lcd_display.setLine(2, 2, statistics.getWinners().size() > 1 ? "Die Teams" : "Das Team");
+//            lcd_display.setLine(2, 3, statistics.getWinners().toString());
+//        }
+//
+//
+//        lcd_display.setLine(2, 4, "");
+//
+//        lcd_display.setLine(3, 1, "Rot" + " " + new DateTime(time_red, DateTimeZone.UTC).toString(lcd_time_format));
+//        lcd_display.setLine(3, 2, "Blau" + " " + new DateTime(time_blue, DateTimeZone.UTC).toString(lcd_time_format));
+//        lcd_display.setLine(3, 3, preset_num_teams >= 3 ? "Grün" + " " + new DateTime(time_green, DateTimeZone.UTC).toString(lcd_time_format) : "");
+//        lcd_display.setLine(3, 4, preset_num_teams >= 4 ? "Gelb" + " " + new DateTime(time_yellow, DateTimeZone.UTC).toString(lcd_time_format) : "");
+//
+//
+//    }
+//
+//    private void writeLCD() {
+//
+//        lcd_display.setLine(1, 1, title);
+//        lcd_display.setLine(1, 2, DateTime.now().toString(DateTimeFormat.shortDateTime()));
+//        lcd_display.setLine(1, 3, "Restzeit " + new DateTime(remaining, DateTimeZone.UTC).toString(lcd_time_format));
+//        lcd_display.setLine(1, 4, MODES[mode]);
+//
+//        if (mode == MODE_CLOCK_GAME_PAUSED) {
+//            lcd_display.setLine(3, 4, SAVEPOINTS[SELECTED_SAVEPOINT]);
+//        }
+//
+////        lcd_display.selectPage(1);
+//
+//        writeLCDFor20x04();
+//
+////        String text = "Time:" + new DateTime(remaining, DateTimeZone.UTC).toString("H:mm:ss") + " ";
+////        text += "R>" + new DateTime(time_red, DateTimeZone.UTC).toString("H:mm:ss")+ " ";
+////        text += "B>" + new DateTime(time_blue, DateTimeZone.UTC).toString("H:mm:ss");
+////        if (preset_num_teams >= 3) text += " G>" + new DateTime(time_green, DateTimeZone.UTC).toString("H:mm:ss");
+////        if (preset_num_teams >= 4) text += " Y>" + new DateTime(time_yellow, DateTimeZone.UTC).toString("H:mm:ss");
+////        lcd_display.setText(text);
+//    }
 
     public boolean isGameRunning() {
         return mode == MODE_CLOCK_GAME_RUNNING;

@@ -19,8 +19,7 @@ public class GameStateService {
     }
 
     /**
-     * wenn alle rankings den rang 1 haben, müssen alle teamranking gleich gespielt haben.
-     *
+     * wenn alle rankings den rang 1 haben, müssen alle teams gleich gespielt haben.
      *
      * @return
      */

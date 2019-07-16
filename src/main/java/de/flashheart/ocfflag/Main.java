@@ -99,7 +99,7 @@ public class Main {
     private static MyAbstractButton button_quit;
     private static MyAbstractButton button_shutdown;
 
-    private static MyLCD lcd_display;
+//    private static MyLCD lcd_display;
 
     private static PinHandler pinHandler; // One handler, to rule them all...
     private static Configs configs;
@@ -166,9 +166,8 @@ public class Main {
         button_quit = new MyAbstractButton(null, null, frameDebug.getBtnQuit());
         button_shutdown = new MyAbstractButton(GPIO, Configs.BUTTON_SHUTDOWN, null, 0, null);
 
-        lcd_display = new MyLCD(frameDebug.getLcd_panel(), 20, 4);
-
-        applicationContext.put("lcd_display", lcd_display);
+//        lcd_display = new MyLCD(frameDebug.getLcd_panel(), 20, 4);
+//        applicationContext.put("lcd_display", lcd_display);
 
         pinHandler.add(new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), Configs.OUT_RGB_FLAG));
 
