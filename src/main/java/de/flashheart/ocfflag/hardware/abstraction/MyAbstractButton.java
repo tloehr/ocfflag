@@ -12,8 +12,9 @@ import java.awt.event.ActionListener;
 /**
  * Created by tloehr on 15.03.16.
  * <p>
- * //todo: kann man das hier nicht vereinfachen, so dass nur ein Listener für alle Fälle gebraucht wird ?
- * // todo: das geht bestimmt über ein Callback. Und ein Button Name für die Debugausgaben. Button auf GND sind Aktiv im Pin_State_LOW
+ * //todo: kann man das hier nicht vereinfachen, so dass nur ein Listener für alle Fälle gebraucht wird ? // todo: das
+ * geht bestimmt über ein Callback. Und ein Button Name für die Debugausgaben. Button auf GND sind Aktiv im
+ * Pin_State_LOW
  */
 public class MyAbstractButton implements HasLogger {
     private static final int DEBOUNCE = 200; //ms
@@ -86,6 +87,16 @@ public class MyAbstractButton implements HasLogger {
             }
         }
     }
+
+    public void setText(String text) {
+        if (guiButton != null) {
+            guiButton.setText(text);
+        }
+    }
+
+    public void setReactiontime(long reactiontime) {
+           this.reactiontime = reactiontime;
+       }
 
 //
 //    public boolean isLow() {

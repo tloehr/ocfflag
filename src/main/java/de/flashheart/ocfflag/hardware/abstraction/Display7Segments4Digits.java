@@ -138,6 +138,10 @@ public class Display7Segments4Digits implements HasLogger {
         segment.getDisplay().setBlinkRate(rate);
     }
 
+    public void setText(int number) throws IOException {
+        setText(String.format("%4d", number));
+    }
+
     public void setText(String text) throws IOException {
         if (text.length() != 4) throw new IOException("this is display has exactly 4 digits. string has wrong size.");
 

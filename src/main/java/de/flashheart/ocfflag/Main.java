@@ -10,9 +10,14 @@ import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
 import com.pi4j.wiringpi.SoftPwm;
 import de.flashheart.ocfflag.gui.FrameDebug;
-import de.flashheart.ocfflag.hardware.abstraction.*;
+import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
+import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
+import de.flashheart.ocfflag.hardware.abstraction.MyPin;
+import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
-import de.flashheart.ocfflag.mechanics.Game;
+import de.flashheart.ocfflag.mechanics.OCF;
+import de.flashheart.ocfflag.mechanics.Games;
+import de.flashheart.ocfflag.mechanics.SpawnCounter;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
 import de.flashheart.ocfflag.statistics.MessageProcessor;
@@ -30,7 +35,7 @@ public class Main {
 
     private static long REACTION_TIME = 3000;
     private static GpioController GPIO;
-    private static Game game;
+    private static Games currentGame;
     private static FrameDebug frameDebug;
 
     private static Logger logger;
@@ -88,16 +93,6 @@ public class Main {
     private static Display7Segments4Digits display_green;
     private static Display7Segments4Digits display_yellow;
 
-    private static MyAbstractButton button_blue;
-    private static MyAbstractButton button_red;
-    private static MyAbstractButton button_green;
-    private static MyAbstractButton button_yellow;
-    private static MyAbstractButton button_reset;
-    private static MyAbstractButton button_standby_active;
-    private static MyAbstractButton button_preset_num_teams;
-    private static MyAbstractButton button_preset_gametime;
-    private static MyAbstractButton button_quit;
-    private static MyAbstractButton button_shutdown;
 
 //    private static MyLCD lcd_display;
 
@@ -155,16 +150,24 @@ public class Main {
         applicationContext.put(display_yellow.getName(), display_yellow);
         applicationContext.put("mcp23017_1", mcp23017_1);
 
-        button_red = new MyAbstractButton(GPIO, Configs.BUTTON_RED, frameDebug.getBtnRed(), REACTION_TIME, getFrameDebug().getPbRed());
-        button_blue = new MyAbstractButton(GPIO, Configs.BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, getFrameDebug().getPbBlue());
-        button_green = new MyAbstractButton(GPIO, Configs.BUTTON_GREEN, frameDebug.getBtnGreen(), REACTION_TIME, getFrameDebug().getPbGreen());
-        button_yellow = new MyAbstractButton(GPIO, Configs.BUTTON_YELLOW, frameDebug.getBtnYellow(), REACTION_TIME, getFrameDebug().getPbYellow());
-        button_reset = new MyAbstractButton(GPIO, Configs.BUTTON_RESET, frameDebug.getBtnReset(), 0l, null);
-        button_preset_num_teams = new MyAbstractButton(GPIO, Configs.BUTTON_PRESET_NUM_TEAMS, frameDebug.getBtnPresetNumTeams(), 0l, null);
-        button_preset_gametime = new MyAbstractButton(GPIO, Configs.BUTTON_PRESET_GAMETIME, frameDebug.getBtnPresetGametime(), 0l, null);
-        button_standby_active = new MyAbstractButton(GPIO, Configs.BUTTON_STANDBY_ACTIVE, frameDebug.getBtnSwitchMode(), 0l, null);
-        button_quit = new MyAbstractButton(null, null, frameDebug.getBtnQuit());
-        button_shutdown = new MyAbstractButton(GPIO, Configs.BUTTON_SHUTDOWN, null, 0, null);
+
+        // Platine K2
+        applicationContext.put(Configs.BUTTON_A, new MyAbstractButton(GPIO, Configs.BUTTON_A, frameDebug.getBtnA(), 0l, null));   // former: num teams
+        // Platine K3
+        applicationContext.put(Configs.BUTTON_B, new MyAbstractButton(GPIO, Configs.BUTTON_B, frameDebug.getBtnB(), 0l, null));  // former: game time
+        // Platine K1
+        applicationContext.put(Configs.BUTTON_C, new MyAbstractButton(GPIO, Configs.BUTTON_C, frameDebug.getBtnC(), 0l, null));  // former: play / pause
+        // Platine K4
+        applicationContext.put(Configs.BUTTON_D, new MyAbstractButton(GPIO, Configs.BUTTON_D, frameDebug.getBtnD(), 0l, null));  // former: RESET / Undo
+
+        // Player Buttons
+        applicationContext.put(Configs.BUTTON_RED, new MyAbstractButton(GPIO, Configs.BUTTON_RED, frameDebug.getBtnRed(), REACTION_TIME, getFrameDebug().getPbRed()));
+        applicationContext.put(Configs.BUTTON_BLUE, new MyAbstractButton(GPIO, Configs.BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, getFrameDebug().getPbRed()));
+        applicationContext.put(Configs.BUTTON_GREEN, new MyAbstractButton(GPIO, Configs.BUTTON_GREEN, frameDebug.getBtnGreen(), REACTION_TIME, getFrameDebug().getPbRed()));
+        applicationContext.put(Configs.BUTTON_YELLOW, new MyAbstractButton(GPIO, Configs.BUTTON_YELLOW, frameDebug.getBtnYellow(), REACTION_TIME, getFrameDebug().getPbRed()));
+        // System Buttons
+        applicationContext.put(Configs.BUTTON_QUIT, new MyAbstractButton(null, null, frameDebug.getBtnQuit()));
+        applicationContext.put(Configs.BUTTON_SHUTDOWN, new MyAbstractButton(GPIO, Configs.BUTTON_SHUTDOWN, null, 0, null));
 
 //        lcd_display = new MyLCD(frameDebug.getLcd_panel(), 20, 4);
 //        applicationContext.put("lcd_display", lcd_display);
@@ -186,22 +189,23 @@ public class Main {
         pinHandler.add(new MyPin(GPIO, Configs.OUT_HOLDDOWN_BUZZER, null, 70, 30));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_SIREN_COLOR_CHANGE, null, 50, 90));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_SIREN_START_STOP, null, 70, 60));
-
-
-        game = new Game(display_white, display_red, display_blue, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_shutdown);
         
+//        currentGame = new OCF(4);
+        currentGame = new SpawnCounter();
+
     }
 
-    public static Game getGame() {
-        return game;
-    }
+//    public static GameModeOCF getGame() {
+//        return gameModeOCF;
+//    }
 
     public static Object getFromContext(String key) {
         return applicationContext.get(key);
     }
 
     /**
-     * Diese Methode enthält alles was initialisiert werden muss, gleich ob wir das Programm auf einem Raspi ausführen oder einem anderen Computer.
+     * Diese Methode enthält alles was initialisiert werden muss, gleich ob wir das Programm auf einem Raspi ausführen
+     * oder einem anderen Computer.
      *
      * @param args
      * @throws InterruptedException
@@ -413,5 +417,9 @@ public class Main {
 
     public static boolean isDev_mode() {
         return dev_mode;
+    }
+
+    public static Games getCurrentGame() {
+        return currentGame;
     }
 }

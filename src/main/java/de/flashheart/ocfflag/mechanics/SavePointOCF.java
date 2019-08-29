@@ -4,12 +4,12 @@ package de.flashheart.ocfflag.mechanics;
  * Diese einfache Hilfs-Klasse wird nur benutzt um bestimmte Situationen im Spiel zu speichern, damit man nachher dahin zurück kehren könnte.
  * Wir bei UNDOs gebraucht.
  */
-public class SavePoint {
+public class SavePointOCF {
     private final String flag;
     private final long time, time_blue, time_red, time_yellow, time_green;
 
 
-    public SavePoint(String flag, long time, long time_blue, long time_red, long time_yellow, long time_green) {
+    public SavePointOCF(String flag, long time, long time_blue, long time_red, long time_yellow, long time_green) {
         this.flag = flag;
         this.time = time;
         this.time_blue = time_blue;

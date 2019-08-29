@@ -63,7 +63,7 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (!Main.getGame().isGameRunning()) return;
+        if (!Main.getCurrentGame().isGameRunning()) return;
         if (!enabled) return;
         
         if (e.getButton() == MouseEvent.BUTTON1) {
@@ -77,7 +77,7 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (!Main.getGame().isGameRunning()) return;
+        if (!Main.getCurrentGame().isGameRunning()) return;
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             getLogger().debug("button released");

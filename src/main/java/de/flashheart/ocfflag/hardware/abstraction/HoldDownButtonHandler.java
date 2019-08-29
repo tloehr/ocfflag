@@ -62,7 +62,7 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
 
 
     public void buttonPressed() {
-        if (!Main.getGame().isGameRunning()) return;
+        if (!Main.getCurrentGame().isGameRunning()) return;
         if (!enabled) return;
         
         getLogger().debug("holding down button");
@@ -74,7 +74,7 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
 
 
     public void buttonReleased() {
-        if (!Main.getGame().isGameRunning()) return;
+        if (!Main.getCurrentGame().isGameRunning()) return;
 
         getLogger().debug("button released");
         if (reactiontime > 0) Main.getPinHandler().off(Configs.OUT_HOLDDOWN_BUZZER);

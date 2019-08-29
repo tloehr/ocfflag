@@ -214,7 +214,7 @@ new FormModel {
 				} ) {
 					name: "panel2"
 					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "btnPresetNumTeams"
+						name: "btnA"
 						"text": "A"
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/add_group.png" )
 						"verticalTextPosition": 3
@@ -226,7 +226,7 @@ new FormModel {
 						"gridHeight": 3
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "btnPresetGametimeUndo"
+						name: "btnB"
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/clock.png" )
 						"toolTipText": "Preset Gametime"
 						"font": &Font1 new java.awt.Font( "Dialog", 1, 24 )
@@ -240,7 +240,7 @@ new FormModel {
 						"gridHeight": 3
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "btnSwitchMode"
+						name: "btnC"
 						"text": "C"
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/player_play.png" )
 						"toolTipText": "Standby / Active"
@@ -254,7 +254,7 @@ new FormModel {
 						"gridHeight": 3
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "btnReset"
+						name: "btnD"
 						"text": "D"
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/reload.png" )
 						"toolTipText": "Reset/Undo"

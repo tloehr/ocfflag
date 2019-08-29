@@ -126,7 +126,7 @@ public class PinBlinkModel implements GenericBlinkModel {
         String scheme = PinHandler.FOREVER + ":";
         Logger logger = Logger.getLogger(RGBBlinkModel.class);
 
-        if (Main.getConfigs().is(Configs.TIME_ANNOUNCER)) {
+        if (Main.getConfigs().is(Configs.OCF_TIME_ANNOUNCER)) {
             DateTime remainingTime = new DateTime(time, DateTimeZone.UTC);
 
             int minutes = remainingTime.getMinuteOfHour();
