@@ -4,6 +4,7 @@
 
 package de.flashheart.ocfflag.gui;
 
+import javax.swing.border.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.flashheart.ocfflag.Main;
@@ -59,6 +60,10 @@ public class FrameDebug extends JFrame {
 
     public JProgressBar getPbYellow() {
         return pbYellow;
+    }
+
+    public JButton getBtnTestDialog() {
+        return btnTestDialog;
     }
 
     public JPanel getLcd_panel() {
@@ -126,6 +131,7 @@ public class FrameDebug extends JFrame {
         btnGreen = new JButton();
         btnYellow = new JButton();
         ledYellowButton = new MyLED();
+        panel4 = new JPanel();
         pbGreen = new JProgressBar();
         pnlFlagLEDs = new JPanel();
         ledFlagWhite = new MyLED();
@@ -133,6 +139,7 @@ public class FrameDebug extends JFrame {
         ledFlagBlue = new MyLED();
         ledFlagGreen = new MyLED();
         ledFlagYellow = new MyLED();
+        panel6 = new JPanel();
         pbYellow = new JProgressBar();
         panel5 = new JPanel();
         btnQuit = new JButton();
@@ -142,9 +149,9 @@ public class FrameDebug extends JFrame {
         btnTestDialog = new JButton();
         panel2 = new JPanel();
         btnPresetNumTeams = new JButton();
+        btnPresetGametimeUndo = new JButton();
         btnSwitchMode = new JButton();
         btnReset = new JButton();
-        btnPresetGametimeUndo = new JButton();
         lcd_panel = new JPanel();
 
         //======== this ========
@@ -226,9 +233,15 @@ public class FrameDebug extends JFrame {
                 ledYellowButton.setToolTipText("Yellow LED in Button");
                 panel1.add(ledYellowButton, CC.xy(13, 5));
 
-                //---- pbGreen ----
-                pbGreen.setStringPainted(true);
-                panel1.add(pbGreen, CC.xywh(1, 7, 3, 1, CC.DEFAULT, CC.FILL));
+                //======== panel4 ========
+                {
+                    panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
+
+                    //---- pbGreen ----
+                    pbGreen.setStringPainted(true);
+                    panel4.add(pbGreen);
+                }
+                panel1.add(panel4, CC.xywh(1, 7, 3, 1, CC.DEFAULT, CC.TOP));
 
                 //======== pnlFlagLEDs ========
                 {
@@ -261,9 +274,15 @@ public class FrameDebug extends JFrame {
                 }
                 panel1.add(pnlFlagLEDs, CC.xy(7, 7));
 
-                //---- pbYellow ----
-                pbYellow.setStringPainted(true);
-                panel1.add(pbYellow, CC.xywh(11, 7, 3, 1, CC.DEFAULT, CC.FILL));
+                //======== panel6 ========
+                {
+                    panel6.setLayout(new BoxLayout(panel6, BoxLayout.X_AXIS));
+
+                    //---- pbYellow ----
+                    pbYellow.setStringPainted(true);
+                    panel6.add(pbYellow);
+                }
+                panel1.add(panel6, CC.xywh(11, 7, 3, 1, CC.DEFAULT, CC.TOP));
             }
             mainView.add(panel1, CC.xywh(3, 3, 9, 1));
 
@@ -304,7 +323,7 @@ public class FrameDebug extends JFrame {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                    "4*(pref), $ugap, default:grow, $lcgap, default, $lcgap",
+                    "pref, default, 3*(pref), $ugap, default:grow, $lcgap, default, $lcgap",
                     "fill:default:grow, $lgap, fill:default:grow"));
 
                 //---- btnPresetNumTeams ----
@@ -315,29 +334,40 @@ public class FrameDebug extends JFrame {
                 btnPresetNumTeams.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
                 panel2.add(btnPresetNumTeams, CC.xywh(1, 1, 1, 3, CC.FILL, CC.FILL));
 
-                //---- btnSwitchMode ----
-                btnSwitchMode.setText(null);
-                btnSwitchMode.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/player_play.png")));
-                btnSwitchMode.setToolTipText("Standby / Active");
-                panel2.add(btnSwitchMode, CC.xywh(2, 1, 1, 3, CC.FILL, CC.FILL));
-
-                //---- btnReset ----
-                btnReset.setText(null);
-                btnReset.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/reload.png")));
-                btnReset.setToolTipText("Reset/Undo");
-                panel2.add(btnReset, CC.xywh(3, 1, 1, 3, CC.FILL, CC.FILL));
-
                 //---- btnPresetGametimeUndo ----
-                btnPresetGametimeUndo.setText(null);
                 btnPresetGametimeUndo.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/clock.png")));
                 btnPresetGametimeUndo.setToolTipText("Preset Gametime");
-                panel2.add(btnPresetGametimeUndo, CC.xywh(4, 1, 1, 3, CC.FILL, CC.FILL));
+                btnPresetGametimeUndo.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                btnPresetGametimeUndo.setVerticalTextPosition(SwingConstants.BOTTOM);
+                btnPresetGametimeUndo.setHorizontalTextPosition(SwingConstants.CENTER);
+                btnPresetGametimeUndo.setText("B");
+                panel2.add(btnPresetGametimeUndo, CC.xywh(2, 1, 1, 3, CC.FILL, CC.FILL));
+
+                //---- btnSwitchMode ----
+                btnSwitchMode.setText("C");
+                btnSwitchMode.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/player_play.png")));
+                btnSwitchMode.setToolTipText("Standby / Active");
+                btnSwitchMode.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                btnSwitchMode.setVerticalTextPosition(SwingConstants.BOTTOM);
+                btnSwitchMode.setHorizontalTextPosition(SwingConstants.CENTER);
+                panel2.add(btnSwitchMode, CC.xywh(3, 1, 1, 3, CC.FILL, CC.FILL));
+
+                //---- btnReset ----
+                btnReset.setText("D");
+                btnReset.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/reload.png")));
+                btnReset.setToolTipText("Reset/Undo");
+                btnReset.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                btnReset.setVerticalTextPosition(SwingConstants.BOTTOM);
+                btnReset.setHorizontalTextPosition(SwingConstants.CENTER);
+                panel2.add(btnReset, CC.xywh(4, 1, 1, 3, CC.FILL, CC.FILL));
 
                 //======== lcd_panel ========
                 {
+                    lcd_panel.setBorder(new LineBorder(Color.black, 4));
+                    lcd_panel.setBackground(new Color(220, 223, 208));
                     lcd_panel.setLayout(new BoxLayout(lcd_panel, BoxLayout.PAGE_AXIS));
                 }
-                panel2.add(lcd_panel, CC.xywh(6, 1, 3, 3));
+                panel2.add(lcd_panel, CC.xywh(7, 1, 3, 3));
             }
             mainView.add(panel2, CC.xywh(7, 5, 5, 1, CC.FILL, CC.FILL));
         }
@@ -445,6 +475,7 @@ public class FrameDebug extends JFrame {
     private JButton btnGreen;
     private JButton btnYellow;
     private MyLED ledYellowButton;
+    private JPanel panel4;
     private JProgressBar pbGreen;
     private JPanel pnlFlagLEDs;
     private MyLED ledFlagWhite;
@@ -452,6 +483,7 @@ public class FrameDebug extends JFrame {
     private MyLED ledFlagBlue;
     private MyLED ledFlagGreen;
     private MyLED ledFlagYellow;
+    private JPanel panel6;
     private JProgressBar pbYellow;
     private JPanel panel5;
     private JButton btnQuit;
@@ -461,9 +493,9 @@ public class FrameDebug extends JFrame {
     private JButton btnTestDialog;
     private JPanel panel2;
     private JButton btnPresetNumTeams;
+    private JButton btnPresetGametimeUndo;
     private JButton btnSwitchMode;
     private JButton btnReset;
-    private JButton btnPresetGametimeUndo;
     private JPanel lcd_panel;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

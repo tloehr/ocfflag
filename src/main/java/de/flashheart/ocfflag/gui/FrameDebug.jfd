@@ -111,13 +111,16 @@ new FormModel {
 						"gridY": 5
 						"gridX": 13
 					} )
-					add( new FormComponent( "javax.swing.JProgressBar" ) {
-						name: "pbGreen"
-						"stringPainted": true
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
+						name: "panel4"
+						add( new FormComponent( "javax.swing.JProgressBar" ) {
+							name: "pbGreen"
+							"stringPainted": true
+						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridY": 7
-						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 						"gridWidth": 3
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints TOP
 					} )
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
 						name: "pnlFlagLEDs"
@@ -150,14 +153,17 @@ new FormModel {
 						"gridX": 7
 						"gridY": 7
 					} )
-					add( new FormComponent( "javax.swing.JProgressBar" ) {
-						name: "pbYellow"
-						"stringPainted": true
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
+						name: "panel6"
+						add( new FormComponent( "javax.swing.JProgressBar" ) {
+							name: "pbYellow"
+							"stringPainted": true
+						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 7
-						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 						"gridX": 11
+						"gridY": 7
 						"gridWidth": 3
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints TOP
 					} )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 3
@@ -203,7 +209,7 @@ new FormModel {
 					"gridY": 5
 				} )
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-					"$columnSpecs": "pref, pref, pref, pref, unrelgap, default:grow, labelcompgap, default, labelcompgap"
+					"$columnSpecs": "pref, default, pref, pref, pref, unrelgap, default:grow, labelcompgap, default, labelcompgap"
 					"$rowSpecs": "fill:default:grow, linegap, fill:default:grow"
 				} ) {
 					name: "panel2"
@@ -220,32 +226,41 @@ new FormModel {
 						"gridHeight": 3
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnPresetGametimeUndo"
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/clock.png" )
+						"toolTipText": "Preset Gametime"
+						"font": &Font1 new java.awt.Font( "Dialog", 1, 24 )
+						"verticalTextPosition": 3
+						"horizontalTextPosition": 0
+						"text": "B"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 2
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"gridHeight": 3
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
 						name: "btnSwitchMode"
-						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"text": "C"
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/player_play.png" )
 						"toolTipText": "Standby / Active"
+						"font": #Font1
+						"verticalTextPosition": 3
+						"horizontalTextPosition": 0
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-						"gridX": 2
+						"gridX": 3
 						"gridHeight": 3
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
 						name: "btnReset"
-						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"text": "D"
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/reload.png" )
 						"toolTipText": "Reset/Undo"
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 3
-						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-						"gridHeight": 3
-					} )
-					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "btnPresetGametimeUndo"
-						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/clock.png" )
-						"toolTipText": "Preset Gametime"
+						"font": #Font1
+						"verticalTextPosition": 3
+						"horizontalTextPosition": 0
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 4
 						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
@@ -256,8 +271,10 @@ new FormModel {
 						"axis": 3
 					} ) {
 						name: "lcd_panel"
+						"border": new javax.swing.border.LineBorder( sfield java.awt.Color black, 4, false )
+						"background": new java.awt.Color( 220, 223, 208, 255 )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 6
+						"gridX": 7
 						"gridWidth": 3
 						"gridHeight": 3
 					} )

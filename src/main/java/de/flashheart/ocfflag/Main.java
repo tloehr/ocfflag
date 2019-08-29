@@ -187,11 +187,6 @@ public class Main {
         pinHandler.add(new MyPin(GPIO, Configs.OUT_SIREN_COLOR_CHANGE, null, 50, 90));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_SIREN_START_STOP, null, 70, 60));
 
-        // for test reasons only
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_MF07, null));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_MF13, null));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_MF14, null));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_MF16, null));
 
         game = new Game(display_white, display_red, display_blue, display_green, display_yellow, button_blue, button_red, button_green, button_yellow, button_reset, button_standby_active, button_preset_num_teams, button_preset_gametime, button_quit, button_shutdown);
         
@@ -353,6 +348,8 @@ public class Main {
         UIManager.setLookAndFeel(
                 UIManager.getCrossPlatformLookAndFeelClassName());
         frameDebug = new FrameDebug();
+        // Das Fenster brauchen wir nur, wenn wir einen Raspi benutzen.
+        frameDebug.getBtnTestDialog().setVisible(Tools.isArm());
         frameDebug.setVisible(true);
     }
 

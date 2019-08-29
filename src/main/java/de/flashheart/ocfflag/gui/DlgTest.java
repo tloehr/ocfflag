@@ -83,10 +83,10 @@ public class DlgTest extends JDialog {
             Main.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, "5:on,1000;off,1000");
         }
 
-        Main.getPinHandler().setScheme(Configs.OUT_MF07, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_MF13, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_MF14, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_MF16, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Configs.OUT_MF07, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Configs.OUT_MF13, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Configs.OUT_MF14, "5:on,1000;off,1000");
+//        Main.getPinHandler().setScheme(Configs.OUT_MF16, "5:on,1000;off,1000");
 
         Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "5:on,1000;off,1000");
         Main.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "5:on,1000;off,1000");

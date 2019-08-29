@@ -42,6 +42,7 @@ public class Configs {
     public static final String BRIGHTNESS_YELLOW = "brightness_yellow";
     public static final String BRIGHTNESS_GREEN = "brightness_green";
     public static final String AIRSIREN_SIGNAL = "airsiren_signal";
+    public static final String SIRENS_ENABLED = "sirens_enabled";
     public static final String COLORCHANGE_SIREN_SIGNAL = "colorchange_siren_signal";
     public static final String GAME_TIME_LIST = "game_time_list";
 
@@ -86,10 +87,10 @@ public class Configs {
     public static final String OUT_HOLDDOWN_BUZZER  = "siren_holddown_buzzer";
 
     // Test reasons
-    public static final String OUT_MF07  = "out_mf07";
-    public static final String OUT_MF13  = "out_mf13";
-    public static final String OUT_MF14  = "out_mf14";
-    public static final String OUT_MF16  = "out_mf16";
+//    public static final String OUT_MF07  = "out_mf07";
+//    public static final String OUT_MF13  = "out_mf13";
+//    public static final String OUT_MF14  = "out_mf14";
+//    public static final String OUT_MF16  = "out_mf16";
 
 
 
@@ -138,23 +139,26 @@ public class Configs {
         configs.put(OUT_LED_BLUE_BTN, "mf02");
         configs.put(OUT_LED_GREEN_BTN, "mf04");
         configs.put(OUT_LED_YELLOW_BTN, "mf05");
-        configs.put(OUT_LED_GREEN, "mf06");
-        configs.put(OUT_LED_WHITE, "mf03");
+        configs.put(OUT_LED_GREEN, "mf03");
+        configs.put(OUT_LED_WHITE, "mf06");
+
+
         configs.put(OUT_FLAG_WHITE, "mf08");
-        configs.put(OUT_FLAG_RED, "mf09");
-        configs.put(OUT_FLAG_BLUE, "mf10");
-        configs.put(OUT_FLAG_GREEN, "mf11");
+        configs.put(OUT_FLAG_RED, "mf13"); // actioncase mf09  // unused in ocfflag
+        configs.put(OUT_FLAG_BLUE, "mf14"); // actioncase mf10   // unused in ocfflag
+        configs.put(OUT_FLAG_GREEN, "mf16");
         configs.put(OUT_FLAG_YELLOW, "mf12");
 
-        configs.put(OUT_SIREN_START_STOP, "rly01");
-        configs.put(OUT_SIREN_COLOR_CHANGE, "rly02");
-        configs.put(OUT_HOLDDOWN_BUZZER, "mf15");
+        configs.put(OUT_SIREN_START_STOP, "mf09"); //mf09  // orig: rly01
+        configs.put(OUT_SIREN_COLOR_CHANGE, "mf10"); // ocfflag2 mf10  // rly02
+        configs.put(OUT_HOLDDOWN_BUZZER, "mf11");   // mf06
+        configs.put(SIRENS_ENABLED, "true");
 
-        // TEST REASONS
-        configs.put(OUT_MF07, "mf07");
-        configs.put(OUT_MF13, "mf13");
-        configs.put(OUT_MF14, "mf14");
-        configs.put(OUT_MF16, "mf16");
+//        // RESERVE
+//        configs.put(OUT_MF07, "mf07");
+//        configs.put(OUT_MF13, "mf13");
+//        configs.put(OUT_MF14, "mf14");
+//        configs.put(OUT_MF16, "mf16");
 
         configs.put(REST_URL, "http://localhost:8090/rest/gamestate/create");
         configs.put(REST_AUTH, "Torsten:test1234");

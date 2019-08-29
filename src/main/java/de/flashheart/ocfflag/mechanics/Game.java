@@ -231,6 +231,7 @@ public class Game implements Runnable, HasLogger {
 
     private void button_quit_pressed() {
 //        if (mode != MODE_PREPARE_GAME) return;
+        Main.prepareShutdown();
         System.exit(0);
     }
 
