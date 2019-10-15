@@ -16,68 +16,22 @@ import java.io.IOException;
 /**
  * In dieser Klasse befindet sich die Spielmechanik.
  */
-public class SpawnCounter implements HasLogger, Games {
+public class SpawnCounter extends Games implements HasLogger {
 
     private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getConfigs().get(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
 //    private final int MODE_CONFIG = 0;
 //    private final int MODE_RUNNING = 1;
 
 
-    //    private int mode = MODE_CONFIG;
-    private final Display7Segments4Digits display_blue;
-    private final Display7Segments4Digits display_red;
-    private final Display7Segments4Digits display_white;
-    private final Display7Segments4Digits display_green;
-    private final Display7Segments4Digits display_yellow;
-
-    private final MyAbstractButton button_quit;
-    private final MyAbstractButton button_shutdown;
-
-    private final MyAbstractButton K1_reset;
-    private final MyAbstractButton K2_zero;
-    private final MyAbstractButton K3_plus_10;
-    private final MyAbstractButton K4_plus_100;
-
-    private final MyAbstractButton button_red;
-    private final MyAbstractButton button_blue;
-    private final MyAbstractButton button_green;
-    private final MyAbstractButton button_yellow;
-
     private int spawn_counter = 100;
 
 
     public SpawnCounter() {
-
-        // ApplicationContext
-        display_red = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_RED_I2C);
-              display_blue = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_BLUE_I2C);
-              display_green = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_GREEN_I2C);
-              display_yellow = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_YELLOW_I2C);
-              display_white = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_WHITE_I2C);
-
-
-        // GUI Buttons
-               button_quit = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_QUIT);
-               button_shutdown = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_SHUTDOWN);
-
-
-               button_red = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_RED);
-               button_blue = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_BLUE);
-               button_green = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_GREEN);
-               button_yellow = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_YELLOW);
-
-        // Hardware / GUI Buttons
-        K1_reset = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_C);  // K1 - stdby actv
-        K2_zero = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_A);     // K2 - num teams
-        K3_plus_10 = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_B);  // K3 - game time
-        K4_plus_100 = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_D);  // K4 - RESET
-
-
-        K1_reset.setText("C reset");
-        K2_zero.setText("A =0");
-        K3_plus_10.setText("B +10");
-        K4_plus_100.setText("D +100");
-
+        super();
+        K1.setText("C reset");
+        K2.setText("A =0");
+        K3.setText("B +10");
+        K4.setText("D +100");
 
         spawn_counter = Main.getConfigs().getInt(Configs.SPWN_START_TICKETS);
 
@@ -106,19 +60,19 @@ public class SpawnCounter implements HasLogger, Games {
             getLogger().debug("GUI_button_yellow");
             button_action_pressed();
         });
-        K2_zero.addActionListener(e -> {
+        K2.addActionListener(e -> {
             getLogger().debug("GUI_button_0");
             button_0_pressed();
         });
-        K3_plus_10.addActionListener(e -> {
+        K3.addActionListener(e -> {
             getLogger().debug("GUI_button_+10");
             button_plus_10_pressed();
         });
-        K4_plus_100.addActionListener(e -> {
+        K4.addActionListener(e -> {
             getLogger().debug("GUI_button_+100");
             button_plus_100_pressed();
         });
-        K1_reset.addActionListener(e -> {
+        K1.addActionListener(e -> {
             getLogger().debug("GUI_button_reset");
             buttonResetPressed();
         });
@@ -252,5 +206,10 @@ public class SpawnCounter implements HasLogger, Games {
     @Override
     public boolean isGameRunning() {
         return true;
+    }
+
+    @Override
+    public String getShortID() {
+        return "SC";
     }
 }

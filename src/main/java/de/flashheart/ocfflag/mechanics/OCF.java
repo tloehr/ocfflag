@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 /**
  * Dies ist die Standard OCF / CenterFlag Spielmechanik für 2-4 Teams.
  */
-public class OCF implements Games, Runnable, HasLogger {
+public class OCF extends Games implements Runnable, HasLogger {
 
 //    private static final String GAMEMODE = "OCF-Flag CenterFlag Conquest";
 
@@ -54,15 +54,6 @@ public class OCF implements Games, Runnable, HasLogger {
 
     private int mode = MODE_PREPARE_GAME;
     private String flag = GameEvent.FLAG_NEUTRAL;
-
-    private final Display7Segments4Digits display_blue;
-    private final Display7Segments4Digits display_red;
-    private final Display7Segments4Digits display_white;
-    private final Display7Segments4Digits display_green;
-    private final Display7Segments4Digits display_yellow;
-
-    private final MyAbstractButton button_quit;
-    private final MyAbstractButton button_shutdown;
 
     private final MyAbstractButton button_preset_gametime;
     private final MyAbstractButton button_blue;
@@ -104,18 +95,9 @@ public class OCF implements Games, Runnable, HasLogger {
     private boolean resetGame = false;
 
     public OCF(int num_teams) {
+        super();
         this.num_teams = num_teams;
         thread = new Thread(this);
-
-        display_red = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_RED_I2C);
-        display_blue = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_BLUE_I2C);
-        display_green = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_GREEN_I2C);
-        display_yellow = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_YELLOW_I2C);
-        display_white = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_WHITE_I2C);
-
-        // GUI Buttons
-        button_quit = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_QUIT);
-        button_shutdown = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_SHUTDOWN);
 
         // Hardware / GUI Buttons
         button_switch_mode = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_C);
@@ -1002,5 +984,8 @@ public class OCF implements Games, Runnable, HasLogger {
         return mode == MODE_CLOCK_GAME_RUNNING;
     }
 
-
+    @Override
+    public String getShortID() {
+        return "OCF"+num_teams;
+    }
 }

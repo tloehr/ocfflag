@@ -234,12 +234,7 @@ public class Main {
         configs = new Configs();
 
         String title = "ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + " [" + Main.getConfigs().getApplicationInfo("buildNumber") + "]";
-        logger.info("\n  ____ _____  _    ____ _____ ___ _   _  ____    ___   ____ _____ _____ _             \n" +
-                " / ___|_   _|/ \\  |  _ \\_   _|_ _| \\ | |/ ___|  / _ \\ / ___|  ___|  ___| | __ _  __ _ \n" +
-                " \\___ \\ | | / _ \\ | |_) || |  | ||  \\| | |  _  | | | | |   | |_  | |_  | |/ _` |/ _` |\n" +
-                "  ___) || |/ ___ \\|  _ < | |  | || |\\  | |_| | | |_| | |___|  _| |  _| | | (_| | (_| |\n" +
-                " |____/ |_/_/   \\_\\_| \\_\\|_| |___|_| \\_|\\____|  \\___/ \\____|_|   |_|   |_|\\__,_|\\__, |\n" +
-                "                                                                                |___/ ");
+        logger.info("Starting RLG System");
         logger.info(title);
 
         /***
@@ -334,12 +329,7 @@ public class Main {
                 logger.error(e);
             }
         }
-        logger.info("\n  _____ _   _ ____     ___  _____    ___   ____ _____ _____ _             \n" +
-                " | ____| \\ | |  _ \\   / _ \\|  ___|  / _ \\ / ___|  ___|  ___| | __ _  __ _ \n" +
-                " |  _| |  \\| | | | | | | | | |_    | | | | |   | |_  | |_  | |/ _` |/ _` |\n" +
-                " | |___| |\\  | |_| | | |_| |  _|   | |_| | |___|  _| |  _| | | (_| | (_| |\n" +
-                " |_____|_| \\_|____/   \\___/|_|      \\___/ \\____|_|   |_|   |_|\\__,_|\\__, |\n" +
-                "                                                                    |___/ ");
+        logger.info("End of program");
     }
 
 
@@ -386,10 +376,6 @@ public class Main {
         applicationContext.put("rly03", RLY03);
         applicationContext.put("rly04", RLY04);
     }
-
-//    public static int getMaxTeams() {
-//        return MAX_TEAMS;
-//    }
 
     public static Level getLogLevel() {
         return logLevel;
