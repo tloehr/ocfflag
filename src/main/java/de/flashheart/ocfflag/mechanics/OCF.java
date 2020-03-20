@@ -49,9 +49,6 @@ public class OCF implements Games, Runnable, HasLogger {
     private final int SAVEPOINT_CURRENT = 3;
     private final String SAVEPOINTS[] = new String[]{"", "SPIELZUG ZURÜCK", "RESET", "KEINE ÄNDERUNG"};
 
-
-    private final int MIN_TEAMS = 2;
-
     private int mode = MODE_PREPARE_GAME;
     private String flag = GameEvent.FLAG_NEUTRAL;
 
@@ -64,21 +61,25 @@ public class OCF implements Games, Runnable, HasLogger {
     private final MyAbstractButton button_quit;
     private final MyAbstractButton button_shutdown;
 
-    private final MyAbstractButton button_preset_gametime;
+
     private final MyAbstractButton button_blue;
     private final MyAbstractButton button_red;
     private final MyAbstractButton button_green;
     private final MyAbstractButton button_yellow;
-    private final MyAbstractButton button_reset;
-    private final MyAbstractButton button_switch_mode;
+//    private final MyAbstractButton button_reset;
+//    private final MyAbstractButton button_switch_mode;
+//    private final MyAbstractButton button_preset_gametime;
 
-//    private final MyLCD lcd_display;
+    private final MyAbstractButton K1_switch_mode;
+    private final MyAbstractButton K2_change_game;
+    private final MyAbstractButton K3_gametime;
+    private final MyAbstractButton K4_reset;
+
 
     private final Thread thread;
     private long SLEEP_PER_CYCLE = 500;
 
     private Statistics statistics;
-//
 
     private long remaining, time_blue, time_red, time_yellow, time_green, standbyStartedAt, lastStatsSent, min_stat_sent_time;
     private int lastMinuteToChangeTimeblinking;
@@ -118,19 +119,31 @@ public class OCF implements Games, Runnable, HasLogger {
         button_shutdown = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_SHUTDOWN);
 
         // Hardware / GUI Buttons
-        button_switch_mode = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_C);
-        button_reset = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_D);
-        button_preset_gametime = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_B);
+//        button_switch_mode = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_C);
+//        button_preset_gametime = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_B);
+//        button_reset = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_D);
 
         button_red = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_RED);
         button_blue = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_BLUE);
         button_green = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_GREEN);
         button_yellow = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_YELLOW);
 
-//        K1_start_stop.setText("K1 start/pause");
-//        K2_undo.setText("K2 undo");
-//        K3_gametime.setText("K3 gametime");
-//        K4_reset.setText("K4 reset");
+        // Hardware / GUI Buttons
+        K1_switch_mode = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_C);  // K1 - stdby actv
+        K2_change_game = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_A);     // K2 - num teams
+        K3_gametime = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_B);  // K3 - game time
+        K4_reset = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_D);  // K4 - RESET
+
+        K1_switch_mode.setText("K1 switch_mode");
+        K2_change_game.setText("K2 change game");
+        K3_gametime.setText("K3 gametime");
+        K4_reset.setText("K4 reset");
+
+        K1_switch_mode.setIcon(FrameDebug.IconPlay);
+//        K2_change_game.setIcon(FrameDebug.IconPlay);
+        K3_gametime.setIcon(FrameDebug.IconGametime);
+        K4_reset.setIcon(FrameDebug.IconUNDO);
+
 
         preset_gametime_position = Integer.parseInt(Main.getConfigs().get(Configs.OCF_GAMETIME));
         preset_times = Main.getConfigs().getGameTimes();
@@ -142,29 +155,6 @@ public class OCF implements Games, Runnable, HasLogger {
         SLEEP_PER_CYCLE = Long.parseLong(Main.getConfigs().get(Configs.SLEEP_PER_CYCLE));
 
         statistics = new Statistics(preset_times[preset_gametime_position]);
-//
-//        colors.put("green", Tools.getColor(Main.getConfigs().get("flag_rgb_green")));
-//        colors.put("red", Tools.getColor(Main.getConfigs().get("flag_rgb_red")));
-//        colors.put("blue", Tools.getColor(Main.getConfigs().get("flag_rgb_blue")));
-//        colors.put("yellow", Tools.getColor(Main.getConfigs().get("flag_rgb_yellow")));
-
-
-//        this.display_green = display_green;
-//        this.display_yellow = display_yellow;
-//        this.button_green = button_green;
-//        this.button_yellow = button_yellow;
-//        this.button_preset_num_teams = button_preset_num_teams;
-//        this.button_preset_gametime = button_preset_gametime;
-//        this.button_quit = button_quit;
-//        this.button_shutdown = button_shutdown;
-//
-//        this.display_blue = display_blue;
-//        this.display_red = display_red;
-//        this.display_white = display_white;
-//        this.button_blue = button_blue;
-//        this.button_red = button_red;
-//        this.button_reset = button_reset;
-//        this.button_switch_mode = button_switch_mode;
 
 //        this.lcd_display = (MyLCD) Main.getApplicationContext().get("lcd_display");
 
@@ -214,19 +204,19 @@ public class OCF implements Games, Runnable, HasLogger {
             getLogger().debug("GUI_button_green");
             button_green_pressed();
         });
-        button_reset.addActionListener(e -> {
+        K4_reset.addActionListener(e -> {
             getLogger().debug("GUI_button_undo_reset");
             button_undo_reset_pressed();
         });
-//        button_preset_num_teams.addActionListener(e -> {
-//            getLogger().debug("GUI_button_preset_num_teams");
-//            button_preset_num_teams();
-//        });
-        button_preset_gametime.addActionListener(e -> {
+        K2_change_game.addActionListener(e -> {
+            getLogger().debug("K2_change_game");
+            changeGame(new GameSelector());
+        });
+        K3_gametime.addActionListener(e -> {
             getLogger().debug("GUI_button_preset_gametime / UNDO");
             button_gametime_pressed();
         });
-        button_switch_mode.addActionListener(e -> {
+        K1_switch_mode.addActionListener(e -> {
             getLogger().debug("GUI_button_switch_mode");
             buttonStandbyRunningPressed();
         });
@@ -548,7 +538,7 @@ public class OCF implements Games, Runnable, HasLogger {
             Main.getPinHandler().off(Configs.OUT_FLAG_YELLOW);
 
             if (mode == MODE_PREPARE_GAME || mode == MODE_CLOCK_GAME_PAUSED) {
-                button_switch_mode.setIcon(FrameDebug.IconPlay);
+                K1_switch_mode.setIcon(FrameDebug.IconPlay);
 
                 String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
                         new RGBScheduleElement(Configs.FLAG_RGB_WHITE, 350l) + ";" +
@@ -619,7 +609,7 @@ public class OCF implements Games, Runnable, HasLogger {
 
             if (mode == MODE_CLOCK_GAME_RUNNING) {
                 getLogger().debug("RUNNING");
-                button_switch_mode.setIcon(FrameDebug.IconPause);
+                K1_switch_mode.setIcon(FrameDebug.IconPause);
 
 
                 Main.getPinHandler().off(Configs.OUT_LED_GREEN);
@@ -1000,6 +990,15 @@ public class OCF implements Games, Runnable, HasLogger {
     @Override
     public boolean isGameRunning() {
         return mode == MODE_CLOCK_GAME_RUNNING;
+    }
+
+    /**
+     * stops this game and switches to the gameselector
+     */
+    public void changeGame(Games game){
+        thread.interrupt();
+        Main.getPinHandler().off();
+        Main.setGame(game);
     }
 
 

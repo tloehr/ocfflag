@@ -19,11 +19,7 @@ import java.io.IOException;
 public class SpawnCounter implements HasLogger, Games {
 
     private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getConfigs().get(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
-//    private final int MODE_CONFIG = 0;
-//    private final int MODE_RUNNING = 1;
 
-
-    //    private int mode = MODE_CONFIG;
     private final Display7Segments4Digits display_blue;
     private final Display7Segments4Digits display_red;
     private final Display7Segments4Digits display_white;
@@ -50,21 +46,19 @@ public class SpawnCounter implements HasLogger, Games {
 
         // ApplicationContext
         display_red = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_RED_I2C);
-              display_blue = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_BLUE_I2C);
-              display_green = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_GREEN_I2C);
-              display_yellow = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_YELLOW_I2C);
-              display_white = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_WHITE_I2C);
-
+        display_blue = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_BLUE_I2C);
+        display_green = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_GREEN_I2C);
+        display_yellow = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_YELLOW_I2C);
+        display_white = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_WHITE_I2C);
 
         // GUI Buttons
-               button_quit = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_QUIT);
-               button_shutdown = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_SHUTDOWN);
+        button_quit = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_QUIT);
+        button_shutdown = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_SHUTDOWN);
 
-
-               button_red = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_RED);
-               button_blue = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_BLUE);
-               button_green = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_GREEN);
-               button_yellow = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_YELLOW);
+        button_red = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_RED);
+        button_blue = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_BLUE);
+        button_green = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_GREEN);
+        button_yellow = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_YELLOW);
 
         // Hardware / GUI Buttons
         K1_reset = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_C);  // K1 - stdby actv
@@ -72,17 +66,14 @@ public class SpawnCounter implements HasLogger, Games {
         K3_plus_10 = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_B);  // K3 - game time
         K4_plus_100 = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_D);  // K4 - RESET
 
-
         K1_reset.setText("C reset");
         K2_zero.setText("A =0");
         K3_plus_10.setText("B +10");
         K4_plus_100.setText("D +100");
 
-
         spawn_counter = Main.getConfigs().getInt(Configs.SPWN_START_TICKETS);
 
         initGame();
-
     }
 
     private void initGame() {

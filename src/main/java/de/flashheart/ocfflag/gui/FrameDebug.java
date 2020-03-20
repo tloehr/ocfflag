@@ -180,7 +180,7 @@ public class FrameDebug extends JFrame {
                 //---- btnRed ----
                 btnRed.setText("Red");
                 btnRed.setForeground(Color.red);
-                btnRed.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 24));
+                btnRed.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
                 upperPanel.add(btnRed, CC.xy(3, 1));
 
                 //---- lblPole ----
@@ -189,13 +189,13 @@ public class FrameDebug extends JFrame {
                 lblPole.setText("Flagge");
                 lblPole.setForeground(Color.black);
                 lblPole.setHorizontalAlignment(SwingConstants.CENTER);
-                lblPole.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 24));
+                lblPole.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
                 upperPanel.add(lblPole, CC.xywh(7, 1, 1, 3));
 
                 //---- btnBlue ----
                 btnBlue.setText("Blue");
                 btnBlue.setForeground(Color.blue);
-                btnBlue.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 24));
+                btnBlue.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
                 upperPanel.add(btnBlue, CC.xy(11, 1, CC.FILL, CC.DEFAULT));
 
                 //---- ledBlueButton ----
@@ -219,7 +219,7 @@ public class FrameDebug extends JFrame {
                 //---- btnGreen ----
                 btnGreen.setText("Green");
                 btnGreen.setForeground(new Color(18, 110, 12));
-                btnGreen.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 24));
+                btnGreen.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
                 upperPanel.add(btnGreen, CC.xy(3, 5));
 
                 //======== pnlFlagLEDs ========
@@ -256,7 +256,7 @@ public class FrameDebug extends JFrame {
                 //---- btnYellow ----
                 btnYellow.setText("Yellow");
                 btnYellow.setForeground(new Color(210, 199, 27));
-                btnYellow.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 24));
+                btnYellow.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
                 upperPanel.add(btnYellow, CC.xy(11, 5, CC.FILL, CC.DEFAULT));
 
                 //---- ledYellowButton ----
@@ -437,13 +437,12 @@ public class FrameDebug extends JFrame {
         return ledGreenButton;
     }
 
-
-    public MyLED getLedStandbyActive() {
-        return ledStandbyActive;
+    public MyLED getLedGreen() {
+        return ledGreen;
     }
 
-    public MyLED getLedStatsSent() {
-        return ledStatsSent;
+    public MyLED getLedWhite() {
+        return ledWhite;
     }
 
     public JButton getBtnYellow() {
