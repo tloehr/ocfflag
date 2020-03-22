@@ -1,25 +1,9 @@
 package de.flashheart.ocfflag;
 
-import com.pi4j.gpio.extension.mcp.MCP23017GpioProvider;
-import com.pi4j.gpio.extension.mcp.MCP23017Pin;
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.RaspiPin;
-import com.pi4j.io.i2c.I2CBus;
-import com.pi4j.io.i2c.I2CFactory;
-import com.pi4j.wiringpi.SoftPwm;
 import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.MySystem;
-import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
-import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
-import de.flashheart.ocfflag.hardware.abstraction.MyPin;
-import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
-import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
 import de.flashheart.ocfflag.mechanics.GameSelector;
-import de.flashheart.ocfflag.mechanics.OCF;
 import de.flashheart.ocfflag.mechanics.Games;
-import de.flashheart.ocfflag.mechanics.SpawnCounter;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
 import de.flashheart.ocfflag.statistics.MessageProcessor;
@@ -35,7 +19,7 @@ import java.util.HashMap;
 
 public class Main {
 
-    private static long REACTION_TIME = 3000;
+
 
     private static Games currentGame;
 
@@ -43,31 +27,34 @@ public class Main {
     private static Level logLevel = Level.DEBUG;
 
     private static final HashMap<String, Object> applicationContext = new HashMap<>();
+    private static Configs configs;
 
     private static boolean ignore_gpio; // ignore gpios, even when running on raspi
     private static boolean dev_mode; // show develop mode functions
 
     private static MessageProcessor messageProcessor;
+
     public static MessageProcessor getMessageProcessor() {
         return messageProcessor;
     }
-    public static HashMap<String, Object> getApplicationContext() {
-        return applicationContext;
-    }
+//    public static HashMap<String, Object> getApplicationContext() {
+//        return applicationContext;
+//    }
 
     public static void main(String[] args) throws Exception {
+
         initBaseSystem(args);
 
         UIManager.setLookAndFeel(
                 UIManager.getCrossPlatformLookAndFeelClassName());
 
         FrameDebug frameDebug = new FrameDebug();
-        applicationContext.put("FrameDebug", frameDebug);
+        applicationContext.put(Configs.FRAME_DEBUG, frameDebug);
         // Das Fenster brauchen wir nur, wenn wir einen Raspi benutzen.
         frameDebug.getBtnTestDialog().setVisible(Tools.isArm());
         frameDebug.setVisible(true);
 
-        applicationContext.put("mysystem", new MySystem(applicationContext));
+        applicationContext.put("mysystem", new MySystem());
 
         setGame(new GameSelector());
     }
@@ -76,16 +63,27 @@ public class Main {
         return applicationContext.get(key);
     }
 
+    public static void addToContext(String key, Object value) {
+        applicationContext.put(key, value);
+    }
+
+    public static String getFromConfigs(String key) {
+        return configs.get(key);
+    }
+
+    public static void addToConfigs(String key, String value) {
+        configs.put(key, value);
+    }
+
     /**
      * Diese Methode enthält alles was initialisiert werden muss, gleich ob wir das Programm auf einem Raspi ausführen
      * oder einem anderen Computer.
      *
      * @param args
-     * @throws InterruptedException
      */
 
-    private static void initBaseSystem(String[] args) throws InterruptedException, IOException {
-
+    private static void initBaseSystem(String[] args) throws IOException {
+        configs  = new Configs();
         System.setProperty("logs", Tools.getWorkingPath());
         Logger.getRootLogger().setLevel(logLevel);
         logger = Logger.getLogger("Main");
@@ -102,10 +100,6 @@ public class Main {
             logger.fatal(e);
             logger.fatal(sw);
         });
-
-        applicationContext.put("configs", new Configs());
-
-        Configs configs = (Configs) applicationContext.get("configs");
 
         String title = "ocfflag " + configs.getApplicationInfo("my.version") + " [" + configs.getApplicationInfo("buildNumber") + "]";
 
@@ -178,7 +172,7 @@ public class Main {
 //
 
 
-        REACTION_TIME = configs.getLong(Configs.BUTTON_REACTION_TIME);
+//        REACTION_TIME = configs.getLong(Configs.BUTTON_REACTION_TIME);
 
         messageProcessor = new MessageProcessor();
         messageProcessor.start();
@@ -196,9 +190,6 @@ public class Main {
                 "                                                                    |___/ ");
     }
 
-    public static long getReactionTime() {
-        return REACTION_TIME;
-    }
 
     public static boolean isIgnore_gpio() {
         return ignore_gpio;
@@ -212,7 +203,7 @@ public class Main {
         return currentGame;
     }
 
-    public static void setGame(Games game){
+    public static void setGame(Games game) {
         currentGame = game;
     }
 }

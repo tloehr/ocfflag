@@ -164,7 +164,7 @@ public class RGBBlinkModel implements GenericBlinkModel {
     }
 
     public static String getGametimeBlinkingScheme(String color, long time) {
-        return getGametimeBlinkingScheme(Tools.getColor(Main.getConfigs().get(color)), time);
+        return getGametimeBlinkingScheme(Tools.getColor(Main.getFromConfigs(color)), time);
     }
 
 

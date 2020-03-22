@@ -42,13 +42,13 @@ public class MessageProcessor extends Thread implements HasLogger {
 
     public MessageProcessor() {
         super();
-        active = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME)) > 0;
+        active = Long.parseLong(Main.getFromConfigs(Configs.MIN_STAT_SEND_TIME)) > 0;
 
         //
         // Authentication
         //
         headers = new HttpHeaders();
-        byte[] encodedAuth = Base64.encodeBase64(Main.getConfigs().get(Configs.REST_AUTH).getBytes(Charset.forName("US-ASCII")));
+        byte[] encodedAuth = Base64.encodeBase64(Main.getFromConfigs(Configs.REST_AUTH).getBytes(Charset.forName("US-ASCII")));
         String authHeader = "Basic " + new String(encodedAuth);
         headers.set("Authorization", authHeader);
 
@@ -93,7 +93,7 @@ public class MessageProcessor extends Thread implements HasLogger {
                         HttpEntity<GameState> requestBody = new HttpEntity<>(gameState, headers);
 
                         // Send request with POST method.
-                        GameState result = restTemplate.postForObject(Main.getConfigs().get(Configs.REST_URL), requestBody, GameState.class);
+                        GameState result = restTemplate.postForObject(Main.getFromConfigs(Configs.REST_URL), requestBody, GameState.class);
 
                         if (result != null && result.getBombname() != null) {
                             getLogger().debug("GameState created: " + result.getTimestamp());

@@ -18,7 +18,7 @@ import java.io.IOException;
  */
 public class SpawnCounter implements HasLogger, Games {
 
-    private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getConfigs().get(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
+    private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getFromConfigs(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
 
     private final Display7Segments4Digits display_blue;
     private final Display7Segments4Digits display_red;
@@ -123,7 +123,7 @@ public class SpawnCounter implements HasLogger, Games {
             getLogger().debug("GPIO_button_shutdown DOWN");
             Main.prepareShutdown();
             try {
-                String line = Main.getConfigs().get(Configs.SHUTDOWN_COMMAND_LINE);
+                String line = Main.getFromConfigs(Configs.SHUTDOWN_COMMAND_LINE);
                 CommandLine commandLine = CommandLine.parse(line);
                 DefaultExecutor executor = new DefaultExecutor();
                 Main.prepareShutdown();
@@ -166,10 +166,10 @@ public class SpawnCounter implements HasLogger, Games {
         if (spawn_counter == 0) return;
         if (spawn_counter == 1) {
             spawn_counter = 0;
-            Main.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, Main.getConfigs().get(Configs.SPWN_SIREN_NOMORETICKETS));
+            Main.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, Main.getFromConfigs(Configs.SPWN_SIREN_NOMORETICKETS));
         } else {
             spawn_counter--;
-            Main.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, Main.getConfigs().get(Configs.SPWN_SIREN_DECREASE));
+            Main.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, Main.getFromConfigs(Configs.SPWN_SIREN_DECREASE));
         }
         setDisplayToEvent();
     }

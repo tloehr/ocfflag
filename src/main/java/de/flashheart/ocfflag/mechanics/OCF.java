@@ -36,7 +36,7 @@ public class OCF implements Games, Runnable, HasLogger {
 //    private static final String GAMEMODE = "OCF-Flag CenterFlag Conquest";
 
 
-    private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getConfigs().get(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
+    private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getFromConfigs(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
     private final int MODE_PREPARE_GAME = 0;
     private final int MODE_CLOCK_GAME_RUNNING = 1;
     private final int MODE_CLOCK_GAME_PAUSED = 2;
@@ -108,31 +108,31 @@ public class OCF implements Games, Runnable, HasLogger {
         this.num_teams = num_teams;
         thread = new Thread(this);
 
-        display_red = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_RED_I2C);
-        display_blue = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_BLUE_I2C);
-        display_green = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_GREEN_I2C);
-        display_yellow = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_YELLOW_I2C);
-        display_white = (Display7Segments4Digits) Main.getApplicationContext().get(Configs.DISPLAY_WHITE_I2C);
+        display_red = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_RED_I2C);
+        display_blue = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_BLUE_I2C);
+        display_green = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_GREEN_I2C);
+        display_yellow = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_YELLOW_I2C);
+        display_white = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_WHITE_I2C);
 
         // GUI Buttons
-        button_quit = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_QUIT);
-        button_shutdown = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_SHUTDOWN);
+        button_quit = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_QUIT);
+        button_shutdown = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_SHUTDOWN);
 
         // Hardware / GUI Buttons
-//        button_switch_mode = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_C);
-//        button_preset_gametime = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_B);
-//        button_reset = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_D);
+//        button_switch_mode = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_C);
+//        button_preset_gametime = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_B);
+//        button_reset = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_D);
 
-        button_red = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_RED);
-        button_blue = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_BLUE);
-        button_green = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_GREEN);
-        button_yellow = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_YELLOW);
+        button_red = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_RED);
+        button_blue = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_BLUE);
+        button_green = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_GREEN);
+        button_yellow = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_YELLOW);
 
         // Hardware / GUI Buttons
-        K1_switch_mode = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_C);  // K1 - stdby actv
-        K2_change_game = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_A);     // K2 - num teams
-        K3_gametime = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_B);  // K3 - game time
-        K4_reset = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_D);  // K4 - RESET
+        K1_switch_mode = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_C);  // K1 - stdby actv
+        K2_change_game = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_A);     // K2 - num teams
+        K3_gametime = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_B);  // K3 - game time
+        K4_reset = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_D);  // K4 - RESET
 
         K1_switch_mode.setText("K1 switch_mode");
         K2_change_game.setText("K2 change game");
@@ -145,20 +145,20 @@ public class OCF implements Games, Runnable, HasLogger {
         K4_reset.setIcon(FrameDebug.IconUNDO);
 
 
-        preset_gametime_position = Integer.parseInt(Main.getConfigs().get(Configs.OCF_GAMETIME));
+        preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
         preset_times = Main.getConfigs().getGameTimes();
         if (preset_gametime_position >= preset_times.length - 1) {
             preset_gametime_position = 0;
             Main.getConfigs().put(Configs.OCF_GAMETIME, preset_gametime_position);
         }
 
-        SLEEP_PER_CYCLE = Long.parseLong(Main.getConfigs().get(Configs.SLEEP_PER_CYCLE));
+        SLEEP_PER_CYCLE = Long.parseLong(Main.getFromConfigs(Configs.SLEEP_PER_CYCLE));
 
         statistics = new Statistics(preset_times[preset_gametime_position]);
 
-//        this.lcd_display = (MyLCD) Main.getApplicationContext().get("lcd_display");
+//        this.lcd_display = (MyLCD) Main.getFromContext("lcd_display");
 
-        preset_gametime_position = Integer.parseInt(Main.getConfigs().get(Configs.OCF_GAMETIME));
+        preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
         preset_times = Main.getConfigs().getGameTimes();
         if (preset_gametime_position >= preset_times.length - 1) {
             preset_gametime_position = 0;
@@ -166,8 +166,8 @@ public class OCF implements Games, Runnable, HasLogger {
         }
 
 
-        SLEEP_PER_CYCLE = Long.parseLong(Main.getConfigs().get(Configs.SLEEP_PER_CYCLE));
-//        num_teams = Integer.min(Integer.parseInt(Main.getConfigs().get(Configs.NUMBER_OF_TEAMS)), Main.getConfigs().getInt(Configs.MAX_NUMBER_OF_TEAMS));
+        SLEEP_PER_CYCLE = Long.parseLong(Main.getFromConfigs(Configs.SLEEP_PER_CYCLE));
+//        num_teams = Integer.min(Integer.parseInt(Main.getFromConfigs(Configs.NUMBER_OF_TEAMS)), Main.getConfigs().getInt(Configs.MAX_NUMBER_OF_TEAMS));
 
         statistics = new Statistics(preset_times[preset_gametime_position]);
 
@@ -228,7 +228,7 @@ public class OCF implements Games, Runnable, HasLogger {
             getLogger().debug("GPIO_button_shutdown DOWN");
             Main.prepareShutdown();
             try {
-                String line = Main.getConfigs().get(Configs.SHUTDOWN_COMMAND_LINE);
+                String line = Main.getFromConfigs(Configs.SHUTDOWN_COMMAND_LINE);
                 CommandLine commandLine = CommandLine.parse(line);
                 DefaultExecutor executor = new DefaultExecutor();
                 Main.prepareShutdown();
@@ -260,7 +260,7 @@ public class OCF implements Games, Runnable, HasLogger {
 
                 lastState = new SavePointOCF(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.RED_ACTIVATED;
-                Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getConfigs().get(Configs.OCF_COLORCHANGE_SIGNAL));
+                Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
                 lastStatsSent = statistics.addEvent(flag, remaining, getRank());
 
                 setDisplayToEvent();
@@ -283,7 +283,7 @@ public class OCF implements Games, Runnable, HasLogger {
 
                 lastState = new SavePointOCF(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.BLUE_ACTIVATED;
-                Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getConfigs().get(Configs.OCF_COLORCHANGE_SIGNAL));
+                Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
                 lastStatsSent = statistics.addEvent(flag, remaining, getRank());
                 setDisplayToEvent();
             } else {
@@ -306,7 +306,7 @@ public class OCF implements Games, Runnable, HasLogger {
 
                 lastState = new SavePointOCF(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.GREEN_ACTIVATED;
-                Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getConfigs().get(Configs.OCF_COLORCHANGE_SIGNAL));
+                Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
                 lastStatsSent = statistics.addEvent(flag, remaining, getRank());
                 setDisplayToEvent();
             } else {
@@ -330,7 +330,7 @@ public class OCF implements Games, Runnable, HasLogger {
 
                 lastState = new SavePointOCF(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.YELLOW_ACTIVATED;
-                Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getConfigs().get(Configs.OCF_COLORCHANGE_SIGNAL));
+                Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
                 lastStatsSent = statistics.addEvent(flag, remaining, getRank());
                 setDisplayToEvent();
             } else {
@@ -466,7 +466,7 @@ public class OCF implements Games, Runnable, HasLogger {
             lastPIT = System.currentTimeMillis();
 
             mode = MODE_CLOCK_GAME_RUNNING;
-            Main.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, Main.getConfigs().get(Configs.OCF_START_STOP_SIGNAL));
+            Main.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, Main.getFromConfigs(Configs.OCF_START_STOP_SIGNAL));
             setDisplayToEvent();
         }
 
@@ -487,7 +487,7 @@ public class OCF implements Games, Runnable, HasLogger {
 //        lcd_display.addPage(); // Seite für Zeiten
 //        lcd_display.selectPage(1);
 
-        min_stat_sent_time = Long.parseLong(Main.getConfigs().get(Configs.MIN_STAT_SEND_TIME));
+        min_stat_sent_time = Long.parseLong(Main.getFromConfigs(Configs.MIN_STAT_SEND_TIME));
 
         remaining = preset_times[preset_gametime_position] * 60000; // die preset_times sind in Minuten. Daher * 60000, weil wir millis brauchen
         standbyStartedAt = 0l;
@@ -625,7 +625,7 @@ public class OCF implements Games, Runnable, HasLogger {
             // hier findet die Auswertung nach dem Spielende statt.
             if (mode == MODE_CLOCK_GAME_OVER) {
 
-                Main.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, Main.getConfigs().get(Configs.OCF_START_STOP_SIGNAL));
+                Main.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, Main.getFromConfigs(Configs.OCF_START_STOP_SIGNAL));
 
 
                 if (GameStateService.isDrawgame(statistics.getGameState())) {
@@ -777,7 +777,7 @@ public class OCF implements Games, Runnable, HasLogger {
             Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "∞:on,500;off,500");
 
             display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
-            Color myyellow = Tools.getColor(Main.getConfigs().get(Configs.FLAG_RGB_YELLOW));
+            Color myyellow = Tools.getColor(Main.getFromConfigs(Configs.FLAG_RGB_YELLOW));
             Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "YELLOW ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(myyellow, remaining));
             Main.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, PinBlinkModel.getGametimeBlinkingScheme(remaining));
 

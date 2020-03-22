@@ -37,7 +37,7 @@ public class Statistics implements HasLogger {
 
     public void reset(long maxtime) {
         winners.clear();
-        gameState = new GameState(Main.getConfigs().get(Configs.FLAGNAME), GameState.TYPE_CENTERFLAG, Main.getConfigs().get(Configs.MYUUID), Main.getConfigs().getNextMatchID(), maxtime);
+        gameState = new GameState(Main.getFromConfigs(Configs.FLAGNAME), GameState.TYPE_CENTERFLAG, Main.getFromConfigs(Configs.MYUUID), ((Configs) Main.getFromContext("configs")).getNextMatchID(), maxtime);
     }
 
     public void updateTimers(long remaining) {
@@ -119,14 +119,14 @@ public class Statistics implements HasLogger {
 //        final StringBuilder php = new StringBuilder();
 //        php.append("<?php\n");
 //
-//        String flagname = Main.getConfigs().get(Configs.FLAGNAME);
+//        String flagname = Main.getFromConfigs(Configs.FLAGNAME);
 //
 //        flagname = StringUtils.replace(flagname, "'", "\\'");
 //        flagname = StringUtils.replace(flagname, "\"", "\\\"");
 //
 //        php.append("$game['flagname'] = '" + flagname + "';\n");
 //        php.append("$game['flagcolor'] = '" + flagcolor + "';\n");
-//        php.append("$game['uuid'] = '" + Main.getConfigs().get(Configs.MYUUID) + "';\n");
+//        php.append("$game['uuid'] = '" + Main.getFromConfigs(Configs.MYUUID) + "';\n");
 //        php.append("$game['matchid'] = '" + matchid + "';\n");
 //        php.append("$game['timestamp'] = '" + DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(new DateTime()) + "';\n");
 //        php.append("$game['ts_game_started'] = '" + DateTimeFormat.mediumDateTime().withLocale(Locale.getDefault()).print(stackDeque.getFirst().getPit()) + "';\n");

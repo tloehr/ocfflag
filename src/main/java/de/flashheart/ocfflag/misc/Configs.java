@@ -14,11 +14,9 @@ import java.util.UUID;
 public class Configs {
     public static final String SHUTDOWN_COMMAND_LINE = "shutdown_cmd_line";
 
-
     private final SortedProperties configs;
     private final Properties applicationContext;
     private final Logger logger = Logger.getLogger(getClass());
-
 
     public static final String MATCHID = "matchid";
     public static final String MYUUID = "uuid";
@@ -126,6 +124,8 @@ public class Configs {
     public static final String OUT_SIREN_COLOR_CHANGE = "siren_color_change"; // für ereignis anzeige. z.B. Farbwechsel
     public static final String OUT_HOLDDOWN_BUZZER = "siren_holddown_buzzer"; // ein einfacher Buzzer
 
+    public static final String FRAME_DEBUG = "FrameDebug";
+
 
     // Test reasons
 //    public static final String OUT_MF07  = "out_mf07";
@@ -148,10 +148,10 @@ public class Configs {
     public static HashMap<String, Color> getColors() {
         HashMap<String, Color> colors = new HashMap<>();
         // wird manchmal gebraucht. Z.B. bei der OCFFlagge. Ist nur zur Bequemlichkeit beim Programmieren.
-        colors.put("green", Tools.getColor(Main.getConfigs().get(Configs.FLAG_RGB_GREEN)));
-        colors.put("red", Tools.getColor(Main.getConfigs().get(Configs.FLAG_RGB_RED)));
-        colors.put("blue", Tools.getColor(Main.getConfigs().get(Configs.FLAG_RGB_BLUE)));
-        colors.put("yellow", Tools.getColor(Main.getConfigs().get(Configs.FLAG_RGB_YELLOW)));
+        colors.put("green", Tools.getColor(Main.getFromConfigs(Configs.FLAG_RGB_GREEN)));
+        colors.put("red", Tools.getColor(Main.getFromConfigs(Configs.FLAG_RGB_RED)));
+        colors.put("blue", Tools.getColor(Main.getFromConfigs(Configs.FLAG_RGB_BLUE)));
+        colors.put("yellow", Tools.getColor(Main.getFromConfigs(Configs.FLAG_RGB_YELLOW)));
         return colors;
     }
 

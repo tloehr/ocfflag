@@ -44,7 +44,7 @@ public class MyAbstractButton implements HasLogger {
     }
 
     public MyAbstractButton(GpioController gpio, String configsKeyForPin, JButton guiButton, long reactionTime, JProgressBar pb) {
-        this(gpio, RaspiPin.getPinByName(Main.getConfigs().get(configsKeyForPin)), guiButton, reactionTime, pb);
+        this(gpio, RaspiPin.getPinByName(Main.getFromConfigs(configsKeyForPin)), guiButton, reactionTime, pb);
     }
 
     public void setVisible(boolean visible) {

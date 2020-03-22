@@ -36,11 +36,11 @@ public class DlgTest extends JDialog {
         btnGreenBrght.setName(Configs.BRIGHTNESS_GREEN);
         btnYellowBrght.setName(Configs.BRIGHTNESS_YELLOW);
 
-        btnWhiteBrght.setText(Main.getConfigs().get(Configs.BRIGHTNESS_WHITE));
-        btnRedBrght.setText(Main.getConfigs().get(Configs.BRIGHTNESS_RED));
-        btnBlueBrght.setText(Main.getConfigs().get(Configs.BRIGHTNESS_BLUE));
-        btnGreenBrght.setText(Main.getConfigs().get(Configs.BRIGHTNESS_GREEN));
-        btnYellowBrght.setText(Main.getConfigs().get(Configs.BRIGHTNESS_YELLOW));
+        btnWhiteBrght.setText(Main.getFromConfigs(Configs.BRIGHTNESS_WHITE));
+        btnRedBrght.setText(Main.getFromConfigs(Configs.BRIGHTNESS_RED));
+        btnBlueBrght.setText(Main.getFromConfigs(Configs.BRIGHTNESS_BLUE));
+        btnGreenBrght.setText(Main.getFromConfigs(Configs.BRIGHTNESS_GREEN));
+        btnYellowBrght.setText(Main.getFromConfigs(Configs.BRIGHTNESS_YELLOW));
 
         DefaultComboBoxModel<String> dcbm = new DefaultComboBoxModel<>();
 

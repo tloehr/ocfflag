@@ -30,7 +30,7 @@ public class RGBScheduleElement {
     }
 
     public RGBScheduleElement(String configKey, long duration) {
-        this(Tools.getColor(Main.getConfigs().get(configKey)), duration);
+        this(Tools.getColor(Main.getFromConfigs(configKey)), duration);
     }
 
     public RGBScheduleElement(Color color) {
