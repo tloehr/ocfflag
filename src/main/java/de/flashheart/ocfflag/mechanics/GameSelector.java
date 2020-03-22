@@ -18,16 +18,16 @@ public class GameSelector implements HasLogger, Games {
     }
 
     void initHardware() {
-        button_red = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_RED);
-        button_blue = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_BLUE);
-        button_green = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_GREEN);
-        button_yellow = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_YELLOW);
+        button_red = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_RED);
+        button_blue = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_BLUE);
+        button_green = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_GREEN);
+        button_yellow = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_YELLOW);
 
         // Hardware / GUI Buttons
-        K1 = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_C); // Next Game
-        K2 = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_A); // Prev Game
-        K3 = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_B); // Switch to selected game
-        K4 = (MyAbstractButton) Main.getApplicationContext().get(Configs.BUTTON_D); // unused
+        K1 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_C); // Next Game
+        K2 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_A); // Prev Game
+        K3 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_B); // Switch to selected game
+        K4 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_D); // unused
     }
 
     @Override

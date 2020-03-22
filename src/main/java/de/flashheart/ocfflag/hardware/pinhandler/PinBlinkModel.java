@@ -1,6 +1,7 @@
 package de.flashheart.ocfflag.hardware.pinhandler;
 
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.hardware.abstraction.MyPin;
 import de.flashheart.ocfflag.misc.Configs;
 import org.apache.log4j.Logger;
@@ -125,8 +126,9 @@ public class PinBlinkModel implements GenericBlinkModel {
     public static String getGametimeBlinkingScheme(long time) {
         String scheme = PinHandler.FOREVER + ":";
         Logger logger = Logger.getLogger(RGBBlinkModel.class);
+        Configs configs = (Configs) Main.getFromContext("configs");
 
-        if (Main.getConfigs().is(Configs.OCF_TIME_ANNOUNCER)) {
+        if (configs.is(Configs.OCF_TIME_ANNOUNCER)) {
             DateTime remainingTime = new DateTime(time, DateTimeZone.UTC);
 
             int minutes = remainingTime.getMinuteOfHour();

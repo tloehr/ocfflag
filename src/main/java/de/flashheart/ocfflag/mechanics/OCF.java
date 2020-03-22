@@ -3,6 +3,7 @@ package de.flashheart.ocfflag.mechanics;
 import de.flashheart.GameEvent;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.FrameDebug;
+import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
 import de.flashheart.ocfflag.hardware.pinhandler.PinBlinkModel;
@@ -33,9 +34,6 @@ import java.util.stream.Collectors;
  */
 public class OCF implements Games, Runnable, HasLogger {
 
-//    private static final String GAMEMODE = "OCF-Flag CenterFlag Conquest";
-
-
     private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getFromConfigs(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
     private final int MODE_PREPARE_GAME = 0;
     private final int MODE_CLOCK_GAME_RUNNING = 1;
@@ -61,31 +59,28 @@ public class OCF implements Games, Runnable, HasLogger {
     private final MyAbstractButton button_quit;
     private final MyAbstractButton button_shutdown;
 
-
     private final MyAbstractButton button_blue;
     private final MyAbstractButton button_red;
     private final MyAbstractButton button_green;
     private final MyAbstractButton button_yellow;
-//    private final MyAbstractButton button_reset;
-//    private final MyAbstractButton button_switch_mode;
-//    private final MyAbstractButton button_preset_gametime;
 
     private final MyAbstractButton K1_switch_mode;
     private final MyAbstractButton K2_change_game;
     private final MyAbstractButton K3_gametime;
     private final MyAbstractButton K4_reset;
 
-
     private final Thread thread;
     private long SLEEP_PER_CYCLE = 500;
 
     private Statistics statistics;
+    private Configs configs;
+    private MySystem mySystem;
 
     private long remaining, time_blue, time_red, time_yellow, time_green, standbyStartedAt, lastStatsSent, min_stat_sent_time;
     private int lastMinuteToChangeTimeblinking;
     private int SELECTED_SAVEPOINT = SAVEPOINT_NONE;
     private SavePointOCF currentState, lastState, resetState;
-    private String title = "ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + "." + Main.getConfigs().getApplicationInfo("buildNumber");
+    private String title = "";
     private String lcd_time_format;
 
     /**
@@ -105,6 +100,9 @@ public class OCF implements Games, Runnable, HasLogger {
     private boolean resetGame = false;
 
     public OCF(int num_teams) {
+        configs = (Configs) Main.getFromContext("configs");
+        mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
+        title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber");
         this.num_teams = num_teams;
         thread = new Thread(this);
 
@@ -146,30 +144,30 @@ public class OCF implements Games, Runnable, HasLogger {
 
 
         preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
-        preset_times = Main.getConfigs().getGameTimes();
+        preset_times = configs.getGameTimes();
         if (preset_gametime_position >= preset_times.length - 1) {
             preset_gametime_position = 0;
-            Main.getConfigs().put(Configs.OCF_GAMETIME, preset_gametime_position);
+            configs.put(Configs.OCF_GAMETIME, preset_gametime_position);
         }
 
         SLEEP_PER_CYCLE = Long.parseLong(Main.getFromConfigs(Configs.SLEEP_PER_CYCLE));
 
-        statistics = new Statistics(preset_times[preset_gametime_position]);
+//        statistics = new Statistics(preset_times[preset_gametime_position]);
 
 //        this.lcd_display = (MyLCD) Main.getFromContext("lcd_display");
 
         preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
-        preset_times = Main.getConfigs().getGameTimes();
+        preset_times = configs.getGameTimes();
         if (preset_gametime_position >= preset_times.length - 1) {
             preset_gametime_position = 0;
-            Main.getConfigs().put(Configs.OCF_GAMETIME, preset_gametime_position);
+            configs.put(Configs.OCF_GAMETIME, preset_gametime_position);
         }
 
 
         SLEEP_PER_CYCLE = Long.parseLong(Main.getFromConfigs(Configs.SLEEP_PER_CYCLE));
-//        num_teams = Integer.min(Integer.parseInt(Main.getFromConfigs(Configs.NUMBER_OF_TEAMS)), Main.getConfigs().getInt(Configs.MAX_NUMBER_OF_TEAMS));
+//        num_teams = Integer.min(Integer.parseInt(Main.getFromConfigs(Configs.NUMBER_OF_TEAMS)), configs.getInt(Configs.MAX_NUMBER_OF_TEAMS));
 
-        statistics = new Statistics(preset_times[preset_gametime_position]);
+//        statistics = new Statistics(preset_times[preset_gametime_position]);
 
 
         lastMinuteToChangeTimeblinking = -1;
@@ -260,7 +258,8 @@ public class OCF implements Games, Runnable, HasLogger {
 
                 lastState = new SavePointOCF(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.RED_ACTIVATED;
-                Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
+
+                mySystem.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
                 lastStatsSent = statistics.addEvent(flag, remaining, getRank());
 
                 setDisplayToEvent();
@@ -283,7 +282,7 @@ public class OCF implements Games, Runnable, HasLogger {
 
                 lastState = new SavePointOCF(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.BLUE_ACTIVATED;
-                Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
+                mySystem.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
                 lastStatsSent = statistics.addEvent(flag, remaining, getRank());
                 setDisplayToEvent();
             } else {
@@ -306,7 +305,7 @@ public class OCF implements Games, Runnable, HasLogger {
 
                 lastState = new SavePointOCF(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.GREEN_ACTIVATED;
-                Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
+                mySystem.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
                 lastStatsSent = statistics.addEvent(flag, remaining, getRank());
                 setDisplayToEvent();
             } else {
@@ -330,7 +329,7 @@ public class OCF implements Games, Runnable, HasLogger {
 
                 lastState = new SavePointOCF(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.YELLOW_ACTIVATED;
-                Main.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
+                mySystem.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
                 lastStatsSent = statistics.addEvent(flag, remaining, getRank());
                 setDisplayToEvent();
             } else {
@@ -394,7 +393,7 @@ public class OCF implements Games, Runnable, HasLogger {
 
 //    private void button_preset_num_teams() {
 //        getLogger().debug("button_num_teams_pressed");
-//        int max_number_of_teams = Main.getConfigs().getInt(Configs.MAX_NUMBER_OF_TEAMS);
+//        int max_number_of_teams = configs.getInt(Configs.MAX_NUMBER_OF_TEAMS);
 //
 //
 //        if (max_number_of_teams == 2) return;
@@ -402,7 +401,7 @@ public class OCF implements Games, Runnable, HasLogger {
 //            num_teams++;
 //            if (num_teams > max_number_of_teams) num_teams = MIN_TEAMS;
 //            getLogger().debug("num_teams is now: " + num_teams);
-//            Main.getConfigs().put(Configs.OCF_NUMBER_OF_TEAMS, num_teams);
+//            configs.put(Configs.OCF_NUMBER_OF_TEAMS, num_teams);
 //            reset_timers();
 //        } else {
 //            getLogger().debug("NOT IN PREGAME: IGNORED");
@@ -415,7 +414,7 @@ public class OCF implements Games, Runnable, HasLogger {
         if (mode == MODE_PREPARE_GAME) {
             preset_gametime_position++;
             if (preset_gametime_position > preset_times.length - 1) preset_gametime_position = 0;
-            Main.getConfigs().put(Configs.OCF_GAMETIME, preset_gametime_position);
+            configs.put(Configs.OCF_GAMETIME, preset_gametime_position);
             reset_timers();
         } else {
             getLogger().debug("NOT IN PREGAME: IGNORED");
@@ -466,7 +465,7 @@ public class OCF implements Games, Runnable, HasLogger {
             lastPIT = System.currentTimeMillis();
 
             mode = MODE_CLOCK_GAME_RUNNING;
-            Main.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, Main.getFromConfigs(Configs.OCF_START_STOP_SIGNAL));
+            mySystem.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, Main.getFromConfigs(Configs.OCF_START_STOP_SIGNAL));
             setDisplayToEvent();
         }
 
@@ -526,16 +525,16 @@ public class OCF implements Games, Runnable, HasLogger {
             display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
             display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
 
-            Main.getPinHandler().off(Configs.OUT_LED_RED_BTN);
-            Main.getPinHandler().off(Configs.OUT_LED_BLUE_BTN);
-            Main.getPinHandler().off(Configs.OUT_LED_GREEN_BTN);
-            Main.getPinHandler().off(Configs.OUT_LED_YELLOW_BTN);
+            mySystem.getPinHandler().off(Configs.OUT_LED_RED_BTN);
+            mySystem.getPinHandler().off(Configs.OUT_LED_BLUE_BTN);
+            mySystem.getPinHandler().off(Configs.OUT_LED_GREEN_BTN);
+            mySystem.getPinHandler().off(Configs.OUT_LED_YELLOW_BTN);
 
-            Main.getPinHandler().off(Configs.OUT_FLAG_WHITE);
-            Main.getPinHandler().off(Configs.OUT_FLAG_RED);
-            Main.getPinHandler().off(Configs.OUT_FLAG_BLUE);
-            Main.getPinHandler().off(Configs.OUT_FLAG_GREEN);
-            Main.getPinHandler().off(Configs.OUT_FLAG_YELLOW);
+            mySystem.getPinHandler().off(Configs.OUT_FLAG_WHITE);
+            mySystem.getPinHandler().off(Configs.OUT_FLAG_RED);
+            mySystem.getPinHandler().off(Configs.OUT_FLAG_BLUE);
+            mySystem.getPinHandler().off(Configs.OUT_FLAG_GREEN);
+            mySystem.getPinHandler().off(Configs.OUT_FLAG_YELLOW);
 
             if (mode == MODE_PREPARE_GAME || mode == MODE_CLOCK_GAME_PAUSED) {
                 K1_switch_mode.setIcon(FrameDebug.IconPlay);
@@ -548,24 +547,24 @@ public class OCF implements Games, Runnable, HasLogger {
                         (num_teams >= 4 ? new RGBScheduleElement(Configs.FLAG_RGB_YELLOW, 350l) + ";" : "") +
                         new RGBScheduleElement(Color.BLACK, 3000l);
 
-                Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "Flagge", pregamePoleColorScheme);
+                mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "Flagge", pregamePoleColorScheme);
 
 
                 if (num_teams == 3) {
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "∞:on,350;off,4050");
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:off,350;on,350;off,3700");
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "∞:off,700;on,350;off,3350");
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, "∞:off,1050;on,350;off,3000");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "∞:on,350;off,4050");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:off,350;on,350;off,3700");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "∞:off,700;on,350;off,3350");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, "∞:off,1050;on,350;off,3000");
                 } else if (num_teams == 4) {
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "∞:on,350;off,4400");
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:off,350;on,350;off,4050");
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "∞:off,700;on,350;off,3700");
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, "∞:off,1050;on,350;off,3350");
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, "∞:off,1400;on,350;off,3000");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "∞:on,350;off,4400");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:off,350;on,350;off,4050");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "∞:off,700;on,350;off,3700");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, "∞:off,1050;on,350;off,3350");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, "∞:off,1400;on,350;off,3000");
                 } else {
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "∞:on,350;off,3700");
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:off,350;on,350;off,3350");
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "∞:off,700;on,350;off,3000");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "∞:on,350;off,3700");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:off,350;on,350;off,3350");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "∞:off,700;on,350;off,3000");
                 }
 
             }
@@ -578,32 +577,32 @@ public class OCF implements Games, Runnable, HasLogger {
                 if (num_teams < 4) display_yellow.clear();
 
                 if (num_teams == 3) {
-                    Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, null, "∞:on,250;off,500");
-                    Main.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, null, "∞:off,250;on,250;off,250");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, null, "∞:on,250;off,500");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, null, "∞:off,250;on,250;off,250");
                 } else if (num_teams == 4) {
-                    Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, null, "∞:on,250;off,750");
-                    Main.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, null, "∞:off,250;on,250;off,500");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, null, "∞:on,250;off,750");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, null, "∞:off,250;on,250;off,500");
                 } else {
-                    Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, null, "∞:on,250;off,250");
-                    Main.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, null, "∞:off,250;on,250");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, null, "∞:on,250;off,250");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, null, "∞:off,250;on,250");
                 }
-                if (num_teams < 3) Main.getPinHandler().off(Configs.OUT_LED_GREEN_BTN);
+                if (num_teams < 3) mySystem.getPinHandler().off(Configs.OUT_LED_GREEN_BTN);
                 else if (num_teams == 3) {
-                    Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, null, "∞:off,500;on,250");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, null, "∞:off,500;on,250");
                 } else if (num_teams == 4) {
-                    Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, null, "∞:off,500;on,250;off,250");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, null, "∞:off,500;on,250;off,250");
                 }
-                if (num_teams < 4) Main.getPinHandler().off(Configs.OUT_LED_YELLOW_BTN);
-                else Main.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, null, "∞:off,750;on,250");
+                if (num_teams < 4) mySystem.getPinHandler().off(Configs.OUT_LED_YELLOW_BTN);
+                else mySystem.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, null, "∞:off,750;on,250");
 
-                Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN, null, "∞:on,1000;off,1000");
+                mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN, null, "∞:on,1000;off,1000");
 
             }
 
             if (mode == MODE_CLOCK_GAME_PAUSED) {
                 getLogger().debug("PAUSED");
                 display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN, null, "∞:on,500;off,500");
+                mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN, null, "∞:on,500;off,500");
                 setColorsAndBlinkingSchemeAccordingToGameSituation();
             }
 
@@ -612,10 +611,10 @@ public class OCF implements Games, Runnable, HasLogger {
                 K1_switch_mode.setIcon(FrameDebug.IconPause);
 
 
-                Main.getPinHandler().off(Configs.OUT_LED_GREEN);
+                mySystem.getPinHandler().off(Configs.OUT_LED_GREEN);
 
 
-                Main.getPinHandler().off(Configs.OUT_LED_WHITE);
+                mySystem.getPinHandler().off(Configs.OUT_LED_WHITE);
                 display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
 
                 setColorsAndBlinkingSchemeAccordingToGameSituation();
@@ -625,7 +624,7 @@ public class OCF implements Games, Runnable, HasLogger {
             // hier findet die Auswertung nach dem Spielende statt.
             if (mode == MODE_CLOCK_GAME_OVER) {
 
-                Main.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, Main.getFromConfigs(Configs.OCF_START_STOP_SIGNAL));
+                mySystem.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, Main.getFromConfigs(Configs.OCF_START_STOP_SIGNAL));
 
 
                 if (GameStateService.isDrawgame(statistics.getGameState())) {
@@ -637,33 +636,33 @@ public class OCF implements Games, Runnable, HasLogger {
                     if (num_teams >= 4)
                         display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
 
-                    Main.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "∞:on,1000;off,1000");
-                    Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,1000;off,1000");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "∞:on,1000;off,1000");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,1000;off,1000");
                     if (num_teams >= 3)
-                        Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "∞:on,1000;off,1000");
+                        mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "∞:on,1000;off,1000");
                     if (num_teams >= 4)
-                        Main.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "∞:on,1000;off,1000");
+                        mySystem.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "∞:on,1000;off,1000");
 
-                    Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "DRAW GAME", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
-                    Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "∞:on,1000;off,1000");
+                    mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "DRAW GAME", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "∞:on,1000;off,1000");
 //                    writeLCDFor2TeamsGameOver();
                 } else {
 
                     if (statistics.getWinners().contains("red")) {
                         display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                        Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,100;off,100");
+                        mySystem.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,100;off,100");
                     }
                     if (statistics.getWinners().contains("blue")) {
                         display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                        Main.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "∞:on,100;off,100");
+                        mySystem.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "∞:on,100;off,100");
                     }
                     if (statistics.getWinners().contains("green")) {
                         display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                        Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "∞:on,100;off,100");
+                        mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "∞:on,100;off,100");
                     }
                     if (statistics.getWinners().contains("yellow")) {
                         display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                        Main.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "∞:on,100;off,100");
+                        mySystem.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "∞:on,100;off,100");
                     }
 
                     // die Flagge soll alle Sieger anzeigen
@@ -675,15 +674,15 @@ public class OCF implements Games, Runnable, HasLogger {
                         text += teamColor + " ";
 
                         if (teamColor.equalsIgnoreCase("red"))
-                            Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:on,250;off,250");
+                            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:on,250;off,250");
                         if (teamColor.equalsIgnoreCase("blue"))
-                            Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "∞:on,250;off,250");
+                            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "∞:on,250;off,250");
                         if (teamColor.equalsIgnoreCase("green"))
-                            Main.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, "∞:on,250;off,250");
+                            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, "∞:on,250;off,250");
                         if (teamColor.equalsIgnoreCase("yellow"))
-                            Main.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, "∞:on,250;off,250");
+                            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, "∞:on,250;off,250");
                     }
-                    Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, text, winningScheme);
+                    mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, text, winningScheme);
 //                    writeLCDFor2TeamsGameOver();
                 }
             }
@@ -695,24 +694,24 @@ public class OCF implements Games, Runnable, HasLogger {
     }
 
     private void setColorsAndBlinkingSchemeAccordingToGameSituation() throws IOException {
-        Main.getPinHandler().off(Configs.OUT_FLAG_WHITE);
-        Main.getPinHandler().off(Configs.OUT_FLAG_RED);
-        Main.getPinHandler().off(Configs.OUT_FLAG_BLUE);
-        Main.getPinHandler().off(Configs.OUT_FLAG_GREEN);
-        Main.getPinHandler().off(Configs.OUT_FLAG_YELLOW);
+        mySystem.getPinHandler().off(Configs.OUT_FLAG_WHITE);
+        mySystem.getPinHandler().off(Configs.OUT_FLAG_RED);
+        mySystem.getPinHandler().off(Configs.OUT_FLAG_BLUE);
+        mySystem.getPinHandler().off(Configs.OUT_FLAG_GREEN);
+        mySystem.getPinHandler().off(Configs.OUT_FLAG_YELLOW);
 
         if (flag.equals(GameEvent.FLAG_NEUTRAL)) {
             getLogger().info("Flag is neutral");
-            Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,500;off,500");
-            Main.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "∞:on,500;off,500");
+            mySystem.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,500;off,500");
+            mySystem.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "∞:on,500;off,500");
 
             if (num_teams >= 3)
-                Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "∞:on,500;off,500");
+                mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "∞:on,500;off,500");
             if (num_teams >= 4)
-                Main.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "∞:on,500;off,500");
+                mySystem.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "∞:on,500;off,500");
 
-            Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
-            Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+            mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
+            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, PinBlinkModel.getGametimeBlinkingScheme(remaining));
 
             button_blue.setEnabled(true);
             button_red.setEnabled(true);
@@ -721,15 +720,15 @@ public class OCF implements Games, Runnable, HasLogger {
 
         } else if (flag.equals(GameEvent.RED_ACTIVATED)) {
             getLogger().info("Flag is red");
-            Main.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "∞:on,500;off,500");
+            mySystem.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "∞:on,500;off,500");
             if (num_teams >= 3)
-                Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "∞:on,500;off,500");
+                mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "∞:on,500;off,500");
             if (num_teams >= 4)
-                Main.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "∞:on,500;off,500");
+                mySystem.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "∞:on,500;off,500");
 
             display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
-            Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "RED ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
-            Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+            mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "RED ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
+            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_RED, PinBlinkModel.getGametimeBlinkingScheme(remaining));
 
             button_blue.setEnabled(true);
             button_red.setEnabled(false);
@@ -739,15 +738,15 @@ public class OCF implements Games, Runnable, HasLogger {
 
         } else if (flag.equals(GameEvent.BLUE_ACTIVATED)) {
             getLogger().info("Flag is blue");
-            Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,500;off,500");
+            mySystem.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,500;off,500");
             if (num_teams >= 3)
-                Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "∞:on,500;off,500");
+                mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "∞:on,500;off,500");
             if (num_teams >= 4)
-                Main.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "∞:on,500;off,500");
+                mySystem.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "∞:on,500;off,500");
 
             display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
-            Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "BLUE ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
-            Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+            mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "BLUE ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
+            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, PinBlinkModel.getGametimeBlinkingScheme(remaining));
 
             button_blue.setEnabled(false);
             button_red.setEnabled(true);
@@ -756,14 +755,14 @@ public class OCF implements Games, Runnable, HasLogger {
 
         } else if (flag.equals(GameEvent.GREEN_ACTIVATED)) {
             getLogger().info("Flag is green");
-            Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,500;off,500");
-            Main.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "∞:on,500;off,500");
+            mySystem.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,500;off,500");
+            mySystem.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "∞:on,500;off,500");
             if (num_teams >= 4)
-                Main.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "∞:on,500;off,500");
+                mySystem.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "∞:on,500;off,500");
 
             display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
-            Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "GREEN ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
-            Main.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+            mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "GREEN ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
+            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, PinBlinkModel.getGametimeBlinkingScheme(remaining));
 
             button_blue.setEnabled(true);
             button_red.setEnabled(true);
@@ -772,14 +771,14 @@ public class OCF implements Games, Runnable, HasLogger {
 
         } else if (flag.equals(GameEvent.YELLOW_ACTIVATED)) {
             getLogger().info("Flag is yellow");
-            Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,500;off,500");
-            Main.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "∞:on,500;off,500");
-            Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "∞:on,500;off,500");
+            mySystem.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,500;off,500");
+            mySystem.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "∞:on,500;off,500");
+            mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "∞:on,500;off,500");
 
             display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
             Color myyellow = Tools.getColor(Main.getFromConfigs(Configs.FLAG_RGB_YELLOW));
-            Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "YELLOW ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(myyellow, remaining));
-            Main.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+            mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "YELLOW ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(myyellow, remaining));
+            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, PinBlinkModel.getGametimeBlinkingScheme(remaining));
 
             button_blue.setEnabled(true);
             button_red.setEnabled(true);
@@ -851,8 +850,8 @@ public class OCF implements Games, Runnable, HasLogger {
                     // Hier muss nach Ablauf jeder vollen Minute, das Blinkschema neu angepasst werden.
                     if (flag.equals(GameEvent.FLAG_NEUTRAL)) {
                         if (changeColorBlinking) {
-                            Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
-                            Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                            mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
+                            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, PinBlinkModel.getGametimeBlinkingScheme(remaining));
                         }
                     }
 
@@ -860,29 +859,29 @@ public class OCF implements Games, Runnable, HasLogger {
                     if (flag.equals(GameEvent.RED_ACTIVATED)) {
                         time_red += diff;
                         if (changeColorBlinking) {
-                            Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
-                            Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                            mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
+                            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_RED, PinBlinkModel.getGametimeBlinkingScheme(remaining));
                         }
                     }
                     if (flag.equals(GameEvent.BLUE_ACTIVATED)) {
                         time_blue += diff;
                         if (changeColorBlinking) {
-                            Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
-                            Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                            mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
+                            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, PinBlinkModel.getGametimeBlinkingScheme(remaining));
                         }
                     }
                     if (flag.equals(GameEvent.GREEN_ACTIVATED)) {
                         time_green += diff;
                         if (changeColorBlinking) {
-                            Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
-                            Main.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                            mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
+                            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, PinBlinkModel.getGametimeBlinkingScheme(remaining));
                         }
                     }
                     if (flag.equals(GameEvent.YELLOW_ACTIVATED)) {
                         time_yellow += diff;
                         if (changeColorBlinking) {
-                            Main.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_YELLOW, remaining));
-                            Main.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                            mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_YELLOW, remaining));
+                            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, PinBlinkModel.getGametimeBlinkingScheme(remaining));
                         }
                     }
 
@@ -995,9 +994,9 @@ public class OCF implements Games, Runnable, HasLogger {
     /**
      * stops this game and switches to the gameselector
      */
-    public void changeGame(Games game){
+    public void changeGame(Games game) {
         thread.interrupt();
-        Main.getPinHandler().off();
+        mySystem.getPinHandler().off();
         Main.setGame(game);
     }
 

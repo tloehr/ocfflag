@@ -18,28 +18,19 @@ import java.io.StringWriter;
 import java.util.HashMap;
 
 public class Main {
-
-
-
     private static Games currentGame;
-
     private static Logger logger;
     private static Level logLevel = Level.DEBUG;
-
     private static final HashMap<String, Object> applicationContext = new HashMap<>();
     private static Configs configs;
 
     private static boolean ignore_gpio; // ignore gpios, even when running on raspi
     private static boolean dev_mode; // show develop mode functions
 
-    private static MessageProcessor messageProcessor;
-
+//    private static MessageProcessor messageProcessor;
     public static MessageProcessor getMessageProcessor() {
-        return messageProcessor;
+        return null;
     }
-//    public static HashMap<String, Object> getApplicationContext() {
-//        return applicationContext;
-//    }
 
     public static void main(String[] args) throws Exception {
 
@@ -54,7 +45,7 @@ public class Main {
         frameDebug.getBtnTestDialog().setVisible(Tools.isArm());
         frameDebug.setVisible(true);
 
-        applicationContext.put("mysystem", new MySystem());
+        applicationContext.put(Configs.MY_SYSTEM, new MySystem());
 
         setGame(new GameSelector());
     }
@@ -84,6 +75,8 @@ public class Main {
 
     private static void initBaseSystem(String[] args) throws IOException {
         configs  = new Configs();
+        applicationContext.put("configs", configs);
+
         System.setProperty("logs", Tools.getWorkingPath());
         Logger.getRootLogger().setLevel(logLevel);
         logger = Logger.getLogger("Main");
@@ -174,14 +167,14 @@ public class Main {
 
 //        REACTION_TIME = configs.getLong(Configs.BUTTON_REACTION_TIME);
 
-        messageProcessor = new MessageProcessor();
-        messageProcessor.start();
+//        messageProcessor = new MessageProcessor();
+//        messageProcessor.start();
 
     }
 
     public static void prepareShutdown() {
-//        ((FTPWrapper) Main.getFromContext("ftpwrapper")).cleanupStatsFile();
-        messageProcessor.interrupt();
+
+//        messageProcessor.interrupt();
         logger.info("\n  _____ _   _ ____     ___  _____    ___   ____ _____ _____ _             \n" +
                 " | ____| \\ | |  _ \\   / _ \\|  ___|  / _ \\ / ___|  ___|  ___| | __ _  __ _ \n" +
                 " |  _| |  \\| | | | | | | | | |_    | | | | |   | |_  | |_  | |/ _` |/ _` |\n" +

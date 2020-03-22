@@ -8,6 +8,7 @@ import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.misc.Configs;
 import org.apache.commons.lang3.StringUtils;
@@ -21,8 +22,14 @@ import java.io.IOException;
  * @author Torsten Löhr
  */
 public class DlgTest extends JDialog {
+    private final Configs configs;
+    private final MySystem mySystem;
+
     public DlgTest(Window owner) {
         super(owner);
+        configs = (Configs) Main.getFromContext("configs");
+        mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
+        
         initComponents();
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -59,7 +66,7 @@ public class DlgTest extends JDialog {
     }
 
     private void btnTestHardwareActionPerformed(ActionEvent e) {
-        Main.getPinHandler().off();
+        mySystem.getPinHandler().off();
 
         try {
             Thread.sleep(1000);
@@ -68,30 +75,30 @@ public class DlgTest extends JDialog {
         }
 
 
-        Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_LED_WHITE, "5:on,1000;off,1000");
+        mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN, "5:on,1000;off,1000");
+        mySystem.getPinHandler().setScheme(Configs.OUT_LED_WHITE, "5:on,1000;off,1000");
 
-        Main.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "5:on,1000;off,1000");
+        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "5:on,1000;off,1000");
+        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "5:on,1000;off,1000");
+        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, "5:on,1000;off,1000");
+        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, "5:on,1000;off,1000");
+        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "5:on,1000;off,1000");
 
         if (cbSirens.isSelected()) {
-            Main.getPinHandler().setScheme(Configs.OUT_SIREN_COLOR_CHANGE, "5:on,1000;off,1000");
-            Main.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, "5:on,1000;off,1000");
-            Main.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, "5:on,1000;off,1000");
+            mySystem.getPinHandler().setScheme(Configs.OUT_SIREN_COLOR_CHANGE, "5:on,1000;off,1000");
+            mySystem.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, "5:on,1000;off,1000");
+            mySystem.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, "5:on,1000;off,1000");
         }
 
-//        Main.getPinHandler().setScheme(Configs.OUT_MF07, "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme(Configs.OUT_MF13, "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme(Configs.OUT_MF14, "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme(Configs.OUT_MF16, "5:on,1000;off,1000");
+//        mySystem.getPinHandler().setScheme(Configs.OUT_MF07, "5:on,1000;off,1000");
+//        mySystem.getPinHandler().setScheme(Configs.OUT_MF13, "5:on,1000;off,1000");
+//        mySystem.getPinHandler().setScheme(Configs.OUT_MF14, "5:on,1000;off,1000");
+//        mySystem.getPinHandler().setScheme(Configs.OUT_MF16, "5:on,1000;off,1000");
 
-        Main.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "5:on,1000;off,1000");
-        Main.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "5:on,1000;off,1000");
+        mySystem.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "5:on,1000;off,1000");
+        mySystem.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "5:on,1000;off,1000");
+        mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "5:on,1000;off,1000");
+        mySystem.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "5:on,1000;off,1000");
 
     }
 
@@ -105,7 +112,7 @@ public class DlgTest extends JDialog {
 
    void writeToDisplay(String text) {
         if (text.isEmpty()) return;
-        Display7Segments4Digits display = (Display7Segments4Digits) Main.getApplicationContext().get(cmbI2C.getSelectedItem().toString());
+        Display7Segments4Digits display = (Display7Segments4Digits) Main.getFromContext(cmbI2C.getSelectedItem().toString());
         try {
             display.setText(StringUtils.left(text, 4));
         } catch (IOException e) {

@@ -13,14 +13,8 @@ import java.util.LinkedHashMap;
 public class Statistics implements HasLogger {
 
     public static final String[] EVENTS_TO_STATE = new String[]{GameEvent.GAME_ABORTED, GameEvent.GAME_OVER};
-
-
     private ArrayList<String> winners;
     private GameState gameState;
-//    protected LinkedHashMap<String, Integer> teams = null;
-
-    private final MessageProcessor messageProcessor;
-
 
     public GameState getGameState() {
         return gameState;
@@ -30,7 +24,7 @@ public class Statistics implements HasLogger {
      * @param maxtime maximum gametime in minutes
      */
     public Statistics(long maxtime) {
-        messageProcessor = Main.getMessageProcessor();
+//        messageProcessor = Main.getMessageProcessor();
         winners = new ArrayList<>();
         reset(maxtime * 60000);
     }
@@ -46,7 +40,8 @@ public class Statistics implements HasLogger {
     }
 
     public void sendStats() {
-        messageProcessor.pushMessage(gameState);
+        //messageProcessor.pushMessage(gameState);
+        // not now. maybe later
     }
 
     public ArrayList<String> getWinners() {

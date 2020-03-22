@@ -116,7 +116,8 @@ public class RGBBlinkModel implements GenericBlinkModel {
     public static String getGametimeBlinkingScheme(Color color, long time) {
         String scheme = PinHandler.FOREVER + ":";
         Logger logger = Logger.getLogger(RGBBlinkModel.class);
-        if (Main.getConfigs().is(Configs.OCF_TIME_ANNOUNCER)) {
+        Configs configs = (Configs) Main.getFromContext("configs");
+        if (configs.is(Configs.OCF_TIME_ANNOUNCER)) {
             DateTime remainingTime = new DateTime(time, DateTimeZone.UTC);
 
             int minutes = remainingTime.getMinuteOfHour();

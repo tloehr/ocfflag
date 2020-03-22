@@ -37,10 +37,10 @@ public class MyPin implements HasLogger {
         this.note = note;
 
         if (gpio != null) {
-            Pin pin = (Pin) Main.getApplicationContext().get(Main.getFromConfigs(name));
+            Pin pin = (Pin) Main.getFromContext(Main.getFromConfigs(name));
 
             if (pin.getProvider().equals(MCP23017GpioProvider.NAME)) {
-                this.outputPin = gpio.provisionDigitalOutputPin((MCP23017GpioProvider) Main.getApplicationContext().get("mcp23017_1"), pin, PinState.LOW);
+                this.outputPin = gpio.provisionDigitalOutputPin((MCP23017GpioProvider) Main.getFromContext("mcp23017_1"), pin, PinState.LOW);
             } else {
                 this.outputPin = gpio.provisionDigitalOutputPin(pin, PinState.LOW);
             }

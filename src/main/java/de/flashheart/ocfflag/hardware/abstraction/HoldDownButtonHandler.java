@@ -4,6 +4,7 @@ import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;
 
@@ -20,6 +21,7 @@ import java.util.ArrayList;
  * https://stackoverflow.com/questions/6828684/java-mouseevent-check-if-pressed-down
  */
 public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListenerDigital, HasLogger {
+    private final MySystem mySystem;
     volatile private boolean isRunning = false;
     volatile private boolean mouseDown = false;
     volatile private boolean reactedupon = false;
@@ -36,6 +38,7 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
     private boolean enabled = true;
 
     public HoldDownButtonHandler(long reactiontime, ActionListener actionListener, Object source, JProgressBar pb) {
+        mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
         this.reactiontime = reactiontime;
         this.actionListener = actionListener;
         this.source = source;
@@ -68,7 +71,7 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
         getLogger().debug("holding down button");
         mouseDown = true;
         holding = System.currentTimeMillis();
-        if (reactiontime > 0) Main.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, scheme);
+        if (reactiontime > 0) mySystem.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, scheme);
         initThread();
     }
 
@@ -77,7 +80,7 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
         if (!Main.getCurrentGame().isGameRunning()) return;
 
         getLogger().debug("button released");
-        if (reactiontime > 0) Main.getPinHandler().off(Configs.OUT_HOLDDOWN_BUZZER);
+        if (reactiontime > 0) mySystem.getPinHandler().off(Configs.OUT_HOLDDOWN_BUZZER);
         holding = 0l;
         if (pb != null) pb.setValue(0);
         reactedupon = false;

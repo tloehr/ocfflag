@@ -26,7 +26,7 @@ import java.io.IOException;
  * Diese Klasse enthält alles was mit der Harware zu tun hat. Da wird auch die gesamte Initialisierung vorgenommen.
  */
 public class MySystem implements HasLogger {
-    private long REACTION_TIME = 3000;
+    private long REACTION_TIME = 0;
     private GpioController GPIO;
     private final int MCP23017_1 = Integer.decode("0x20");//0x20;
     private final FrameDebug frameDebug;
@@ -88,6 +88,14 @@ public class MySystem implements HasLogger {
         pinHandler = new PinHandler();
         initRaspi();
         initGameSystem();
+    }
+
+    public PinHandler getPinHandler() {
+        return pinHandler;
+    }
+
+    public long getREACTION_TIME() {
+        return REACTION_TIME;
     }
 
     /**

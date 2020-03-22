@@ -1,6 +1,7 @@
 package de.flashheart.ocfflag.hardware.abstraction;
 
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;
 
@@ -17,6 +18,7 @@ import java.util.ArrayList;
  * https://stackoverflow.com/questions/6828684/java-mouseevent-check-if-pressed-down
  */
 public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
+    private final MySystem mySystem;
     volatile private boolean isRunning = false;
     volatile private boolean mouseDown = false;
     volatile private boolean reactedupon = false;
@@ -32,6 +34,7 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
     private boolean enabled = true;
 
     public HoldDownMouseAdapter(long reactiontime, ActionListener actionListener, Object source, JProgressBar pb) {
+        mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
         this.reactiontime = reactiontime;
         this.actionListener = actionListener;
         this.source = source;
@@ -70,7 +73,7 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
             getLogger().debug("holding down button");
             mouseDown = true;
             holding = System.currentTimeMillis();
-            if (reactiontime > 0) Main.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, scheme);
+            if (reactiontime > 0) mySystem.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, scheme);
             initThread();
         }
     }
@@ -81,7 +84,7 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             getLogger().debug("button released");
-            if (reactiontime > 0) Main.getPinHandler().off(Configs.OUT_HOLDDOWN_BUZZER);
+            if (reactiontime > 0) mySystem.getPinHandler().off(Configs.OUT_HOLDDOWN_BUZZER);
             holding = 0l;
             pb.setValue(0);
             reactedupon = false;

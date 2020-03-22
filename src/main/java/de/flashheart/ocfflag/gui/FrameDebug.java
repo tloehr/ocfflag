@@ -7,6 +7,8 @@ package de.flashheart.ocfflag.gui;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.hardware.MySystem;
+import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Logger;
 
@@ -22,8 +24,9 @@ import java.awt.event.WindowEvent;
  */
 public class FrameDebug extends JFrame {
     private final Logger logger = Logger.getLogger(getClass());
-    private Font font;
-    private Font font2;
+    private final MySystem mySystem;
+//    private Font font;
+//    private Font font2;
     private JDialog testDlg;
     public static final Icon IconPlay = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/player_play.png"));
     public static final Icon IconPause = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/player_pause.png"));
@@ -31,11 +34,14 @@ public class FrameDebug extends JFrame {
     public static final Icon IconUNDO = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/reload.png"));
 
     public FrameDebug() {
+        mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
+        Configs configs = (Configs) Main.getFromContext("configs");
+
         initComponents();
-        initFonts();
+//        initFonts();
         initFrame();
 
-        String title = "ocfflag " + Main.getConfigs().getApplicationInfo("my.version") + "." + Main.getConfigs().getApplicationInfo("buildNumber") + " [" + Main.getConfigs().getApplicationInfo("project.build.timestamp") + "]";
+        String title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber") + " [" + configs.getApplicationInfo("project.build.timestamp") + "]";
 
         logger.info(title);
         setTitle(title);
@@ -68,30 +74,30 @@ public class FrameDebug extends JFrame {
     private void initFrame() {
         btnTestDialog.setVisible(Main.isDev_mode());
 
-        btnRed.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
-        btnBlue.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
-        btnGreen.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
-        btnYellow.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
+//        btnRed.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
+//        btnBlue.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
+//        btnGreen.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
+//        btnYellow.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
 
-        pbBlue.setVisible(Main.getReactionTime() > 0);
-        pbGreen.setVisible(Main.getReactionTime() > 0);
-        pbYellow.setVisible(Main.getReactionTime() > 0);
-        pbRed.setVisible(Main.getReactionTime() > 0);
+//        pbBlue.setVisible(mySystem.getREACTION_TIME() > 0);
+//        pbGreen.setVisible(mySystem.getREACTION_TIME() > 0);
+//        pbYellow.setVisible(mySystem.getREACTION_TIME() > 0);
+//        pbRed.setVisible(mySystem.getREACTION_TIME() > 0);
 
-        lblPole.setFont(font2.deriveFont(80f).deriveFont(Font.BOLD));
-
+//        lblPole.setFont(font2.deriveFont(80f).deriveFont(Font.BOLD));
+                                                                                                      
         if (Tools.isArm()) setExtendedState(MAXIMIZED_BOTH);
     }
 
-    private void initFonts() {
-        try {
-            font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/DSEG14Classic-Regular.ttf"));
-            font2 = new JLabel().getFont();
-        } catch (Exception e) {
-            logger.fatal(e);
-            System.exit(1);
-        }
-    }
+//    private void initFonts() {
+//        try {
+//            font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/DSEG14Classic-Regular.ttf"));
+//            font2 = new JLabel().getFont();
+//        } catch (Exception e) {
+//            logger.fatal(e);
+//            System.exit(1);
+//        }
+//    }
 
     public JButton getBtnQuit() {
         return btnQuit;
@@ -163,14 +169,14 @@ public class FrameDebug extends JFrame {
         //======== mainView ========
         {
             mainView.setLayout(new FormLayout(
-                "$rgap, $lcgap, pref, $lcgap, 62dlu:grow, $lcgap, pref:grow, $lcgap, $rgap",
-                "$rgap, $lgap, pref, $rgap, fill:pref:grow, $lgap"));
+                    "$rgap, $lcgap, pref, $lcgap, 62dlu:grow, $lcgap, pref:grow, $lcgap, $rgap",
+                    "$rgap, $lgap, pref, $rgap, fill:pref:grow, $lgap"));
 
             //======== upperPanel ========
             {
                 upperPanel.setLayout(new FormLayout(
-                    "default, $lcgap, pref, $lcgap, $ugap, $lcgap, 162dlu:grow, $lcgap, $ugap, $lcgap, pref, $lcgap, default",
-                    "pref, $lgap, fill:default, $lgap, pref, $lgap, fill:default, $lgap, pref"));
+                        "default, $lcgap, pref, $lcgap, $ugap, $lcgap, 162dlu:grow, $lcgap, $ugap, $lcgap, pref, $lcgap, default",
+                        "pref, $lgap, fill:default, $lgap, pref, $lgap, fill:default, $lgap, pref"));
 
                 //---- ledRedButton ----
                 ledRedButton.setColor(Color.red);
@@ -287,8 +293,8 @@ public class FrameDebug extends JFrame {
                 //======== panel7 ========
                 {
                     panel7.setLayout(new FormLayout(
-                        "4*(default:grow)",
-                        "2*(pref)"));
+                            "4*(default:grow)",
+                            "2*(pref)"));
 
                     //---- btnA ----
                     btnA.setText("A");
@@ -356,8 +362,8 @@ public class FrameDebug extends JFrame {
             //======== panel5 ========
             {
                 panel5.setLayout(new FormLayout(
-                    "327dlu:grow",
-                    "fill:default:grow, $ugap, default, $lgap, default"));
+                        "327dlu:grow",
+                        "fill:default:grow, $ugap, default, $lgap, default"));
 
                 //======== lcd_panel ========
                 {

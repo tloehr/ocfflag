@@ -11,12 +11,13 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.UUID;
 
-public class Configs {
+public class Configs implements HasLogger {
     public static final String SHUTDOWN_COMMAND_LINE = "shutdown_cmd_line";
+    public static final String MY_SYSTEM = "mysystem";
 
     private final SortedProperties configs;
     private final Properties applicationContext;
-    private final Logger logger = Logger.getLogger(getClass());
+
 
     public static final String MATCHID = "matchid";
     public static final String MYUUID = "uuid";
@@ -263,7 +264,7 @@ public class Configs {
         loadApplicationContext();
 
         // und der Rest
-        logger.setLevel(Level.toLevel(configs.getProperty(LOGLEVEL), Level.DEBUG));
+        getLogger().setLevel(Level.toLevel(configs.getProperty(LOGLEVEL), Level.DEBUG));
         if (!configs.containsKey(MYUUID)) {
             configs.put(MYUUID, UUID.randomUUID().toString());
         }
@@ -328,7 +329,7 @@ public class Configs {
             configs.store(out, "Settings OCFFlag");
             out.close();
         } catch (Exception ex) {
-            logger.fatal(ex);
+            getLogger().fatal(ex);
             System.exit(1);
         }
     }
