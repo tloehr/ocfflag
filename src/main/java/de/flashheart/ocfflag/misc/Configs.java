@@ -14,6 +14,8 @@ import java.util.UUID;
 public class Configs implements HasLogger {
     public static final String SHUTDOWN_COMMAND_LINE = "shutdown_cmd_line";
     public static final String MY_SYSTEM = "mysystem";
+    public static final String IGNORE_GPIO_IN_ARM_MODE = "ignore_gpios";
+    public static final String DEV_MODE = "dev_mode";
 
     private final SortedProperties configs;
     private final Properties applicationContext;

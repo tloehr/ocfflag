@@ -35,6 +35,10 @@ public class Tools {
         return time < 0l ? "--" : new DateTime(time, DateTimeZone.UTC).toString(pattern);
     }
 
+    public static boolean isBooleanFromContext(String key){
+        return  ((Boolean) Main.getFromContext(key));
+    }
+
 
     public static String formatLongTime(long time) {
         return formatLongTime(time, "mm:ss,SSS");
@@ -49,7 +53,7 @@ public class Tools {
     // http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
     public static boolean isArm() {
         String os = System.getProperty("os.arch").toLowerCase();
-        return (!Main.isIgnore_gpio() && os.indexOf("arm") >= 0);
+        return (!isBooleanFromContext(Configs.IGNORE_GPIO_IN_ARM_MODE) && os.indexOf("arm") >= 0);
     }
 
     // https://stackoverflow.com/questions/4672271/reverse-opposing-colors

@@ -38,8 +38,7 @@ public class FrameDebug extends JFrame {
         Configs configs = (Configs) Main.getFromContext("configs");
 
         initComponents();
-//        initFonts();
-        initFrame();
+        btnTestDialog.setVisible(Tools.isBooleanFromContext(Configs.DEV_MODE));
 
         String title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber") + " [" + configs.getApplicationInfo("project.build.timestamp") + "]";
 
@@ -71,18 +70,18 @@ public class FrameDebug extends JFrame {
         return lcd_panel;
     }
 
-    private void initFrame() {
-        btnTestDialog.setVisible(Main.isDev_mode());
+    public void initFrame() {
+
 
 //        btnRed.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
 //        btnBlue.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
 //        btnGreen.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
 //        btnYellow.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
 
-//        pbBlue.setVisible(mySystem.getREACTION_TIME() > 0);
-//        pbGreen.setVisible(mySystem.getREACTION_TIME() > 0);
-//        pbYellow.setVisible(mySystem.getREACTION_TIME() > 0);
-//        pbRed.setVisible(mySystem.getREACTION_TIME() > 0);
+        pbBlue.setVisible(mySystem.getREACTION_TIME() > 0);
+        pbGreen.setVisible(mySystem.getREACTION_TIME() > 0);
+        pbYellow.setVisible(mySystem.getREACTION_TIME() > 0);
+        pbRed.setVisible(mySystem.getREACTION_TIME() > 0);
 
 //        lblPole.setFont(font2.deriveFont(80f).deriveFont(Font.BOLD));
                                                                                                       

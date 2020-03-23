@@ -152,7 +152,7 @@ public class OCF implements Games, Runnable, HasLogger {
 
         SLEEP_PER_CYCLE = Long.parseLong(Main.getFromConfigs(Configs.SLEEP_PER_CYCLE));
 
-//        statistics = new Statistics(preset_times[preset_gametime_position]);
+        statistics = new Statistics(preset_times[preset_gametime_position]);
 
 //        this.lcd_display = (MyLCD) Main.getFromContext("lcd_display");
 

@@ -8,6 +8,8 @@ import de.flashheart.ocfflag.misc.HasLogger;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.EventListener;
+import java.util.Optional;
 
 /**
  * Created by tloehr on 15.03.16.
@@ -20,83 +22,104 @@ public class MyAbstractButton implements HasLogger {
     private static final int DEBOUNCE = 200; //ms
     private long reactiontime = 0;
     private final JProgressBar pb;
-    private ActionListener actionListener;
-    private final GpioPinDigitalInput hardwareButton;
-    private final JButton guiButton;
-    private HoldDownMouseAdapter holdDownMouseAdapter;
-    private HoldDownButtonHandler holdDownButtonHandler;
+    private final Optional<GpioPinDigitalInput> hardwareButton;
+    private final Optional<JButton> guiButton;
+    private Optional<HoldDownMouseAdapter> holdDownMouseAdapter;
+    private Optional<HoldDownButtonHandler> holdDownButtonHandler;
+    private Optional<EventListener> guiListener; // for later removal
 
-    public MyAbstractButton(GpioController gpio, Pin pin, long reactiontime) {
-        this(gpio, pin, null, reactiontime, null);
-    }
+//    public MyAbstractButton(GpioController gpio, Pin pin, long reactiontime) {
+//        this(gpio, pin, null, reactiontime, null);
+//    }
 
     public MyAbstractButton(GpioController gpio, Pin pin, JButton guiButton) {
         this(gpio, pin, guiButton, 0l, null);
     }
 
     public MyAbstractButton(GpioController gpio, Pin pin, JButton guiButton, long reactiontime, JProgressBar pb) {
+        guiListener = Optional.empty();
+
         this.reactiontime = reactiontime;
         this.pb = pb;
 //        this.actionListener = actionListener;
-        hardwareButton = gpio == null ? null : gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
-        if (hardwareButton != null) hardwareButton.setDebounce(DEBOUNCE);
-        this.guiButton = guiButton;
+        hardwareButton = gpio == null ? Optional.empty() : Optional.of(gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP));
+        hardwareButton.ifPresent(gpioPinDigitalInput -> gpioPinDigitalInput.setDebounce(DEBOUNCE));
+        this.guiButton = Optional.of(guiButton);
     }
 
     public MyAbstractButton(GpioController gpio, String configsKeyForPin, JButton guiButton, long reactionTime, JProgressBar pb) {
         this(gpio, RaspiPin.getPinByName(Main.getFromConfigs(configsKeyForPin)), guiButton, reactionTime, pb);
     }
 
-    public void setVisible(boolean visible) {
-        if (guiButton != null) {
-            guiButton.setVisible(visible);
-        }
-    }
+//    public void setVisible(boolean visible) {
+//        if (guiButton != null) {
+//            guiButton.setVisible(visible);
+//        }
+//    }
 
     public void setEnabled(boolean enabled) {
-        if (holdDownMouseAdapter != null) holdDownMouseAdapter.setEnabled(enabled);
-        if (holdDownButtonHandler != null) holdDownButtonHandler.setEnabled(enabled);
-        if (guiButton != null) guiButton.setEnabled(enabled);
+        holdDownMouseAdapter.ifPresent(holdDownMouseAdapter1 -> holdDownMouseAdapter1.setEnabled(enabled));
+        holdDownButtonHandler.ifPresent(holdDownButtonHandler1 -> holdDownButtonHandler1.setEnabled(enabled));
+        guiButton.ifPresent(jButton -> jButton.setEnabled(enabled));
     }
 
     public void setIcon(Icon icon) {
-        if (guiButton != null) guiButton.setIcon(icon);
+        guiButton.ifPresent(jButton -> jButton.setIcon(icon));
     }
 
-    public void addActionListener(ActionListener actionListener) {
-        if (guiButton != null) {
+    /**
+     * Es gibt immer nur einen ActionListener. Jeder Set entfernt den vorherigen, wenn es einen gibt.
+     *
+     * @param actionListener
+     */
+    public void setActionListener(ActionListener actionListener) {
+
+        if (guiButton.isPresent()) {
             if (reactiontime == 0) {
-                guiButton.addActionListener(actionListener);
+
+                guiListener.ifPresent(eventListener -> {
+                    guiButton.get().removeActionListener((ActionListener) eventListener);
+                });
+
+                guiListener = Optional.of(actionListener);
+                guiButton.get().addActionListener(actionListener);
+
             } else {
-                if (holdDownMouseAdapter == null)
-                    holdDownMouseAdapter = new HoldDownMouseAdapter(reactiontime, actionListener, guiButton, pb);
-                guiButton.addMouseListener(holdDownMouseAdapter);
+
+                holdDownMouseAdapter.ifPresent(holdDownMouseAdapter1 ->
+                        guiButton.get().removeMouseListener(holdDownMouseAdapter1)
+                );
+
+                holdDownMouseAdapter = Optional.of(new HoldDownMouseAdapter(reactiontime, actionListener, guiButton, pb));
+                guiButton.get().addMouseListener(holdDownMouseAdapter.get());
+
             }
         }
 
-        if (hardwareButton != null) {
+        if (hardwareButton.isPresent()) {
+
+            hardwareButton.get().removeAllListeners();
+                        // todo: hier gehts weiter
             if (reactiontime == 0) {
-                hardwareButton.addListener((GpioPinListenerDigital) event -> {
+                hardwareButton.get().addListener((GpioPinListenerDigital) event -> {
                     if (event.getState() != PinState.LOW) return;
                     actionListener.actionPerformed(new ActionEvent(this, 1, "action!"));
                 });
             } else {
-                if (holdDownButtonHandler == null)
-                    holdDownButtonHandler = new HoldDownButtonHandler(reactiontime, actionListener, guiButton, pb);
-                hardwareButton.addListener(holdDownButtonHandler);
+
+                holdDownButtonHandler = Optional.of(new HoldDownButtonHandler(reactiontime, actionListener, guiButton, pb));
+                hardwareButton.get().addListener(holdDownButtonHandler.get());
             }
         }
     }
 
     public void setText(String text) {
-        if (guiButton != null) {
-            guiButton.setText(text);
-        }
+        guiButton.ifPresent(jButton -> jButton.setText(text));
     }
 
     public void setReactiontime(long reactiontime) {
-           this.reactiontime = reactiontime;
-       }
+        this.reactiontime = reactiontime;
+    }
 
 //
 //    public boolean isLow() {

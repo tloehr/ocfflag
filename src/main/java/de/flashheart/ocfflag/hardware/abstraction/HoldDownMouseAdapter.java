@@ -13,6 +13,8 @@ import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.EventListener;
+import java.util.Optional;
 
 /**
  * https://stackoverflow.com/questions/6828684/java-mouseevent-check-if-pressed-down
@@ -27,7 +29,6 @@ public class HoldDownMouseAdapter extends MouseAdapter implements HasLogger {
     private final ActionListener actionListener;
     private final Object source;
     private final JProgressBar pb;
-    private ArrayList<BigDecimal> beeperTimes;
 
     private String scheme = "1:on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,2000;off,0";
     private int beeptime_ms = 50;
