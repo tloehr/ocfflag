@@ -2,7 +2,6 @@ package de.flashheart.ocfflag.gui;
 
 import de.flashheart.ocfflag.misc.Colors;
 import de.flashheart.ocfflag.misc.Tools;
-import org.apache.commons.collections.CollectionUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -80,7 +79,7 @@ public class YesNoToggleButton extends JPanel implements ItemSelectable {
     }
 
     void broadcast(final ItemEvent e) {
-        CollectionUtils.forAllDo(itemListenerList, o -> ((ItemListener) o).itemStateChanged(e));
+        itemListenerList.forEach(itemListener -> itemListener.itemStateChanged(e));
     }
 
     public void setSelected(boolean selected) {

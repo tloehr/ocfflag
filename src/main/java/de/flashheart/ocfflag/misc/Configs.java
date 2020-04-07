@@ -1,8 +1,8 @@
 package de.flashheart.ocfflag.misc;
 
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 import java.awt.*;
 import java.io.*;
@@ -37,7 +37,7 @@ public class Configs implements HasLogger {
 
     public static final String SIRENS_ENABLED = "sirens_enabled";
 
-//    public static final String NUMBER_OF_TEAMS = "num_teams";
+    //    public static final String NUMBER_OF_TEAMS = "num_teams";
     public static final String MAX_NUMBER_OF_TEAMS = "max_teams";
 
     public static final String FLAG_RGB_WHITE = "flag_rgb_white";
@@ -61,7 +61,6 @@ public class Configs implements HasLogger {
     public static final String OCF_START_STOP_SIGNAL = "ocf_start_stop_signal";
     public static final String OCF_GAME_TIME_LIST = "ocf_game_time_list";
     public static final String OCF_TIME_ANNOUNCER = "ocf_time_announcer"; // schaltet das Blinken gemäß der Restspielzeit ein oder aus.
-
 
 
     // SpawnCounter
@@ -92,12 +91,17 @@ public class Configs implements HasLogger {
 
     //
 
-    // Config Buttons
-
+    // Config Buttons. Ich mach hier zwei Zuordnungen. Die OCF Flagge benutzt eine Fernsteuerung die von A-D
+    // beschriftet ist. Auf der Platine steht K1 - K4
     public static final String BUTTON_A = "button_a"; // num_teams
-    public static final String BUTTON_B = "button_b";     // button_standby_active
-    public static final String BUTTON_C = "button_c";  // gametime
-    public static final String BUTTON_D = "button_d";  // UNDO / RESET
+    public static final String BUTTON_B = "button_b"; // standby_active
+    public static final String BUTTON_C = "button_c"; // gametime
+    public static final String BUTTON_D = "button_d"; // UNDO / RESET
+
+    public static final String BUTTON_K1 = BUTTON_B; // standby_active
+    public static final String BUTTON_K2 = BUTTON_A; // num_teams
+    public static final String BUTTON_K3 = BUTTON_C; // gametime
+    public static final String BUTTON_K4 = BUTTON_D; // UNDO / RESET
 
     // System Buttons
     public static final String BUTTON_SHUTDOWN = "button_shutdown";

@@ -168,14 +168,14 @@ public class FrameDebug extends JFrame {
         //======== mainView ========
         {
             mainView.setLayout(new FormLayout(
-                    "$rgap, $lcgap, pref, $lcgap, 62dlu:grow, $lcgap, pref:grow, $lcgap, $rgap",
-                    "$rgap, $lgap, pref, $rgap, fill:pref:grow, $lgap"));
+                "$rgap, $lcgap, pref, $lcgap, 62dlu:grow, $lcgap, pref:grow, $lcgap, $rgap",
+                "$rgap, $lgap, pref, $rgap, fill:pref:grow, $lgap"));
 
             //======== upperPanel ========
             {
                 upperPanel.setLayout(new FormLayout(
-                        "default, $lcgap, pref, $lcgap, $ugap, $lcgap, 162dlu:grow, $lcgap, $ugap, $lcgap, pref, $lcgap, default",
-                        "pref, $lgap, fill:default, $lgap, pref, $lgap, fill:default, $lgap, pref"));
+                    "default, $lcgap, 70dlu, $lcgap, $ugap, $lcgap, 162dlu:grow, $lcgap, $ugap, $lcgap, 70dlu, $lcgap, default",
+                    "pref, $lgap, fill:default, $lgap, pref, $lgap, fill:default, $lgap, pref"));
 
                 //---- ledRedButton ----
                 ledRedButton.setColor(Color.red);
@@ -292,8 +292,8 @@ public class FrameDebug extends JFrame {
                 //======== panel7 ========
                 {
                     panel7.setLayout(new FormLayout(
-                            "4*(default:grow)",
-                            "2*(pref)"));
+                        "4*(default:grow)",
+                        "2*(pref)"));
 
                     //---- btnA ----
                     btnA.setText("A");
@@ -361,8 +361,8 @@ public class FrameDebug extends JFrame {
             //======== panel5 ========
             {
                 panel5.setLayout(new FormLayout(
-                        "327dlu:grow",
-                        "fill:default:grow, $ugap, default, $lgap, default"));
+                    "327dlu:grow",
+                    "fill:default:grow, $ugap, default, $lgap, default"));
 
                 //======== lcd_panel ========
                 {

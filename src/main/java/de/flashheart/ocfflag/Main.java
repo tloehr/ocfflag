@@ -2,12 +2,10 @@ package de.flashheart.ocfflag;
 
 import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.MySystem;
-import de.flashheart.ocfflag.mechanics.GameSelector;
-import de.flashheart.ocfflag.mechanics.Games;
-import de.flashheart.ocfflag.mechanics.OCF;
+import de.flashheart.ocfflag.gamemodes.GameMode;
+import de.flashheart.ocfflag.gamemodes.OCF;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
-import de.flashheart.ocfflag.statistics.MessageProcessor;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -19,19 +17,11 @@ import java.io.StringWriter;
 import java.util.HashMap;
 
 public class Main {
-    private static Games currentGame;
+    private static GameMode currentGame;
     private static Logger logger;
     private static Level logLevel = Level.DEBUG;
     private static final HashMap<String, Object> applicationContext = new HashMap<>();
     private static Configs configs;
-
-//    private static boolean ignore_gpio; // ignore gpios, even when running on raspi
-//    private static boolean dev_mode; // show develop mode functions
-//
-////    private static MessageProcessor messageProcessor;
-//    public static MessageProcessor getMessageProcessor() {
-//        return null;
-//    }
 
     public static void main(String[] args) throws Exception {
 
@@ -76,7 +66,7 @@ public class Main {
 
     private static void initBaseSystem(String[] args) throws IOException {
         System.setProperty("logs", Tools.getWorkingPath());
-        configs  = new Configs();
+        configs = new Configs();
         applicationContext.put("configs", configs);
 
         Logger.getRootLogger().setLevel(logLevel);
@@ -184,20 +174,11 @@ public class Main {
                 "                                                                    |___/ ");
     }
 
-
-//    public static boolean isIgnore_gpio() {
-//        return ignore_gpio;
-//    }
-//
-//    public static boolean isDev_mode() {
-//        return dev_mode;
-//    }
-
-    public static Games getCurrentGame() {
+    public static GameMode getCurrentGame() {
         return currentGame;
     }
 
-    public static void setGame(Games game) {
+    public static void setGame(GameMode game) {
         currentGame = game;
     }
 }

@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.mechanics;
+package de.flashheart.ocfflag.gamemodes;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.MySystem;
@@ -17,35 +17,41 @@ import java.io.IOException;
 /**
  * In dieser Klasse befindet sich die Spielmechanik.
  */
-public class SpawnCounter implements HasLogger, Games {
+public class SpawnCounter implements HasLogger, GameMode {
 
     private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getFromConfigs(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
 
-    private final Display7Segments4Digits display_blue;
-    private final Display7Segments4Digits display_red;
-    private final Display7Segments4Digits display_white;
-    private final Display7Segments4Digits display_green;
-    private final Display7Segments4Digits display_yellow;
+    private Display7Segments4Digits display_blue;
+    private Display7Segments4Digits display_red;
+    private Display7Segments4Digits display_white;
+    private Display7Segments4Digits display_green;
+    private Display7Segments4Digits display_yellow;
 
-    private final MyAbstractButton button_quit;
-    private final MyAbstractButton button_shutdown;
+    private MyAbstractButton button_quit;
+    private MyAbstractButton button_shutdown;
 
-    private final MyAbstractButton K1_reset;
-    private final MyAbstractButton K2_zero;
-    private final MyAbstractButton K3_plus_10;
-    private final MyAbstractButton K4_plus_100;
+    private MyAbstractButton K1_reset;
+    private MyAbstractButton K2_zero;
+    private MyAbstractButton K3_plus_10;
+    private MyAbstractButton K4_plus_100;
 
-    private final MyAbstractButton button_red;
-    private final MyAbstractButton button_blue;
-    private final MyAbstractButton button_green;
-    private final MyAbstractButton button_yellow;
-    private final MySystem mySystem;
+    private MyAbstractButton button_red;
+    private MyAbstractButton button_blue;
+    private MyAbstractButton button_green;
+    private MyAbstractButton button_yellow;
+    private MySystem mySystem;
 
     private int spawn_counter = 100;
     private Configs configs;
 
 
     public SpawnCounter() {
+        initHardware();
+
+        initGame();
+    }
+
+    private void initHardware() {
         configs = (Configs) Main.getFromContext("configs");
         mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
 
@@ -77,54 +83,52 @@ public class SpawnCounter implements HasLogger, Games {
         K4_plus_100.setText("D +100");
 
         spawn_counter = configs.getInt(Configs.SPWN_START_TICKETS);
-
-        initGame();
     }
 
     private void initGame() {
         button_blue.setReactiontime(0);
-        button_blue.addActionListener(e -> {
+        button_blue.setActionListener(e -> {
             getLogger().debug("GUI_button_blue");
             button_action_pressed();
         });
         button_red.setReactiontime(0);
-        button_red.addActionListener(e -> {
+        button_red.setActionListener(e -> {
             getLogger().debug("GUI_button_red");
             button_action_pressed();
         });
         button_green.setReactiontime(0);
-        button_green.addActionListener(e -> {
+        button_green.setActionListener(e -> {
             getLogger().debug("GUI_button_green");
             button_action_pressed();
         });
         button_yellow.setReactiontime(0);
-        button_yellow.addActionListener(e -> {
+        button_yellow.setActionListener(e -> {
             getLogger().debug("GUI_button_yellow");
             button_action_pressed();
         });
-        K2_zero.addActionListener(e -> {
+        K2_zero.setActionListener(e -> {
             getLogger().debug("GUI_button_0");
             button_0_pressed();
         });
-        K3_plus_10.addActionListener(e -> {
+        K3_plus_10.setActionListener(e -> {
             getLogger().debug("GUI_button_+10");
             button_plus_10_pressed();
         });
-        K4_plus_100.addActionListener(e -> {
+        K4_plus_100.setActionListener(e -> {
             getLogger().debug("GUI_button_+100");
             button_plus_100_pressed();
         });
-        K1_reset.addActionListener(e -> {
+        K1_reset.setActionListener(e -> {
             getLogger().debug("GUI_button_reset");
             buttonResetPressed();
         });
-        button_quit.addActionListener(e -> {
+        button_quit.setActionListener(e -> {
             getLogger().debug("GUI_button_quit");
             button_quit_pressed();
         });
 
 
-        button_shutdown.addActionListener(event -> {
+        button_shutdown.setActionListener(event -> {
             getLogger().debug("GPIO_button_shutdown DOWN");
             Main.prepareShutdown();
             try {

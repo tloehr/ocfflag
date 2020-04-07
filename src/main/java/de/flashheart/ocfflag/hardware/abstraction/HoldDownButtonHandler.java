@@ -56,18 +56,18 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
     }
 
     public boolean isEnabled() {
-           return enabled;
-       }
+        return enabled;
+    }
 
-       public void setEnabled(boolean enabled) {
-           this.enabled = enabled;
-       }
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
 
     public void buttonPressed() {
         if (!Main.getCurrentGame().isGameRunning()) return;
         if (!enabled) return;
-        
+
         getLogger().debug("holding down button");
         mouseDown = true;
         holding = System.currentTimeMillis();

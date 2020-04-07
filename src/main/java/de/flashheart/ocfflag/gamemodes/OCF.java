@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.mechanics;
+package de.flashheart.ocfflag.gamemodes;
 
 import de.flashheart.GameEvent;
 import de.flashheart.ocfflag.Main;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 /**
  * Dies ist die Standard OCF / CenterFlag Spielmechanik für 2-4 Teams.
  */
-public class OCF implements Games, Runnable, HasLogger {
+public class OCF extends GameMode implements Runnable, HasLogger {
 
     private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getFromConfigs(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
     private final int MODE_PREPARE_GAME = 0;
@@ -50,24 +50,7 @@ public class OCF implements Games, Runnable, HasLogger {
     private int mode = MODE_PREPARE_GAME;
     private String flag = GameEvent.FLAG_NEUTRAL;
 
-    private final Display7Segments4Digits display_blue;
-    private final Display7Segments4Digits display_red;
-    private final Display7Segments4Digits display_white;
-    private final Display7Segments4Digits display_green;
-    private final Display7Segments4Digits display_yellow;
 
-    private final MyAbstractButton button_quit;
-    private final MyAbstractButton button_shutdown;
-
-    private final MyAbstractButton button_blue;
-    private final MyAbstractButton button_red;
-    private final MyAbstractButton button_green;
-    private final MyAbstractButton button_yellow;
-
-    private final MyAbstractButton K1_switch_mode;
-    private final MyAbstractButton K2_change_game;
-    private final MyAbstractButton K3_gametime;
-    private final MyAbstractButton K4_reset;
 
     private final Thread thread;
     private long SLEEP_PER_CYCLE = 500;
@@ -100,47 +83,19 @@ public class OCF implements Games, Runnable, HasLogger {
     private boolean resetGame = false;
 
     public OCF(int num_teams) {
+        super();
         configs = (Configs) Main.getFromContext("configs");
         mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
         title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber");
         this.num_teams = num_teams;
         thread = new Thread(this);
 
-        display_red = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_RED_I2C);
-        display_blue = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_BLUE_I2C);
-        display_green = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_GREEN_I2C);
-        display_yellow = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_YELLOW_I2C);
-        display_white = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_WHITE_I2C);
 
-        // GUI Buttons
-        button_quit = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_QUIT);
-        button_shutdown = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_SHUTDOWN);
 
-        // Hardware / GUI Buttons
-//        button_switch_mode = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_C);
-//        button_preset_gametime = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_B);
-//        button_reset = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_D);
-
-        button_red = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_RED);
-        button_blue = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_BLUE);
-        button_green = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_GREEN);
-        button_yellow = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_YELLOW);
-
-        // Hardware / GUI Buttons
-        K1_switch_mode = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_C);  // K1 - stdby actv
-        K2_change_game = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_A);     // K2 - num teams
-        K3_gametime = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_B);  // K3 - game time
-        K4_reset = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_D);  // K4 - RESET
-
-        K1_switch_mode.setText("K1 switch_mode");
-        K2_change_game.setText("K2 change game");
-        K3_gametime.setText("K3 gametime");
-        K4_reset.setText("K4 reset");
-
-        K1_switch_mode.setIcon(FrameDebug.IconPlay);
+//        K1_switch_mode.setIcon(FrameDebug.IconPlay);
 //        K2_change_game.setIcon(FrameDebug.IconPlay);
-        K3_gametime.setIcon(FrameDebug.IconGametime);
-        K4_reset.setIcon(FrameDebug.IconUNDO);
+//        K3_gametime.setIcon(FrameDebug.IconGametime);
+//        K4_reset.setIcon(FrameDebug.IconUNDO);
 
 
         preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
@@ -186,43 +141,43 @@ public class OCF implements Games, Runnable, HasLogger {
     }
 
     private void initGame() {
-        button_blue.addActionListener(e -> {
+        button_blue.setActionListener(e -> {
             getLogger().debug("GUI_button_blue");
             button_blue_pressed();
         });
-        button_red.addActionListener(e -> {
+        button_red.setActionListener(e -> {
             getLogger().debug("GUI_button_red");
             button_red_pressed();
         });
-        button_yellow.addActionListener(e -> {
+        button_yellow.setActionListener(e -> {
             getLogger().debug("GUI_button_yellow");
             button_yellow_pressed();
         });
-        button_green.addActionListener(e -> {
+        button_green.setActionListener(e -> {
             getLogger().debug("GUI_button_green");
             button_green_pressed();
         });
-        K4_reset.addActionListener(e -> {
-            getLogger().debug("GUI_button_undo_reset");
-            button_undo_reset_pressed();
-        });
-        K2_change_game.addActionListener(e -> {
-            getLogger().debug("K2_change_game");
-            changeGame(new GameSelector());
-        });
-        K3_gametime.addActionListener(e -> {
-            getLogger().debug("GUI_button_preset_gametime / UNDO");
-            button_gametime_pressed();
-        });
-        K1_switch_mode.addActionListener(e -> {
+        K1_switch_mode.setActionListener(e -> {
             getLogger().debug("GUI_button_switch_mode");
             buttonStandbyRunningPressed();
         });
-        button_quit.addActionListener(e -> {
+        K2_change_game.setActionListener(e -> {
+            getLogger().debug("K2_change_game");
+            changeGame(new GameSelector());
+        });
+        K3_gametime.setActionListener(e -> {
+            getLogger().debug("GUI_button_preset_gametime / UNDO");
+            button_gametime_pressed();
+        });
+        K4_reset.setActionListener(e -> {
+            getLogger().debug("GUI_button_undo_reset");
+            button_undo_reset_pressed();
+        });
+        button_quit.setActionListener(e -> {
             getLogger().debug("GUI_button_quit");
             button_quit_pressed();
         });
-        button_shutdown.addActionListener(event -> {
+        button_shutdown.setActionListener(event -> {
             getLogger().debug("GPIO_button_shutdown DOWN");
             Main.prepareShutdown();
             try {
@@ -994,7 +949,7 @@ public class OCF implements Games, Runnable, HasLogger {
     /**
      * stops this game and switches to the gameselector
      */
-    public void changeGame(Games game) {
+    public void changeGame(GameMode game) {
         thread.interrupt();
         mySystem.getPinHandler().off();
         Main.setGame(game);

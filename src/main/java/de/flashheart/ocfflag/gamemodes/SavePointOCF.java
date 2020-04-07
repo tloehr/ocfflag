@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.mechanics;
+package de.flashheart.ocfflag.gamemodes;
 
 /**
  * Diese einfache Hilfs-Klasse wird nur benutzt um bestimmte Situationen im Spiel zu speichern, damit man nachher dahin zurück kehren könnte.

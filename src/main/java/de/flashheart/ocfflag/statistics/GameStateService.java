@@ -1,7 +1,7 @@
 package de.flashheart.ocfflag.statistics;
 
 import de.flashheart.GameState;
-import org.springframework.util.CollectionUtils;
+import org.apache.commons.collections4.IteratorUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -24,13 +24,10 @@ public class GameStateService {
      * @return
      */
     public static boolean isDrawgame(GameState gameState) {
-        LinkedHashMap<String, Integer> rank =  CollectionUtils.lastElement(gameState.getGameEvents()).getTeamranking();
+        // lastElement() replacement
+        LinkedHashMap<String, Integer> rank = IteratorUtils.get(gameState.getGameEvents().iterator(), gameState.getGameEvents().size() - 1).getTeamranking();
         return rank.values().stream()
                 .distinct().count() == 1; // ermittelt ob alle Werte in der Map gleich sind.
-    }
-
-    public static int getNumTeams(GameState gameState) {
-        return CollectionUtils.lastElement(gameState.getGameEvents()).getTeamranking().size();
     }
 
     public static ArrayList<String> getWinners(LinkedHashMap<String, Integer> teamranking) {

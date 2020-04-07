@@ -54,9 +54,9 @@
             <version>3.7</version>
         </dependency>
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.2</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.4</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
@@ -103,11 +103,11 @@
             <artifactId>ant-jsch</artifactId>
             <version>1.9.6</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-rest</artifactId>
-            <version>RELEASE</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-data-rest</artifactId>-->
+<!--            <version>RELEASE</version>-->
+<!--        </dependency>-->
         <!--local libs-->
         <!-- mvn install:install-file -Dfile=/Users/tloehr/Documents/IdeaProjects/rlgutils/target/rlgutils-1.0.1-RELEASE.jar -DgroupId=de.flashheart -DartifactId=rlgutils -Dversion=1.0.1-RELEASE -Dpackaging=jar -->
         <dependency>
