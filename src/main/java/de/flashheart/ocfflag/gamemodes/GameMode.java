@@ -1,11 +1,13 @@
 package de.flashheart.ocfflag.gamemodes;
 
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
 import de.flashheart.ocfflag.misc.Configs;
+import de.flashheart.ocfflag.misc.HasLogger;
 
-public abstract class GameMode {
+public abstract class GameMode implements HasLogger {
 
     Display7Segments4Digits display_blue;
     Display7Segments4Digits display_red;
@@ -29,8 +31,12 @@ public abstract class GameMode {
     // So wie es auf der Platine steht. K1..K4
     String[] K_LABEL = new String[]{"dummy_for_0", "stdby act", "num teams", "game time", "reset"};
 
+    Configs configs;
+    MySystem mySystem;
 
     GameMode() {
+        configs = (Configs) Main.getFromContext("configs");
+        mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
         initHardware();
         initGame();
     }
@@ -40,8 +46,6 @@ public abstract class GameMode {
     abstract boolean isGameRunning();
 
     void initHardware() {
-
-        //todo: hier gehts weiter. 
         display_red = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_RED_I2C);
         display_blue = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_BLUE_I2C);
         display_green = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_GREEN_I2C);
@@ -70,6 +74,61 @@ public abstract class GameMode {
 
     }
 
-    abstract void initGame();
+    void initGame() {
+        button_blue.setActionListener(e -> {
+            getLogger().debug("GUI_button_blue");
+            button_blue_pressed();
+        });
+        button_red.setActionListener(e -> {
+            getLogger().debug("GUI_button_red");
+            button_red_pressed();
+        });
+        button_yellow.setActionListener(e -> {
+            getLogger().debug("GUI_button_yellow");
+            button_yellow_pressed();
+        });
+        button_green.setActionListener(e -> {
+            getLogger().debug("GUI_button_green");
+            button_green_pressed();
+        });
+        k1.setActionListener(e -> {
+            getLogger().debug("K1");
+            button_k1_pressed();
+        });
+        k2.setActionListener(e -> {
+            getLogger().debug("K2");
+            change_game();
+        });
+        k3.setActionListener(e -> {
+            getLogger().debug("K3");
+            button_k3_pressed();
+        });
+        k4.setActionListener(e -> {
+            getLogger().debug("K4");
+            button_k4_pressed();
+        });
+        button_quit.setActionListener(e -> {
+            getLogger().debug("GUI_button_quit");
+            button_quit_pressed();
+        });
+    }
+
+    abstract void button_quit_pressed();
+
+    abstract void button_red_pressed();
+
+    abstract void button_blue_pressed();
+
+    abstract void button_green_pressed();
+
+    abstract void button_yellow_pressed();
+
+    abstract void button_k4_pressed();
+
+    abstract void button_k1_pressed();
+
+    abstract void button_k3_pressed();
+
+    abstract void change_game(); // k2
 
 }

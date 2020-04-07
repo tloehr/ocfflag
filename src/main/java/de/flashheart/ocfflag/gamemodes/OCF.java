@@ -3,16 +3,12 @@ package de.flashheart.ocfflag.gamemodes;
 import de.flashheart.GameEvent;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.FrameDebug;
-import de.flashheart.ocfflag.hardware.MySystem;
-import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
-import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
 import de.flashheart.ocfflag.hardware.pinhandler.PinBlinkModel;
 import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
 import de.flashheart.ocfflag.hardware.pinhandler.RGBBlinkModel;
 import de.flashheart.ocfflag.hardware.pinhandler.RGBScheduleElement;
 import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
 import de.flashheart.ocfflag.statistics.GameStateService;
 import de.flashheart.ocfflag.statistics.Statistics;
@@ -32,7 +28,7 @@ import java.util.stream.Collectors;
 /**
  * Dies ist die Standard OCF / CenterFlag Spielmechanik für 2-4 Teams.
  */
-public class OCF extends GameMode implements Runnable, HasLogger {
+public class OCF extends GameMode implements Runnable {
 
     private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getFromConfigs(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
     private final int MODE_PREPARE_GAME = 0;
@@ -51,13 +47,11 @@ public class OCF extends GameMode implements Runnable, HasLogger {
     private String flag = GameEvent.FLAG_NEUTRAL;
 
 
-
     private final Thread thread;
     private long SLEEP_PER_CYCLE = 500;
 
     private Statistics statistics;
-    private Configs configs;
-    private MySystem mySystem;
+
 
     private long remaining, time_blue, time_red, time_yellow, time_green, standbyStartedAt, lastStatsSent, min_stat_sent_time;
     private int lastMinuteToChangeTimeblinking;
@@ -84,19 +78,10 @@ public class OCF extends GameMode implements Runnable, HasLogger {
 
     public OCF(int num_teams) {
         super();
-        configs = (Configs) Main.getFromContext("configs");
-        mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
+
         title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber");
         this.num_teams = num_teams;
         thread = new Thread(this);
-
-
-
-//        K1_switch_mode.setIcon(FrameDebug.IconPlay);
-//        K2_change_game.setIcon(FrameDebug.IconPlay);
-//        K3_gametime.setIcon(FrameDebug.IconGametime);
-//        K4_reset.setIcon(FrameDebug.IconUNDO);
-
 
         preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
         preset_times = configs.getGameTimes();
@@ -109,8 +94,6 @@ public class OCF extends GameMode implements Runnable, HasLogger {
 
         statistics = new Statistics(preset_times[preset_gametime_position]);
 
-//        this.lcd_display = (MyLCD) Main.getFromContext("lcd_display");
-
         preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
         preset_times = configs.getGameTimes();
         if (preset_gametime_position >= preset_times.length - 1) {
@@ -120,10 +103,6 @@ public class OCF extends GameMode implements Runnable, HasLogger {
 
 
         SLEEP_PER_CYCLE = Long.parseLong(Main.getFromConfigs(Configs.SLEEP_PER_CYCLE));
-//        num_teams = Integer.min(Integer.parseInt(Main.getFromConfigs(Configs.NUMBER_OF_TEAMS)), configs.getInt(Configs.MAX_NUMBER_OF_TEAMS));
-
-//        statistics = new Statistics(preset_times[preset_gametime_position]);
-
 
         lastMinuteToChangeTimeblinking = -1;
 
@@ -140,43 +119,9 @@ public class OCF extends GameMode implements Runnable, HasLogger {
 
     }
 
-    private void initGame() {
-        button_blue.setActionListener(e -> {
-            getLogger().debug("GUI_button_blue");
-            button_blue_pressed();
-        });
-        button_red.setActionListener(e -> {
-            getLogger().debug("GUI_button_red");
-            button_red_pressed();
-        });
-        button_yellow.setActionListener(e -> {
-            getLogger().debug("GUI_button_yellow");
-            button_yellow_pressed();
-        });
-        button_green.setActionListener(e -> {
-            getLogger().debug("GUI_button_green");
-            button_green_pressed();
-        });
-        K1_switch_mode.setActionListener(e -> {
-            getLogger().debug("GUI_button_switch_mode");
-            buttonStandbyRunningPressed();
-        });
-        K2_change_game.setActionListener(e -> {
-            getLogger().debug("K2_change_game");
-            changeGame(new GameSelector());
-        });
-        K3_gametime.setActionListener(e -> {
-            getLogger().debug("GUI_button_preset_gametime / UNDO");
-            button_gametime_pressed();
-        });
-        K4_reset.setActionListener(e -> {
-            getLogger().debug("GUI_button_undo_reset");
-            button_undo_reset_pressed();
-        });
-        button_quit.setActionListener(e -> {
-            getLogger().debug("GUI_button_quit");
-            button_quit_pressed();
-        });
+    @Override
+    void initGame() {
+        super.initGame();
         button_shutdown.setActionListener(event -> {
             getLogger().debug("GPIO_button_shutdown DOWN");
             Main.prepareShutdown();
@@ -197,17 +142,15 @@ public class OCF extends GameMode implements Runnable, HasLogger {
         reset_timers();
     }
 
-
-    private void button_quit_pressed() {
+    @Override
+    void button_quit_pressed() {
 //        if (mode != MODE_PREPARE_GAME) return;
         Main.prepareShutdown();
         System.exit(0);
     }
 
-    private void button_red_pressed() {
-        getLogger().debug("button_red_pressed");
-
-
+    @Override
+    void button_red_pressed() {
         if (mode == MODE_CLOCK_GAME_RUNNING) {
             if (!flag.equals(GameEvent.RED_ACTIVATED)) {
 
@@ -227,9 +170,8 @@ public class OCF extends GameMode implements Runnable, HasLogger {
         }
     }
 
-
-    private void button_blue_pressed() {
-        getLogger().debug("button_blue_pressed");
+    @Override
+    void button_blue_pressed() {
 
         if (mode == MODE_CLOCK_GAME_RUNNING) {
 
@@ -248,9 +190,8 @@ public class OCF extends GameMode implements Runnable, HasLogger {
         }
     }
 
-    private void button_green_pressed() {
-        getLogger().debug("button_green_pressed");
-
+    @Override
+    void button_green_pressed() {
         if (num_teams < 3) {
             getLogger().debug("NO GREEN TEAM: ignoring");
             return;
@@ -272,9 +213,8 @@ public class OCF extends GameMode implements Runnable, HasLogger {
         }
     }
 
-    private void button_yellow_pressed() {
-        getLogger().debug("button_yellow_pressed");
-
+    @Override
+    void button_yellow_pressed() {
         if (num_teams < 4) {
             getLogger().debug("NO YELLOW TEAM: ignoring");
             return;
@@ -295,14 +235,15 @@ public class OCF extends GameMode implements Runnable, HasLogger {
         }
     }
 
-    private void button_undo_reset_pressed() {
+    @Override
+    void button_k4_pressed() {
         getLogger().debug("button_undo_reset_pressed");
 
         if (mode == MODE_PREPARE_GAME) return;
 
         // Ein Druck auf die Undo Taste setzt das Spiel sofort in den Pause Modus.
         if (mode == MODE_CLOCK_GAME_RUNNING) {
-            buttonStandbyRunningPressed();
+            button_k1_pressed();
         }
 
         // hier wird auch ein evtl. UNDO direkt abgearbeitet
@@ -346,24 +287,8 @@ public class OCF extends GameMode implements Runnable, HasLogger {
 
     }
 
-//    private void button_preset_num_teams() {
-//        getLogger().debug("button_num_teams_pressed");
-//        int max_number_of_teams = configs.getInt(Configs.MAX_NUMBER_OF_TEAMS);
-//
-//
-//        if (max_number_of_teams == 2) return;
-//        if (mode == MODE_PREPARE_GAME) {
-//            num_teams++;
-//            if (num_teams > max_number_of_teams) num_teams = MIN_TEAMS;
-//            getLogger().debug("num_teams is now: " + num_teams);
-//            configs.put(Configs.OCF_NUMBER_OF_TEAMS, num_teams);
-//            reset_timers();
-//        } else {
-//            getLogger().debug("NOT IN PREGAME: IGNORED");
-//        }
-//    }
-
-    private void button_gametime_pressed() {
+    @Override
+    void button_k3_pressed() {
         getLogger().debug("button_gametime_pressed");
 
         if (mode == MODE_PREPARE_GAME) {
@@ -376,7 +301,8 @@ public class OCF extends GameMode implements Runnable, HasLogger {
         }
     }
 
-    private void buttonStandbyRunningPressed() {
+    @Override
+    void button_k1_pressed() {
         getLogger().debug("button_Standby_Active_pressed");
         long now = System.currentTimeMillis();
 
@@ -395,7 +321,6 @@ public class OCF extends GameMode implements Runnable, HasLogger {
             standbyStartedAt = 0l;
 
             currentState = null;
-//            lastState = null;
 
             if (resetGame) {
                 lastStatsSent = statistics.addEvent(GameEvent.GAME_ABORTED, remaining, getRank());
@@ -437,9 +362,6 @@ public class OCF extends GameMode implements Runnable, HasLogger {
         lastState = null;
         mode = MODE_PREPARE_GAME;
         mode = MODE_PREPARE_GAME;
-//        lcd_display.reset();
-//        lcd_display.addPage(); // Seite für Zeiten
-//        lcd_display.selectPage(1);
 
         min_stat_sent_time = Long.parseLong(Main.getFromConfigs(Configs.MIN_STAT_SEND_TIME));
 
@@ -492,7 +414,6 @@ public class OCF extends GameMode implements Runnable, HasLogger {
             mySystem.getPinHandler().off(Configs.OUT_FLAG_YELLOW);
 
             if (mode == MODE_PREPARE_GAME || mode == MODE_CLOCK_GAME_PAUSED) {
-                K1_switch_mode.setIcon(FrameDebug.IconPlay);
 
                 String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
                         new RGBScheduleElement(Configs.FLAG_RGB_WHITE, 350l) + ";" +
@@ -563,7 +484,7 @@ public class OCF extends GameMode implements Runnable, HasLogger {
 
             if (mode == MODE_CLOCK_GAME_RUNNING) {
                 getLogger().debug("RUNNING");
-                K1_switch_mode.setIcon(FrameDebug.IconPause);
+//                K1_switch_mode.setIcon(FrameDebug.IconPause);
 
 
                 mySystem.getPinHandler().off(Configs.OUT_LED_GREEN);
@@ -949,10 +870,11 @@ public class OCF extends GameMode implements Runnable, HasLogger {
     /**
      * stops this game and switches to the gameselector
      */
-    public void changeGame(GameMode game) {
+    @Override
+    void change_game() {
         thread.interrupt();
         mySystem.getPinHandler().off();
-        Main.setGame(game);
+        Main.setGame(new GameSelector());
     }
 
 

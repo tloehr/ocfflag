@@ -17,38 +17,38 @@ import java.io.IOException;
 /**
  * In dieser Klasse befindet sich die Spielmechanik.
  */
-public class SpawnCounter implements HasLogger, GameMode {
+public class SpawnCounter extends GameMode {
 
     private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getFromConfigs(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
 
-    private Display7Segments4Digits display_blue;
-    private Display7Segments4Digits display_red;
-    private Display7Segments4Digits display_white;
-    private Display7Segments4Digits display_green;
-    private Display7Segments4Digits display_yellow;
-
-    private MyAbstractButton button_quit;
-    private MyAbstractButton button_shutdown;
-
-    private MyAbstractButton K1_reset;
-    private MyAbstractButton K2_zero;
-    private MyAbstractButton K3_plus_10;
-    private MyAbstractButton K4_plus_100;
-
-    private MyAbstractButton button_red;
-    private MyAbstractButton button_blue;
-    private MyAbstractButton button_green;
-    private MyAbstractButton button_yellow;
-    private MySystem mySystem;
+//    private Display7Segments4Digits display_blue;
+//    private Display7Segments4Digits display_red;
+//    private Display7Segments4Digits display_white;
+//    private Display7Segments4Digits display_green;
+//    private Display7Segments4Digits display_yellow;
+//
+//    private MyAbstractButton button_quit;
+//    private MyAbstractButton button_shutdown;
+//
+//    private MyAbstractButton K1_reset;
+//    private MyAbstractButton K2_zero;
+//    private MyAbstractButton K3_plus_10;
+//    private MyAbstractButton K4_plus_100;
+//
+//    private MyAbstractButton button_red;
+//    private MyAbstractButton button_blue;
+//    private MyAbstractButton button_green;
+//    private MyAbstractButton button_yellow;
+//    private MySystem mySystem;
 
     private int spawn_counter = 100;
-    private Configs configs;
+//    private Configs configs;
 
 
     public SpawnCounter() {
-        initHardware();
-
-        initGame();
+//        initHardware();
+//
+//        initGame();
     }
 
     private void initHardware() {
