@@ -6,6 +6,10 @@ import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+
+import java.io.IOException;
 
 public abstract class GameMode implements HasLogger {
 
@@ -41,9 +45,11 @@ public abstract class GameMode implements HasLogger {
         initGame();
     }
 
-    abstract String getName();
+    public abstract String getName();
 
-    abstract boolean isGameRunning();
+    public abstract boolean isGameRunning();
+
+    public abstract void run_game();
 
     void initHardware() {
         display_red = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_RED_I2C);
@@ -60,6 +66,11 @@ public abstract class GameMode implements HasLogger {
         button_blue = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_BLUE);
         button_green = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_GREEN);
         button_yellow = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_YELLOW);
+
+        button_red.setReactiontime(0);
+        button_blue.setReactiontime(0);
+        button_green.setReactiontime(0);
+        button_yellow.setReactiontime(0);
 
         // Hardware / GUI Buttons
         k1 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_K1);
@@ -111,24 +122,51 @@ public abstract class GameMode implements HasLogger {
             getLogger().debug("GUI_button_quit");
             button_quit_pressed();
         });
+        button_shutdown.setActionListener(e -> {
+            getLogger().debug("GPIO_button_shutdown DOWN");
+            Main.prepareShutdown();
+            try {
+                String line = Main.getFromConfigs(Configs.SHUTDOWN_COMMAND_LINE);
+                CommandLine commandLine = CommandLine.parse(line);
+                DefaultExecutor executor = new DefaultExecutor();
+                Main.prepareShutdown();
+                executor.setExitValue(1);
+                executor.execute(commandLine);
+            } catch (IOException exc) {
+                getLogger().error(exc);
+            }
+        });
     }
 
-    abstract void button_quit_pressed();
+    void button_quit_pressed() {
+        Main.prepareShutdown();
+        System.exit(0);
+    }
 
-    abstract void button_red_pressed();
+    void button_red_pressed() {
+    }
 
-    abstract void button_blue_pressed();
+    void button_blue_pressed() {
+    }
 
-    abstract void button_green_pressed();
+    void button_green_pressed() {
+    }
 
-    abstract void button_yellow_pressed();
+    void button_yellow_pressed() {
+    }
 
-    abstract void button_k4_pressed();
+    void button_k4_pressed() {
+    }
 
-    abstract void button_k1_pressed();
+    void button_k1_pressed() {
+    }
 
-    abstract void button_k3_pressed();
+    void button_k3_pressed() {
+    }
 
-    abstract void change_game(); // k2
+    void change_game() {
+        mySystem.getPinHandler().off();
+        Main.setGame(new GameSelector());
+    }
 
 }

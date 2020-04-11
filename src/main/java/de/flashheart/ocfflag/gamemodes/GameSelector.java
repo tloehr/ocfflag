@@ -1,33 +1,71 @@
 package de.flashheart.ocfflag.gamemodes;
 
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
-import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.HasLogger;
 
-public class GameSelector implements HasLogger, GameMode {
-    private MyAbstractButton K1, K2, K3, K4;
+import java.io.IOException;
 
-    private MyAbstractButton button_red;
-    private MyAbstractButton button_blue;
-    private MyAbstractButton button_green;
-    private MyAbstractButton button_yellow;
+public class GameSelector extends GameMode {
+    String[] gamemodes = new String[]{"OCF2", "OCF3", "OCF4", "SPWN"};
+    final int OCF2 = 0;
+    final int OCF3 = 1;
+    final int OCF4 = 2;
+    final int SPWN = 3;
+    int game_index;
 
     public GameSelector() {
-        initHardware();
+        super();
+        game_index = 0;
     }
 
+    @Override
     void initHardware() {
-        button_red = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_RED);
-        button_blue = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_BLUE);
-        button_green = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_GREEN);
-        button_yellow = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_YELLOW);
+        super.initHardware();
 
-        // Hardware / GUI Buttons
-        K1 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_K1); // Next Game
-        K2 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_K2); // Prev Game
-        K3 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_K3); // Switch to selected game
-        K4 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_K4); // unused
+        k1.setText("Run selected game");
+        k3.setText("game++");
+        k4.setText("game--");
+
+    }
+
+    @Override
+    void button_k1_pressed() {
+        GameMode gameMode = null;
+        switch (game_index){
+            case OCF2 : {
+                gameMode = new OCF(2);
+                break;
+            }
+            case OCF3 : {
+                gameMode = new OCF(3);
+                break;
+            }
+            case OCF4 : {
+                gameMode = new OCF(4);
+                break;
+            }
+            case SPWN : {
+                gameMode = new SpawnCounter();
+                break;
+            }
+            default:{
+
+            }
+        }
+        Main.setGame(gameMode);
+    }
+
+    @Override
+    void button_k3_pressed() {
+        game_index++;
+        if (game_index >= gamemodes.length) game_index = 0;
+        setDisplay();
+    }
+
+    @Override
+    void button_k4_pressed() {
+        game_index--;
+        if (game_index <= 0) game_index = gamemodes.length - 1;
+        setDisplay();
     }
 
     @Override
@@ -39,4 +77,18 @@ public class GameSelector implements HasLogger, GameMode {
     public boolean isGameRunning() {
         return true;
     }
+
+    private void setDisplay() {
+        try {
+            display_white.setText(gamemodes[game_index]);
+        } catch (IOException e) {
+            getLogger().error(e);
+        }
+    }
+
+    @Override
+    public void run_game() {
+        // nothing to start here really
+    }
+
 }

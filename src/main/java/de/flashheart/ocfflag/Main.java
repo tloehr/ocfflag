@@ -1,9 +1,10 @@
 package de.flashheart.ocfflag;
 
+import de.flashheart.ocfflag.gamemodes.GameSelector;
+import de.flashheart.ocfflag.gamemodes.SpawnCounter;
 import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.gamemodes.GameMode;
-import de.flashheart.ocfflag.gamemodes.OCF;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.cli.*;
@@ -38,7 +39,7 @@ public class Main {
 
         applicationContext.put(Configs.MY_SYSTEM, new MySystem());
 
-        setGame(new OCF(2));
+        setGame(new GameSelector());
     }
 
     public static Object getFromContext(String key) {
@@ -53,9 +54,9 @@ public class Main {
         return configs.get(key);
     }
 
-    public static void addToConfigs(String key, String value) {
-        configs.put(key, value);
-    }
+//    public static void addToConfigs(String key, String value) {
+//        configs.put(key, value);
+//    }
 
     /**
      * Diese Methode enthält alles was initialisiert werden muss, gleich ob wir das Programm auf einem Raspi ausführen
@@ -147,19 +148,6 @@ public class Main {
 
         addToContext(Configs.IGNORE_GPIO_IN_ARM_MODE, new Boolean(cl.hasOption("n")));
         addToContext(Configs.DEV_MODE, new Boolean(cl.hasOption("n")));
-
-//        if (cl.hasOption("n")) {
-//            applicationContext.put(Configs.APPCONTEXT_NOGPIO, Boolean.TRUE);
-//        } else {
-//            applicationContext.put(Configs.APPCONTEXT_NOGPIO, System.getProperty("os.arch").toLowerCase().indexOf("arm") >= 0 ? Boolean.FALSE : Boolean.TRUE);
-//        }
-//
-
-
-//        REACTION_TIME = configs.getLong(Configs.BUTTON_REACTION_TIME);
-
-//        messageProcessor = new MessageProcessor();
-//        messageProcessor.start();
 
     }
 

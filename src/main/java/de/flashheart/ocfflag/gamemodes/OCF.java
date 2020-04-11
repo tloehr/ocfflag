@@ -78,10 +78,14 @@ public class OCF extends GameMode implements Runnable {
 
     public OCF(int num_teams) {
         super();
-
-        title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber");
         this.num_teams = num_teams;
         thread = new Thread(this);
+    }
+
+    @Override
+    void initGame() {
+        super.initGame();
+        title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber");
 
         preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
         preset_times = configs.getGameTimes();
@@ -112,41 +116,12 @@ public class OCF extends GameMode implements Runnable {
          * Daher wird beim UNDO Drücken jeweils die folgenden 3 Zustände durchgegangen. Letzer Zustand, Aktueller Zustand, RESET Zustand, und dann wieder von vorne.
          */
         resetState = new SavePointOCF(GameEvent.FLAG_NEUTRAL, 0l, 0l, 0l, 0l, 0l);
-
-
-        initGame();
-        thread.start();
-
-    }
-
-    @Override
-    void initGame() {
-        super.initGame();
-        button_shutdown.setActionListener(event -> {
-            getLogger().debug("GPIO_button_shutdown DOWN");
-            Main.prepareShutdown();
-            try {
-                String line = Main.getFromConfigs(Configs.SHUTDOWN_COMMAND_LINE);
-                CommandLine commandLine = CommandLine.parse(line);
-                DefaultExecutor executor = new DefaultExecutor();
-                Main.prepareShutdown();
-                executor.setExitValue(1);
-                executor.execute(commandLine);
-//                Thread.sleep(5000);
-            } catch (IOException e) {
-                getLogger().error(e);
-            }
-        });
-
-
         reset_timers();
     }
 
     @Override
-    void button_quit_pressed() {
-//        if (mode != MODE_PREPARE_GAME) return;
-        Main.prepareShutdown();
-        System.exit(0);
+    public void run_game() {
+        thread.start();
     }
 
     @Override
@@ -867,15 +842,9 @@ public class OCF extends GameMode implements Runnable {
         return mode == MODE_CLOCK_GAME_RUNNING;
     }
 
-    /**
-     * stops this game and switches to the gameselector
-     */
     @Override
     void change_game() {
         thread.interrupt();
-        mySystem.getPinHandler().off();
-        Main.setGame(new GameSelector());
+        super.change_game();
     }
-
-
 }
