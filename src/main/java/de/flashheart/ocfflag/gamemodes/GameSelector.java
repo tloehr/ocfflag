@@ -86,9 +86,5 @@ public class GameSelector extends GameMode {
         }
     }
 
-    @Override
-    public void run_game() {
-        // nothing to start here really
-    }
 
 }

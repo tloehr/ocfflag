@@ -27,6 +27,7 @@ public class MyAbstractButton implements HasLogger {
     private Optional<HoldDownMouseAdapter> holdDownMouseAdapter;
     private Optional<HoldDownButtonHandler> holdDownButtonHandler;
     private Optional<EventListener> guiListener; // for later removal
+    private String text="";
 
     public MyAbstractButton(GpioController gpio, Pin pin, JButton guiButton) {
         this(gpio, pin, guiButton, 0l, null);
@@ -99,7 +100,12 @@ public class MyAbstractButton implements HasLogger {
     }
 
     public void setText(String text) {
+        this.text = text;
         guiButton.ifPresent(jButton -> jButton.setText(text));
+    }
+
+    public String getText() {
+        return text;
     }
 
     public void setReactiontime(long reactiontime) {

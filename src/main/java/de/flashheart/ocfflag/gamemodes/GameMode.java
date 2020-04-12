@@ -4,6 +4,7 @@ import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
+import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;
 import org.apache.commons.exec.CommandLine;
@@ -37,19 +38,53 @@ public abstract class GameMode implements HasLogger {
 
     Configs configs;
     MySystem mySystem;
+    int num_teams;
+
+    long matchlength, matchtime, remaining;
+
+    long SLEEP_PER_CYCLE = 500;
 
     GameMode() {
+        this(2);
+    }
+
+    GameMode(int num_teams) {
+        this.num_teams = num_teams;
+        init();
+        initGame();
+    }
+
+    GameMode(int num_teams, long matchlength) {
+        init();
+        this.num_teams = num_teams;
+        this.matchlength = matchlength;
+        initGame();
+    }
+
+    private void init() {
         configs = (Configs) Main.getFromContext("configs");
         mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
         initHardware();
-        initGame();
+        matchlength = 0l;
+        matchtime = 0l;
+        remaining = 0l;
     }
 
     public abstract String getName();
 
     public abstract boolean isGameRunning();
 
-    public abstract void run_game();
+    public void start_gamemode() {
+        getLogger().debug("\n\n==================================================");
+        getLogger().debug("starting gamemode: " + getName());
+    }
+
+    public void stop_gamemode() {
+        getLogger().debug("stopping gamemode: " + getName());
+        getLogger().debug("==================================================\n\n");
+//        getLogger().debug("                                                  ");
+        mySystem.getPinHandler().off();
+    }
 
     void initHardware() {
         display_red = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_RED_I2C);
@@ -144,29 +179,164 @@ public abstract class GameMode implements HasLogger {
     }
 
     void button_red_pressed() {
+        getLogger().debug("button_red_pressed");
     }
 
     void button_blue_pressed() {
+        getLogger().debug("button_blue_pressed");
     }
 
     void button_green_pressed() {
+        getLogger().debug("button_green_pressed");
     }
 
     void button_yellow_pressed() {
+        getLogger().debug("button_yellow_pressed");
     }
 
     void button_k4_pressed() {
+        getLogger().debug("button_k4_pressed: " + k4.getText());
     }
 
     void button_k1_pressed() {
+        getLogger().debug("button_k4_pressed: " + k1.getText());
     }
 
     void button_k3_pressed() {
+        getLogger().debug("button_k4_pressed: " + k3.getText());
+    }
+
+    void set_blinking_red_button(String scheme) {
+        mySystem.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, scheme);
+    }
+
+    void set_blinking_blue_button(String scheme) {
+        mySystem.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, scheme);
+    }
+
+    void set_blinking_green_button(String scheme) {
+        mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, scheme);
+    }
+
+    void set_blinking_yellow_button(String scheme) {
+        mySystem.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, scheme);
+    }
+
+    void set_blinking_flag_rgb(String scheme) {
+        set_blinking_flag_rgb(null, scheme);
+    }
+
+    void set_blinking_flag_white(String scheme) {
+        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, scheme);
+    }
+
+    void set_blinking_flag_red(String scheme) {
+        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_RED, scheme);
+    }
+
+    void set_blinking_flag_blue(String scheme) {
+        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, scheme);
+    }
+
+    void set_blinking_flag_green(String scheme) {
+        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, scheme);
+    }
+
+    void set_blinking_flag_yellow(String scheme) {
+        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, scheme);
+    }
+
+    void set_blinking_led_white(String scheme) {
+        mySystem.getPinHandler().setScheme(Configs.OUT_LED_WHITE, scheme);
+    }
+
+    void set_blinking_led_green(String scheme) {
+        mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN, scheme);
+    }
+
+    void off_red_button() {
+        set_blinking_red_button("0:");
+    }
+
+    void off_blue_button() {
+        set_blinking_blue_button("0:");
+    }
+
+    void off_green_button() {
+        set_blinking_green_button("0:");
+    }
+
+    void off_yellow_button() {
+        set_blinking_yellow_button("0:");
+    }
+
+    void off_flag_white() {
+        set_blinking_flag_white("0:");
+    }
+
+    void off_flag_red() {
+        set_blinking_flag_red("0:");
+    }
+
+    void off_flag_blue() {
+        set_blinking_flag_blue("0:");
+    }
+
+    void off_flag_green() {
+        set_blinking_flag_green("0:");
+    }
+
+    void off_flag_yellow() {
+        set_blinking_flag_yellow("0:");
+    }
+
+    void set_blinking_flag_rgb(String text, String scheme) {
+        if (text != null) mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, text, scheme);
+        else mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, scheme);
+    }
+
+    void blinking_off() {
+        try {
+            display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+            display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+            display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+            display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+            display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+        } catch (IOException e) {
+            getLogger().error(e);
+        }
+        mySystem.getPinHandler().off(Configs.OUT_LED_RED_BTN);
+        mySystem.getPinHandler().off(Configs.OUT_LED_BLUE_BTN);
+        mySystem.getPinHandler().off(Configs.OUT_LED_GREEN_BTN);
+        mySystem.getPinHandler().off(Configs.OUT_LED_YELLOW_BTN);
+
+        mySystem.getPinHandler().off(Configs.OUT_FLAG_WHITE);
+        mySystem.getPinHandler().off(Configs.OUT_FLAG_RED);
+        mySystem.getPinHandler().off(Configs.OUT_FLAG_BLUE);
+        mySystem.getPinHandler().off(Configs.OUT_FLAG_GREEN);
+        mySystem.getPinHandler().off(Configs.OUT_FLAG_YELLOW);
+
+        mySystem.getPinHandler().off(Configs.OUT_FLAG_RED);
+
+        mySystem.getPinHandler().off(Configs.OUT_LED_GREEN);
+        mySystem.getPinHandler().off(Configs.OUT_LED_WHITE);
     }
 
     void change_game() {
-        mySystem.getPinHandler().off();
+        getLogger().debug("changing game");
+        stop_gamemode();
         Main.setGame(new GameSelector());
     }
+
+    void set_siren_scheme(String siren_key, String siren_scheme) {
+        siren_key = Main.getFromConfigs(siren_key).equals("null") ? siren_key : Main.getFromConfigs(siren_scheme);
+        mySystem.getPinHandler().setScheme(siren_key, siren_key);
+    }
+
+    void updateTimers() {
+        matchtime = matchlength - remaining;
+    }
+
+    abstract void setDisplay();
 
 }

@@ -13,12 +13,10 @@ import java.io.IOException;
  */
 public class SpawnCounter extends GameMode {
     private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getFromConfigs(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
-
     private int spawn_counter = 100;
 
-
     public SpawnCounter() {
-        super();
+        super(1);
     }
 
     @Override
@@ -32,11 +30,7 @@ public class SpawnCounter extends GameMode {
         spawn_counter = configs.getInt(Configs.SPWN_START_TICKETS);
     }
 
-    @Override
-    public void run_game() {
-        // nothing to start here really
-    }
-
+    
     @Override
     void initGame() {
         super.initGame();
@@ -45,30 +39,28 @@ public class SpawnCounter extends GameMode {
             button_quit_pressed();
         });
 
-
-//        mode = MODE_CONFIG;
-        setDisplayToEvent();
+        setDisplay();
     }
 
     @Override
     void button_k3_pressed() {
         spawn_counter += 10;
         configs.put(Configs.SPWN_START_TICKETS, spawn_counter);
-        setDisplayToEvent();
+        setDisplay();
     }
 
     @Override
     void button_k4_pressed() {
         spawn_counter += 100;
         configs.put(Configs.SPWN_START_TICKETS, spawn_counter);
-        setDisplayToEvent();
+        setDisplay();
     }
 
     @Override
     void button_k1_pressed() {
         if (spawn_counter == configs.getInt(Configs.SPWN_START_TICKETS)) spawn_counter = 0;
         else spawn_counter = configs.getInt(Configs.SPWN_START_TICKETS);
-        setDisplayToEvent();
+        setDisplay();
     }
 
     @Override
@@ -100,7 +92,7 @@ public class SpawnCounter extends GameMode {
             spawn_counter--;
             mySystem.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, Main.getFromConfigs(Configs.SPWN_SIREN_DECREASE));
         }
-        setDisplayToEvent();
+        setDisplay();
     }
 
     private void button_saveNquit_pressed() {
@@ -108,7 +100,8 @@ public class SpawnCounter extends GameMode {
     }
 
 
-    private void setDisplayToEvent() {
+    @Override
+     void setDisplay() {
         try {
             display_white.setText(spawn_counter);
 
