@@ -12,7 +12,7 @@ import org.apache.commons.exec.DefaultExecutor;
 
 import java.io.IOException;
 
-public abstract class GameMode implements HasLogger {
+public abstract class BaseGame implements HasLogger {
 
     Display7Segments4Digits display_blue;
     Display7Segments4Digits display_red;
@@ -40,46 +40,28 @@ public abstract class GameMode implements HasLogger {
     MySystem mySystem;
     int num_teams;
 
-    long matchlength, matchtime, remaining;
-
-    long SLEEP_PER_CYCLE = 500;
-
-    GameMode() {
-        this(2);
-    }
-
-    GameMode(int num_teams) {
-        this.num_teams = num_teams;
-        init();
-        initGame();
-    }
-
-    GameMode(int num_teams, long matchlength) {
-        init();
-        this.num_teams = num_teams;
-        this.matchlength = matchlength;
-        initGame();
-    }
-
-    private void init() {
+    BaseGame() {
+        this.num_teams = 2;
         configs = (Configs) Main.getFromContext("configs");
         mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
+        initBaseSystem();
         initHardware();
-        matchlength = 0l;
-        matchtime = 0l;
-        remaining = 0l;
+        initGame();
     }
+
+    abstract void initBaseSystem();
 
     public abstract String getName();
 
     public abstract boolean isGameRunning();
 
-    public void start_gamemode() {
+
+    void start_gamemode() {
         getLogger().debug("\n\n==================================================");
         getLogger().debug("starting gamemode: " + getName());
     }
 
-    public void stop_gamemode() {
+    void stop_gamemode() {
         getLogger().debug("stopping gamemode: " + getName());
         getLogger().debug("==================================================\n\n");
 //        getLogger().debug("                                                  ");
@@ -270,23 +252,23 @@ public abstract class GameMode implements HasLogger {
         set_blinking_yellow_button("0:");
     }
 
-    void off_flag_white() {
+    void off_white_flag() {
         set_blinking_flag_white("0:");
     }
 
-    void off_flag_red() {
+    void off_red_flag() {
         set_blinking_flag_red("0:");
     }
 
-    void off_flag_blue() {
+    void off_blue_flag() {
         set_blinking_flag_blue("0:");
     }
 
-    void off_flag_green() {
+    void off_green_flag() {
         set_blinking_flag_green("0:");
     }
 
-    void off_flag_yellow() {
+    void off_yellow_flag() {
         set_blinking_flag_yellow("0:");
     }
 
@@ -295,7 +277,7 @@ public abstract class GameMode implements HasLogger {
         else mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, scheme);
     }
 
-    void blinking_off() {
+    void all_off() {
         try {
             display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
             display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
@@ -331,10 +313,6 @@ public abstract class GameMode implements HasLogger {
     void set_siren_scheme(String siren_key, String siren_scheme) {
         siren_key = Main.getFromConfigs(siren_key).equals("null") ? siren_key : Main.getFromConfigs(siren_scheme);
         mySystem.getPinHandler().setScheme(siren_key, siren_key);
-    }
-
-    void updateTimers() {
-        matchtime = matchlength - remaining;
     }
 
     abstract void setDisplay();

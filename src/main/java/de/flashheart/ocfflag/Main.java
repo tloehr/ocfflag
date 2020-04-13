@@ -1,10 +1,9 @@
 package de.flashheart.ocfflag;
 
 import de.flashheart.ocfflag.gamemodes.GameSelector;
-import de.flashheart.ocfflag.gamemodes.SpawnCounter;
 import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.MySystem;
-import de.flashheart.ocfflag.gamemodes.GameMode;
+import de.flashheart.ocfflag.gamemodes.BaseGame;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.cli.*;
@@ -18,7 +17,7 @@ import java.io.StringWriter;
 import java.util.HashMap;
 
 public class Main {
-    private static GameMode currentGame;
+    private static BaseGame currentGame;
     private static Logger logger;
     private static Level logLevel = Level.DEBUG;
     private static final HashMap<String, Object> applicationContext = new HashMap<>();
@@ -162,11 +161,11 @@ public class Main {
                 "                                                                    |___/ ");
     }
 
-    public static GameMode getCurrentGame() {
+    public static BaseGame getCurrentGame() {
         return currentGame;
     }
 
-    public static void setGame(GameMode game) {
+    public static void setGame(BaseGame game) {
         currentGame = game;
     }
 }

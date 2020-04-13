@@ -14,16 +14,13 @@ import org.joda.time.DateTimeZone;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Dies ist die Standard OCF / CenterFlag Spielmechanik für 2-4 Teams.
  */
-public class OCF extends GameMode implements Runnable {
+public class OCF extends TimedBaseGame {
 
     private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getFromConfigs(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
     private final int MODE_PREPARE_GAME = 0;
@@ -38,10 +35,11 @@ public class OCF extends GameMode implements Runnable {
     private final int SAVEPOINT_CURRENT = 3;
     private final String SAVEPOINTS[] = new String[]{"", "SPIELZUG ZURÜCK", "RESET", "KEINE ÄNDERUNG"};
 
+    private ArrayList<String> winners;
+
     private int mode = MODE_PREPARE_GAME;
     private String flag = GameEvent.FLAG_NEUTRAL;
 
-    private final Thread thread;
 
 //    private Statistics statistics;
 
@@ -52,16 +50,7 @@ public class OCF extends GameMode implements Runnable {
     private String title = "";
     private String lcd_time_format;
 
-    /**
-     * In der methode run() wird in regelmässigen Abständen die Restspielzeit remaining neu berechnet. Dabei rechnen wir
-     * bei jedem Durchgang die abgelaufene Zeit seit dem letzten Mal aus. Das machen wir mittels der Variable lastPIT
-     * (letzer Zeitpunkt). Die aktuelle Zeit abzüglich lastPIT bildet die Zeitdifferenz zum letzten Mal. Diese Differenz
-     * wird von der verbliebenen Spielzeit abgezogen. Bei Pause wird einmalig (am Ende der Pause) lastPIT um die
-     * Pausezeit erhöht. Somit wirkt sich die Spielpause nicht auf die Restspielzeit aus.
-     * <p>
-     * lastPIT wird einmal bei buttonStandbyRunningPressed() und einmal in run() bearbeitet.
-     */
-    private long lastPIT;
+
 
     private Long[] preset_times;
     private int preset_gametime_position = 0;
@@ -69,15 +58,14 @@ public class OCF extends GameMode implements Runnable {
     private boolean resetGame = false;
 
     public OCF(int num_teams) {
-        super(num_teams);
-        thread = new Thread(this);
+        super();
     }
 
     @Override
     void initGame() {
         super.initGame();
+        winners = new ArrayList<>();
         title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber");
-
         preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
         preset_times = configs.getGameTimes();
         if (preset_gametime_position >= preset_times.length - 1) {
@@ -85,17 +73,7 @@ public class OCF extends GameMode implements Runnable {
             configs.put(Configs.OCF_GAMETIME, preset_gametime_position);
         }
 
-        SLEEP_PER_CYCLE = Long.parseLong(Main.getFromConfigs(Configs.SLEEP_PER_CYCLE));
-
-        preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
-        preset_times = configs.getGameTimes();
-        if (preset_gametime_position >= preset_times.length - 1) {
-            preset_gametime_position = 0;
-            configs.put(Configs.OCF_GAMETIME, preset_gametime_position);
-        }
-
-
-        SLEEP_PER_CYCLE = Long.parseLong(Main.getFromConfigs(Configs.SLEEP_PER_CYCLE));
+//        SLEEP_PER_CYCLE = Long.parseLong(Main.getFromConfigs(Configs.SLEEP_PER_CYCLE));
 
         lastMinuteToChangeTimeblinking = -1;
 
@@ -143,7 +121,7 @@ public class OCF extends GameMode implements Runnable {
 
                 lastState = new SavePointOCF(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.BLUE_ACTIVATED;
-                set_siren_scheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE,Configs.OCF_COLORCHANGE_SIGNAL);
+                set_siren_scheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Configs.OCF_COLORCHANGE_SIGNAL);
 
                 setDisplay();
             } else {
@@ -166,7 +144,7 @@ public class OCF extends GameMode implements Runnable {
                 lastState = new SavePointOCF(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.GREEN_ACTIVATED;
                 mySystem.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
-                lastStatsSent = statistics.addEvent(flag, remaining, getRank());
+
                 setDisplay();
             } else {
                 getLogger().debug("GREEN ALREADY: IGNORED");
@@ -189,7 +167,7 @@ public class OCF extends GameMode implements Runnable {
                 lastState = new SavePointOCF(flag, remaining, time_blue, time_red, time_yellow, time_green);
                 flag = GameEvent.YELLOW_ACTIVATED;
                 mySystem.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
-                lastStatsSent = statistics.addEvent(flag, remaining, getRank());
+
                 setDisplay();
             } else {
                 getLogger().debug("YELLOW ALREADY: IGNORED");
@@ -266,46 +244,55 @@ public class OCF extends GameMode implements Runnable {
     }
 
     @Override
+    void pause() {
+        SELECTED_SAVEPOINT = SAVEPOINT_NONE;
+        standbyStartedAt = System.currentTimeMillis();
+        mode = MODE_CLOCK_GAME_PAUSED;
+
+        currentState = new SavePointOCF(flag, remaining, time_blue, time_red, time_yellow, time_green);
+//            lcd_display.addPage(); // Für die Ausgabe des Savepoints
+        setDisplay();
+    }
+
+    @Override
+    void resume() {
+        // lastPIT neu berechnen und anpassen
+        long pause = now - standbyStartedAt;
+        lastPIT = lastPIT + pause;
+        standbyStartedAt = 0l;
+
+        currentState = null;
+
+        if (resetGame) {
+
+            reset_timers();
+        } else {
+            mode = MODE_CLOCK_GAME_RUNNING;
+
+            if (SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS) {
+                SELECTED_SAVEPOINT = SAVEPOINT_NONE;
+
+                lastState = new SavePointOCF(flag, remaining, time_blue, time_red, time_yellow, time_green);
+            }
+//                lcd_display.deletePage(3); // brauchen wir dann erstmal nicht mehr
+            setDisplay();
+        }
+    }
+
+    @Override
     void button_k1_pressed() {
         getLogger().debug("button_Standby_Active_pressed");
         long now = System.currentTimeMillis();
 
         if (mode == MODE_CLOCK_GAME_RUNNING) {
-            SELECTED_SAVEPOINT = SAVEPOINT_NONE;
-            standbyStartedAt = System.currentTimeMillis();
-            mode = MODE_CLOCK_GAME_PAUSED;
-            lastStatsSent = statistics.addEvent(GameEvent.PAUSING, remaining, getRank());
-            currentState = new SavePointOCF(flag, remaining, time_blue, time_red, time_yellow, time_green);
-//            lcd_display.addPage(); // Für die Ausgabe des Savepoints
-            setDisplay();
+            pause();
         } else if (mode == MODE_CLOCK_GAME_PAUSED) {
-            // lastPIT neu berechnen und anpassen
-            long pause = now - standbyStartedAt;
-            lastPIT = lastPIT + pause;
-            standbyStartedAt = 0l;
-
-            currentState = null;
-
-            if (resetGame) {
-                lastStatsSent = statistics.addEvent(GameEvent.GAME_ABORTED, remaining, getRank());
-                reset_timers();
-            } else {
-                mode = MODE_CLOCK_GAME_RUNNING;
-                lastStatsSent = statistics.addEvent(GameEvent.LAST_EVENT_REVERTED, remaining, getRank());
-                if (SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS) {
-                    SELECTED_SAVEPOINT = SAVEPOINT_NONE;
-                    lastStatsSent = statistics.addEvent(GameEvent.LAST_EVENT_REVERTED, remaining, getRank());
-                    lastStatsSent = statistics.addEvent(flag, remaining, getRank());
-                    lastState = new SavePointOCF(flag, remaining, time_blue, time_red, time_yellow, time_green);
-                }
-//                lcd_display.deletePage(3); // brauchen wir dann erstmal nicht mehr
-                setDisplay();
-            }
+             resume();
         } else if (mode == MODE_CLOCK_GAME_OVER) {
             reset_timers();
         } else if (mode == MODE_PREPARE_GAME) {
 
-            lastStatsSent = statistics.addEvent(GameEvent.FLAG_NEUTRAL, remaining, getRank());
+
             lastPIT = System.currentTimeMillis();
 
             mode = MODE_CLOCK_GAME_RUNNING;
@@ -315,35 +302,10 @@ public class OCF extends GameMode implements Runnable {
 
     }
 
-    private void reset_timers() {
-        flag = GameEvent.FLAG_NEUTRAL;
-        lcd_time_format = "H:mm:ss";
-        if (preset_times[preset_gametime_position] <= 60) {
-            lcd_time_format = "mm:ss";
-        }
-        resetGame = false;
-        currentState = null;
-        lastState = null;
-        mode = MODE_PREPARE_GAME;
-        mode = MODE_PREPARE_GAME;
-
-        remaining = preset_times[preset_gametime_position] * 60000; // die preset_times sind in Minuten. Daher * 60000, weil wir millis brauchen
-        standbyStartedAt = 0l;
-        lastPIT = 0l;
-
-        time_red = 0l;
-        time_blue = 0l;
-        time_green = 0l;
-        time_yellow = 0l;
-
-        SELECTED_SAVEPOINT = SAVEPOINT_NONE;
-        setDisplay();
-    }
 
     @Override
     void setDisplay() {
         try {
-//            writeLCD();
 
             display_white.setTime(remaining);
             display_red.setTime(time_red);
@@ -355,7 +317,7 @@ public class OCF extends GameMode implements Runnable {
             if (num_teams < 4) display_yellow.clear();
             else display_yellow.setTime(time_yellow);
 
-            blinking_off();
+            all_off();
 
             if (mode == MODE_PREPARE_GAME || mode == MODE_CLOCK_GAME_PAUSED) {
 
@@ -421,7 +383,7 @@ public class OCF extends GameMode implements Runnable {
                 getLogger().debug("PAUSED");
                 display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                 set_blinking_led_green("∞:on,500;off,500");
-                setColorsAndBlinkingSchemeAccordingToGameSituation();
+                setSignals();
             }
 
             if (mode == MODE_CLOCK_GAME_RUNNING) {
@@ -431,73 +393,76 @@ public class OCF extends GameMode implements Runnable {
                 mySystem.getPinHandler().off(Configs.OUT_LED_WHITE);
                 display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
 
-                setColorsAndBlinkingSchemeAccordingToGameSituation();
+                setSignals();
 
             }
 
-            // hier findet die Auswertung nach dem Spielende statt.
+//            // hier findet die Auswertung nach dem Spielende statt.
             if (mode == MODE_CLOCK_GAME_OVER) {
                 set_siren_scheme(Configs.OUT_SIREN_START_STOP, Configs.OCF_START_STOP_SIGNAL);
 
-                if (GameStateService.isDrawgame(statistics.getGameState())) {
-                    getLogger().info("Draw Game");
-                    display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                    display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                    if (num_teams >= 3)
-                        display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                    if (num_teams >= 4)
-                        display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-
-                    set_blinking_blue_button("∞:on,1000;off,1000");
-                    set_blinking_red_button("∞:on,1000;off,1000");
-                    if (num_teams >= 3)
-                        set_blinking_green_button("∞:on,1000;off,1000");
-                    if (num_teams >= 4)
-                        set_blinking_yellow_button("∞:on,1000;off,1000");
-
-                    set_blinking_flag_rgb("DRAW GAME", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
-                    set_blinking_flag_white("∞:on,1000;off,1000");
-
-                } else {
-
-                    if (statistics.getWinners().contains("red")) {
-                        display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                        set_blinking_red_button("∞:on,100;off,100");
-                    }
-                    if (statistics.getWinners().contains("blue")) {
-                        display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                        set_blinking_blue_button("∞:on,100;off,100");
-                    }
-                    if (statistics.getWinners().contains("green")) {
-                        display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                        set_blinking_green_button("∞:on,100;off,100");
-                    }
-                    if (statistics.getWinners().contains("yellow")) {
-                        display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                        set_blinking_yellow_button("∞:on,100;off,100");
-                    }
-
-                    // die Flagge soll alle Sieger anzeigen
-                    String winningScheme = PinHandler.FOREVER + ":";
-                    String text = "Winning Team(s): ";
-                    for (String teamColor : statistics.getWinners()) {
-                        winningScheme += new RGBScheduleElement(Configs.getColors().get(teamColor), 250) + ";" + new RGBScheduleElement(Color.BLACK, 250) + ";";
-
-                        text += teamColor + " ";
-
-                        if (teamColor.equalsIgnoreCase("red"))
-                            set_blinking_flag_red("∞:on,250;off,250");
-                        if (teamColor.equalsIgnoreCase("blue"))
-                        set_blinking_flag_blue("∞:on,250;off,250");
-                        if (teamColor.equalsIgnoreCase("green"))
-                            set_blinking_flag_green("∞:on,250;off,250");
-                        if (teamColor.equalsIgnoreCase("yellow"))
-                            set_blinking_flag_yellow("∞:on,250;off,250");
-                    }
-                    set_blinking_flag_rgb(text, winningScheme);
-//                    writeLCDFor2TeamsGameOver();
-                }
             }
+//
+//
+//                if (GameStateService.isDrawgame(statistics.getGameState())) {
+//                    getLogger().info("Draw Game");
+//                    display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+//                    display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+//                    if (num_teams >= 3)
+//                        display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+//                    if (num_teams >= 4)
+//                        display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+//
+//                    set_blinking_blue_button("∞:on,1000;off,1000");
+//                    set_blinking_red_button("∞:on,1000;off,1000");
+//                    if (num_teams >= 3)
+//                        set_blinking_green_button("∞:on,1000;off,1000");
+//                    if (num_teams >= 4)
+//                        set_blinking_yellow_button("∞:on,1000;off,1000");
+//
+//                    set_blinking_flag_rgb("DRAW GAME", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
+//                    set_blinking_flag_white("∞:on,1000;off,1000");
+//
+//                } else {
+//
+//                    if (statistics.getWinners().contains("red")) {
+//                        display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+//                        set_blinking_red_button("∞:on,100;off,100");
+//                    }
+//                    if (statistics.getWinners().contains("blue")) {
+//                        display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+//                        set_blinking_blue_button("∞:on,100;off,100");
+//                    }
+//                    if (statistics.getWinners().contains("green")) {
+//                        display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+//                        set_blinking_green_button("∞:on,100;off,100");
+//                    }
+//                    if (statistics.getWinners().contains("yellow")) {
+//                        display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+//                        set_blinking_yellow_button("∞:on,100;off,100");
+//                    }
+//
+//                    // die Flagge soll alle Sieger anzeigen
+//                    String winningScheme = PinHandler.FOREVER + ":";
+//                    String text = "Winning Team(s): ";
+//                    for (String teamColor : statistics.getWinners()) {
+//                        winningScheme += new RGBScheduleElement(Configs.getColors().get(teamColor), 250) + ";" + new RGBScheduleElement(Color.BLACK, 250) + ";";
+//
+//                        text += teamColor + " ";
+//
+//                        if (teamColor.equalsIgnoreCase("red"))
+//                            set_blinking_flag_red("∞:on,250;off,250");
+//                        if (teamColor.equalsIgnoreCase("blue"))
+//                            set_blinking_flag_blue("∞:on,250;off,250");
+//                        if (teamColor.equalsIgnoreCase("green"))
+//                            set_blinking_flag_green("∞:on,250;off,250");
+//                        if (teamColor.equalsIgnoreCase("yellow"))
+//                            set_blinking_flag_yellow("∞:on,250;off,250");
+//                    }
+//                    set_blinking_flag_rgb(text, winningScheme);
+////                    writeLCDFor2TeamsGameOver();
+//                }
+//            }
 
         } catch (IOException e) {
             getLogger().fatal(e);
@@ -505,13 +470,12 @@ public class OCF extends GameMode implements Runnable {
         }
     }
 
-    private void setColorsAndBlinkingSchemeAccordingToGameSituation() throws IOException {
-        off_yellow_button();
-        mySystem.getPinHandler().off(Configs.OUT_FLAG_WHITE);
-        mySystem.getPinHandler().off(Configs.OUT_FLAG_RED);
-        mySystem.getPinHandler().off(Configs.OUT_FLAG_BLUE);
-        mySystem.getPinHandler().off(Configs.OUT_FLAG_GREEN);
-        mySystem.getPinHandler().off(Configs.OUT_FLAG_YELLOW);
+    private void setSignals() throws IOException {
+        off_white_flag();
+        off_red_flag();
+        off_blue_flag();
+        off_green_flag();
+        off_yellow_flag();
 
         if (flag.equals(GameEvent.FLAG_NEUTRAL)) {
             getLogger().info("Flag is neutral");
@@ -632,94 +596,93 @@ public class OCF extends GameMode implements Runnable {
         return toplist;
     }
 
-    @Override
-    public void run() {
-        while (!thread.isInterrupted()) {
-            try {
-                if (mode == MODE_CLOCK_GAME_RUNNING) {
-                    long now = System.currentTimeMillis();
-                    long diff = now - lastPIT;
+    void game_cycle() throws Exception {
+        if (mode == MODE_CLOCK_GAME_RUNNING) {
 
-                    lastPIT = now;
-
-                    remaining = remaining - diff;
-
-                    remaining = Math.max(remaining, 0);
-
-                    updateTimers();
+            int thisMinuteOfDay = new DateTime(remaining, DateTimeZone.UTC).getMinuteOfDay();
+            boolean changeColorBlinking = thisMinuteOfDay != lastMinuteToChangeTimeblinking;
+            if (changeColorBlinking) lastMinuteToChangeTimeblinking = thisMinuteOfDay;
 
 
-                    int thisMinuteOfDay = new DateTime(remaining, DateTimeZone.UTC).getMinuteOfDay();
-                    boolean changeColorBlinking = thisMinuteOfDay != lastMinuteToChangeTimeblinking;
-                    if (changeColorBlinking) lastMinuteToChangeTimeblinking = thisMinuteOfDay;
+            // Hier muss nach Ablauf jeder vollen Minute, das Blinkschema neu angepasst werden.
+            if (flag.equals(GameEvent.FLAG_NEUTRAL)) {
+                if (changeColorBlinking) {
+                    set_blinking_flag_rgb("NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
+                    set_blinking_flag_white(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                }
+            }
 
-
-                    // Hier muss nach Ablauf jeder vollen Minute, das Blinkschema neu angepasst werden.
-                    if (flag.equals(GameEvent.FLAG_NEUTRAL)) {
-                        if (changeColorBlinking) {
-                            mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
-                            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                        }
-                    }
-
-                    // Zeit zum entsprechenden Team addieren.
-                    if (flag.equals(GameEvent.RED_ACTIVATED)) {
-                        time_red += diff;
-                        if (changeColorBlinking) {
-                            mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
-                            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_RED, PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                        }
-                    }
-                    if (flag.equals(GameEvent.BLUE_ACTIVATED)) {
-                        time_blue += diff;
-                        if (changeColorBlinking) {
-                            mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
-                            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                        }
-                    }
-                    if (flag.equals(GameEvent.GREEN_ACTIVATED)) {
-                        time_green += diff;
-                        if (changeColorBlinking) {
-                            mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
-                            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                        }
-                    }
-                    if (flag.equals(GameEvent.YELLOW_ACTIVATED)) {
-                        time_yellow += diff;
-                        if (changeColorBlinking) {
-                            mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_YELLOW, remaining));
-                            mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                        }
-                    }
+            // Zeit zum entsprechenden Team addieren.
+            if (flag.equals(GameEvent.RED_ACTIVATED)) {
+                time_red += diff;
+                if (changeColorBlinking) {
+                    mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_RED, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                }
+            }
+            if (flag.equals(GameEvent.BLUE_ACTIVATED)) {
+                time_blue += diff;
+                if (changeColorBlinking) {
+                    mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                }
+            }
+            if (flag.equals(GameEvent.GREEN_ACTIVATED)) {
+                time_green += diff;
+                if (changeColorBlinking) {
+                    mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                }
+            }
+            if (flag.equals(GameEvent.YELLOW_ACTIVATED)) {
+                time_yellow += diff;
+                if (changeColorBlinking) {
+                    mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_YELLOW, remaining));
+                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                }
+            }
 
 //                    writeLCD();
-                    display_white.setTime(remaining);
-                    display_red.setTime(time_red);
-                    display_blue.setTime(time_blue);
-                    if (num_teams >= 3) display_green.setTime(time_green);
-                    if (num_teams >= 4) display_yellow.setTime(time_yellow);
+            display_white.setTime(remaining);
+            display_red.setTime(time_red);
+            display_blue.setTime(time_blue);
+            if (num_teams >= 3) display_green.setTime(time_green);
+            if (num_teams >= 4) display_yellow.setTime(time_yellow);
 
 
-                    if (remaining == 0) {
-                        getLogger().info("GAME OVER");
-                        mode = MODE_CLOCK_GAME_OVER;
-                        lastStatsSent = statistics.addEvent(GameEvent.GAME_OVER, remaining, getRank());
-                        setDisplay();
-                    }
-
-                }
-
-                Thread.sleep(SLEEP_PER_CYCLE);
-
-
-            } catch (InterruptedException ie) {
-                getLogger().debug(this + " interrupted!");
-            } catch (Exception e) {
-                getLogger().error(e);
-                e.printStackTrace();
-                System.exit(1);
+            if (remaining == 0) {
+                getLogger().info("GAME OVER");
+                mode = MODE_CLOCK_GAME_OVER;
+                setDisplay();
             }
+
         }
+    }
+
+    @Override
+    void reset_timers() {
+        super.reset_timers();
+        flag = GameEvent.FLAG_NEUTRAL;
+        lcd_time_format = "H:mm:ss";
+        if (preset_times[preset_gametime_position] <= 60) {
+            lcd_time_format = "mm:ss";
+        }
+        setMatchlength(preset_times[preset_gametime_position] * 60000); // die preset_times sind in Minuten. Daher * 60000, weil wir millis brauchen
+
+        resetGame = false;
+        currentState = null;
+        lastState = null;
+        mode = MODE_PREPARE_GAME;
+
+        standbyStartedAt = 0l;
+
+        time_red = 0l;
+        time_blue = 0l;
+        time_green = 0l;
+        time_yellow = 0l;
+
+        SELECTED_SAVEPOINT = SAVEPOINT_NONE;
+        setDisplay();
     }
 
 //    private void writeLCDFor20x04() {

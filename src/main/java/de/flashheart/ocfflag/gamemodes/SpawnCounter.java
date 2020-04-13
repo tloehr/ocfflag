@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * In dieser Klasse befindet sich die Spielmechanik.
  */
-public class SpawnCounter extends GameMode {
+public class SpawnCounter extends BaseGame {
     private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getFromConfigs(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
     private int spawn_counter = 100;
 
