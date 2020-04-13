@@ -1,9 +1,15 @@
 package de.flashheart.ocfflag.gamemodes;
 
 public abstract class TimedBaseGame extends BaseGame implements Runnable {
-    long matchlength, matchtime, remaining;
+    final int TIMED_GAME_PREPARE = 0;
+    final int TIMED_GAME_RUNNING = 1;
+    final int TIMED_GAME_PAUSED = 2;
+    final int TIMED_GAME_OVER = 3;
+
+    long matchlength, matchtime, remaining, pausing_started_at, last_cycle_started_at, time_difference_since_last_cycle;
     long SLEEP_PER_CYCLE;
     final Thread thread;
+
     /**
      * In der methode run() wird in regelmässigen Abständen die Restspielzeit remaining neu berechnet. Dabei rechnen wir
      * bei jedem Durchgang die abgelaufene Zeit seit dem letzten Mal aus. Das machen wir mittels der Variable lastPIT
@@ -11,9 +17,8 @@ public abstract class TimedBaseGame extends BaseGame implements Runnable {
      * wird von der verbliebenen Spielzeit abgezogen. Bei Pause wird einmalig (am Ende der Pause) lastPIT um die
      * Pausezeit erhöht. Somit wirkt sich die Spielpause nicht auf die Restspielzeit aus.
      * <p>
-     * lastPIT wird einmal bei buttonStandbyRunningPressed() und einmal in run() bearbeitet.
+     * last_cycle_started_at wird einmal bei buttonStandbyRunningPressed() und einmal in run() bearbeitet.
      */
-    long last_cycle_time;
 
     TimedBaseGame() {
         super();
@@ -24,9 +29,9 @@ public abstract class TimedBaseGame extends BaseGame implements Runnable {
 
     void update_timers() {
         long now = System.currentTimeMillis();
-        long diff = now - last_cycle_time;
-        last_cycle_time = now;
-        remaining = remaining - diff;
+        time_difference_since_last_cycle = now - last_cycle_started_at;
+        last_cycle_started_at = now;
+        remaining = remaining - time_difference_since_last_cycle;
         remaining = Math.max(remaining, 0);
         matchtime = matchlength - remaining;
     }
@@ -37,21 +42,38 @@ public abstract class TimedBaseGame extends BaseGame implements Runnable {
     void reset_timers() {
         remaining = matchlength;
         matchtime = 0l;
-        last_cycle_time = 0l;
+        last_cycle_started_at = 0l;
     }
 
-    abstract void pause();
-    abstract void resume();
+    void pause() {
+        game_state = TIMED_GAME_PAUSED;
+        pausing_started_at = System.currentTimeMillis();
+    }
+
+    void resume() {
+        game_state = TIMED_GAME_RUNNING;
+        long pause = System.currentTimeMillis() - pausing_started_at;
+        last_cycle_started_at = last_cycle_started_at + pause; // verschieben des Zeitpunkts um die Pausenzeit
+        pausing_started_at = 0l;
+    }
+
+    void game_over(){
+        game_state = TIMED_GAME_OVER;
+    }
 
     /**
      * Übergang von Prepare zum Match Beginn
      */
-    abstract void start();
+    void start(){
+        game_state = TIMED_GAME_RUNNING;
+    }
 
     /**
      * zurück zur Vorbereitungsphase VOR dem Beginn des Matches
      */
-    abstract void prepare();
+    void prepare(){
+        game_state = TIMED_GAME_PREPARE;
+    }
 
 
     /**
@@ -63,6 +85,17 @@ public abstract class TimedBaseGame extends BaseGame implements Runnable {
     }
 
     abstract void game_cycle() throws Exception;
+
+    @Override
+    public boolean isGameRunning() {
+        return game_state == TIMED_GAME_RUNNING;
+    }
+
+    @Override
+    void change_game() {
+        thread.interrupt();
+        super.change_game();
+    }
 
     @Override
     public void run() {
