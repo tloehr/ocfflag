@@ -20,8 +20,8 @@ public abstract class TimedBaseGame extends BaseGame implements Runnable {
      * last_cycle_started_at wird einmal bei buttonStandbyRunningPressed() und einmal in run() bearbeitet.
      */
 
-    TimedBaseGame() {
-        super();
+    TimedBaseGame(int num_teams) {
+        super(num_teams);
         reset_timers();
         thread = new Thread(this);
         SLEEP_PER_CYCLE = 500l;
@@ -34,6 +34,12 @@ public abstract class TimedBaseGame extends BaseGame implements Runnable {
         remaining = remaining - time_difference_since_last_cycle;
         remaining = Math.max(remaining, 0);
         matchtime = matchlength - remaining;
+    }
+
+    @Override
+    void start_gamemode() {
+        super.start_gamemode();
+        thread.start();
     }
 
     /**

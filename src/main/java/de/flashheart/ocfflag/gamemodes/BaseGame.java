@@ -68,14 +68,17 @@ public abstract class BaseGame implements HasLogger {
     String flag_state;
     int game_state;
 
-    BaseGame() {
-        this.num_teams = 2;
+    BaseGame(int num_teams) {
+        this.num_teams = num_teams;
         configs = (Configs) Main.getFromContext("configs");
         mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
         initBaseSystem();
         initHardware();
         initGame();
+        start_gamemode();
     }
+
+
 
     abstract void initBaseSystem();
 

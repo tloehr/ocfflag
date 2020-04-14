@@ -50,7 +50,7 @@ public class OCF extends TimedBaseGame {
     private boolean resetGame = false;
 
     public OCF(int num_teams) {
-        super();
+        super(num_teams);
     }
 
 
@@ -74,12 +74,6 @@ public class OCF extends TimedBaseGame {
          */
         resetState = new SavePointOCF(FLAG_NEUTRAL, 0l, 0l, 0l, 0l, 0l);
         reset_timers();
-    }
-
-    @Override
-    public void start_gamemode() {
-        super.start_gamemode();
-        thread.start();
     }
 
     @Override
@@ -262,7 +256,9 @@ public class OCF extends TimedBaseGame {
 
     @Override
     void game_over() {
-        reset_timers();
+        getLogger().info("GAME OVER");
+        game_state = TIMED_GAME_OVER;
+        setDisplay();
     }
 
     @Override
@@ -282,7 +278,7 @@ public class OCF extends TimedBaseGame {
         } else if (game_state == TIMED_GAME_PAUSED) {
             resume();
         } else if (game_state == TIMED_GAME_OVER) {
-            game_over();
+            reset_timers();
         } else if (game_state == TIMED_GAME_PREPARE) {
             prepare();
         }
@@ -610,29 +606,29 @@ public class OCF extends TimedBaseGame {
             if (flag_state.equals(RED_ACTIVATED)) {
                 time_red += time_difference_since_last_cycle;
                 if (changeColorBlinking) {
-                    mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
-                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_RED, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                    set_blinking_flag_rgb("RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
+                    set_blinking_flag_red(PinBlinkModel.getGametimeBlinkingScheme(remaining));
                 }
             }
             if (flag_state.equals(BLUE_ACTIVATED)) {
                 time_blue += time_difference_since_last_cycle;
                 if (changeColorBlinking) {
-                    mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
-                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                    set_blinking_flag_rgb("BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
+                    set_blinking_flag_blue(PinBlinkModel.getGametimeBlinkingScheme(remaining));
                 }
             }
             if (flag_state.equals(GREEN_ACTIVATED)) {
                 time_green += time_difference_since_last_cycle;
                 if (changeColorBlinking) {
-                    mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
-                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                    set_blinking_flag_rgb("GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
+                    set_blinking_flag_green(PinBlinkModel.getGametimeBlinkingScheme(remaining));
                 }
             }
             if (flag_state.equals(YELLOW_ACTIVATED)) {
                 time_yellow += time_difference_since_last_cycle;
                 if (changeColorBlinking) {
-                    mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, "YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_YELLOW, remaining));
-                    mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                    set_blinking_flag_rgb("YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_YELLOW, remaining));
+                    set_blinking_flag_yellow(PinBlinkModel.getGametimeBlinkingScheme(remaining));
                 }
             }
 
@@ -645,9 +641,7 @@ public class OCF extends TimedBaseGame {
 
 
             if (remaining == 0) {
-                getLogger().info("GAME OVER");
-                game_state = TIMED_GAME_OVER;
-                setDisplay();
+                game_over();
             }
 
         }
