@@ -46,7 +46,7 @@ public abstract class BaseGame implements HasLogger {
     Display7Segments4Digits display_yellow;
 
     MyAbstractButton button_quit;
-    MyAbstractButton button_shutdown;
+    MyAbstractButton button_change_game; // war früher SHUTDOWN
 
     MyAbstractButton button_blue;
     MyAbstractButton button_red;
@@ -108,7 +108,7 @@ public abstract class BaseGame implements HasLogger {
 
         // GUI Buttons
         button_quit = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_QUIT);
-        button_shutdown = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_SHUTDOWN);
+        button_change_game = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_SHUTDOWN);
 
         button_red = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_RED);
         button_blue = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_BLUE);
@@ -156,7 +156,7 @@ public abstract class BaseGame implements HasLogger {
         });
         k2.setActionListener(e -> {
             getLogger().debug("K2");
-            change_game();
+            button_k2_pressed();
         });
         k3.setActionListener(e -> {
             getLogger().debug("K3");
@@ -170,20 +170,30 @@ public abstract class BaseGame implements HasLogger {
             getLogger().debug("GUI_button_quit");
             button_quit_pressed();
         });
-        button_shutdown.setActionListener(e -> {
-            getLogger().debug("GPIO_button_shutdown DOWN");
-            Main.prepareShutdown();
-            try {
-                String line = Main.getFromConfigs(Configs.SHUTDOWN_COMMAND_LINE);
-                CommandLine commandLine = CommandLine.parse(line);
-                DefaultExecutor executor = new DefaultExecutor();
-                Main.prepareShutdown();
-                executor.setExitValue(1);
-                executor.execute(commandLine);
-            } catch (IOException exc) {
-                getLogger().error(exc);
-            }
+        button_change_game.setActionListener(e -> {
+            getLogger().debug("CHANGE_GAME");
+            change_game();
         });
+    }
+
+    void change_game() {
+        getLogger().debug("changing game");
+        stop_gamemode();
+        Main.setGame(new GameSelector());
+    }
+
+    void shutdown_system(){
+        Main.prepareShutdown();
+        try {
+            String line = Main.getFromConfigs(Configs.SHUTDOWN_COMMAND_LINE);
+            CommandLine commandLine = CommandLine.parse(line);
+            DefaultExecutor executor = new DefaultExecutor();
+            Main.prepareShutdown();
+            executor.setExitValue(1);
+            executor.execute(commandLine);
+        } catch (IOException exc) {
+            getLogger().error(exc);
+        }
     }
 
     void button_quit_pressed() {
@@ -213,6 +223,10 @@ public abstract class BaseGame implements HasLogger {
 
     void button_k1_pressed() {
         getLogger().debug("button_k4_pressed: " + k1.getText());
+    }
+
+    void button_k2_pressed() {
+        getLogger().debug("button_k2_pressed: " + k2.getText());
     }
 
     void button_k3_pressed() {
@@ -335,11 +349,7 @@ public abstract class BaseGame implements HasLogger {
         mySystem.getPinHandler().off(Configs.OUT_LED_WHITE);
     }
 
-    void change_game() {
-        getLogger().debug("changing game");
-        stop_gamemode();
-        Main.setGame(new GameSelector());
-    }
+
 
     void set_siren_scheme(String siren_key, String siren_scheme) {
         siren_key = Main.getFromConfigs(siren_key).equals("null") ? siren_key : Main.getFromConfigs(siren_scheme);

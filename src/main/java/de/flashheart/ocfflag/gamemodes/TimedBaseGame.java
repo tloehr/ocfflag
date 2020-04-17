@@ -6,7 +6,7 @@ public abstract class TimedBaseGame extends BaseGame implements Runnable {
     final int TIMED_GAME_PAUSED = 2;
     final int TIMED_GAME_OVER = 3;
 
-    long matchlength, matchtime, remaining, pausing_started_at, last_cycle_started_at, time_difference_since_last_cycle;
+    long matchlength, matchtime, remaining, pausing_since, last_cycle_started_at, time_difference_since_last_cycle;
     long SLEEP_PER_CYCLE;
     final Thread thread;
 
@@ -51,31 +51,40 @@ public abstract class TimedBaseGame extends BaseGame implements Runnable {
         last_cycle_started_at = 0l;
     }
 
+    /**
+     * das Spiel wird in den Pausezustand versetzt
+     */
     void pause() {
         game_state = TIMED_GAME_PAUSED;
-        pausing_started_at = System.currentTimeMillis();
+        pausing_since = System.currentTimeMillis();
     }
 
+    /**
+     * das Spiel wird nach dem Pausezustand fortgesetzt
+     */
     void resume() {
         game_state = TIMED_GAME_RUNNING;
-        long pause = System.currentTimeMillis() - pausing_started_at;
+        long pause = System.currentTimeMillis() - pausing_since;
         last_cycle_started_at = last_cycle_started_at + pause; // verschieben des Zeitpunkts um die Pausenzeit
-        pausing_started_at = 0l;
+        pausing_since = 0l;
     }
 
+    /**
+     * das Spiel wird beendet.
+     */
     void game_over(){
         game_state = TIMED_GAME_OVER;
     }
 
     /**
-     * Übergang von Prepare zum Match Beginn
+     * das Spiel beginnt
      */
     void start(){
         game_state = TIMED_GAME_RUNNING;
     }
 
     /**
-     * zurück zur Vorbereitungsphase VOR dem Beginn des Matches
+     * Spiel wird in den Vorbereitungsmodus versetzt
      */
     void prepare(){
         game_state = TIMED_GAME_PREPARE;
@@ -98,9 +107,9 @@ public abstract class TimedBaseGame extends BaseGame implements Runnable {
     }
 
     @Override
-    void change_game() {
+    void button_k2_pressed() {
         thread.interrupt();
-        super.change_game();
+        super.button_k2_pressed();
     }
 
     @Override

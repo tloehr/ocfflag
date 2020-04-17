@@ -39,7 +39,8 @@ public class OCF extends TimedBaseGame {
     private long time_blue, time_red, time_yellow, time_green;
     private int lastMinuteToChangeTimeblinking;
     private int SELECTED_SAVEPOINT = SAVEPOINT_NONE;
-    private SavePointOCF currentState, lastState, resetState;
+    private SavePointOCF currentSavePoint, lastSavePoint;
+    private final SavePointOCF resetSavePoint;
     private String title = "";
     private String lcd_time_format;
 
@@ -47,10 +48,16 @@ public class OCF extends TimedBaseGame {
     private Long[] preset_times;
     private int preset_gametime_position = 0;
 
-    private boolean resetGame = false;
+    private boolean reset_the_game_when_resuming = false;
 
     public OCF(int num_teams) {
         super(num_teams);
+        /**
+         * dieser ResetState ist ein Trick. Ich wollte aus Sicherheitsgründen auf den RESET Button verzichten,
+         * damit es bei REVERTS im Spiel nicht versehentlich zum RESET kommt.
+         * Daher wird beim UNDO Drücken jeweils die folgenden 3 Zustände durchgegangen. Letzer Zustand, Aktueller Zustand, RESET Zustand, und dann wieder von vorne.
+         */
+        resetSavePoint = new SavePointOCF(FLAG_NEUTRAL, 0l, 0l, 0l, 0l, 0l);
     }
 
 
@@ -67,12 +74,6 @@ public class OCF extends TimedBaseGame {
 
         lastMinuteToChangeTimeblinking = -1;
 
-        /**
-         * dieser ResetState ist ein Trick. Ich wollte aus Sicherheitsgründen auf den RESET Button verzichten,
-         * damit es bei REVERTS im Spiel nicht versehentlich zum RESET kommt.
-         * Daher wird beim UNDO Drücken jeweils die folgenden 3 Zustände durchgegangen. Letzer Zustand, Aktueller Zustand, RESET Zustand, und dann wieder von vorne.
-         */
-        resetState = new SavePointOCF(FLAG_NEUTRAL, 0l, 0l, 0l, 0l, 0l);
         reset_timers();
     }
 
@@ -81,7 +82,7 @@ public class OCF extends TimedBaseGame {
         if (game_state == TIMED_GAME_RUNNING) {
             if (!flag_state.equals(RED_ACTIVATED)) {
 
-                lastState = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
+                lastSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
                 flag_state = RED_ACTIVATED;
 
                 mySystem.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
@@ -103,7 +104,7 @@ public class OCF extends TimedBaseGame {
 
             if (!flag_state.equals(BLUE_ACTIVATED)) {
 
-                lastState = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
+                lastSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
                 flag_state = BLUE_ACTIVATED;
                 set_siren_scheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Configs.OCF_COLORCHANGE_SIGNAL);
 
@@ -125,7 +126,7 @@ public class OCF extends TimedBaseGame {
         if (game_state == TIMED_GAME_RUNNING) {
             if (!flag_state.equals(GREEN_ACTIVATED)) {
 
-                lastState = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
+                lastSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
                 flag_state = GREEN_ACTIVATED;
                 mySystem.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
 
@@ -148,7 +149,7 @@ public class OCF extends TimedBaseGame {
         if (game_state == TIMED_GAME_RUNNING) {
             if (!flag_state.equals(YELLOW_ACTIVATED)) {
 
-                lastState = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
+                lastSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
                 flag_state = YELLOW_ACTIVATED;
                 mySystem.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
 
@@ -162,39 +163,37 @@ public class OCF extends TimedBaseGame {
     }
 
     @Override
-    void button_k4_pressed() {
-        getLogger().debug("button_undo_reset_pressed");
-
+    void button_k4_pressed() { // undo / reset
+        super.button_k4_pressed();
+        
         if (game_state == TIMED_GAME_PREPARE) return;
 
         // Ein Druck auf die Undo Taste setzt das Spiel sofort in den Pause Modus.
         if (game_state == TIMED_GAME_RUNNING) {
-            button_k1_pressed();
+            pause();
         }
 
-        // hier wird auch ein evtl. UNDO direkt abgearbeitet
-
-        getLogger().info("Trying to UNDO");
-
-
+        // UNDO Funktion ?
         SELECTED_SAVEPOINT++;
         if (SELECTED_SAVEPOINT > 3) SELECTED_SAVEPOINT = 1;
         // kein vorheriger vorhanden. Daher geht das nicht. Dann nur RESET oder CURRENT.
-        if (lastState == null && SELECTED_SAVEPOINT == 1) SELECTED_SAVEPOINT++;
+        if (lastSavePoint == null && SELECTED_SAVEPOINT == 1) SELECTED_SAVEPOINT++;
         SavePointOCF savePointOCF;
-        resetGame = false;
+
         switch (SELECTED_SAVEPOINT) {
             case SAVEPOINT_RESET: {
-                savePointOCF = resetState;
-                resetGame = true;
+                savePointOCF = resetSavePoint;
+                reset_the_game_when_resuming = true;
                 break;
             }
             case SAVEPOINT_PREVIOUS: {
-                savePointOCF = lastState;
+                savePointOCF = lastSavePoint;
+                reset_the_game_when_resuming = false;
                 break;
             }
             case SAVEPOINT_CURRENT: {
-                savePointOCF = currentState;
+                savePointOCF = currentSavePoint;
+                reset_the_game_when_resuming = false;
                 break;
             }
             default: {
@@ -210,7 +209,6 @@ public class OCF extends TimedBaseGame {
         time_green = savePointOCF.getTime_green();
         time_yellow = savePointOCF.getTime_yellow();
         setDisplay();
-
     }
 
     @Override
@@ -232,22 +230,21 @@ public class OCF extends TimedBaseGame {
         super.pause();
         SELECTED_SAVEPOINT = SAVEPOINT_NONE;
         game_state = TIMED_GAME_PAUSED;
-        currentState = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
-//            lcd_display.addPage(); // Für die Ausgabe des Savepoints
+        currentSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
         setDisplay();
     }
 
     @Override
     void resume() {
-        // lastPIT neu berechnen und anpassen
-        currentState = null;
-        if (resetGame) {
+        super.resume();
+        currentSavePoint = null;
+        if (reset_the_game_when_resuming) {
             reset_timers();
         } else {
             game_state = TIMED_GAME_RUNNING;
             if (SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS) {
                 SELECTED_SAVEPOINT = SAVEPOINT_NONE;
-                lastState = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
+                lastSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
             }
 //                lcd_display.deletePage(3); // brauchen wir dann erstmal nicht mehr
             setDisplay();
@@ -257,7 +254,6 @@ public class OCF extends TimedBaseGame {
     @Override
     void game_over() {
         getLogger().info("GAME OVER");
-        game_state = TIMED_GAME_OVER;
         setDisplay();
     }
 
@@ -271,8 +267,6 @@ public class OCF extends TimedBaseGame {
 
     @Override
     void button_k1_pressed() {
-//        long now = System.currentTimeMillis();
-
         if (game_state == TIMED_GAME_RUNNING) {
             pause();
         } else if (game_state == TIMED_GAME_PAUSED) {
@@ -657,12 +651,12 @@ public class OCF extends TimedBaseGame {
         }
         setMatchlength(preset_times[preset_gametime_position] * 60000); // die preset_times sind in Minuten. Daher * 60000, weil wir millis brauchen
 
-        resetGame = false;
-        currentState = null;
-        lastState = null;
+        reset_the_game_when_resuming = false;
+        currentSavePoint = null;
+        lastSavePoint = null;
         game_state = TIMED_GAME_PREPARE;
 
-        pausing_started_at = 0l;
+        pausing_since = 0l;
 
         time_red = 0l;
         time_blue = 0l;
