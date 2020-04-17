@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.hardware.abstraction;
+package de.flashheart.ocfflag.hardware;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.MySystem;

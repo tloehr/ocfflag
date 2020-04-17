@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.hardware.abstraction;
+package de.flashheart.ocfflag.hardware;
 
 import com.pi4j.gpio.extension.mcp.MCP23017GpioProvider;
 import com.pi4j.io.gpio.GpioController;

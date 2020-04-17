@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.hardware.pinhandler;
+package de.flashheart.ocfflag.hardware;
 
 import java.util.concurrent.Callable;
 

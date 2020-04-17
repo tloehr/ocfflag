@@ -1,6 +1,6 @@
 package de.flashheart.ocfflag.gamemodes;
 
-public abstract class TimedBaseGame extends BaseGame implements Runnable {
+public abstract class TimedGame extends Game implements Runnable {
     final int TIMED_GAME_PREPARE = 0;
     final int TIMED_GAME_RUNNING = 1;
     final int TIMED_GAME_PAUSED = 2;
@@ -20,7 +20,7 @@ public abstract class TimedBaseGame extends BaseGame implements Runnable {
      * last_cycle_started_at wird einmal bei buttonStandbyRunningPressed() und einmal in run() bearbeitet.
      */
 
-    TimedBaseGame(int num_teams) {
+    TimedGame(int num_teams) {
         super(num_teams);
         reset_timers();
         thread = new Thread(this);
@@ -49,6 +49,8 @@ public abstract class TimedBaseGame extends BaseGame implements Runnable {
         remaining = matchlength;
         matchtime = 0l;
         last_cycle_started_at = 0l;
+        flag_state = FLAG_NEUTRAL;
+        pausing_since = 0l;
     }
 
     /**
@@ -57,6 +59,7 @@ public abstract class TimedBaseGame extends BaseGame implements Runnable {
     void pause() {
         game_state = TIMED_GAME_PAUSED;
         pausing_since = System.currentTimeMillis();
+        setDisplay();
     }
 
     /**
@@ -67,13 +70,16 @@ public abstract class TimedBaseGame extends BaseGame implements Runnable {
         long pause = System.currentTimeMillis() - pausing_since;
         last_cycle_started_at = last_cycle_started_at + pause; // verschieben des Zeitpunkts um die Pausenzeit
         pausing_since = 0l;
+        setDisplay();
     }
 
     /**
      * das Spiel wird beendet.
      */
     void game_over(){
+        getLogger().info("game_over()");
         game_state = TIMED_GAME_OVER;
+        setDisplay();
     }
 
     /**
@@ -88,8 +94,15 @@ public abstract class TimedBaseGame extends BaseGame implements Runnable {
      */
     void prepare(){
         game_state = TIMED_GAME_PREPARE;
+        setDisplay();
     }
 
+    @Override
+    void change_game() {
+        thread.interrupt();
+        super.change_game();
+
+    }
 
     /**
      * @param matchlength - Gesamt-Spielzeit in Millisekunden
@@ -104,12 +117,6 @@ public abstract class TimedBaseGame extends BaseGame implements Runnable {
     @Override
     public boolean isGameRunning() {
         return game_state == TIMED_GAME_RUNNING;
-    }
-
-    @Override
-    void button_k2_pressed() {
-        thread.interrupt();
-        super.button_k2_pressed();
     }
 
     @Override

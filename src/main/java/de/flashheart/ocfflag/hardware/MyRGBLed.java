@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.hardware.abstraction;
+package de.flashheart.ocfflag.hardware;
 
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.wiringpi.SoftPwm;

@@ -1,8 +1,8 @@
 package de.flashheart.ocfflag.gamemodes;
 
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
-import de.flashheart.ocfflag.hardware.pinhandler.RGBScheduleElement;
+import de.flashheart.ocfflag.hardware.PinHandler;
+import de.flashheart.ocfflag.hardware.RGBScheduleElement;
 import de.flashheart.ocfflag.misc.Configs;
 
 import java.awt.*;
@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * In dieser Klasse befindet sich die Spielmechanik.
  */
-public class SpawnCounter extends BaseGame {
+public class SpawnCounter extends Game {
     private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getFromConfigs(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
     private int spawn_counter = 100;
 

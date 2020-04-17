@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.hardware.pinhandler;
+package de.flashheart.ocfflag.hardware;
 
 public class PinScheduleEvent {
     boolean on;

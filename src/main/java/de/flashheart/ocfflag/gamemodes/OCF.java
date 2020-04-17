@@ -1,11 +1,11 @@
 package de.flashheart.ocfflag.gamemodes;
 
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.pinhandler.PinBlinkModel;
-import de.flashheart.ocfflag.hardware.pinhandler.PinHandler;
-import de.flashheart.ocfflag.hardware.pinhandler.RGBBlinkModel;
-import de.flashheart.ocfflag.hardware.pinhandler.RGBScheduleElement;
-import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
+import de.flashheart.ocfflag.hardware.PinBlinkModel;
+import de.flashheart.ocfflag.hardware.PinHandler;
+import de.flashheart.ocfflag.hardware.RGBBlinkModel;
+import de.flashheart.ocfflag.hardware.RGBScheduleElement;
+import de.flashheart.ocfflag.hardware.LEDBackPack;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
 
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 /**
  * Dies ist die Standard OCF / CenterFlag Spielmechanik für 2-4 Teams.
  */
-public class OCF extends TimedBaseGame {
+public class OCF extends TimedGame {
 
     private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getFromConfigs(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
 
@@ -71,7 +71,10 @@ public class OCF extends TimedBaseGame {
             preset_gametime_position = 0;
             configs.put(Configs.OCF_GAMETIME, preset_gametime_position);
         }
-
+        k1.setText("RUN/PAUSE");
+        k2.setText("SET GAMETIME");
+        k3.setText("UNDO/RESET");
+        k4.setText("--");
         lastMinuteToChangeTimeblinking = -1;
 
         reset_timers();
@@ -79,6 +82,7 @@ public class OCF extends TimedBaseGame {
 
     @Override
     void button_red_pressed() {
+        super.button_red_pressed();
         if (game_state == TIMED_GAME_RUNNING) {
             if (!flag_state.equals(RED_ACTIVATED)) {
 
@@ -99,7 +103,7 @@ public class OCF extends TimedBaseGame {
 
     @Override
     void button_blue_pressed() {
-
+        super.button_blue_pressed();
         if (game_state == TIMED_GAME_RUNNING) {
 
             if (!flag_state.equals(BLUE_ACTIVATED)) {
@@ -119,6 +123,7 @@ public class OCF extends TimedBaseGame {
 
     @Override
     void button_green_pressed() {
+        super.button_green_pressed();
         if (num_teams < 3) {
             getLogger().debug("NO GREEN TEAM: ignoring");
             return;
@@ -142,6 +147,7 @@ public class OCF extends TimedBaseGame {
 
     @Override
     void button_yellow_pressed() {
+        super.button_yellow_pressed();
         if (num_teams < 4) {
             getLogger().debug("NO YELLOW TEAM: ignoring");
             return;
@@ -163,57 +169,21 @@ public class OCF extends TimedBaseGame {
     }
 
     @Override
-    void button_k4_pressed() { // undo / reset
-        super.button_k4_pressed();
-        
-        if (game_state == TIMED_GAME_PREPARE) return;
-
-        // Ein Druck auf die Undo Taste setzt das Spiel sofort in den Pause Modus.
+    void button_k1_pressed() {
         if (game_state == TIMED_GAME_RUNNING) {
             pause();
+        } else if (game_state == TIMED_GAME_PAUSED) {
+            resume();
+        } else if (game_state == TIMED_GAME_OVER) {
+            prepare();
+        } else if (game_state == TIMED_GAME_PREPARE) {
+            start();
         }
-
-        // UNDO Funktion ?
-        SELECTED_SAVEPOINT++;
-        if (SELECTED_SAVEPOINT > 3) SELECTED_SAVEPOINT = 1;
-        // kein vorheriger vorhanden. Daher geht das nicht. Dann nur RESET oder CURRENT.
-        if (lastSavePoint == null && SELECTED_SAVEPOINT == 1) SELECTED_SAVEPOINT++;
-        SavePointOCF savePointOCF;
-
-        switch (SELECTED_SAVEPOINT) {
-            case SAVEPOINT_RESET: {
-                savePointOCF = resetSavePoint;
-                reset_the_game_when_resuming = true;
-                break;
-            }
-            case SAVEPOINT_PREVIOUS: {
-                savePointOCF = lastSavePoint;
-                reset_the_game_when_resuming = false;
-                break;
-            }
-            case SAVEPOINT_CURRENT: {
-                savePointOCF = currentSavePoint;
-                reset_the_game_when_resuming = false;
-                break;
-            }
-            default: {
-                savePointOCF = null;
-            }
-        }
-
-        flag_state = savePointOCF.getFlag();
-        remaining = savePointOCF.getTime();
-        time_red = savePointOCF.getTime_red();
-        time_blue = savePointOCF.getTime_blue();
-        // spielt keine Rolle ob es diese Teams gibt. Sind dann sowieso 0l;
-        time_green = savePointOCF.getTime_green();
-        time_yellow = savePointOCF.getTime_yellow();
-        setDisplay();
     }
 
     @Override
-    void button_k3_pressed() {
-        getLogger().debug("button_gametime_pressed");
+    void button_k2_pressed() {
+        super.button_k2_pressed();
 
         if (game_state == TIMED_GAME_PREPARE) {
             preset_gametime_position++;
@@ -221,60 +191,86 @@ public class OCF extends TimedBaseGame {
             configs.put(Configs.OCF_GAMETIME, preset_gametime_position);
             reset_timers();
         } else {
-            getLogger().debug("NOT IN PREGAME: IGNORED");
+            getLogger().debug("NOT IN PREGAME: IGNORING");
         }
     }
 
     @Override
-    void pause() {
-        super.pause();
-        SELECTED_SAVEPOINT = SAVEPOINT_NONE;
-        game_state = TIMED_GAME_PAUSED;
-        currentSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
-        setDisplay();
-    }
+    void button_k3_pressed() { // undo / reset
+        super.button_k3_pressed();
 
-    @Override
-    void resume() {
-        super.resume();
-        currentSavePoint = null;
-        if (reset_the_game_when_resuming) {
-            reset_timers();
+        if (game_state == TIMED_GAME_PREPARE) return;
+
+        // Ein Druck auf die Undo Taste setzt das Spiel sofort in den Pause Modus.
+        if (game_state == TIMED_GAME_RUNNING) {
+            pause();
         } else {
-            game_state = TIMED_GAME_RUNNING;
-            if (SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS) {
-                SELECTED_SAVEPOINT = SAVEPOINT_NONE;
-                lastSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
+            // UNDO Funktion ?
+            SELECTED_SAVEPOINT++;
+            if (SELECTED_SAVEPOINT > 3) SELECTED_SAVEPOINT = 1;
+            // kein vorheriger vorhanden. Daher geht das nicht. Dann nur RESET oder CURRENT.
+            if (lastSavePoint == null && SELECTED_SAVEPOINT == 1) SELECTED_SAVEPOINT++;
+            SavePointOCF savePointOCF;
+
+            switch (SELECTED_SAVEPOINT) {
+                case SAVEPOINT_RESET: {
+                    savePointOCF = resetSavePoint;
+                    reset_the_game_when_resuming = true;
+                    break;
+                }
+                case SAVEPOINT_PREVIOUS: {
+                    savePointOCF = lastSavePoint;
+                    reset_the_game_when_resuming = false;
+                    break;
+                }
+                case SAVEPOINT_CURRENT: {
+                    savePointOCF = currentSavePoint;
+                    reset_the_game_when_resuming = false;
+                    break;
+                }
+                default: {
+                    savePointOCF = null;
+                }
             }
-//                lcd_display.deletePage(3); // brauchen wir dann erstmal nicht mehr
+
+            flag_state = savePointOCF.getFlag();
+            remaining = savePointOCF.getTime();
+            time_red = savePointOCF.getTime_red();
+            time_blue = savePointOCF.getTime_blue();
+            // spielt keine Rolle ob es diese Teams gibt. Sind dann sowieso 0l;
+            time_green = savePointOCF.getTime_green();
+            time_yellow = savePointOCF.getTime_yellow();
             setDisplay();
         }
     }
 
+
     @Override
-    void game_over() {
-        getLogger().info("GAME OVER");
-        setDisplay();
+    void pause() {
+        SELECTED_SAVEPOINT = SAVEPOINT_NONE;
+        currentSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
+        super.pause();
     }
 
     @Override
-    void prepare() {
-        last_cycle_started_at = System.currentTimeMillis();
-        game_state = TIMED_GAME_RUNNING;
+    void start() {
+        super.start();
         set_siren_scheme(Configs.OUT_SIREN_START_STOP, Configs.OCF_START_STOP_SIGNAL);
-        setDisplay();
     }
 
     @Override
-    void button_k1_pressed() {
-        if (game_state == TIMED_GAME_RUNNING) {
-            pause();
-        } else if (game_state == TIMED_GAME_PAUSED) {
-            resume();
-        } else if (game_state == TIMED_GAME_OVER) {
+    void resume() {
+        currentSavePoint = null;
+        if (reset_the_game_when_resuming) {
             reset_timers();
-        } else if (game_state == TIMED_GAME_PREPARE) {
             prepare();
+        } else {
+            if (SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS) {
+                SELECTED_SAVEPOINT = SAVEPOINT_NONE;
+                lastSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
+            }
+            super.resume();
+//                lcd_display.deletePage(3); // brauchen wir dann erstmal nicht mehr
         }
     }
 
@@ -327,7 +323,6 @@ public class OCF extends TimedBaseGame {
             }
 
             if (game_state == TIMED_GAME_PREPARE) {
-                getLogger().debug("PREGAME");
                 getLogger().debug("num_teams " + num_teams);
 
                 if (num_teams < 3) display_green.clear();
@@ -561,7 +556,7 @@ public class OCF extends TimedBaseGame {
         HashMap<String, Integer> rank = new HashMap<>();
 
         // to seconds of day
-        
+
         rank.put("red", dateTime_red.getSecond());
         rank.put("blue", dateTime_blue.getSecond());
         if (num_teams >= 3) rank.put("green", dateTime_green.getSecond());
@@ -586,7 +581,6 @@ public class OCF extends TimedBaseGame {
             // eine neue Minute angebrochen ist.
             boolean changeColorBlinking = thisMinuteOfDay != lastMinuteToChangeTimeblinking;
             if (changeColorBlinking) lastMinuteToChangeTimeblinking = thisMinuteOfDay;
-
 
             // Hier muss nach Ablauf jeder vollen Minute, das Blinkschema neu angepasst werden.
             if (flag_state.equals(FLAG_NEUTRAL)) {
@@ -644,7 +638,6 @@ public class OCF extends TimedBaseGame {
     @Override
     void reset_timers() {
         super.reset_timers();
-        flag_state = FLAG_NEUTRAL;
         lcd_time_format = "H:mm:ss";
         if (preset_times[preset_gametime_position] <= 60) {
             lcd_time_format = "mm:ss";
@@ -654,17 +647,16 @@ public class OCF extends TimedBaseGame {
         reset_the_game_when_resuming = false;
         currentSavePoint = null;
         lastSavePoint = null;
-        game_state = TIMED_GAME_PREPARE;
-
-        pausing_since = 0l;
+        SELECTED_SAVEPOINT = SAVEPOINT_NONE;
 
         time_red = 0l;
         time_blue = 0l;
         time_green = 0l;
         time_yellow = 0l;
 
-        SELECTED_SAVEPOINT = SAVEPOINT_NONE;
-        setDisplay();
+
+//        game_state = TIMED_GAME_PREPARE;
+//        setDisplay();
     }
 
 //    private void writeLCDFor20x04() {

@@ -1,10 +1,6 @@
-package de.flashheart.ocfflag.hardware.pinhandler;
+package de.flashheart.ocfflag.hardware;
 
-import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.abstraction.MyPin;
-import de.flashheart.ocfflag.hardware.abstraction.MyRGBLed;
 import de.flashheart.ocfflag.misc.HasLogger;
-import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;

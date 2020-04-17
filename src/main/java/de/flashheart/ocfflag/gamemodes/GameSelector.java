@@ -4,7 +4,7 @@ import de.flashheart.ocfflag.Main;
 
 import java.io.IOException;
 
-public class GameSelector extends BaseGame {
+public class GameSelector extends Game {
     String[] gamemodes = new String[]{"OCF2", "OCF3", "OCF4", "SPWN"};
     final int OCF2 = 0;
     final int OCF3 = 1;
@@ -12,8 +12,8 @@ public class GameSelector extends BaseGame {
     final int SPWN = 3;
     int game_index;
 
-    public GameSelector() {
-        super();
+    @Override
+    void initBaseSystem() {
         game_index = 0;
     }
 
@@ -29,29 +29,29 @@ public class GameSelector extends BaseGame {
 
     @Override
     void button_k1_pressed() {
-        BaseGame baseGame = null;
+        Game game = null;
         switch (game_index){
             case OCF2 : {
-                baseGame = new OCF(2);
+                game = new OCF(2);
                 break;
             }
             case OCF3 : {
-                baseGame = new OCF(3);
+                game = new OCF(3);
                 break;
             }
             case OCF4 : {
-                baseGame = new OCF(4);
+                game = new OCF(4);
                 break;
             }
             case SPWN : {
-                baseGame = new SpawnCounter();
+                game = new SpawnCounter();
                 break;
             }
             default:{
 
             }
         }
-        Main.setGame(baseGame);
+        Main.setGame(game);
     }
 
     @Override

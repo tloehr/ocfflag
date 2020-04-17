@@ -2,17 +2,15 @@ package de.flashheart.ocfflag.gamemodes;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.MySystem;
-import de.flashheart.ocfflag.hardware.abstraction.Display7Segments4Digits;
-import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
-import de.flashheart.ocfflag.hardware.sevensegdisplay.LEDBackPack;
+import de.flashheart.ocfflag.hardware.Display7Segments4Digits;
+import de.flashheart.ocfflag.hardware.MyAbstractButton;
+import de.flashheart.ocfflag.hardware.LEDBackPack;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
 
 import java.io.IOException;
 
-public abstract class BaseGame implements HasLogger {
+public abstract class Game implements HasLogger {
     public static final String RESUMED = "RESUMED";
     public static final String FUSED = "FUSED";
     public static final String DEFUSED = "DEFUSED";
@@ -68,7 +66,11 @@ public abstract class BaseGame implements HasLogger {
     String flag_state;
     int game_state;
 
-    BaseGame(int num_teams) {
+    Game(){
+        this(2);
+    }
+
+    Game(int num_teams) {
         this.num_teams = num_teams;
         configs = (Configs) Main.getFromContext("configs");
         mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
@@ -177,24 +179,24 @@ public abstract class BaseGame implements HasLogger {
     }
 
     void change_game() {
-        getLogger().debug("changing game");
+        getLogger().debug("change_game()");
         stop_gamemode();
         Main.setGame(new GameSelector());
     }
 
-    void shutdown_system(){
-        Main.prepareShutdown();
-        try {
-            String line = Main.getFromConfigs(Configs.SHUTDOWN_COMMAND_LINE);
-            CommandLine commandLine = CommandLine.parse(line);
-            DefaultExecutor executor = new DefaultExecutor();
-            Main.prepareShutdown();
-            executor.setExitValue(1);
-            executor.execute(commandLine);
-        } catch (IOException exc) {
-            getLogger().error(exc);
-        }
-    }
+//    void shutdown_system(){
+//        Main.prepareShutdown();
+//        try {
+//            String line = Main.getFromConfigs(Configs.SHUTDOWN_COMMAND_LINE);
+//            CommandLine commandLine = CommandLine.parse(line);
+//            DefaultExecutor executor = new DefaultExecutor();
+//            Main.prepareShutdown();
+//            executor.setExitValue(1);
+//            executor.execute(commandLine);
+//        } catch (IOException exc) {
+//            getLogger().error(exc);
+//        }
+//    }
 
     void button_quit_pressed() {
         Main.prepareShutdown();

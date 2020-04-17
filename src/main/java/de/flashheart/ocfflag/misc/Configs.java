@@ -1,7 +1,6 @@
 package de.flashheart.ocfflag.misc;
 
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.abstraction.MyAbstractButton;
 import org.apache.log4j.Level;
 
 import java.awt.*;

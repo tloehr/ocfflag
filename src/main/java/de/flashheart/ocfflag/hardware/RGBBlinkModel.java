@@ -1,104 +1,86 @@
-package de.flashheart.ocfflag.hardware.pinhandler;
+package de.flashheart.ocfflag.hardware;
 
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.MySystem;
-import de.flashheart.ocfflag.hardware.abstraction.MyPin;
 import de.flashheart.ocfflag.misc.Configs;
+import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 
 /**
  * Created by tloehr on 14.07.16.
  */
-public class PinBlinkModel implements GenericBlinkModel {
-    public static final String SCHEME_TEST_REGEX = "^(\\d+|∞):(((on|off){1},\\d+)+(;((on|off){1},\\d+))*)$";
+public class RGBBlinkModel implements GenericBlinkModel {
 
-
-    MyPin pin;
-    private ArrayList<PinScheduleEvent> onOffScheme;
+    private final MyRGBLed myRGBLed;
+    private final ArrayList<RGBScheduleElement> blinkAndColorSchemes;
     int repeat;
 
+
+    int positionInScheme;
     private final Logger logger = Logger.getLogger(getClass());
     String infinity = "\u221E";
 
-    public PinBlinkModel(MyPin pin) {
 
-        this.onOffScheme = new ArrayList<>();
-        this.pin = pin;
+    public RGBBlinkModel(MyRGBLed myRGBLed) {
+        this.myRGBLed = myRGBLed;
+
+        this.blinkAndColorSchemes = new ArrayList<>();
+        this.positionInScheme = -1;
         this.repeat = Integer.MAX_VALUE;
     }
 
     @Override
     public String call() throws Exception {
-        logger.debug(new DateTime().toString() + " working on:" + pin.getName() + " [" + pin.getText() + "]  onOffScheme.size()=" + onOffScheme.size());
 
         if (repeat == 0) {
-            pin.setState(false);
+            myRGBLed.off();
             return null;
         }
 
         for (int turn = 0; turn < repeat; turn++) {
-
-            for (PinScheduleEvent event : onOffScheme) {
+            for (RGBScheduleElement scheme : blinkAndColorSchemes) {
 
                 if (Thread.currentThread().isInterrupted()) {
-                    pin.setState(false);
+                    myRGBLed.off();
                     return null;
                 }
 
-                pin.setState(event.isOn());
-
+                myRGBLed.setRGB(scheme.getRed(), scheme.getGreen(), scheme.getBlue());
 
                 try {
-                    Thread.sleep(event.getDuration());
+                    Thread.sleep(scheme.getDuration());
                 } catch (InterruptedException exc) {
-                    pin.setState(false);
+                    myRGBLed.off();
                     return null;
                 }
-
             }
         }
 
-        setText("");
+        myRGBLed.setToolTipText("");
         return null;
     }
 
-    @Override
-    public void setText(String text) {
-        pin.setText(text);
-    }
-
-
     /**
-     * accepts a blinking scheme as a String formed like this: "repeat:[on|off],timeINms;*".
+     * accepts a blinking scheme as a String formed like this: "repeat:r,g,b,duration;r,g,b,duration".
      * if repeat is 0 then a previous blinking process is stopped and the pin is set to OFF.
      * There is no "BLINK FOREVER" really. But You could always put Integer.MAX_VALUE as REPEAT instead into the String.
      *
      * @param scheme
      */
     @Override
-    public void setScheme(String scheme) {
-
-
-
-//        if (!scheme.matches(SCHEME_TEST_REGEX)) return;
-
-        
-
-        onOffScheme.clear();
-
-        //logger.debug("new scheme for pin: " + pin.getName() + " : " + scheme);
-
+    public void setScheme(String scheme) throws NumberFormatException {
+        logger.debug(myRGBLed.getName() + ": " + scheme);
+        blinkAndColorSchemes.clear();
 
         // zuerst wiederholungen vom muster trennen
         String[] splitFirstTurn = scheme.trim().split(":");
         String repeatString = splitFirstTurn[0];
         repeat = repeatString.equals("∞") ? Integer.MAX_VALUE : Integer.parseInt(repeatString);
-
 
         String textScheme = ""; // was als Text ausgeben wird.
         textScheme = (this.repeat == Integer.MAX_VALUE ? infinity : Integer.toString(this.repeat));
@@ -108,72 +90,82 @@ public class PinBlinkModel implements GenericBlinkModel {
             String[] splitSecondTurn = splitFirstTurn[1].trim().split(";");
 
             for (String pattern : splitSecondTurn) {
+                if (pattern == null) break; // für die leeren ";" am ende
+
                 String[] splitThirdTurn = pattern.trim().split(",");
-                onOffScheme.add(new PinScheduleEvent(splitThirdTurn[0], splitThirdTurn[1]));
+                blinkAndColorSchemes.add(new RGBScheduleElement(splitThirdTurn[0], splitThirdTurn[1], splitThirdTurn[2], splitThirdTurn[3]));
             }
         }
 
-        pin.setToolTipText(textScheme);
+        myRGBLed.setToolTipText(textScheme);
     }
 
+    @Override
+    public void setText(String text) {
+        myRGBLed.setToolTipText(text);
+    }
 
     /**
      * Erstellt ein Blinkkschema für die Flagge, mit der sich die restliche Spielzeit ablesen lässt.
      *
+     * @param color
      * @param time
      * @return
      */
-    public static String getGametimeBlinkingScheme(long time) {
+    public static String getGametimeBlinkingScheme(Color color, long time) {
         String scheme = PinHandler.FOREVER + ":";
         Logger logger = Logger.getLogger(RGBBlinkModel.class);
         Configs configs = (Configs) Main.getFromContext("configs");
-
         if (configs.is(Configs.OCF_TIME_ANNOUNCER)) {
             DateTime remainingTime = new DateTime(time, DateTimeZone.UTC);
 
             int minutes = remainingTime.getMinuteOfHour();
             int seconds = remainingTime.getSecondOfMinute();
-            int hours = remainingTime.getHourOfDay();
 
+            int hours = remainingTime.getHourOfDay();
             int tenminutes = minutes / 10;
             int remminutes = minutes - tenminutes * 10; // restliche Minuten ausrechnen
 
             logger.debug("time announcer: " + hours + ":" + minutes + ":" + seconds);
 
+
             if (hours > 0 || minutes > 0) {
 
                 if (hours > 0) {
                     for (int h = 0; h < hours; h++) {
-                        scheme += new PinScheduleEvent("on", 1000l) + ";" + new PinScheduleEvent("off", 250l) + ";";
+                        scheme += new RGBScheduleElement(color, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 250l) + ";";
                     }
                 }
 
                 if (tenminutes > 0) {
                     for (int tm = 0; tm < tenminutes; tm++) {
-                        scheme += new PinScheduleEvent("on", 625l) + ";" + new PinScheduleEvent("off", 250l) + ";";
+                        scheme += new RGBScheduleElement(color, 625l) + ";" + new RGBScheduleElement(Color.BLACK, 250l) + ";";
                     }
                 }
 
                 if (remminutes > 0) {
                     for (int rm = 0; rm < remminutes; rm++) {
-                        scheme += new PinScheduleEvent("on", 250l) + ";" + new PinScheduleEvent("off", 250l) + ";";
+                        scheme += new RGBScheduleElement(color, 250l) + ";" + new RGBScheduleElement(Color.BLACK, 250l) + ";";
                     }
                 }
 
-                scheme += new PinScheduleEvent("off", 2500l) + ";";
+                scheme += new RGBScheduleElement(Color.BLACK, 2500l);
 
             } else {
-                scheme += new PinScheduleEvent("on", 100l) + ";" + new PinScheduleEvent("off", 250l) + ";";
+                scheme += new RGBScheduleElement(color, 100l) + ";" + new RGBScheduleElement(Color.BLACK, 100l) + ";";
+
             }
         } else {
             logger.debug("no time announcer");
-            scheme += new PinScheduleEvent("on", 1000l) + ";" + new PinScheduleEvent("off", 1000l) + ";";
+            scheme += new RGBScheduleElement(color, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l) + ";";
         }
         logger.debug(scheme);
         return scheme;
     }
 
-
+    public static String getGametimeBlinkingScheme(String color, long time) {
+        return getGametimeBlinkingScheme(Tools.getColor(Main.getFromConfigs(color)), time);
+    }
 
 
 }

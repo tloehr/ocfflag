@@ -1,7 +1,5 @@
-package de.flashheart.ocfflag.hardware.abstraction;
+package de.flashheart.ocfflag.hardware;
 
-import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.sevensegdisplay.SevenSegment;
 import de.flashheart.ocfflag.misc.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.lang3.StringUtils;

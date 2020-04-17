@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.hardware.abstraction;
+package de.flashheart.ocfflag.hardware;
 
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
