@@ -1,11 +1,7 @@
 package de.flashheart.ocfflag.gamemodes;
 
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.PinBlinkModel;
-import de.flashheart.ocfflag.hardware.PinHandler;
-import de.flashheart.ocfflag.hardware.RGBBlinkModel;
-import de.flashheart.ocfflag.hardware.RGBScheduleElement;
-import de.flashheart.ocfflag.hardware.LEDBackPack;
+import de.flashheart.ocfflag.hardware.*;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
 
@@ -81,93 +77,36 @@ public class OCF extends TimedGame {
     }
 
     @Override
-    void button_red_pressed() {
-        super.button_red_pressed();
-        if (game_state == TIMED_GAME_RUNNING) {
-            if (!flag_state.equals(RED_ACTIVATED)) {
-
-                lastSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
-                flag_state = RED_ACTIVATED;
-
-                mySystem.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
-
-                setDisplay();
-            } else {
-                getLogger().debug("RED ALREADY: IGNORED");
-            }
-
-        } else {
-            getLogger().debug("NOT RUNNING: IGNORED");
-        }
-    }
-
-    @Override
-    void button_blue_pressed() {
-        super.button_blue_pressed();
-        if (game_state == TIMED_GAME_RUNNING) {
-
-            if (!flag_state.equals(BLUE_ACTIVATED)) {
-
-                lastSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
-                flag_state = BLUE_ACTIVATED;
-                set_siren_scheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Configs.OCF_COLORCHANGE_SIGNAL);
-
-                setDisplay();
-            } else {
-                getLogger().debug("BLUE ALREADY: IGNORED");
-            }
-        } else {
-            getLogger().debug("NOT RUNNING: IGNORED");
-        }
-    }
-
-    @Override
-    void button_green_pressed() {
-        super.button_green_pressed();
-        if (num_teams < 3) {
+    void button_teamcolor_pressed(String FLAGSTATE) {
+        if (FLAGSTATE.equals(GREEN_ACTIVATED) && num_teams < 3) {
             getLogger().debug("NO GREEN TEAM: ignoring");
             return;
         }
-        if (game_state == TIMED_GAME_RUNNING) {
-            if (!flag_state.equals(GREEN_ACTIVATED)) {
-
-                lastSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
-                flag_state = GREEN_ACTIVATED;
-                mySystem.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
-
-                setDisplay();
-            } else {
-                getLogger().debug("GREEN ALREADY: IGNORED");
-            }
-
-        } else {
-            getLogger().debug("NOT RUNNING: IGNORED");
-        }
-    }
-
-    @Override
-    void button_yellow_pressed() {
-        super.button_yellow_pressed();
-        if (num_teams < 4) {
+        if (FLAGSTATE.equals(YELLOW_ACTIVATED) && num_teams < 4) {
             getLogger().debug("NO YELLOW TEAM: ignoring");
             return;
         }
         if (game_state == TIMED_GAME_RUNNING) {
-            if (!flag_state.equals(YELLOW_ACTIVATED)) {
+            if (!flag_state.equals(FLAGSTATE)) {
 
                 lastSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
-                flag_state = YELLOW_ACTIVATED;
+                flag_state = FLAGSTATE;
+
                 mySystem.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
 
                 setDisplay();
             } else {
-                getLogger().debug("YELLOW ALREADY: IGNORED");
+                getLogger().debug(String.format("FLAGSTATE %s ALREADY SELECTED: NEW EVENT IGNORED", FLAGSTATE));
             }
+
         } else {
             getLogger().debug("NOT RUNNING: IGNORED");
         }
     }
 
+    /**
+     * Auswahltaste zum Starten oder Stoppen des Spiels. Bzw. zurück auf Anfang, nach einem GAME OVER
+     */
     @Override
     void button_k1_pressed() {
         if (game_state == TIMED_GAME_RUNNING) {
@@ -181,6 +120,9 @@ public class OCF extends TimedGame {
         }
     }
 
+    /**
+     * Auswahl der Spielzeit. Aber nur im PREPARE Zustand
+     */
     @Override
     void button_k2_pressed() {
         super.button_k2_pressed();
@@ -189,12 +131,16 @@ public class OCF extends TimedGame {
             preset_gametime_position++;
             if (preset_gametime_position > preset_times.length - 1) preset_gametime_position = 0;
             configs.put(Configs.OCF_GAMETIME, preset_gametime_position);
-            reset_timers();
+            setMatchlength(preset_times[preset_gametime_position] * 60000); // die preset_times sind in Minuten. Daher * 60000, weil wir millis brauchen
+
         } else {
             getLogger().debug("NOT IN PREGAME: IGNORING");
         }
     }
 
+    /**
+     * Auswahl zwischen UNDO und RESET. Nur im Pause Zustand. Im Laufenden Spiel wird der Pause-Zustand vorher noch hergestellt.
+     */
     @Override
     void button_k3_pressed() { // undo / reset
         super.button_k3_pressed();
@@ -204,44 +150,45 @@ public class OCF extends TimedGame {
         // Ein Druck auf die Undo Taste setzt das Spiel sofort in den Pause Modus.
         if (game_state == TIMED_GAME_RUNNING) {
             pause();
-        } else {
-            // UNDO Funktion ?
-            SELECTED_SAVEPOINT++;
-            if (SELECTED_SAVEPOINT > 3) SELECTED_SAVEPOINT = 1;
-            // kein vorheriger vorhanden. Daher geht das nicht. Dann nur RESET oder CURRENT.
-            if (lastSavePoint == null && SELECTED_SAVEPOINT == 1) SELECTED_SAVEPOINT++;
-            SavePointOCF savePointOCF;
-
-            switch (SELECTED_SAVEPOINT) {
-                case SAVEPOINT_RESET: {
-                    savePointOCF = resetSavePoint;
-                    reset_the_game_when_resuming = true;
-                    break;
-                }
-                case SAVEPOINT_PREVIOUS: {
-                    savePointOCF = lastSavePoint;
-                    reset_the_game_when_resuming = false;
-                    break;
-                }
-                case SAVEPOINT_CURRENT: {
-                    savePointOCF = currentSavePoint;
-                    reset_the_game_when_resuming = false;
-                    break;
-                }
-                default: {
-                    savePointOCF = null;
-                }
-            }
-
-            flag_state = savePointOCF.getFlag();
-            remaining = savePointOCF.getTime();
-            time_red = savePointOCF.getTime_red();
-            time_blue = savePointOCF.getTime_blue();
-            // spielt keine Rolle ob es diese Teams gibt. Sind dann sowieso 0l;
-            time_green = savePointOCF.getTime_green();
-            time_yellow = savePointOCF.getTime_yellow();
-            setDisplay();
         }
+
+        // UNDO Funktion ?
+        SELECTED_SAVEPOINT++;
+        if (SELECTED_SAVEPOINT > 3) SELECTED_SAVEPOINT = 1;
+        // kein vorheriger vorhanden. Daher geht das nicht. Dann nur RESET oder CURRENT.
+        if (lastSavePoint == null && SELECTED_SAVEPOINT == 1) SELECTED_SAVEPOINT++;
+        SavePointOCF savePointOCF;
+
+        switch (SELECTED_SAVEPOINT) {
+            case SAVEPOINT_RESET: {
+                savePointOCF = resetSavePoint;
+                reset_the_game_when_resuming = true;
+                break;
+            }
+            case SAVEPOINT_PREVIOUS: {
+                savePointOCF = lastSavePoint;
+                reset_the_game_when_resuming = false;
+                break;
+            }
+            case SAVEPOINT_CURRENT: {
+                savePointOCF = currentSavePoint;
+                reset_the_game_when_resuming = false;
+                break;
+            }
+            default: {
+                savePointOCF = null;
+            }
+        }
+
+        flag_state = savePointOCF.getFlag();
+        remaining = savePointOCF.getTime();
+        time_red = savePointOCF.getTime_red();
+        time_blue = savePointOCF.getTime_blue();
+        // spielt keine Rolle ob es diese Teams gibt. Sind dann sowieso 0l;
+        time_green = savePointOCF.getTime_green();
+        time_yellow = savePointOCF.getTime_yellow();
+        setDisplay();
+
     }
 
 
@@ -572,6 +519,12 @@ public class OCF extends TimedGame {
         return toplist;
     }
 
+    /**
+     * Dieser Block wird vom Thread der Superklasse ausgeführt. Danach wird eine Pause von SLEEP_PER_CYCLE in ms eingelegt.
+     *
+     * @throws Exception
+     */
+    @Override
     void game_cycle() throws Exception {
         if (game_state == TIMED_GAME_RUNNING) {
 
@@ -588,37 +541,34 @@ public class OCF extends TimedGame {
                     set_blinking_flag_rgb("NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
                     set_blinking_flag_white(PinBlinkModel.getGametimeBlinkingScheme(remaining));
                 }
-            }
+            } else
 
-            // Zeit zum entsprechenden Team addieren.
-            if (flag_state.equals(RED_ACTIVATED)) {
-                time_red += time_difference_since_last_cycle;
-                if (changeColorBlinking) {
-                    set_blinking_flag_rgb("RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
-                    set_blinking_flag_red(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                // Zeit zum entsprechenden Team addieren.
+                if (flag_state.equals(RED_ACTIVATED)) {
+                    time_red += time_difference_since_last_cycle;
+                    if (changeColorBlinking) {
+                        set_blinking_flag_rgb("RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
+                        set_blinking_flag_red(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                    }
+                } else if (flag_state.equals(BLUE_ACTIVATED)) {
+                    time_blue += time_difference_since_last_cycle;
+                    if (changeColorBlinking) {
+                        set_blinking_flag_rgb("BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
+                        set_blinking_flag_blue(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                    }
+                } else if (flag_state.equals(GREEN_ACTIVATED)) {
+                    time_green += time_difference_since_last_cycle;
+                    if (changeColorBlinking) {
+                        set_blinking_flag_rgb("GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
+                        set_blinking_flag_green(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                    }
+                } else if (flag_state.equals(YELLOW_ACTIVATED)) {
+                    time_yellow += time_difference_since_last_cycle;
+                    if (changeColorBlinking) {
+                        set_blinking_flag_rgb("YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_YELLOW, remaining));
+                        set_blinking_flag_yellow(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                    }
                 }
-            }
-            if (flag_state.equals(BLUE_ACTIVATED)) {
-                time_blue += time_difference_since_last_cycle;
-                if (changeColorBlinking) {
-                    set_blinking_flag_rgb("BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
-                    set_blinking_flag_blue(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                }
-            }
-            if (flag_state.equals(GREEN_ACTIVATED)) {
-                time_green += time_difference_since_last_cycle;
-                if (changeColorBlinking) {
-                    set_blinking_flag_rgb("GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
-                    set_blinking_flag_green(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                }
-            }
-            if (flag_state.equals(YELLOW_ACTIVATED)) {
-                time_yellow += time_difference_since_last_cycle;
-                if (changeColorBlinking) {
-                    set_blinking_flag_rgb("YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_YELLOW, remaining));
-                    set_blinking_flag_yellow(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                }
-            }
 
 //                    writeLCD();
             display_white.setTime(remaining);
@@ -626,7 +576,6 @@ public class OCF extends TimedGame {
             display_blue.setTime(time_blue);
             if (num_teams >= 3) display_green.setTime(time_green);
             if (num_teams >= 4) display_yellow.setTime(time_yellow);
-
 
             if (remaining == 0) {
                 game_over();
@@ -642,7 +591,6 @@ public class OCF extends TimedGame {
         if (preset_times[preset_gametime_position] <= 60) {
             lcd_time_format = "mm:ss";
         }
-        setMatchlength(preset_times[preset_gametime_position] * 60000); // die preset_times sind in Minuten. Daher * 60000, weil wir millis brauchen
 
         reset_the_game_when_resuming = false;
         currentSavePoint = null;
@@ -653,10 +601,6 @@ public class OCF extends TimedGame {
         time_blue = 0l;
         time_green = 0l;
         time_yellow = 0l;
-
-
-//        game_state = TIMED_GAME_PREPARE;
-//        setDisplay();
     }
 
 //    private void writeLCDFor20x04() {

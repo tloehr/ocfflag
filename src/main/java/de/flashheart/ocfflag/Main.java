@@ -1,6 +1,7 @@
 package de.flashheart.ocfflag;
 
 import de.flashheart.ocfflag.gamemodes.GameSelector;
+import de.flashheart.ocfflag.gamemodes.OCF;
 import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.gamemodes.Game;
@@ -30,6 +31,7 @@ public class Main {
         UIManager.setLookAndFeel(
                 UIManager.getCrossPlatformLookAndFeelClassName());
 
+        // todo: option for headless
         FrameDebug frameDebug = new FrameDebug();
         applicationContext.put(Configs.FRAME_DEBUG, frameDebug);
         // Das Fenster brauchen wir nur, wenn wir einen Raspi benutzen.
@@ -38,7 +40,7 @@ public class Main {
 
         applicationContext.put(Configs.MY_SYSTEM, new MySystem());
 
-        setGame(new GameSelector());
+        setGame(new OCF(2));
     }
 
     public static Object getFromContext(String key) {
@@ -63,7 +65,6 @@ public class Main {
      *
      * @param args
      */
-
     private static void initBaseSystem(String[] args) throws IOException {
         System.setProperty("logs", Tools.getWorkingPath());
         configs = new Configs();

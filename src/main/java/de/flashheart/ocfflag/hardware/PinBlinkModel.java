@@ -2,17 +2,19 @@ package de.flashheart.ocfflag.hardware;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Configs;
+import de.flashheart.ocfflag.misc.HasLogger;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 
 /**
  * Created by tloehr on 14.07.16.
  */
-public class PinBlinkModel implements GenericBlinkModel {
+public class PinBlinkModel implements GenericBlinkModel, HasLogger {
     public static final String SCHEME_TEST_REGEX = "^(\\d+|∞):(((on|off){1},\\d+)+(;((on|off){1},\\d+))*)$";
 
 
@@ -20,7 +22,6 @@ public class PinBlinkModel implements GenericBlinkModel {
     private ArrayList<PinScheduleEvent> onOffScheme;
     int repeat;
 
-    private final Logger logger = Logger.getLogger(getClass());
     String infinity = "\u221E";
 
     public PinBlinkModel(MyPin pin) {
@@ -32,7 +33,7 @@ public class PinBlinkModel implements GenericBlinkModel {
 
     @Override
     public String call() throws Exception {
-        logger.debug(new DateTime().toString() + " working on:" + pin.getName() + " [" + pin.getText() + "]  onOffScheme.size()=" + onOffScheme.size());
+        getLogger().debug(" working on:" + pin.getName() + " [" + pin.getText() + "]  onOffScheme.size()=" + onOffScheme.size());
 
         if (repeat == 0) {
             pin.setState(false);
@@ -82,10 +83,8 @@ public class PinBlinkModel implements GenericBlinkModel {
     public void setScheme(String scheme) {
 
 
-
 //        if (!scheme.matches(SCHEME_TEST_REGEX)) return;
 
-        
 
         onOffScheme.clear();
 
@@ -118,21 +117,22 @@ public class PinBlinkModel implements GenericBlinkModel {
     /**
      * Erstellt ein Blinkkschema für die Flagge, mit der sich die restliche Spielzeit ablesen lässt.
      *
-     * @param time
+     * @param timestamp
      * @return
      */
-    public static String getGametimeBlinkingScheme(long time) {
+    public static String getGametimeBlinkingScheme(long timestamp) {
         String scheme = PinHandler.FOREVER + ":";
         Logger logger = Logger.getLogger(RGBBlinkModel.class);
         Configs configs = (Configs) Main.getFromContext("configs");
 
         if (configs.is(Configs.OCF_TIME_ANNOUNCER)) {
-            DateTime remainingTime = new DateTime(time, DateTimeZone.UTC);
+            LocalDateTime remainingTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp),
+                    TimeZone.getDefault().toZoneId());
 
-            int minutes = remainingTime.getMinuteOfHour();
-            int seconds = remainingTime.getSecondOfMinute();
-            int hours = remainingTime.getHourOfDay();
+            int minutes = remainingTime.getMinute();
+            int seconds = remainingTime.getSecond();
 
+            int hours = remainingTime.getHour();
             int tenminutes = minutes / 10;
             int remminutes = minutes - tenminutes * 10; // restliche Minuten ausrechnen
 
@@ -170,8 +170,6 @@ public class PinBlinkModel implements GenericBlinkModel {
         logger.debug(scheme);
         return scheme;
     }
-
-
 
 
 }

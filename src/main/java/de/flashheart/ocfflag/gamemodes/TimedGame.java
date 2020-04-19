@@ -22,8 +22,10 @@ public abstract class TimedGame extends Game implements Runnable {
 
     TimedGame(int num_teams) {
         super(num_teams);
-        reset_timers();
         thread = new Thread(this);
+        thread.start();
+        reset_timers();
+
         SLEEP_PER_CYCLE = 500l;
     }
 
@@ -39,7 +41,6 @@ public abstract class TimedGame extends Game implements Runnable {
     @Override
     void start_gamemode() {
         super.start_gamemode();
-        thread.start();
     }
 
     /**
@@ -76,7 +77,7 @@ public abstract class TimedGame extends Game implements Runnable {
     /**
      * das Spiel wird beendet.
      */
-    void game_over(){
+    void game_over() {
         getLogger().info("game_over()");
         game_state = TIMED_GAME_OVER;
         setDisplay();
@@ -85,14 +86,14 @@ public abstract class TimedGame extends Game implements Runnable {
     /**
      * das Spiel beginnt
      */
-    void start(){
+    void start() {
         game_state = TIMED_GAME_RUNNING;
     }
 
     /**
      * Spiel wird in den Vorbereitungsmodus versetzt
      */
-    void prepare(){
+    void prepare() {
         game_state = TIMED_GAME_PREPARE;
         setDisplay();
     }

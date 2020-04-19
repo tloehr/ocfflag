@@ -191,6 +191,26 @@ public class MySystem implements HasLogger {
             return;
         }
 
+
+//        I2CDevice _device = null;
+//        I2CLCD _lcd = null;
+//
+//        try {
+//            I2CBus bus = I2CFactory.getInstance(I2CBus.BUS_1);
+//            _device = bus.getDevice(0x27);
+//            _lcd = new I2CLCD(_device);
+//            _lcd.init();
+//            _lcd.backlight(true);
+//            Main.addToContext("lcd", _lcd);
+//        } catch (Exception ex) {
+//            System.out.println(ex.toString());
+//        }
+//
+//        MyLCD myLCD = new MyLCD(20, 4);
+//        Main.addToContext("mylcd", myLCD);
+//        myLCD.setCenteredLine(0, 1, configs.getBuildInfo("my.projectname"));
+//        myLCD.setCenteredLine(0, 2, String.format("v%s.%s", configs.getBuildInfo("my.version"), configs.getBuildInfo("buildNumber")));
+
         SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
         SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
         SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);

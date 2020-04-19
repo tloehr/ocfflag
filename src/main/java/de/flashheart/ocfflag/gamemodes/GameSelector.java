@@ -28,6 +28,11 @@ public class GameSelector extends Game {
     }
 
     @Override
+    void button_teamcolor_pressed(String FLAGSTATE) {
+        // i dont care about these buttons here
+    }
+
+    @Override
     void button_k1_pressed() {
         Game game = null;
         switch (game_index){

@@ -20,6 +20,11 @@ public class SpawnCounter extends Game {
     }
 
     @Override
+    void initBaseSystem() {
+
+    }
+
+    @Override
     void initHardware() {
         super.initHardware();
         k1.setText("C reset/=0");
@@ -64,26 +69,7 @@ public class SpawnCounter extends Game {
     }
 
     @Override
-    void button_red_pressed() {
-        button_action_pressed();
-    }
-
-    @Override
-    void button_blue_pressed() {
-        button_action_pressed();
-    }
-
-    @Override
-    void button_green_pressed() {
-        button_action_pressed();
-    }
-
-    @Override
-    void button_yellow_pressed() {
-        button_action_pressed();
-    }
-
-    private void button_action_pressed() {
+    void button_teamcolor_pressed(String FLAGSTATE) {
         if (spawn_counter == 0) return;
         if (spawn_counter == 1) {
             spawn_counter = 0;

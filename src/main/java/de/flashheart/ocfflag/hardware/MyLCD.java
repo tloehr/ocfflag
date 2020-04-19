@@ -3,6 +3,7 @@ package de.flashheart.ocfflag.hardware;
 import de.flashheart.ocfflag.misc.HasLogger;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
@@ -10,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MyLCD implements Runnable, HasLogger {
     public static final char LCD_DEGREE_SYMBOL = 223;
     public static final char LCD_UMLAUT_A = 0xe4;
-    private final int cols, rows;
+    private final int COLS = 20, ROWS = 4;
     //    private final JPanel panel;
     private final Thread thread;
     private final int SECONDS_PER_PAGE = 3;
@@ -21,31 +22,31 @@ public class MyLCD implements Runnable, HasLogger {
     private long loopcounter = 0;
     private int prev_page = 0;
     private ReentrantLock lock;
-    private final Optional<I2CLCD> i2CLCD;
+    private Optional<JPanel> guipanel;
+    private Optional<I2CLCD> lcd;
+    ArrayList<JLabel> lines;
 //    public MyLCD(JPanel panel) {
-//        this(panel, 20, 4);
-//    }
 
-    public MyLCD(int cols, int rows) {
-        i2CLCD = Optional.ofNullable((I2CLCD) Main.getApplicationContext().get("reallcd"));
+    public MyLCD(Optional<JPanel> opt_panel, Optional<I2CLCD> opt_lcd) {
+        lines = new ArrayList<>();
+        guipanel = opt_panel;
+        lcd = opt_lcd;
+
+        guipanel.ifPresent(jPanel -> {
+            for (int r = 0; r < ROWS; r++) {
+                lines.add(new JLabel());
+                jPanel.add(lines.get(r));
+            }
+        });
+
+
+        // hier gehts weiter
         lock = new ReentrantLock();
-        this.cols = cols;
-        this.rows = rows;
+
         thread = new Thread(this);
-//        linelist = new ArrayList<>(rows);
         pages = new ArrayList<>();
         pages.add(new LCDPage()); // there is always one page.
-//        active_page = 1;
 
-//        this.panel = panel;
-//
-//        for (int r = 0; r < rows; r++) {
-//            JLabel jl = new JLabel("");
-//            linelist.add(jl);
-//            panel.add(jl);
-//        }
-//
-//        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         thread.start();
     }
 
@@ -69,6 +70,7 @@ public class MyLCD implements Runnable, HasLogger {
 
     /**
      * Fügt eine neue Seite hinzu
+     *
      * @return nummer der neuen Seite
      */
     public int addPage() {
@@ -78,12 +80,12 @@ public class MyLCD implements Runnable, HasLogger {
         } finally {
             lock.unlock();
         }
-        return pages.size()-1;
+        return pages.size() - 1;
     }
 
     public void setCenteredLine(int page, int line, String text) {
-           setLine(page, line, StringUtils.center(StringUtils.left(text, cols), cols));
-       }
+        setLine(page, line, StringUtils.center(StringUtils.left(text, COLS), COLS));
+    }
 
     /**
      * löscht die aktuelle Seite. Eine Seite bleibt immer stehen.
@@ -105,23 +107,24 @@ public class MyLCD implements Runnable, HasLogger {
     private void inc_page() {
         prev_page = active_page;
         active_page++;
-        if (active_page > pages.size()-1) active_page = 0;
+        if (active_page > pages.size() - 1) active_page = 0;
     }
 
     private void page_to_display() {
         LCDPage currentPage = pages.get(active_page);
         // Schreibt alle Zeilen der aktiven Seite.
-        for (int r = 0; r < rows; r++) {
-            String line = currentPage.getLine(r).isEmpty() ? StringUtils.repeat(" ", 16) : StringUtils.rightPad(currentPage.getLine(r), 16);
-            getLogger().debug("VISIBLE PAGE #" + (active_page) + " Line" + r + ": " + line);
-            if (i2CLCD.isPresent()) i2CLCD.get().display_string(line, r + 1);
+        for (int row = 0; row < ROWS; row++) {
+            final String line = currentPage.getLine(row).isEmpty() ? StringUtils.repeat(" ", COLS) : StringUtils.rightPad(currentPage.getLine(row), COLS);
+            getLogger().debug("VISIBLE PAGE #" + (active_page) + " Line" + row + ": " + line);
+            lines.forEach(jLabel -> {
+                jLabel.setText(line);
+            });
+            if (lcd.isPresent()) lcd.get().display_string(line, row + 1);
         }
-//        SwingUtilities.invokeLater(() -> { // Swing Tricks
-//
-////            panel.revalidate();
-////            panel.repaint();
-//        });
-        //todo real LCD setter
+        guipanel.ifPresent(jPanel -> SwingUtilities.invokeLater(() -> {
+            jPanel.revalidate();
+            jPanel.repaint();
+        }));
     }
 
     private void clearPage() {
@@ -152,14 +155,14 @@ public class MyLCD implements Runnable, HasLogger {
      * @param text
      */
     public void setLine(int page, int line, String text) {
-        if (page < 0 || page > pages.size()-1) return;
-        if (line < 1 || line > rows) return;
-        pages.get(page).lines.set(line - 1, StringUtils.left(text, cols));
+        if (page < 0 || page > pages.size() - 1) return;
+        if (line < 1 || line > ROWS) return;
+        pages.get(page).lines.set(line - 1, StringUtils.left(text, COLS));
     }
 
     public void clear(int page) {
-        if (page < 0 || page > pages.size()-1) return;
-        for (int l = 1; l <= rows; l++) {
+        if (page < 0 || page > pages.size() - 1) return;
+        for (int l = 1; l <= ROWS; l++) {
             setLine(page, l, "");
         }
     }
@@ -167,7 +170,6 @@ public class MyLCD implements Runnable, HasLogger {
 
     @Override
     public void run() {
-
         while (!thread.isInterrupted()) {
             try {
                 lock.lock();
@@ -206,8 +208,7 @@ public class MyLCD implements Runnable, HasLogger {
         private ArrayList<String> lines;
 
         public LCDPage() {
-            this.lines = new ArrayList<>(rows);
-
+            this.lines = new ArrayList<>(ROWS);
             clear();
         }
 
@@ -221,7 +222,7 @@ public class MyLCD implements Runnable, HasLogger {
 
         public void clear() {
             lines.clear();
-            for (int r = 0; r < rows; r++) {
+            for (int r = 0; r < ROWS; r++) {
                 lines.add("");
                 setLine(r, "");
             }

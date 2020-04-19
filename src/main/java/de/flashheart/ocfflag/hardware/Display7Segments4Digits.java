@@ -3,11 +3,13 @@ package de.flashheart.ocfflag.hardware;
 import de.flashheart.ocfflag.misc.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.TimeZone;
 
 /**
  * Eine Klasse zur abstrakten Ansteuerung von 7-Segment Anzeigen.
@@ -21,6 +23,8 @@ public class Display7Segments4Digits implements HasLogger {
     SevenSegment segment = null;
     private boolean colon = true;
     private long lastTimeSet = 0;
+    private final DateTimeFormatter text_time_format = DateTimeFormatter.ofPattern("mmss");
+    private final DateTimeFormatter common_time_format = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     public boolean isFourDigitsOnly() {
         return fourDigitsOnly;
@@ -82,42 +86,45 @@ public class Display7Segments4Digits implements HasLogger {
      * Setzt die Zeitanzeige.
      * Die Stunden werden als 1-4 Punkte auf dem Display dargestellt. Minuten und Sekunden stehen auf dem 4 stelligen Anzeige.
      *
-     * @param time
+     * @param timestamp
      * @throws IOException
      * @throws IllegalArgumentException
      */
-    public void setTime(long time) throws IOException, IllegalArgumentException {
-        if (time < 0 || time > 18000000l)
+    public void setTime(long timestamp) throws IOException, IllegalArgumentException {
+        if (timestamp < 0 || timestamp > 18000000l)
             throw new IllegalArgumentException("time is out of range. can't display more than 5 hours");
 
-        lastTimeSet = time;
+        lastTimeSet = timestamp;
 
-        DateTime dateTime = new DateTime(time, DateTimeZone.UTC);
-        int hours = dateTime.getHourOfDay();
 
-        String textTime = dateTime.toString("mmss");
-        String strMinutes = textTime.charAt(0) + (hours == 4 ? "." : "")
-                + textTime.charAt(1) + (hours >= 3 ? "." : "");
-        String strSeconds = textTime.charAt(2) + (hours >= 2 ? "." : "")
-                + textTime.charAt(3) + (hours >= 1 ? "." : "");
+        LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp),
+                TimeZone.getDefault().toZoneId());
 
-        String commonTimeFormat = dateTime.toString("HH:mm:ss");
+        int hours = ldt.getHour();
+
+        String text_time = ldt.format(text_time_format);
+        String strMinutes = text_time.charAt(0) + (hours == 4 ? "." : "")
+                + text_time.charAt(1) + (hours >= 3 ? "." : "");
+        String strSeconds = text_time.charAt(2) + (hours >= 2 ? "." : "")
+                + text_time.charAt(3) + (hours >= 1 ? "." : "");
+
+        String common_time = ldt.format(common_time_format);
 
         // Bildschirm Darstellung
         if (lblSegment != null) {
-            lblSegment.setToolTipText(commonTimeFormat);
-            lblSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : commonTimeFormat);
+            lblSegment.setToolTipText(common_time);
+            lblSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : common_time);
         }
 
         if (btnSegment != null) {
-            btnSegment.setToolTipText(commonTimeFormat);
-            btnSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : commonTimeFormat);
+            btnSegment.setToolTipText(common_time);
+            btnSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : common_time);
         }
 
         // Hardware 7Segment
         if (segment != null) {
-            int minutes = dateTime.getMinuteOfHour();
-            int seconds = dateTime.getSecondOfMinute();
+            int minutes = ldt.getMinute();
+            int seconds = ldt.getSecond();
             boolean[] dots = new boolean[]{hours == 4, hours >= 3, hours >= 2, hours >= 1,};
             int[] timeDigits = new int[]{minutes / 10, minutes % 10, seconds / 10, seconds % 10};
             fullDisplay(timeDigits, dots);

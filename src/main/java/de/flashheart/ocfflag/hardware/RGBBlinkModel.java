@@ -4,11 +4,12 @@ import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import java.awt.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 
 /**
@@ -109,20 +110,22 @@ public class RGBBlinkModel implements GenericBlinkModel {
      * Erstellt ein Blinkkschema für die Flagge, mit der sich die restliche Spielzeit ablesen lässt.
      *
      * @param color
-     * @param time
+     * @param timestamp
      * @return
      */
-    public static String getGametimeBlinkingScheme(Color color, long time) {
+    public static String getGametimeBlinkingScheme(Color color, long timestamp) {
         String scheme = PinHandler.FOREVER + ":";
         Logger logger = Logger.getLogger(RGBBlinkModel.class);
         Configs configs = (Configs) Main.getFromContext("configs");
         if (configs.is(Configs.OCF_TIME_ANNOUNCER)) {
-            DateTime remainingTime = new DateTime(time, DateTimeZone.UTC);
+            LocalDateTime remainingTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp),
+                    TimeZone.getDefault().toZoneId());
 
-            int minutes = remainingTime.getMinuteOfHour();
-            int seconds = remainingTime.getSecondOfMinute();
 
-            int hours = remainingTime.getHourOfDay();
+            int minutes = remainingTime.getMinute();
+            int seconds = remainingTime.getSecond();
+
+            int hours = remainingTime.getHour();
             int tenminutes = minutes / 10;
             int remminutes = minutes - tenminutes * 10; // restliche Minuten ausrechnen
 

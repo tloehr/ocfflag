@@ -1,8 +1,6 @@
 package de.flashheart.ocfflag.misc;
 
 import de.flashheart.ocfflag.Main;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,17 +29,9 @@ public class Tools {
         }
     }
 
-    public static String formatLongTime(long time, String pattern) {
-        return time < 0l ? "--" : new DateTime(time, DateTimeZone.UTC).toString(pattern);
-    }
 
     public static boolean isBooleanFromContext(String key){
         return  ((Boolean) Main.getFromContext(key));
-    }
-
-
-    public static String formatLongTime(long time) {
-        return formatLongTime(time, "mm:ss,SSS");
     }
 
 

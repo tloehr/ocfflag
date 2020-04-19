@@ -1,10 +1,10 @@
 package de.flashheart.ocfflag.gamemodes;
 
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.hardware.Display7Segments4Digits;
-import de.flashheart.ocfflag.hardware.MyAbstractButton;
 import de.flashheart.ocfflag.hardware.LEDBackPack;
+import de.flashheart.ocfflag.hardware.MyAbstractButton;
+import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;
 
@@ -57,7 +57,7 @@ public abstract class Game implements HasLogger {
     MyAbstractButton k4;
 
     // So wie es auf der Platine steht. K1..K4
-    String[] K_LABEL = new String[]{"dummy_for_0", "stdby act", "num teams", "game time", "reset"};
+    String[] K_LABEL = new String[]{"dummy_for_index_0_never_used", "stdby act", "num teams", "game time", "reset"};
 
     Configs configs;
     MySystem mySystem;
@@ -66,7 +66,7 @@ public abstract class Game implements HasLogger {
     String flag_state;
     int game_state;
 
-    Game(){
+    Game() {
         this(2);
     }
 
@@ -74,12 +74,11 @@ public abstract class Game implements HasLogger {
         this.num_teams = num_teams;
         configs = (Configs) Main.getFromContext("configs");
         mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
-        initBaseSystem();
         initHardware();
+        initBaseSystem();
         initGame();
         start_gamemode();
     }
-
 
 
     abstract void initBaseSystem();
@@ -102,6 +101,7 @@ public abstract class Game implements HasLogger {
     }
 
     void initHardware() {
+
         display_red = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_RED_I2C);
         display_blue = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_BLUE_I2C);
         display_green = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_GREEN_I2C);
@@ -205,18 +205,24 @@ public abstract class Game implements HasLogger {
 
     void button_red_pressed() {
         getLogger().debug("button_red_pressed");
+        button_teamcolor_pressed(RED_ACTIVATED);
     }
+
+    abstract void button_teamcolor_pressed(String FLAGSTATE);
 
     void button_blue_pressed() {
         getLogger().debug("button_blue_pressed");
+        button_teamcolor_pressed(BLUE_ACTIVATED);
     }
 
     void button_green_pressed() {
         getLogger().debug("button_green_pressed");
+        button_teamcolor_pressed(GREEN_ACTIVATED);
     }
 
     void button_yellow_pressed() {
         getLogger().debug("button_yellow_pressed");
+        button_teamcolor_pressed(YELLOW_ACTIVATED);
     }
 
     void button_k4_pressed() {
@@ -350,7 +356,6 @@ public abstract class Game implements HasLogger {
         mySystem.getPinHandler().off(Configs.OUT_LED_GREEN);
         mySystem.getPinHandler().off(Configs.OUT_LED_WHITE);
     }
-
 
 
     void set_siren_scheme(String siren_key, String siren_scheme) {
