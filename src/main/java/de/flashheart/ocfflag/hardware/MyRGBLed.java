@@ -9,7 +9,6 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MyRGBLed {
-    private final Logger logger = Logger.getLogger(getClass());
     private final JLabel lbl;
     private final Pin pinRed;
     private final Pin pinGreen;

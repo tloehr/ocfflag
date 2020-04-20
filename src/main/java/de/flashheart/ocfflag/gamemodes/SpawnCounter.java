@@ -20,7 +20,7 @@ public class SpawnCounter extends Game {
     }
 
     @Override
-    void initBaseSystem() {
+    void initSoftware() {
 
     }
 
@@ -38,7 +38,6 @@ public class SpawnCounter extends Game {
     
     @Override
     void initGame() {
-        super.initGame();
         button_quit.setActionListener(e -> {
             getLogger().debug("GUI_button_quit");
             button_quit_pressed();

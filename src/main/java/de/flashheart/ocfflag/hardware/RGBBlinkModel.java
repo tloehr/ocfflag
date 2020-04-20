@@ -2,8 +2,8 @@ package de.flashheart.ocfflag.hardware;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Configs;
+import de.flashheart.ocfflag.misc.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
-import org.apache.log4j.Logger;
 
 import java.awt.*;
 import java.time.Instant;
@@ -15,7 +15,7 @@ import java.util.TimeZone;
 /**
  * Created by tloehr on 14.07.16.
  */
-public class RGBBlinkModel implements GenericBlinkModel {
+public class RGBBlinkModel implements GenericBlinkModel, HasLogger {
 
     private final MyRGBLed myRGBLed;
     private final ArrayList<RGBScheduleElement> blinkAndColorSchemes;
@@ -23,7 +23,6 @@ public class RGBBlinkModel implements GenericBlinkModel {
 
 
     int positionInScheme;
-    private final Logger logger = Logger.getLogger(getClass());
     String infinity = "\u221E";
 
 
@@ -75,7 +74,7 @@ public class RGBBlinkModel implements GenericBlinkModel {
      */
     @Override
     public void setScheme(String scheme) throws NumberFormatException {
-        logger.debug(myRGBLed.getName() + ": " + scheme);
+        getLogger().debug(myRGBLed.getName() + ": " + scheme);
         blinkAndColorSchemes.clear();
 
         // zuerst wiederholungen vom muster trennen
@@ -115,7 +114,6 @@ public class RGBBlinkModel implements GenericBlinkModel {
      */
     public static String getGametimeBlinkingScheme(Color color, long timestamp) {
         String scheme = PinHandler.FOREVER + ":";
-        Logger logger = Logger.getLogger(RGBBlinkModel.class);
         Configs configs = (Configs) Main.getFromContext("configs");
         if (configs.is(Configs.OCF_TIME_ANNOUNCER)) {
             LocalDateTime remainingTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp),
@@ -129,7 +127,7 @@ public class RGBBlinkModel implements GenericBlinkModel {
             int tenminutes = minutes / 10;
             int remminutes = minutes - tenminutes * 10; // restliche Minuten ausrechnen
 
-            logger.debug("time announcer: " + hours + ":" + minutes + ":" + seconds);
+//            getLogger().debug("time announcer: " + hours + ":" + minutes + ":" + seconds);
 
 
             if (hours > 0 || minutes > 0) {
@@ -159,10 +157,10 @@ public class RGBBlinkModel implements GenericBlinkModel {
 
             }
         } else {
-            logger.debug("no time announcer");
+
             scheme += new RGBScheduleElement(color, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l) + ";";
         }
-        logger.debug(scheme);
+
         return scheme;
     }
 

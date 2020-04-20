@@ -33,7 +33,7 @@ public class PinBlinkModel implements GenericBlinkModel, HasLogger {
 
     @Override
     public String call() throws Exception {
-        getLogger().debug(" working on:" + pin.getName() + " [" + pin.getText() + "]  onOffScheme.size()=" + onOffScheme.size());
+//        getLogger().debug(" working on:" + pin.getName() + " [" + pin.getText() + "]  onOffScheme.size()=" + onOffScheme.size());
 
         if (repeat == 0) {
             pin.setState(false);
@@ -122,7 +122,6 @@ public class PinBlinkModel implements GenericBlinkModel, HasLogger {
      */
     public static String getGametimeBlinkingScheme(long timestamp) {
         String scheme = PinHandler.FOREVER + ":";
-        Logger logger = Logger.getLogger(RGBBlinkModel.class);
         Configs configs = (Configs) Main.getFromContext("configs");
 
         if (configs.is(Configs.OCF_TIME_ANNOUNCER)) {
@@ -136,7 +135,7 @@ public class PinBlinkModel implements GenericBlinkModel, HasLogger {
             int tenminutes = minutes / 10;
             int remminutes = minutes - tenminutes * 10; // restliche Minuten ausrechnen
 
-            logger.debug("time announcer: " + hours + ":" + minutes + ":" + seconds);
+//            logger.debug("time announcer: " + hours + ":" + minutes + ":" + seconds);
 
             if (hours > 0 || minutes > 0) {
 
@@ -164,10 +163,10 @@ public class PinBlinkModel implements GenericBlinkModel, HasLogger {
                 scheme += new PinScheduleEvent("on", 100l) + ";" + new PinScheduleEvent("off", 250l) + ";";
             }
         } else {
-            logger.debug("no time announcer");
+//            logger.debug("no time announcer");
             scheme += new PinScheduleEvent("on", 1000l) + ";" + new PinScheduleEvent("off", 1000l) + ";";
         }
-        logger.debug(scheme);
+//        logger.debug(scheme);
         return scheme;
     }
 

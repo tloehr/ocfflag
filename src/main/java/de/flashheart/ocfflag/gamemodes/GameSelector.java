@@ -13,18 +13,11 @@ public class GameSelector extends Game {
     int game_index;
 
     @Override
-    void initBaseSystem() {
-        game_index = 0;
-    }
-
-    @Override
-    void initHardware() {
-        super.initHardware();
-
+    void initGame() {
         k1.setText("Run selected game");
         k3.setText("game++");
         k4.setText("game--");
-
+        game_index = 0;
     }
 
     @Override
@@ -35,24 +28,24 @@ public class GameSelector extends Game {
     @Override
     void button_k1_pressed() {
         Game game = null;
-        switch (game_index){
-            case OCF2 : {
+        switch (game_index) {
+            case OCF2: {
                 game = new OCF(2);
                 break;
             }
-            case OCF3 : {
+            case OCF3: {
                 game = new OCF(3);
                 break;
             }
-            case OCF4 : {
+            case OCF4: {
                 game = new OCF(4);
                 break;
             }
-            case SPWN : {
+            case SPWN: {
                 game = new SpawnCounter();
                 break;
             }
-            default:{
+            default: {
 
             }
         }

@@ -18,7 +18,6 @@ import javax.sound.midi.Synthesizer;
  * Created by tloehr on 07.06.15.
  */
 public class MyPin implements HasLogger {
-    private final Logger logger = Logger.getLogger(getClass());
     private final GpioPinDigitalOutput outputPin;
     private final String name;
     private MyLED guiControlLED; // Diese MyLED wird zwecks debugging mit geschaltet.

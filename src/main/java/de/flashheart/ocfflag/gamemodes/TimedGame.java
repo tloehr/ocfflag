@@ -22,20 +22,18 @@ public abstract class TimedGame extends Game implements Runnable {
 
     TimedGame(int num_teams) {
         super(num_teams);
-        thread = new Thread(this);
-        thread.start();
-        reset_timers();
-
         SLEEP_PER_CYCLE = 500l;
+        thread = new Thread(this);
+        last_cycle_started_at = System.currentTimeMillis();
+        thread.start();
     }
 
     void update_timers() {
-        long now = System.currentTimeMillis();
-        time_difference_since_last_cycle = now - last_cycle_started_at;
-        last_cycle_started_at = now;
         remaining = remaining - time_difference_since_last_cycle;
         remaining = Math.max(remaining, 0);
         matchtime = matchlength - remaining;
+        getLogger().debug(String.format("game_state %s, flag_state %s", game_state, flag_state));
+        getLogger().debug(String.format("Matchlength: %d, remaining: %d, time_difference_since_last_cycle: %d", matchlength, remaining, time_difference_since_last_cycle));
     }
 
     @Override
@@ -105,14 +103,6 @@ public abstract class TimedGame extends Game implements Runnable {
 
     }
 
-    /**
-     * @param matchlength - Gesamt-Spielzeit in Millisekunden
-     */
-    void setMatchlength(long matchlength) {
-        this.matchlength = matchlength;
-        reset_timers();
-    }
-
     abstract void game_cycle() throws Exception;
 
     @Override
@@ -124,6 +114,9 @@ public abstract class TimedGame extends Game implements Runnable {
     public void run() {
         while (!thread.isInterrupted()) {
             try {
+                long now = System.currentTimeMillis();
+                time_difference_since_last_cycle = now - last_cycle_started_at;
+                last_cycle_started_at = now;
                 update_timers();
                 game_cycle();
                 Thread.sleep(SLEEP_PER_CYCLE);

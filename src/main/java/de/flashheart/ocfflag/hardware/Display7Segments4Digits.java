@@ -91,8 +91,10 @@ public class Display7Segments4Digits implements HasLogger {
      * @throws IllegalArgumentException
      */
     public void setTime(long timestamp) throws IOException, IllegalArgumentException {
-        if (timestamp < 0 || timestamp > 18000000l)
+        if (timestamp < 0 || timestamp > 18000000l) {
+            getLogger().error(String.format("timestamp out of range: " + timestamp));
             throw new IllegalArgumentException("time is out of range. can't display more than 5 hours");
+        }
 
         lastTimeSet = timestamp;
 

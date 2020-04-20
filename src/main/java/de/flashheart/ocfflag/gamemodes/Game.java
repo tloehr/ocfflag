@@ -66,6 +66,9 @@ public abstract class Game implements HasLogger {
     String flag_state;
     int game_state;
 
+    /**
+     * Diese Klasse stellt die Grundlage für alle Spielvarianten des Systems dar.
+     */
     Game() {
         this(2);
     }
@@ -75,67 +78,15 @@ public abstract class Game implements HasLogger {
         configs = (Configs) Main.getFromContext("configs");
         mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
         initHardware();
-        initBaseSystem();
+        initSoftware();
         initGame();
         start_gamemode();
     }
 
-
-    abstract void initBaseSystem();
-
-    public abstract String getName();
-
-    public abstract boolean isGameRunning();
-
-
-    void start_gamemode() {
-        getLogger().debug("\n\n==================================================");
-        getLogger().debug("starting gamemode: " + getName());
-    }
-
-    void stop_gamemode() {
-        getLogger().debug("stopping gamemode: " + getName());
-        getLogger().debug("==================================================\n\n");
-//        getLogger().debug("                                                  ");
-        mySystem.getPinHandler().off();
-    }
-
-    void initHardware() {
-
-        display_red = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_RED_I2C);
-        display_blue = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_BLUE_I2C);
-        display_green = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_GREEN_I2C);
-        display_yellow = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_YELLOW_I2C);
-        display_white = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_WHITE_I2C);
-
-        // GUI Buttons
-        button_quit = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_QUIT);
-        button_change_game = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_SHUTDOWN);
-
-        button_red = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_RED);
-        button_blue = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_BLUE);
-        button_green = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_GREEN);
-        button_yellow = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_YELLOW);
-
-        button_red.setReactiontime(0);
-        button_blue.setReactiontime(0);
-        button_green.setReactiontime(0);
-        button_yellow.setReactiontime(0);
-
-        // Hardware / GUI Buttons
-        k1 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_K1);
-        k2 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_K2);
-        k3 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_K3);
-        k4 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_K4);
-
-        k1.setText(K_LABEL[1]);
-        k2.setText(K_LABEL[2]);
-        k3.setText(K_LABEL[3]);
-        k4.setText(K_LABEL[4]);
-
-    }
-
-    void initGame() {
+    /**
+     * hier werden alle Event-Listeners verknüpft.
+     */
+    void initSoftware(){
         button_blue.setActionListener(e -> {
             getLogger().debug("GUI_button_blue");
             button_blue_pressed();
@@ -177,6 +128,72 @@ public abstract class Game implements HasLogger {
             change_game();
         });
     }
+
+    public abstract String getName();
+
+    public abstract boolean isGameRunning();
+
+
+    /**
+     * damit wird der eigentliche Game-Mode gestartet
+     */
+    void start_gamemode() {
+        getLogger().debug("\n\n==================================================");
+        getLogger().debug("starting gamemode: " + getName());
+    }
+
+    /**
+     * kurz bevor der Game-Mode endet, wir diese Methode aufgerufen.
+     * Meistens vor einem Game-Mode wechsel.
+     */
+    void stop_gamemode() {
+        getLogger().debug("stopping gamemode: " + getName());
+        getLogger().debug("==================================================\n\n");
+        mySystem.getPinHandler().off();
+    }
+
+    /**
+     * initialisiert sämtliche Hardware-Komponenten
+     */
+    void initHardware() {
+
+        display_red = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_RED_I2C);
+        display_blue = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_BLUE_I2C);
+        display_green = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_GREEN_I2C);
+        display_yellow = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_YELLOW_I2C);
+        display_white = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_WHITE_I2C);
+
+        // GUI Buttons
+        button_quit = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_QUIT);
+        button_change_game = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_SHUTDOWN);
+
+        button_red = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_RED);
+        button_blue = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_BLUE);
+        button_green = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_GREEN);
+        button_yellow = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_YELLOW);
+
+        button_red.setReactiontime(0);
+        button_blue.setReactiontime(0);
+        button_green.setReactiontime(0);
+        button_yellow.setReactiontime(0);
+
+        // Hardware / GUI Buttons
+        k1 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_K1);
+        k2 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_K2);
+        k3 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_K3);
+        k4 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_K4);
+
+        k1.setText(K_LABEL[1]);
+        k2.setText(K_LABEL[2]);
+        k3.setText(K_LABEL[3]);
+        k4.setText(K_LABEL[4]);
+
+    }
+
+    /**
+     * wird von den Unterklassen implementiert um alle GameMode bezogenen Initialisierungen durchzuführen.
+     */
+    abstract  void initGame();
 
     void change_game() {
         getLogger().debug("change_game()");
@@ -359,8 +376,8 @@ public abstract class Game implements HasLogger {
 
 
     void set_siren_scheme(String siren_key, String siren_scheme) {
-        siren_key = Main.getFromConfigs(siren_key).equals("null") ? siren_key : Main.getFromConfigs(siren_scheme);
-        mySystem.getPinHandler().setScheme(siren_key, siren_key);
+
+        mySystem.getPinHandler().setScheme(siren_key, Main.getFromConfigs(siren_scheme));
     }
 
     abstract void setDisplay();

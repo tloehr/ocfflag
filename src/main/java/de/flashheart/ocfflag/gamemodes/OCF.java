@@ -58,7 +58,7 @@ public class OCF extends TimedGame {
 
 
     @Override
-    void initBaseSystem() {
+    void initGame() {
         winners = new ArrayList<>();
         title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber");
         preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
@@ -67,6 +67,8 @@ public class OCF extends TimedGame {
             preset_gametime_position = 0;
             configs.put(Configs.OCF_GAMETIME, preset_gametime_position);
         }
+        // die preset_times sind in Minuten. Daher * 60000, weil wir millis brauchen
+        matchlength = preset_times[preset_gametime_position] * 60000;
         k1.setText("RUN/PAUSE");
         k2.setText("SET GAMETIME");
         k3.setText("UNDO/RESET");
@@ -74,6 +76,7 @@ public class OCF extends TimedGame {
         lastMinuteToChangeTimeblinking = -1;
 
         reset_timers();
+        setDisplay();
     }
 
     @Override
@@ -131,8 +134,8 @@ public class OCF extends TimedGame {
             preset_gametime_position++;
             if (preset_gametime_position > preset_times.length - 1) preset_gametime_position = 0;
             configs.put(Configs.OCF_GAMETIME, preset_gametime_position);
-            setMatchlength(preset_times[preset_gametime_position] * 60000); // die preset_times sind in Minuten. Daher * 60000, weil wir millis brauchen
-
+            matchlength = preset_times[preset_gametime_position] * 60000;
+            reset_timers();
         } else {
             getLogger().debug("NOT IN PREGAME: IGNORING");
         }
