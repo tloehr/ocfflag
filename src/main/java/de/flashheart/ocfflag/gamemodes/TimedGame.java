@@ -1,5 +1,13 @@
 package de.flashheart.ocfflag.gamemodes;
 
+import de.flashheart.ocfflag.hardware.PinBlinkModel;
+import de.flashheart.ocfflag.hardware.RGBBlinkModel;
+import de.flashheart.ocfflag.misc.Configs;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.TimeZone;
+
 public abstract class TimedGame extends Game implements Runnable {
     final int TIMED_GAME_PREPARE = 0;
     final int TIMED_GAME_RUNNING = 1;
@@ -8,6 +16,8 @@ public abstract class TimedGame extends Game implements Runnable {
 
     long matchlength, matchtime, remaining, pausing_since, last_cycle_started_at, time_difference_since_last_cycle;
     long SLEEP_PER_CYCLE;
+    long cycle_counter = 0l; // zum abzählen, damit die logs nicht zu oft geschrieben werden.
+    int the_last_minute_when_timesignal_changed;
     final Thread thread;
 
     /**
@@ -23,17 +33,21 @@ public abstract class TimedGame extends Game implements Runnable {
     TimedGame(int num_teams) {
         super(num_teams);
         SLEEP_PER_CYCLE = 500l;
+        the_last_minute_when_timesignal_changed = -1;
         thread = new Thread(this);
         last_cycle_started_at = System.currentTimeMillis();
         thread.start();
     }
 
     void update_timers() {
+        if (game_state != TIMED_GAME_RUNNING) return;
         remaining = remaining - time_difference_since_last_cycle;
         remaining = Math.max(remaining, 0);
         matchtime = matchlength - remaining;
-        getLogger().debug(String.format("game_state %s, flag_state %s", game_state, flag_state));
-        getLogger().debug(String.format("Matchlength: %d, remaining: %d, time_difference_since_last_cycle: %d", matchlength, remaining, time_difference_since_last_cycle));
+        if (cycle_counter % 10 == 0) {
+            getLogger().debug(String.format("game_state %s, flag_state %s", game_state, flag_state));
+            getLogger().debug(String.format("Matchlength: %d, remaining: %d, time_difference_since_last_cycle: %d", matchlength, remaining, time_difference_since_last_cycle));
+        }
     }
 
     @Override
@@ -58,7 +72,6 @@ public abstract class TimedGame extends Game implements Runnable {
     void pause() {
         game_state = TIMED_GAME_PAUSED;
         pausing_since = System.currentTimeMillis();
-        setDisplay();
     }
 
     /**
@@ -69,7 +82,6 @@ public abstract class TimedGame extends Game implements Runnable {
         long pause = System.currentTimeMillis() - pausing_since;
         last_cycle_started_at = last_cycle_started_at + pause; // verschieben des Zeitpunkts um die Pausenzeit
         pausing_since = 0l;
-        setDisplay();
     }
 
     /**
@@ -78,7 +90,6 @@ public abstract class TimedGame extends Game implements Runnable {
     void game_over() {
         getLogger().info("game_over()");
         game_state = TIMED_GAME_OVER;
-        setDisplay();
     }
 
     /**
@@ -93,7 +104,6 @@ public abstract class TimedGame extends Game implements Runnable {
      */
     void prepare() {
         game_state = TIMED_GAME_PREPARE;
-        setDisplay();
     }
 
     @Override
@@ -103,7 +113,49 @@ public abstract class TimedGame extends Game implements Runnable {
 
     }
 
-    abstract void game_cycle() throws Exception;
+    void game_cycle() throws Exception {
+        int thisMinuteOfDay = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining), TimeZone.getTimeZone("UTC").toZoneId()).getMinute();
+        // jede Minute soll das Zeitsignal aktualisiert werden. Daher prüfe ich, ob
+        // eine neue Minute angebrochen ist.
+        boolean the_color_flag_blinking_scheme_needs_to_update = thisMinuteOfDay != the_last_minute_when_timesignal_changed;
+        if (the_color_flag_blinking_scheme_needs_to_update) the_last_minute_when_timesignal_changed = thisMinuteOfDay;
+
+        if (flag_state.equals(FLAG_NEUTRAL)) {
+            if (the_color_flag_blinking_scheme_needs_to_update) {
+                set_blinking_flag_rgb("NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
+                set_blinking_flag_white(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+            }
+        } else
+            // Zeit zum entsprechenden Team addieren.
+            if (flag_state.equals(RED_ACTIVATED)) {
+                if (the_color_flag_blinking_scheme_needs_to_update) {
+                    set_blinking_flag_rgb("RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
+                    set_blinking_flag_red(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                }
+            } else if (flag_state.equals(BLUE_ACTIVATED)) {
+                if (the_color_flag_blinking_scheme_needs_to_update) {
+                    set_blinking_flag_rgb("BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
+                    set_blinking_flag_blue(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                }
+            } else if (flag_state.equals(GREEN_ACTIVATED)) {
+                if (the_color_flag_blinking_scheme_needs_to_update) {
+                    set_blinking_flag_rgb("GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
+                    set_blinking_flag_green(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                }
+            } else if (flag_state.equals(YELLOW_ACTIVATED)) {
+                if (the_color_flag_blinking_scheme_needs_to_update) {
+                    set_blinking_flag_rgb("YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_YELLOW, remaining));
+                    set_blinking_flag_yellow(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                }
+            }
+    }
+
+    void update_all_signals() {
+        all_off();
+        setDisplay();
+        setSirens();
+        setSignals();
+    }
 
     @Override
     public boolean isGameRunning() {
@@ -113,10 +165,12 @@ public abstract class TimedGame extends Game implements Runnable {
     @Override
     public void run() {
         while (!thread.isInterrupted()) {
+            cycle_counter++;
+            long now = System.currentTimeMillis();
+            time_difference_since_last_cycle = now - last_cycle_started_at;
+            last_cycle_started_at = now;
+
             try {
-                long now = System.currentTimeMillis();
-                time_difference_since_last_cycle = now - last_cycle_started_at;
-                last_cycle_started_at = now;
                 update_timers();
                 game_cycle();
                 Thread.sleep(SLEEP_PER_CYCLE);

@@ -117,7 +117,7 @@ public class RGBBlinkModel implements GenericBlinkModel, HasLogger {
         Configs configs = (Configs) Main.getFromContext("configs");
         if (configs.is(Configs.OCF_TIME_ANNOUNCER)) {
             LocalDateTime remainingTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp),
-                    TimeZone.getDefault().toZoneId());
+                    TimeZone.getTimeZone("UTC").toZoneId());
 
 
             int minutes = remainingTime.getMinute();

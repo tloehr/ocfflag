@@ -86,7 +86,7 @@ public abstract class Game implements HasLogger {
     /**
      * hier werden alle Event-Listeners verknüpft.
      */
-    void initSoftware(){
+    void initSoftware() {
         button_blue.setActionListener(e -> {
             getLogger().debug("GUI_button_blue");
             button_blue_pressed();
@@ -191,9 +191,9 @@ public abstract class Game implements HasLogger {
     }
 
     /**
-     * wird von den Unterklassen implementiert um alle GameMode bezogenen Initialisierungen durchzuführen.
+     * wird von den eigentlichen Klassen implementiert um alle GameMode bezogenen Initialisierungen durchzuführen.
      */
-    abstract  void initGame();
+    abstract void initGame();
 
     void change_game() {
         getLogger().debug("change_game()");
@@ -310,6 +310,14 @@ public abstract class Game implements HasLogger {
         set_blinking_red_button("0:");
     }
 
+    void off_white_led() {
+        set_blinking_led_white("0:");
+    }
+
+    void off_green_led() {
+        set_blinking_led_green("0:");
+    }
+
     void off_blue_button() {
         set_blinking_blue_button("0:");
     }
@@ -334,6 +342,10 @@ public abstract class Game implements HasLogger {
         set_blinking_flag_blue("0:");
     }
 
+    void off_rgb_flag() {
+        set_blinking_flag_rgb("0:");
+    }
+
     void off_green_flag() {
         set_blinking_flag_green("0:");
     }
@@ -347,6 +359,18 @@ public abstract class Game implements HasLogger {
         else mySystem.getPinHandler().setScheme(Configs.OUT_RGB_FLAG, scheme);
     }
 
+
+    void set_siren_scheme(String siren_key, String siren_scheme) {
+
+        mySystem.getPinHandler().setScheme(siren_key, Main.getFromConfigs(siren_scheme));
+    }
+
+    abstract void setDisplay();
+
+    abstract void setSignals();
+
+    void setSirens(){};
+
     void all_off() {
         try {
             display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
@@ -357,29 +381,22 @@ public abstract class Game implements HasLogger {
         } catch (IOException e) {
             getLogger().error(e);
         }
-        mySystem.getPinHandler().off(Configs.OUT_LED_RED_BTN);
-        mySystem.getPinHandler().off(Configs.OUT_LED_BLUE_BTN);
-        mySystem.getPinHandler().off(Configs.OUT_LED_GREEN_BTN);
-        mySystem.getPinHandler().off(Configs.OUT_LED_YELLOW_BTN);
+        off_blue_button();
+        off_red_button();
+        off_green_button();
+        off_yellow_button();
 
-        mySystem.getPinHandler().off(Configs.OUT_FLAG_WHITE);
-        mySystem.getPinHandler().off(Configs.OUT_FLAG_RED);
-        mySystem.getPinHandler().off(Configs.OUT_FLAG_BLUE);
-        mySystem.getPinHandler().off(Configs.OUT_FLAG_GREEN);
-        mySystem.getPinHandler().off(Configs.OUT_FLAG_YELLOW);
+        off_white_flag();
+        off_red_flag();
+        off_blue_flag();
+        off_green_flag();
+        off_yellow_flag();
 
-        mySystem.getPinHandler().off(Configs.OUT_FLAG_RED);
+        off_rgb_flag();
 
-        mySystem.getPinHandler().off(Configs.OUT_LED_GREEN);
-        mySystem.getPinHandler().off(Configs.OUT_LED_WHITE);
+        off_white_led();
+        off_green_led();
+
     }
-
-
-    void set_siren_scheme(String siren_key, String siren_scheme) {
-
-        mySystem.getPinHandler().setScheme(siren_key, Main.getFromConfigs(siren_scheme));
-    }
-
-    abstract void setDisplay();
 
 }

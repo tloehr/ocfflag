@@ -128,6 +128,16 @@ public class SpawnCounter extends Game {
         }
     }
 
+    @Override
+    void setSignals() {
+        
+    }
+
+    @Override
+    void setSirens() {
+
+    }
+
 
     @Override
     public String getName() {

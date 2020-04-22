@@ -100,10 +100,11 @@ public class Display7Segments4Digits implements HasLogger {
 
 
         LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp),
-                TimeZone.getDefault().toZoneId());
+                TimeZone.getTimeZone("UTC").toZoneId());
 
         int hours = ldt.getHour();
 
+        // hier baue ich die Punkte mit ein zur Zeitanzeige
         String text_time = ldt.format(text_time_format);
         String strMinutes = text_time.charAt(0) + (hours == 4 ? "." : "")
                 + text_time.charAt(1) + (hours >= 3 ? "." : "");
@@ -115,12 +116,14 @@ public class Display7Segments4Digits implements HasLogger {
         // Bildschirm Darstellung
         if (lblSegment != null) {
             lblSegment.setToolTipText(common_time);
-            lblSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : common_time);
+            lblSegment.setText(common_time);
+//            lblSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : common_time);
         }
 
         if (btnSegment != null) {
             btnSegment.setToolTipText(common_time);
-            btnSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : common_time);
+            btnSegment.setText(common_time);
+//            btnSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : common_time);
         }
 
         // Hardware 7Segment

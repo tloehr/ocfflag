@@ -85,5 +85,15 @@ public class GameSelector extends Game {
         }
     }
 
+    @Override
+    void setSignals() {
+        
+    }
+
+    @Override
+    void setSirens() {
+
+    }
+
 
 }
