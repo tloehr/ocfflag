@@ -48,6 +48,31 @@ public abstract class TimedGame extends Game implements Runnable {
             getLogger().debug(String.format("game_state %s, flag_state %s", game_state, flag_state));
             getLogger().debug(String.format("Matchlength: %d, remaining: %d, time_difference_since_last_cycle: %d", matchlength, remaining, time_difference_since_last_cycle));
         }
+
+        // jede Minute soll das Zeitsignal aktualisiert werden. Daher prüfe ich, ob
+        // eine neue Minute angebrochen ist.
+        int thisMinuteOfDay = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining), TimeZone.getTimeZone("UTC").toZoneId()).getMinute();
+        if (thisMinuteOfDay != the_last_minute_when_timesignal_changed) {
+            the_last_minute_when_timesignal_changed = thisMinuteOfDay;
+            if (flag_state.equals(FLAG_NEUTRAL)) {
+                set_blinking_flag_rgb("NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
+                set_blinking_flag_white(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+            } else {
+                if (flag_state.equals(RED_ACTIVATED)) {
+                    set_blinking_flag_rgb("RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
+                    set_blinking_flag_red(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                } else if (flag_state.equals(BLUE_ACTIVATED)) {
+                    set_blinking_flag_rgb("BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
+                    set_blinking_flag_blue(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                } else if (flag_state.equals(GREEN_ACTIVATED)) {
+                    set_blinking_flag_rgb("GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
+                    set_blinking_flag_green(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                } else if (flag_state.equals(YELLOW_ACTIVATED)) {
+                    set_blinking_flag_rgb("YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_YELLOW, remaining));
+                    set_blinking_flag_yellow(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                }
+            }
+        }
     }
 
     @Override
@@ -70,18 +95,20 @@ public abstract class TimedGame extends Game implements Runnable {
      * das Spiel wird in den Pausezustand versetzt
      */
     void pause() {
-        game_state = TIMED_GAME_PAUSED;
+        getLogger().info("pause()");
         pausing_since = System.currentTimeMillis();
+        game_state = TIMED_GAME_PAUSED;
     }
 
     /**
      * das Spiel wird nach dem Pausezustand fortgesetzt
      */
     void resume() {
-        game_state = TIMED_GAME_RUNNING;
-        long pause = System.currentTimeMillis() - pausing_since;
-        last_cycle_started_at = last_cycle_started_at + pause; // verschieben des Zeitpunkts um die Pausenzeit
+        getLogger().info("resume()");
+//        long pause = System.currentTimeMillis() - pausing_since;
+//        last_cycle_started_at = last_cycle_started_at + pause; // verschieben des Zeitpunkts um die Pausenzeit
         pausing_since = 0l;
+        game_state = TIMED_GAME_RUNNING;
     }
 
     /**
@@ -113,42 +140,7 @@ public abstract class TimedGame extends Game implements Runnable {
 
     }
 
-    void game_cycle() throws Exception {
-        int thisMinuteOfDay = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining), TimeZone.getTimeZone("UTC").toZoneId()).getMinute();
-        // jede Minute soll das Zeitsignal aktualisiert werden. Daher prüfe ich, ob
-        // eine neue Minute angebrochen ist.
-        boolean the_color_flag_blinking_scheme_needs_to_update = thisMinuteOfDay != the_last_minute_when_timesignal_changed;
-        if (the_color_flag_blinking_scheme_needs_to_update) the_last_minute_when_timesignal_changed = thisMinuteOfDay;
-
-        if (flag_state.equals(FLAG_NEUTRAL)) {
-            if (the_color_flag_blinking_scheme_needs_to_update) {
-                set_blinking_flag_rgb("NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
-                set_blinking_flag_white(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-            }
-        } else
-            // Zeit zum entsprechenden Team addieren.
-            if (flag_state.equals(RED_ACTIVATED)) {
-                if (the_color_flag_blinking_scheme_needs_to_update) {
-                    set_blinking_flag_rgb("RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
-                    set_blinking_flag_red(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                }
-            } else if (flag_state.equals(BLUE_ACTIVATED)) {
-                if (the_color_flag_blinking_scheme_needs_to_update) {
-                    set_blinking_flag_rgb("BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
-                    set_blinking_flag_blue(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                }
-            } else if (flag_state.equals(GREEN_ACTIVATED)) {
-                if (the_color_flag_blinking_scheme_needs_to_update) {
-                    set_blinking_flag_rgb("GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
-                    set_blinking_flag_green(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                }
-            } else if (flag_state.equals(YELLOW_ACTIVATED)) {
-                if (the_color_flag_blinking_scheme_needs_to_update) {
-                    set_blinking_flag_rgb("YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_YELLOW, remaining));
-                    set_blinking_flag_yellow(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                }
-            }
-    }
+    abstract void game_cycle() throws Exception;
 
     void update_all_signals() {
         all_off();

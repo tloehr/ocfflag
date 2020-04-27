@@ -15,7 +15,7 @@ new FormModel {
 			} ) {
 				name: "mainView"
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-					"$columnSpecs": "default, labelcompgap, 70dlu, labelcompgap, unrelgap, labelcompgap, 162dlu:grow, labelcompgap, unrelgap, labelcompgap, 70dlu, labelcompgap, default"
+					"$columnSpecs": "default, labelcompgap, 70dlu:grow, labelcompgap, unrelgap, labelcompgap, 162dlu:grow, labelcompgap, unrelgap, labelcompgap, 70dlu:grow, labelcompgap, default"
 					"$rowSpecs": "pref, linegap, fill:default, linegap, pref, linegap, fill:default, linegap, pref"
 				} ) {
 					name: "upperPanel"
@@ -63,6 +63,7 @@ new FormModel {
 					add( new FormComponent( "javax.swing.JProgressBar" ) {
 						name: "pbRed"
 						"stringPainted": true
+						"visible": false
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridY": 3
 						"gridWidth": 3
@@ -71,6 +72,7 @@ new FormModel {
 					add( new FormComponent( "javax.swing.JProgressBar" ) {
 						name: "pbBlue"
 						"stringPainted": true
+						"visible": false
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridY": 3
 						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
@@ -148,6 +150,7 @@ new FormModel {
 						add( new FormComponent( "javax.swing.JProgressBar" ) {
 							name: "pbGreen"
 							"stringPainted": true
+							"visible": false
 						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridY": 7
@@ -159,6 +162,7 @@ new FormModel {
 						add( new FormComponent( "javax.swing.JProgressBar" ) {
 							name: "pbYellow"
 							"stringPainted": true
+							"visible": false
 						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 11
@@ -178,11 +182,12 @@ new FormModel {
 							"verticalTextPosition": 3
 							"horizontalTextPosition": 0
 							"font": new java.awt.Font( "Dialog", 1, 24 )
+							"toolTipText": sfield com.jformdesigner.model.FormObject NULL_VALUE
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnB"
 							"icon": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"toolTipText": "Preset Gametime"
+							"toolTipText": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							"font": &Font1 new java.awt.Font( "Dialog", 1, 24 )
 							"verticalTextPosition": 3
 							"horizontalTextPosition": 0
@@ -194,7 +199,7 @@ new FormModel {
 							name: "btnC"
 							"text": "C"
 							"icon": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"toolTipText": "Standby / Active"
+							"toolTipText": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							"font": #Font1
 							"verticalTextPosition": 3
 							"horizontalTextPosition": 0
@@ -205,7 +210,7 @@ new FormModel {
 							name: "btnD"
 							"text": "D"
 							"icon": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"toolTipText": "Reset/Undo"
+							"toolTipText": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							"font": #Font1
 							"verticalTextPosition": 3
 							"horizontalTextPosition": 0

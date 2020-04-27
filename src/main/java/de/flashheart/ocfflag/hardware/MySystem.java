@@ -108,6 +108,12 @@ public class MySystem implements HasLogger {
         display_green = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_GREEN_I2C), frameDebug.getBtnGreen(), Configs.DISPLAY_GREEN_I2C);
         display_yellow = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_YELLOW_I2C), frameDebug.getBtnYellow(), Configs.DISPLAY_YELLOW_I2C);
 
+        display_white.setFourDigitsOnly(false);
+        display_red.setFourDigitsOnly(false);
+        display_blue.setFourDigitsOnly(false);
+        display_green.setFourDigitsOnly(false);
+        display_yellow.setFourDigitsOnly(false);
+
         Main.addToContext(display_white.getName(), display_white);
         Main.addToContext(display_red.getName(), display_red);
         Main.addToContext(display_blue.getName(), display_blue);
@@ -127,9 +133,9 @@ public class MySystem implements HasLogger {
 
         // Player Buttons
         Main.addToContext(Configs.BUTTON_RED, new MyAbstractButton(GPIO, Configs.BUTTON_RED, frameDebug.getBtnRed(), REACTION_TIME, frameDebug.getPbRed()));
-        Main.addToContext(Configs.BUTTON_BLUE, new MyAbstractButton(GPIO, Configs.BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, frameDebug.getPbRed()));
-        Main.addToContext(Configs.BUTTON_GREEN, new MyAbstractButton(GPIO, Configs.BUTTON_GREEN, frameDebug.getBtnGreen(), REACTION_TIME, frameDebug.getPbRed()));
-        Main.addToContext(Configs.BUTTON_YELLOW, new MyAbstractButton(GPIO, Configs.BUTTON_YELLOW, frameDebug.getBtnYellow(), REACTION_TIME, frameDebug.getPbRed()));
+        Main.addToContext(Configs.BUTTON_BLUE, new MyAbstractButton(GPIO, Configs.BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, frameDebug.getPbBlue()));
+        Main.addToContext(Configs.BUTTON_GREEN, new MyAbstractButton(GPIO, Configs.BUTTON_GREEN, frameDebug.getBtnGreen(), REACTION_TIME, frameDebug.getPbGreen()));
+        Main.addToContext(Configs.BUTTON_YELLOW, new MyAbstractButton(GPIO, Configs.BUTTON_YELLOW, frameDebug.getBtnYellow(), REACTION_TIME, frameDebug.getPbYellow()));
         // System Buttons
         Main.addToContext(Configs.BUTTON_QUIT, new MyAbstractButton(null, null, frameDebug.getBtnQuit()));
         Main.addToContext(Configs.BUTTON_SHUTDOWN, new MyAbstractButton(GPIO, Configs.BUTTON_SHUTDOWN, null, 0, null));

@@ -24,26 +24,18 @@ import java.awt.event.WindowEvent;
  */
 public class FrameDebug extends JFrame {
     private final Logger logger = Logger.getLogger(getClass());
-    private final MySystem mySystem;
+//    private MySystem mySystem;
 //    private Font font;
 //    private Font font2;
     private JDialog testDlg;
-    public static final Icon IconPlay = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/player_play.png"));
-    public static final Icon IconPause = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/player_pause.png"));
-    public static final Icon IconGametime = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/clock.png"));
-    public static final Icon IconUNDO = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/reload.png"));
+//    public static final Icon IconPlay = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/player_play.png"));
+//    public static final Icon IconPause = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/player_pause.png"));
+//    public static final Icon IconGametime = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/clock.png"));
+//    public static final Icon IconUNDO = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/reload.png"));
 
     public FrameDebug() {
-        mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
-        Configs configs = (Configs) Main.getFromContext("configs");
-
         initComponents();
-        btnTestDialog.setVisible(Tools.isBooleanFromContext(Configs.DEV_MODE));
-
-        String title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber") + " [" + configs.getApplicationInfo("project.build.timestamp") + "]";
-
-        logger.info(title);
-        setTitle(title);
+        initFrame();
     }
 
     public JProgressBar getPbRed() {
@@ -70,18 +62,29 @@ public class FrameDebug extends JFrame {
         return lcd_panel;
     }
 
-    public void initFrame() {
+    private void initFrame() {
+//        mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
+        Configs configs = (Configs) Main.getFromContext("configs");
+
+//        initFonts();
+        btnTestDialog.setVisible(Tools.isBooleanFromContext(Configs.DEV_MODE));
+
+        String title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber") + " [" + configs.getApplicationInfo("project.build.timestamp") + "]";
+
+        logger.info(title);
+
+        setTitle(title);
 
 
-//        btnRed.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
-//        btnBlue.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
-//        btnGreen.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
-//        btnYellow.setFont(font.deriveFont(36f).deriveFont(Font.BOLD));
+//        btnRed.setFont(font.deriveFont(24f).deriveFont(Font.BOLD));
+//        btnBlue.setFont(font.deriveFont(24f).deriveFont(Font.BOLD));
+//        btnGreen.setFont(font.deriveFont(24f).deriveFont(Font.BOLD));
+//        btnYellow.setFont(font.deriveFont(24f).deriveFont(Font.BOLD));
 
-        pbBlue.setVisible(mySystem.getREACTION_TIME() > 0);
-        pbGreen.setVisible(mySystem.getREACTION_TIME() > 0);
-        pbYellow.setVisible(mySystem.getREACTION_TIME() > 0);
-        pbRed.setVisible(mySystem.getREACTION_TIME() > 0);
+//        pbBlue.setVisible(mySystem.getREACTION_TIME() > 0);
+//        pbGreen.setVisible(mySystem.getREACTION_TIME() > 0);
+//        pbYellow.setVisible(mySystem.getREACTION_TIME() > 0);
+//        pbRed.setVisible(mySystem.getREACTION_TIME() > 0);
 
 //        lblPole.setFont(font2.deriveFont(80f).deriveFont(Font.BOLD));
                                                                                                       
@@ -91,7 +94,7 @@ public class FrameDebug extends JFrame {
 //    private void initFonts() {
 //        try {
 //            font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/DSEG14Classic-Regular.ttf"));
-//            font2 = new JLabel().getFont();
+////            font2 = new JLabel().getFont();
 //        } catch (Exception e) {
 //            logger.fatal(e);
 //            System.exit(1);
@@ -174,7 +177,7 @@ public class FrameDebug extends JFrame {
             //======== upperPanel ========
             {
                 upperPanel.setLayout(new FormLayout(
-                    "default, $lcgap, 70dlu, $lcgap, $ugap, $lcgap, 162dlu:grow, $lcgap, $ugap, $lcgap, 70dlu, $lcgap, default",
+                    "default, $lcgap, 70dlu:grow, $lcgap, $ugap, $lcgap, 162dlu:grow, $lcgap, $ugap, $lcgap, 70dlu:grow, $lcgap, default",
                     "pref, $lgap, fill:default, $lgap, pref, $lgap, fill:default, $lgap, pref"));
 
                 //---- ledRedButton ----
@@ -210,10 +213,12 @@ public class FrameDebug extends JFrame {
 
                 //---- pbRed ----
                 pbRed.setStringPainted(true);
+                pbRed.setVisible(false);
                 upperPanel.add(pbRed, CC.xywh(1, 3, 3, 1, CC.DEFAULT, CC.FILL));
 
                 //---- pbBlue ----
                 pbBlue.setStringPainted(true);
+                pbBlue.setVisible(false);
                 upperPanel.add(pbBlue, CC.xywh(11, 3, 3, 1, CC.DEFAULT, CC.FILL));
 
                 //---- ledGreenButton ----
@@ -275,6 +280,7 @@ public class FrameDebug extends JFrame {
 
                     //---- pbGreen ----
                     pbGreen.setStringPainted(true);
+                    pbGreen.setVisible(false);
                     panel4.add(pbGreen);
                 }
                 upperPanel.add(panel4, CC.xywh(1, 7, 3, 1, CC.DEFAULT, CC.TOP));
@@ -285,6 +291,7 @@ public class FrameDebug extends JFrame {
 
                     //---- pbYellow ----
                     pbYellow.setStringPainted(true);
+                    pbYellow.setVisible(false);
                     panel6.add(pbYellow);
                 }
                 upperPanel.add(panel6, CC.xywh(11, 7, 3, 1, CC.DEFAULT, CC.TOP));
@@ -301,11 +308,12 @@ public class FrameDebug extends JFrame {
                     btnA.setVerticalTextPosition(SwingConstants.BOTTOM);
                     btnA.setHorizontalTextPosition(SwingConstants.CENTER);
                     btnA.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                    btnA.setToolTipText(null);
                     panel7.add(btnA, CC.xy(1, 1));
 
                     //---- btnB ----
                     btnB.setIcon(null);
-                    btnB.setToolTipText("Preset Gametime");
+                    btnB.setToolTipText(null);
                     btnB.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
                     btnB.setVerticalTextPosition(SwingConstants.BOTTOM);
                     btnB.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -315,7 +323,7 @@ public class FrameDebug extends JFrame {
                     //---- btnC ----
                     btnC.setText("C");
                     btnC.setIcon(null);
-                    btnC.setToolTipText("Standby / Active");
+                    btnC.setToolTipText(null);
                     btnC.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
                     btnC.setVerticalTextPosition(SwingConstants.BOTTOM);
                     btnC.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -324,7 +332,7 @@ public class FrameDebug extends JFrame {
                     //---- btnD ----
                     btnD.setText("D");
                     btnD.setIcon(null);
-                    btnD.setToolTipText("Reset/Undo");
+                    btnD.setToolTipText(null);
                     btnD.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
                     btnD.setVerticalTextPosition(SwingConstants.BOTTOM);
                     btnD.setHorizontalTextPosition(SwingConstants.CENTER);

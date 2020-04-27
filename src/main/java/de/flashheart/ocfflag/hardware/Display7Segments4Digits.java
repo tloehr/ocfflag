@@ -25,6 +25,7 @@ public class Display7Segments4Digits implements HasLogger {
     private long lastTimeSet = 0;
     private final DateTimeFormatter text_time_format = DateTimeFormatter.ofPattern("mmss");
     private final DateTimeFormatter common_time_format = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private boolean fourDigitsOnly = true;
 
     public boolean isFourDigitsOnly() {
         return fourDigitsOnly;
@@ -40,7 +41,7 @@ public class Display7Segments4Digits implements HasLogger {
         this.fourDigitsOnly = fourDigitsOnly;
     }
 
-    private boolean fourDigitsOnly = true;
+
 
     public String getName() {
         return name;
@@ -98,7 +99,6 @@ public class Display7Segments4Digits implements HasLogger {
 
         lastTimeSet = timestamp;
 
-
         LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp),
                 TimeZone.getTimeZone("UTC").toZoneId());
 
@@ -116,14 +116,14 @@ public class Display7Segments4Digits implements HasLogger {
         // Bildschirm Darstellung
         if (lblSegment != null) {
             lblSegment.setToolTipText(common_time);
-            lblSegment.setText(common_time);
-//            lblSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : common_time);
+//            lblSegment.setText(common_time);
+            lblSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : common_time);
         }
 
         if (btnSegment != null) {
             btnSegment.setToolTipText(common_time);
-            btnSegment.setText(common_time);
-//            btnSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : common_time);
+//            btnSegment.setText(common_time);
+            btnSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : common_time);
         }
 
         // Hardware 7Segment

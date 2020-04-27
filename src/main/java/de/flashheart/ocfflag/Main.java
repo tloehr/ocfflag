@@ -1,10 +1,9 @@
 package de.flashheart.ocfflag;
 
-import de.flashheart.ocfflag.gamemodes.GameSelector;
+import de.flashheart.ocfflag.gamemodes.Game;
 import de.flashheart.ocfflag.gamemodes.OCF;
 import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.MySystem;
-import de.flashheart.ocfflag.gamemodes.Game;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.cli.*;
@@ -31,14 +30,14 @@ public class Main {
         UIManager.setLookAndFeel(
                 UIManager.getCrossPlatformLookAndFeelClassName());
 
-        // todo: option for headless
+
         FrameDebug frameDebug = new FrameDebug();
         applicationContext.put(Configs.FRAME_DEBUG, frameDebug);
-        // Das Fenster brauchen wir nur, wenn wir einen Raspi benutzen.
+        applicationContext.put(Configs.MY_SYSTEM, new MySystem());
+
         frameDebug.getBtnTestDialog().setVisible(Tools.isArm());
         frameDebug.setVisible(true);
 
-        applicationContext.put(Configs.MY_SYSTEM, new MySystem());
 
         setGame(new OCF(2));
     }

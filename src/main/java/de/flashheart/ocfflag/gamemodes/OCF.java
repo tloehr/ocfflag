@@ -26,24 +26,13 @@ public class OCF extends TimedGame {
     private final int SAVEPOINT_RESET = 2;
     private final int SAVEPOINT_CURRENT = 3;
     private final String SAVEPOINTS[] = new String[]{"", "SPIELZUG ZURÜCK", "RESET", "KEINE ÄNDERUNG"};
-
     private ArrayList<String> winners;
-
-
-//    private Statistics statistics;
-
     private long time_blue, time_red, time_yellow, time_green;
-
     private int SELECTED_SAVEPOINT = SAVEPOINT_NONE;
     private SavePointOCF currentSavePoint, lastSavePoint;
     private final SavePointOCF RESETSAVEPOINT;
-    private String title = "";
-    private String lcd_time_format;
-
-
     private Long[] preset_times;
-    private int preset_gametime_position = 0;
-
+    private int preset_gametime_position;
     private boolean reset_the_game_when_resuming = false;
 
     public OCF(int num_teams) {
@@ -60,13 +49,13 @@ public class OCF extends TimedGame {
     @Override
     void initGame() {
         winners = new ArrayList<>();
-        title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber");
+//        title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber");
         preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
         preset_times = configs.getGameTimes();
-        if (preset_gametime_position >= preset_times.length - 1) {
-            preset_gametime_position = 0;
-            configs.put(Configs.OCF_GAMETIME, preset_gametime_position);
-        }
+//        if (preset_gametime_position >= preset_times.length - 1) {
+//            preset_gametime_position = 0;
+//            configs.put(Configs.OCF_GAMETIME, preset_gametime_position);
+//        }
         // die preset_times sind in Minuten. Daher * 60000, weil wir millis brauchen
         matchlength = preset_times[preset_gametime_position] * 60000;
         k1.setText("RUN/PAUSE");
@@ -75,10 +64,7 @@ public class OCF extends TimedGame {
         k4.setText("--");
 
         reset_timers();
-        all_off();
-        setDisplay();
-        setSirens();
-        setSignals();
+        update_all_signals();
     }
 
     @Override
@@ -93,13 +79,10 @@ public class OCF extends TimedGame {
         }
         if (game_state == TIMED_GAME_RUNNING) {
             if (!flag_state.equals(FLAGSTATE)) {
-
                 lastSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
                 flag_state = FLAGSTATE;
-                all_off();
-                setDisplay();
                 mySystem.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
-                setSignals();
+                update_all_signals();
             } else {
                 getLogger().debug(String.format("FLAGSTATE %s ALREADY SELECTED: NEW EVENT IGNORED", FLAGSTATE));
             }
@@ -541,43 +524,19 @@ public class OCF extends TimedGame {
      */
     @Override
     void game_cycle() throws Exception {
+
         if (game_state == TIMED_GAME_RUNNING) {
-            // to minute of day
 
-            // Hier muss nach Ablauf jeder vollen Minute, das Blinkschema neu angepasst werden.
-            if (flag_state.equals(FLAG_NEUTRAL)) {
-                if (changeColorBlinking) {
-                    set_blinking_flag_rgb("NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
-                    set_blinking_flag_white(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                }
-            } else
-
-                // Zeit zum entsprechenden Team addieren.
-                if (flag_state.equals(RED_ACTIVATED)) {
-                    time_red += time_difference_since_last_cycle;
-                    if (changeColorBlinking) {
-                        set_blinking_flag_rgb("RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
-                        set_blinking_flag_red(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                    }
-                } else if (flag_state.equals(BLUE_ACTIVATED)) {
-                    time_blue += time_difference_since_last_cycle;
-                    if (changeColorBlinking) {
-                        set_blinking_flag_rgb("BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
-                        set_blinking_flag_blue(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                    }
-                } else if (flag_state.equals(GREEN_ACTIVATED)) {
-                    time_green += time_difference_since_last_cycle;
-                    if (changeColorBlinking) {
-                        set_blinking_flag_rgb("GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
-                        set_blinking_flag_green(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                    }
-                } else if (flag_state.equals(YELLOW_ACTIVATED)) {
-                    time_yellow += time_difference_since_last_cycle;
-                    if (changeColorBlinking) {
-                        set_blinking_flag_rgb("YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_YELLOW, remaining));
-                        set_blinking_flag_yellow(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                    }
-                }
+            // Zeit zum entsprechenden Team addieren.
+            if (flag_state.equals(RED_ACTIVATED)) {
+                time_red += time_difference_since_last_cycle;
+            } else if (flag_state.equals(BLUE_ACTIVATED)) {
+                time_blue += time_difference_since_last_cycle;
+            } else if (flag_state.equals(GREEN_ACTIVATED)) {
+                time_green += time_difference_since_last_cycle;
+            } else if (flag_state.equals(YELLOW_ACTIVATED)) {
+                time_yellow += time_difference_since_last_cycle;
+            }
 
             display_white.setTime(remaining);
             display_red.setTime(time_red);
@@ -588,17 +547,16 @@ public class OCF extends TimedGame {
             if (remaining == 0) {
                 game_over();
             }
-
         }
     }
 
     @Override
     void reset_timers() {
         super.reset_timers();
-        lcd_time_format = "H:mm:ss";
-        if (preset_times[preset_gametime_position] <= 60) {
-            lcd_time_format = "mm:ss";
-        }
+//        lcd_time_format = "H:mm:ss";
+//        if (preset_times[preset_gametime_position] <= 60) {
+//            lcd_time_format = "mm:ss";
+//        }
 
         reset_the_game_when_resuming = false;
         currentSavePoint = null;
