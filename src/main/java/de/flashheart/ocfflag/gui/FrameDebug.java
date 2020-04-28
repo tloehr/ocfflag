@@ -58,8 +58,12 @@ public class FrameDebug extends JFrame {
         return btnTestDialog;
     }
 
-    public JPanel getLcd_panel() {
-        return lcd_panel;
+    public JScrollPane getLogscroller() {
+        return logscroller;
+    }
+
+    public JTextArea getTxtLogger() {
+        return txtLogger;
     }
 
     private void initFrame() {
@@ -154,8 +158,8 @@ public class FrameDebug extends JFrame {
         lblC = new JLabel();
         lblD = new JLabel();
         panel5 = new JPanel();
-        lcd_panel = new JPanel();
-        label4 = new JLabel();
+        logscroller = new JScrollPane();
+        txtLogger = new JTextArea();
         panel3 = new JPanel();
         ledGreen = new MyLED();
         ledWhite = new MyLED();
@@ -170,9 +174,7 @@ public class FrameDebug extends JFrame {
 
         //======== mainView ========
         {
-            mainView.setLayout(new FormLayout(
-                "$rgap, $lcgap, pref, $lcgap, 62dlu:grow, $lcgap, pref:grow, $lcgap, $rgap",
-                "$rgap, $lgap, pref, $rgap, fill:pref:grow, $lgap"));
+            mainView.setLayout(new BorderLayout());
 
             //======== upperPanel ========
             {
@@ -364,26 +366,27 @@ public class FrameDebug extends JFrame {
                 }
                 upperPanel.add(panel7, CC.xywh(1, 9, 13, 1, CC.FILL, CC.TOP));
             }
-            mainView.add(upperPanel, CC.xywh(3, 3, 5, 1, CC.DEFAULT, CC.TOP));
+            mainView.add(upperPanel, BorderLayout.NORTH);
 
             //======== panel5 ========
             {
-                panel5.setLayout(new FormLayout(
-                    "327dlu:grow",
-                    "fill:default:grow, $ugap, default, $lgap, default"));
+                panel5.setLayout(new BoxLayout(panel5, BoxLayout.PAGE_AXIS));
 
-                //======== lcd_panel ========
+                //======== logscroller ========
                 {
-                    lcd_panel.setBorder(new LineBorder(Color.black, 4));
-                    lcd_panel.setBackground(new Color(220, 223, 208));
-                    lcd_panel.setLayout(new BoxLayout(lcd_panel, BoxLayout.PAGE_AXIS));
+                    logscroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                    logscroller.setAutoscrolls(true);
+                    logscroller.setPreferredSize(null);
 
-                    //---- label4 ----
-                    label4.setText("12345678901234567890");
-                    label4.setFont(new Font("Courier New", Font.BOLD, 16));
-                    lcd_panel.add(label4);
+                    //---- txtLogger ----
+                    txtLogger.setForeground(Color.green);
+                    txtLogger.setBackground(Color.black);
+                    txtLogger.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
+                    txtLogger.setWrapStyleWord(true);
+                    txtLogger.setLineWrap(true);
+                    logscroller.setViewportView(txtLogger);
                 }
-                panel5.add(lcd_panel, CC.xy(1, 1));
+                panel5.add(logscroller);
 
                 //======== panel3 ========
                 {
@@ -409,9 +412,9 @@ public class FrameDebug extends JFrame {
                     btnQuit.setToolTipText("Programm beenden");
                     panel3.add(btnQuit);
                 }
-                panel5.add(panel3, CC.xy(1, 3, CC.CENTER, CC.DEFAULT));
+                panel5.add(panel3);
             }
-            mainView.add(panel5, CC.xy(3, 5));
+            mainView.add(panel5, BorderLayout.CENTER);
         }
         contentPane.add(mainView);
         setSize(890, 660);
@@ -536,8 +539,8 @@ public class FrameDebug extends JFrame {
     private JLabel lblC;
     private JLabel lblD;
     private JPanel panel5;
-    private JPanel lcd_panel;
-    private JLabel label4;
+    private JScrollPane logscroller;
+    private JTextArea txtLogger;
     private JPanel panel3;
     private MyLED ledGreen;
     private MyLED ledWhite;

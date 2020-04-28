@@ -367,9 +367,11 @@ public abstract class Game implements HasLogger {
 
     abstract void setDisplay();
 
-    abstract void setSignals();
+    abstract void setFlagSignals();
 
-    void setSirens(){};
+    abstract void setSirens();
+
+    abstract void setLEDsAndButtons();
 
     void all_off() {
         try {

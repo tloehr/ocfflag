@@ -52,11 +52,6 @@ public class OCF extends TimedGame {
 //        title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber");
         preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
         preset_times = configs.getGameTimes();
-//        if (preset_gametime_position >= preset_times.length - 1) {
-//            preset_gametime_position = 0;
-//            configs.put(Configs.OCF_GAMETIME, preset_gametime_position);
-//        }
-        // die preset_times sind in Minuten. Daher * 60000, weil wir millis brauchen
         matchlength = preset_times[preset_gametime_position] * 60000;
         k1.setText("RUN/PAUSE");
         k2.setText("SET GAMETIME");
@@ -183,9 +178,15 @@ public class OCF extends TimedGame {
 
     @Override
     void pause() {
+        super.pause();
         SELECTED_SAVEPOINT = SAVEPOINT_NONE;
         currentSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
-        super.pause();
+    }
+
+    @Override
+    void game_over() {
+        super.game_over();
+        set_siren_scheme(Configs.OUT_SIREN_START_STOP, Configs.OCF_START_STOP_SIGNAL);
     }
 
     @Override
@@ -198,7 +199,6 @@ public class OCF extends TimedGame {
     void resume() {
         currentSavePoint = null;
         if (reset_the_game_when_resuming) {
-            reset_timers();
             prepare();
         } else {
             if (SELECTED_SAVEPOINT == SAVEPOINT_PREVIOUS) {
@@ -208,12 +208,6 @@ public class OCF extends TimedGame {
             super.resume();
 //                lcd_display.deletePage(3); // brauchen wir dann erstmal nicht mehr
         }
-    }
-
-    @Override
-    void game_over() {
-        super.game_over();
-        update_all_signals();
     }
 
     @Override
@@ -230,36 +224,12 @@ public class OCF extends TimedGame {
             if (num_teams < 4) display_yellow.clear();
             else display_yellow.setTime(time_yellow);
 
-            if (game_state == TIMED_GAME_PREPARE) {
-                getLogger().debug("num_teams " + num_teams);
-
-                if (num_teams == 3) {
-                    set_blinking_red_button("∞:on,250;off,500");
-                    set_blinking_blue_button("∞:off,250;on,250;off,250");
-                } else if (num_teams == 4) {
-                    set_blinking_red_button("∞:on,250;off,750");
-                    set_blinking_blue_button("∞:off,250;on,250;off,500");
-                } else {
-                    set_blinking_red_button("∞:on,250;off,250");
-                    set_blinking_blue_button("∞:off,250;on,250");
-                }
-                if (num_teams < 3) off_green_button();
-                else if (num_teams == 3) {
-                    set_blinking_green_button("∞:off,500;on,250");
-                } else if (num_teams == 4) {
-                    set_blinking_green_button("∞:off,500;on,250;off,250");
-                }
-                if (num_teams < 4) off_yellow_button();
-                else set_blinking_yellow_button("∞:off,750;on,250");
-
-                set_blinking_led_green("∞:on,1000;off,1000");
-            }
 
             if (game_state == TIMED_GAME_PAUSED) {
                 getLogger().debug("PAUSED");
                 display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
                 set_blinking_led_green("∞:on,500;off,500");
-                setSignals();
+                setFlagSignals();
             }
 
             if (game_state == TIMED_GAME_RUNNING) {
@@ -272,10 +242,7 @@ public class OCF extends TimedGame {
             }
 
 //            // hier findet die Auswertung nach dem Spielende statt.
-            if (game_state == TIMED_GAME_OVER) {
-                set_siren_scheme(Configs.OUT_SIREN_START_STOP, Configs.OCF_START_STOP_SIGNAL);
 
-            }
 //
 //
 //                if (GameStateService.isDrawgame(statistics.getGameState())) {
@@ -345,9 +312,125 @@ public class OCF extends TimedGame {
     }
 
     @Override
-    void setSignals() {
-        if (game_state == TIMED_GAME_PREPARE || game_state == TIMED_GAME_PAUSED) {
+    void setSirens() {
+    }
 
+    @Override
+    void setLEDsAndButtons() {
+        if (game_state == TIMED_GAME_PREPARE) {
+            if (num_teams == 3) {
+                set_blinking_red_button("∞:on,250;off,500");
+                set_blinking_blue_button("∞:off,250;on,250;off,250");
+            } else if (num_teams == 4) {
+                set_blinking_red_button("∞:on,250;off,750");
+                set_blinking_blue_button("∞:off,250;on,250;off,500");
+            } else {
+                set_blinking_red_button("∞:on,250;off,250");
+                set_blinking_blue_button("∞:off,250;on,250");
+            }
+            if (num_teams < 3) off_green_button();
+            else if (num_teams == 3) {
+                set_blinking_green_button("∞:off,500;on,250");
+            } else if (num_teams == 4) {
+                set_blinking_green_button("∞:off,500;on,250;off,250");
+            }
+            if (num_teams < 4) off_yellow_button();
+            else set_blinking_yellow_button("∞:off,750;on,250");
+
+            set_blinking_led_green("∞:on,1000;off,1000");
+        }
+
+        if (game_state == TIMED_GAME_RUNNING) {
+            if (flag_state.equals(FLAG_NEUTRAL)) {
+                set_blinking_red_button("∞:on,500;off,500");
+                set_blinking_blue_button("∞:on,500;off,500");
+
+                if (num_teams >= 3)
+                    set_blinking_green_button("∞:on,500;off,500");
+                if (num_teams >= 4)
+                    set_blinking_yellow_button("∞:on,500;off,500");
+
+//                button_blue.setEnabled(true);
+//                button_red.setEnabled(true);
+//                button_green.setEnabled(num_teams >= 3);
+//                button_yellow.setEnabled(num_teams >= 4);
+
+            } else if (flag_state.equals(RED_ACTIVATED)) {
+                set_blinking_blue_button("∞:on,500;off,500");
+
+                if (num_teams >= 3)
+                    set_blinking_green_button("∞:on,500;off,500");
+                if (num_teams >= 4)
+                    set_blinking_yellow_button("∞:on,500;off,500");
+
+                try {
+                    display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
+                } catch (IOException e) {
+                    getLogger().error(e);
+                }
+
+//                button_blue.setEnabled(true);
+//                button_red.setEnabled(false);
+//                button_green.setEnabled(num_teams >= 3);
+//                button_yellow.setEnabled(num_teams >= 4);
+
+            } else if (flag_state.equals(BLUE_ACTIVATED)) {
+                set_blinking_red_button("∞:on,500;off,500");
+
+                if (num_teams >= 3)
+                    set_blinking_green_button("∞:on,500;off,500");
+                if (num_teams >= 4)
+                    set_blinking_yellow_button("∞:on,500;off,500");
+
+                try {
+                    display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
+                } catch (IOException e) {
+                    getLogger().error(e);
+                }
+
+//                button_blue.setEnabled(false);
+//                button_red.setEnabled(true);
+//                button_green.setEnabled(num_teams >= 3);
+//                button_yellow.setEnabled(num_teams >= 4);
+            } else if (flag_state.equals(GREEN_ACTIVATED)) {
+                set_blinking_red_button("∞:on,500;off,500");
+                set_blinking_blue_button("∞:on,500;off,500");
+
+                if (num_teams >= 4)
+                    set_blinking_yellow_button("∞:on,500;off,500");
+
+                try {
+                    display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
+                } catch (IOException e) {
+                    getLogger().error(e);
+                }
+
+//                button_blue.setEnabled(true);
+//                button_red.setEnabled(true);
+//                button_green.setEnabled(false);
+//                button_yellow.setEnabled(num_teams >= 4);
+            } else if (flag_state.equals(YELLOW_ACTIVATED)) {
+                set_blinking_red_button("∞:on,500;off,500");
+                set_blinking_blue_button("∞:on,500;off,500");
+                set_blinking_green_button("∞:on,500;off,500");
+
+                try {
+                    display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
+                } catch (IOException e) {
+                    getLogger().error(e);
+                }
+
+//                button_blue.setEnabled(true);
+//                button_red.setEnabled(true);
+//                button_green.setEnabled(true);
+//                button_yellow.setEnabled(false);
+            }
+        }
+    }
+
+    @Override
+    void setFlagSignals() {
+        if (game_state == TIMED_GAME_PREPARE || game_state == TIMED_GAME_PAUSED) {
             String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
                     new RGBScheduleElement(Configs.FLAG_RGB_WHITE, 350l) + ";" +
                     new RGBScheduleElement(Configs.FLAG_RGB_RED, 350l) + ";" +
@@ -375,111 +458,26 @@ public class OCF extends TimedGame {
                 set_blinking_flag_blue("∞:off,700;on,350;off,3000");
             }
 
-        } else {
+        }
+        if (game_state == TIMED_GAME_RUNNING) {
             if (flag_state.equals(FLAG_NEUTRAL)) {
-                getLogger().info("Flag is neutral");
-                set_blinking_red_button("∞:on,500;off,500");
-                set_blinking_blue_button("∞:on,500;off,500");
-
-                if (num_teams >= 3)
-                    set_blinking_green_button("∞:on,500;off,500");
-                if (num_teams >= 4)
-                    set_blinking_yellow_button("∞:on,500;off,500");
-
                 set_blinking_flag_rgb("NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
                 set_blinking_flag_white(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-
-                button_blue.setEnabled(true);
-                button_red.setEnabled(true);
-                button_green.setEnabled(num_teams >= 3);
-                button_yellow.setEnabled(num_teams >= 4);
-
             } else if (flag_state.equals(RED_ACTIVATED)) {
-                getLogger().info("Flag is red");
-                set_blinking_blue_button("∞:on,500;off,500");
-
-                if (num_teams >= 3)
-                    set_blinking_green_button("∞:on,500;off,500");
-                if (num_teams >= 4)
-                    set_blinking_yellow_button("∞:on,500;off,500");
-
-                try {
-                    display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
-                } catch (IOException e) {
-                    getLogger().error(e);
-                }
                 set_blinking_flag_rgb("RED ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
                 set_blinking_flag_blue(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-
-                button_blue.setEnabled(true);
-                button_red.setEnabled(false);
-                button_green.setEnabled(num_teams >= 3);
-                button_yellow.setEnabled(num_teams >= 4);
-
             } else if (flag_state.equals(BLUE_ACTIVATED)) {
-                getLogger().info("Flag is blue");
-                set_blinking_red_button("∞:on,500;off,500");
-
-                if (num_teams >= 3)
-                    set_blinking_green_button("∞:on,500;off,500");
-                if (num_teams >= 4)
-                    set_blinking_yellow_button("∞:on,500;off,500");
-
-                try {
-                    display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
-                } catch (IOException e) {
-                    getLogger().error(e);
-                }
                 set_blinking_flag_rgb("RED ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
                 set_blinking_flag_blue(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-
-                button_blue.setEnabled(false);
-                button_red.setEnabled(true);
-                button_green.setEnabled(num_teams >= 3);
-                button_yellow.setEnabled(num_teams >= 4);
             } else if (flag_state.equals(GREEN_ACTIVATED)) {
-                getLogger().info("Flag is green");
-
-                set_blinking_red_button("∞:on,500;off,500");
-                set_blinking_blue_button("∞:on,500;off,500");
-
-                if (num_teams >= 4)
-                    set_blinking_yellow_button("∞:on,500;off,500");
-
-                try {
-                    display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
-                } catch (IOException e) {
-                    getLogger().error(e);
-                }
-
                 set_blinking_flag_rgb("GREEN ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
                 set_blinking_flag_green(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-
-                button_blue.setEnabled(true);
-                button_red.setEnabled(true);
-                button_green.setEnabled(false);
-                button_yellow.setEnabled(num_teams >= 4);
             } else if (flag_state.equals(YELLOW_ACTIVATED)) {
-                getLogger().info("Flag is yellow");
-                set_blinking_red_button("∞:on,500;off,500");
-                set_blinking_blue_button("∞:on,500;off,500");
-                set_blinking_green_button("∞:on,500;off,500");
-
-                try {
-                    display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
-                } catch (IOException e) {
-                    getLogger().error(e);
-                }
                 // je nachdem welches RGB Stripes man nimmt, ist die Definition von "gelb" sehr unterschiedlich.
                 // Daher mische ich hier mein eigenes Gelb.
                 Color myyellow = Tools.getColor(Main.getFromConfigs(Configs.FLAG_RGB_YELLOW));
                 set_blinking_flag_rgb("YELLOW ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(myyellow, remaining));
                 set_blinking_flag_yellow(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-
-                button_blue.setEnabled(true);
-                button_red.setEnabled(true);
-                button_green.setEnabled(true);
-                button_yellow.setEnabled(false);
             }
         }
     }

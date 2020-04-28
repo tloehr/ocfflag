@@ -129,13 +129,18 @@ public class SpawnCounter extends Game {
     }
 
     @Override
-    void setSignals() {
+    void setFlagSignals() {
         
     }
 
     @Override
     void setSirens() {
 
+    }
+
+    @Override
+    void setLEDsAndButtons() {
+        
     }
 
 

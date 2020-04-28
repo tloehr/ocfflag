@@ -9,10 +9,7 @@ new FormModel {
 			"defaultCloseOperation": 3
 			"$locationPolicy": 1
 			"$sizePolicy": 1
-			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-				"$columnSpecs": "relgap, labelcompgap, pref, labelcompgap, 62dlu:grow, labelcompgap, pref:grow, labelcompgap, relgap"
-				"$rowSpecs": "relgap, linegap, pref, relgap, fill:pref:grow, linegap"
-			} ) {
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 				name: "mainView"
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 					"$columnSpecs": "default, labelcompgap, 70dlu:grow, labelcompgap, unrelgap, labelcompgap, 162dlu:grow, labelcompgap, unrelgap, labelcompgap, 70dlu:grow, labelcompgap, default"
@@ -259,29 +256,27 @@ new FormModel {
 						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints TOP
 						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					} )
-				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 3
-					"gridY": 3
-					"gridWidth": 5
-					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints TOP
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "North"
 				} )
-				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-					"$columnSpecs": "327dlu:grow"
-					"$rowSpecs": "fill:default:grow, unrelgap, default, linegap, default"
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+					"axis": 3
 				} ) {
 					name: "panel5"
-					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
-						"axis": 3
-					} ) {
-						name: "lcd_panel"
-						"border": new javax.swing.border.LineBorder( sfield java.awt.Color black, 4, false )
-						"background": new java.awt.Color( 220, 223, 208, 255 )
-						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "label4"
-							"text": "12345678901234567890"
-							"font": new java.awt.Font( "Courier New", 1, 16 )
+					add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+						name: "logscroller"
+						"horizontalScrollBarPolicy": 31
+						"autoscrolls": true
+						"preferredSize": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						add( new FormComponent( "javax.swing.JTextArea" ) {
+							name: "txtLogger"
+							"foreground": sfield java.awt.Color green
+							"background": new java.awt.Color( 0, 0, 0, 255 )
+							"font": new java.awt.Font( "Monospaced", 0, 14 )
+							"wrapStyleWord": true
+							"lineWrap": true
 						} )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) )
+					} )
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
 						name: "panel3"
 						add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
@@ -304,13 +299,9 @@ new FormModel {
 							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/exit.png" )
 							"toolTipText": "Programm beenden"
 						} )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 3
-						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints CENTER
 					} )
-				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 3
-					"gridY": 5
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "Center"
 				} )
 			} )
 		}, new FormLayoutConstraints( null ) {

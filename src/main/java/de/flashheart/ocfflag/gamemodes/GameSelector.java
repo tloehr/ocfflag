@@ -86,7 +86,7 @@ public class GameSelector extends Game {
     }
 
     @Override
-    void setSignals() {
+    void setFlagSignals() {
         
     }
 
@@ -95,5 +95,8 @@ public class GameSelector extends Game {
 
     }
 
-
+    @Override
+    void setLEDsAndButtons() {
+        
+    }
 }

@@ -84,6 +84,7 @@ public abstract class TimedGame extends Game implements Runnable {
      * setzt die restliche Spielzeit auf die Gesamtspielzeit zurück
      */
     void reset_timers() {
+        getLogger().info("reset_timers()");
         remaining = matchlength;
         matchtime = 0l;
         last_cycle_started_at = 0l;
@@ -117,6 +118,7 @@ public abstract class TimedGame extends Game implements Runnable {
     void game_over() {
         getLogger().info("game_over()");
         game_state = TIMED_GAME_OVER;
+        update_all_signals();
     }
 
     /**
@@ -124,6 +126,7 @@ public abstract class TimedGame extends Game implements Runnable {
      */
     void start() {
         game_state = TIMED_GAME_RUNNING;
+        update_all_signals();
     }
 
     /**
@@ -131,6 +134,7 @@ public abstract class TimedGame extends Game implements Runnable {
      */
     void prepare() {
         game_state = TIMED_GAME_PREPARE;
+        reset_timers();
     }
 
     @Override
@@ -146,7 +150,8 @@ public abstract class TimedGame extends Game implements Runnable {
         all_off();
         setDisplay();
         setSirens();
-        setSignals();
+        setLEDsAndButtons();
+        setFlagSignals();
     }
 
     @Override
