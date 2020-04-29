@@ -99,6 +99,7 @@ public abstract class TimedGame extends Game implements Runnable {
         getLogger().info("pause()");
         pausing_since = System.currentTimeMillis();
         game_state = TIMED_GAME_PAUSED;
+        update_all_signals();
     }
 
     /**
@@ -110,6 +111,7 @@ public abstract class TimedGame extends Game implements Runnable {
 //        last_cycle_started_at = last_cycle_started_at + pause; // verschieben des Zeitpunkts um die Pausenzeit
         pausing_since = 0l;
         game_state = TIMED_GAME_RUNNING;
+        update_all_signals();
     }
 
     /**
@@ -149,7 +151,6 @@ public abstract class TimedGame extends Game implements Runnable {
     void update_all_signals() {
         all_off();
         setDisplay();
-        setSirens();
         setLEDsAndButtons();
         setFlagSignals();
     }

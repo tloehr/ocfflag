@@ -109,6 +109,14 @@ public class FrameDebug extends JFrame {
         return btnQuit;
     }
 
+    public JButton getBtnSwitchGame() {
+        return btnSwitchGame;
+    }
+
+    public JButton getBtnShutdown() {
+        return btnShutdown;
+    }
+
     private void btnTestDialogActionPerformed(ActionEvent e) {
         if (testDlg != null) return;
         testDlg = new DlgTest(this);
@@ -153,10 +161,6 @@ public class FrameDebug extends JFrame {
         btnB = new JButton();
         btnC = new JButton();
         btnD = new JButton();
-        lblA = new JLabel();
-        lblB = new JLabel();
-        lblC = new JLabel();
-        lblD = new JLabel();
         panel5 = new JPanel();
         logscroller = new JScrollPane();
         txtLogger = new JTextArea();
@@ -165,9 +169,11 @@ public class FrameDebug extends JFrame {
         ledWhite = new MyLED();
         btnTestDialog = new JButton();
         btnQuit = new JButton();
+        btnSwitchGame = new JButton();
+        btnShutdown = new JButton();
 
         //======== this ========
-        setTitle("OCF-Flag 1.0.0.0");
+        setTitle("RLG System");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
@@ -179,19 +185,19 @@ public class FrameDebug extends JFrame {
             //======== upperPanel ========
             {
                 upperPanel.setLayout(new FormLayout(
-                    "default, $lcgap, 70dlu:grow, $lcgap, $ugap, $lcgap, 162dlu:grow, $lcgap, $ugap, $lcgap, 70dlu:grow, $lcgap, default",
-                    "pref, $lgap, fill:default, $lgap, pref, $lgap, fill:default, $lgap, pref"));
+                    "$rgap, default, $lcgap, 70dlu:grow, $lcgap, $ugap, $lcgap, 162dlu:grow, $lcgap, $ugap, $lcgap, 70dlu:grow, $lcgap, default, $rgap",
+                    "$rgap, pref, $lgap, fill:default, $lgap, pref, $lgap, fill:default, $lgap, pref"));
 
                 //---- ledRedButton ----
                 ledRedButton.setColor(Color.red);
                 ledRedButton.setToolTipText("Red LED in Button");
-                upperPanel.add(ledRedButton, CC.xy(1, 1));
+                upperPanel.add(ledRedButton, CC.xy(2, 2));
 
                 //---- btnRed ----
                 btnRed.setText("Red");
                 btnRed.setForeground(Color.red);
                 btnRed.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
-                upperPanel.add(btnRed, CC.xy(3, 1));
+                upperPanel.add(btnRed, CC.xy(4, 2));
 
                 //---- lblPole ----
                 lblPole.setOpaque(true);
@@ -200,39 +206,39 @@ public class FrameDebug extends JFrame {
                 lblPole.setForeground(Color.black);
                 lblPole.setHorizontalAlignment(SwingConstants.CENTER);
                 lblPole.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
-                upperPanel.add(lblPole, CC.xywh(7, 1, 1, 3));
+                upperPanel.add(lblPole, CC.xywh(8, 2, 1, 3));
 
                 //---- btnBlue ----
                 btnBlue.setText("Blue");
                 btnBlue.setForeground(Color.blue);
                 btnBlue.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
-                upperPanel.add(btnBlue, CC.xy(11, 1, CC.FILL, CC.DEFAULT));
+                upperPanel.add(btnBlue, CC.xy(12, 2, CC.FILL, CC.DEFAULT));
 
                 //---- ledBlueButton ----
                 ledBlueButton.setColor(Color.blue);
                 ledBlueButton.setToolTipText("Blue LED in Button");
-                upperPanel.add(ledBlueButton, CC.xy(13, 1));
+                upperPanel.add(ledBlueButton, CC.xy(14, 2));
 
                 //---- pbRed ----
                 pbRed.setStringPainted(true);
                 pbRed.setVisible(false);
-                upperPanel.add(pbRed, CC.xywh(1, 3, 3, 1, CC.DEFAULT, CC.FILL));
+                upperPanel.add(pbRed, CC.xywh(2, 4, 3, 1, CC.DEFAULT, CC.FILL));
 
                 //---- pbBlue ----
                 pbBlue.setStringPainted(true);
                 pbBlue.setVisible(false);
-                upperPanel.add(pbBlue, CC.xywh(11, 3, 3, 1, CC.DEFAULT, CC.FILL));
+                upperPanel.add(pbBlue, CC.xywh(12, 4, 3, 1, CC.DEFAULT, CC.FILL));
 
                 //---- ledGreenButton ----
                 ledGreenButton.setColor(Color.green);
                 ledGreenButton.setToolTipText("Red LED in Button");
-                upperPanel.add(ledGreenButton, CC.xy(1, 5));
+                upperPanel.add(ledGreenButton, CC.xy(2, 6));
 
                 //---- btnGreen ----
                 btnGreen.setText("Green");
                 btnGreen.setForeground(new Color(18, 110, 12));
                 btnGreen.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
-                upperPanel.add(btnGreen, CC.xy(3, 5));
+                upperPanel.add(btnGreen, CC.xy(4, 6));
 
                 //======== pnlFlagLEDs ========
                 {
@@ -263,18 +269,18 @@ public class FrameDebug extends JFrame {
                     ledFlagYellow.setToolTipText("Yellow LED in Button");
                     pnlFlagLEDs.add(ledFlagYellow);
                 }
-                upperPanel.add(pnlFlagLEDs, CC.xywh(7, 5, 1, 3));
+                upperPanel.add(pnlFlagLEDs, CC.xywh(8, 6, 1, 3));
 
                 //---- btnYellow ----
                 btnYellow.setText("Yellow");
                 btnYellow.setForeground(new Color(210, 199, 27));
                 btnYellow.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
-                upperPanel.add(btnYellow, CC.xy(11, 5, CC.FILL, CC.DEFAULT));
+                upperPanel.add(btnYellow, CC.xy(12, 6, CC.FILL, CC.DEFAULT));
 
                 //---- ledYellowButton ----
                 ledYellowButton.setColor(Color.yellow);
                 ledYellowButton.setToolTipText("Yellow LED in Button");
-                upperPanel.add(ledYellowButton, CC.xy(13, 5));
+                upperPanel.add(ledYellowButton, CC.xy(14, 6));
 
                 //======== panel4 ========
                 {
@@ -285,7 +291,7 @@ public class FrameDebug extends JFrame {
                     pbGreen.setVisible(false);
                     panel4.add(pbGreen);
                 }
-                upperPanel.add(panel4, CC.xywh(1, 7, 3, 1, CC.DEFAULT, CC.TOP));
+                upperPanel.add(panel4, CC.xywh(2, 8, 3, 1, CC.DEFAULT, CC.TOP));
 
                 //======== panel6 ========
                 {
@@ -296,13 +302,13 @@ public class FrameDebug extends JFrame {
                     pbYellow.setVisible(false);
                     panel6.add(pbYellow);
                 }
-                upperPanel.add(panel6, CC.xywh(11, 7, 3, 1, CC.DEFAULT, CC.TOP));
+                upperPanel.add(panel6, CC.xywh(12, 8, 3, 1, CC.DEFAULT, CC.TOP));
 
                 //======== panel7 ========
                 {
                     panel7.setLayout(new FormLayout(
                         "4*(default:grow)",
-                        "2*(pref)"));
+                        "pref"));
 
                     //---- btnA ----
                     btnA.setText("A");
@@ -339,32 +345,8 @@ public class FrameDebug extends JFrame {
                     btnD.setVerticalTextPosition(SwingConstants.BOTTOM);
                     btnD.setHorizontalTextPosition(SwingConstants.CENTER);
                     panel7.add(btnD, CC.xy(4, 1));
-
-                    //---- lblA ----
-                    lblA.setText("text");
-                    lblA.setFont(new Font(Font.DIALOG, Font.BOLD, 18));
-                    lblA.setHorizontalAlignment(SwingConstants.CENTER);
-                    panel7.add(lblA, CC.xy(1, 2));
-
-                    //---- lblB ----
-                    lblB.setText("text");
-                    lblB.setFont(new Font(Font.DIALOG, Font.BOLD, 18));
-                    lblB.setHorizontalAlignment(SwingConstants.CENTER);
-                    panel7.add(lblB, CC.xy(2, 2));
-
-                    //---- lblC ----
-                    lblC.setText("text");
-                    lblC.setFont(new Font(Font.DIALOG, Font.BOLD, 18));
-                    lblC.setHorizontalAlignment(SwingConstants.CENTER);
-                    panel7.add(lblC, CC.xy(3, 2));
-
-                    //---- lblD ----
-                    lblD.setText("text");
-                    lblD.setFont(new Font(Font.DIALOG, Font.BOLD, 18));
-                    lblD.setHorizontalAlignment(SwingConstants.CENTER);
-                    panel7.add(lblD, CC.xy(4, 2));
                 }
-                upperPanel.add(panel7, CC.xywh(1, 9, 13, 1, CC.FILL, CC.TOP));
+                upperPanel.add(panel7, CC.xywh(2, 10, 13, 1, CC.FILL, CC.TOP));
             }
             mainView.add(upperPanel, BorderLayout.NORTH);
 
@@ -408,9 +390,21 @@ public class FrameDebug extends JFrame {
 
                     //---- btnQuit ----
                     btnQuit.setText(null);
-                    btnQuit.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/exit.png")));
+                    btnQuit.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/player_pause.png")));
                     btnQuit.setToolTipText("Programm beenden");
                     panel3.add(btnQuit);
+
+                    //---- btnSwitchGame ----
+                    btnSwitchGame.setText(null);
+                    btnSwitchGame.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/gaming_pad.png")));
+                    btnSwitchGame.setToolTipText("Programm beenden");
+                    panel3.add(btnSwitchGame);
+
+                    //---- btnShutdown ----
+                    btnShutdown.setText(null);
+                    btnShutdown.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/exit.png")));
+                    btnShutdown.setToolTipText("Programm beenden");
+                    panel3.add(btnShutdown);
                 }
                 panel5.add(panel3);
             }
@@ -534,10 +528,6 @@ public class FrameDebug extends JFrame {
     private JButton btnB;
     private JButton btnC;
     private JButton btnD;
-    private JLabel lblA;
-    private JLabel lblB;
-    private JLabel lblC;
-    private JLabel lblD;
     private JPanel panel5;
     private JScrollPane logscroller;
     private JTextArea txtLogger;
@@ -546,5 +536,7 @@ public class FrameDebug extends JFrame {
     private MyLED ledWhite;
     private JButton btnTestDialog;
     private JButton btnQuit;
+    private JButton btnSwitchGame;
+    private JButton btnShutdown;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
