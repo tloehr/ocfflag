@@ -183,28 +183,28 @@ new FormModel {
 					} ) {
 						name: "panel7"
 						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnA"
-							"text": "A"
-							"icon": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"verticalTextPosition": 3
-							"horizontalTextPosition": 0
-							"font": new java.awt.Font( "Dialog", 1, 24 )
-							"toolTipText": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) )
-						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnB"
 							"icon": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							"toolTipText": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							"font": &Font1 new java.awt.Font( "Dialog", 1, 24 )
 							"verticalTextPosition": 3
 							"horizontalTextPosition": 0
-							"text": "B"
+							"text": "K1"
+						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "btnA"
+							"text": "K2"
+							"icon": sfield com.jformdesigner.model.FormObject NULL_VALUE
+							"verticalTextPosition": 3
+							"horizontalTextPosition": 0
+							"font": new java.awt.Font( "Dialog", 1, 24 )
+							"toolTipText": sfield com.jformdesigner.model.FormObject NULL_VALUE
 						}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 							"gridX": 2
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnC"
-							"text": "C"
+							"text": "K3"
 							"icon": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							"toolTipText": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							"font": #Font1
@@ -215,7 +215,7 @@ new FormModel {
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnD"
-							"text": "D"
+							"text": "K4"
 							"icon": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							"toolTipText": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							"font": #Font1
@@ -273,6 +273,7 @@ new FormModel {
 							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/player_pause.png" )
 							"toolTipText": "Programm beenden"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnQuitActionPerformed", true ) )
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnSwitchGame"
@@ -286,6 +287,25 @@ new FormModel {
 							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/exit.png" )
 							"toolTipText": "Programm beenden"
 						} )
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
+							name: "panel1"
+							"border": new javax.swing.border.TitledBorder( "LOG-LEVEL" )
+							add( new FormComponent( "javax.swing.JToggleButton" ) {
+								name: "tbDebug"
+								"text": "DEBUG"
+								"$buttonGroup": new FormReference( "buttonGroup1" )
+								"selected": true
+								"selectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/48x48/led-green-on.png" )
+								"icon": sfield com.jformdesigner.model.FormObject NULL_VALUE
+								addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "tbDebugItemStateChanged", true ) )
+							} )
+							add( new FormComponent( "javax.swing.JToggleButton" ) {
+								name: "tbInfo"
+								"text": "INFO"
+								"$buttonGroup": new FormReference( "buttonGroup1" )
+								addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "tbInfoItemStateChanged", true ) )
+							} )
+						} )
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {
 					"value": "Center"
@@ -294,6 +314,11 @@ new FormModel {
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 10 )
 			"size": new java.awt.Dimension( 890, 660 )
+		} )
+		add( new FormNonVisual( "javax.swing.ButtonGroup" ) {
+			name: "buttonGroup1"
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 686 )
 		} )
 	}
 }

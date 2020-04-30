@@ -75,11 +75,6 @@ public abstract class TimedGame extends Game implements Runnable {
         }
     }
 
-    @Override
-    void start_gamemode() {
-        super.start_gamemode();
-    }
-
     /**
      * setzt die restliche Spielzeit auf die Gesamtspielzeit zurück
      */

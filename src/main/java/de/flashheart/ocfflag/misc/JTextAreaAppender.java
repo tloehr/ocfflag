@@ -16,18 +16,20 @@ public class JTextAreaAppender extends AppenderSkeleton {
 
     @Override
     protected void append(LoggingEvent event) {
+
         if (txt == null && Main.getFromContext(Configs.FRAME_DEBUG) != null) {
             txt = ((FrameDebug) Main.getFromContext(Configs.FRAME_DEBUG)).getTxtLogger();
             scrl = ((FrameDebug) Main.getFromContext(Configs.FRAME_DEBUG)).getLogscroller();
         }
 
-        if (txt != null) {
+        if (txt != null && event.getLevel().isGreaterOrEqual(((FrameDebug) Main.getFromContext(Configs.FRAME_DEBUG)).getLogLevel())) {
             SwingUtilities.invokeLater(() -> {
                 txt.append(layout.format(event));
                 scrl.getVerticalScrollBar().setValue(scrl.getVerticalScrollBar().getMaximum());
             });
 
         }
+
     }
 
     public void close() {

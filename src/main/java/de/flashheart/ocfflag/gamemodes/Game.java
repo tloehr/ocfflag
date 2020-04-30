@@ -77,11 +77,9 @@ public abstract class Game implements HasLogger {
         this.num_teams = num_teams;
         configs = (Configs) Main.getFromContext("configs");
         mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
-        initHardware();
-        initSoftware();
-        initGame();
-        start_gamemode();
     }
+
+
 
     /**
      * hier werden alle Event-Listeners verknüpft.
@@ -137,16 +135,19 @@ public abstract class Game implements HasLogger {
     /**
      * damit wird der eigentliche Game-Mode gestartet
      */
-    void start_gamemode() {
+    public void start_gamemode() {
         getLogger().debug("\n\n==================================================");
         getLogger().debug("starting gamemode: " + getName());
+        initHardware();
+        initSoftware();
+        initGame();
     }
 
     /**
      * kurz bevor der Game-Mode endet, wir diese Methode aufgerufen.
      * Meistens vor einem Game-Mode wechsel.
      */
-    void stop_gamemode() {
+    public void stop_gamemode() {
         getLogger().debug("stopping gamemode: " + getName());
         getLogger().debug("==================================================\n\n");
         mySystem.getPinHandler().off();
@@ -193,7 +194,9 @@ public abstract class Game implements HasLogger {
     /**
      * wird von den eigentlichen Klassen implementiert um alle GameMode bezogenen Initialisierungen durchzuführen.
      */
-    abstract void initGame();
+    void initGame() {
+
+    }
 
     void change_game() {
         getLogger().debug("change_game()");
@@ -225,7 +228,8 @@ public abstract class Game implements HasLogger {
         button_teamcolor_pressed(RED_ACTIVATED);
     }
 
-    abstract void button_teamcolor_pressed(String FLAGSTATE);
+    void button_teamcolor_pressed(String FLAGSTATE) {
+    }
 
     void button_blue_pressed() {
         getLogger().debug("button_blue_pressed");
@@ -365,11 +369,17 @@ public abstract class Game implements HasLogger {
         mySystem.getPinHandler().setScheme(siren_key, Main.getFromConfigs(siren_scheme));
     }
 
-    abstract void setDisplay();
+    void setDisplay() {
 
-    abstract void setFlagSignals();
+    }
 
-    abstract void setLEDsAndButtons();
+    void setFlagSignals() {
+
+    }
+
+    void setLEDsAndButtons() {
+
+    }
 
     void all_off() {
         try {

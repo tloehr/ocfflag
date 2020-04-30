@@ -15,14 +15,10 @@ public class GameSelector extends Game {
     @Override
     void initGame() {
         k1.setText("Run selected game");
-        k3.setText("game++");
-        k4.setText("game--");
+        k2.setText("game++");
+        k3.setText("game--");
+        k4.setText("");
         game_index = 0;
-    }
-
-    @Override
-    void button_teamcolor_pressed(String FLAGSTATE) {
-        // i dont care about these buttons here
     }
 
     @Override
@@ -53,16 +49,16 @@ public class GameSelector extends Game {
     }
 
     @Override
-    void button_k3_pressed() {
+    void button_k2_pressed() {
         game_index++;
         if (game_index >= gamemodes.length) game_index = 0;
         setDisplay();
     }
 
     @Override
-    void button_k4_pressed() {
+    void button_k3_pressed() {
         game_index--;
-        if (game_index <= 0) game_index = gamemodes.length - 1;
+        if (game_index < 0) game_index = gamemodes.length - 1;
         setDisplay();
     }
 
@@ -79,19 +75,11 @@ public class GameSelector extends Game {
     @Override
     void setDisplay() {
         try {
+            getLogger().debug(gamemodes[game_index]);
             display_white.setText(gamemodes[game_index]);
         } catch (IOException e) {
             getLogger().error(e);
         }
     }
 
-    @Override
-    void setFlagSignals() {
-        
-    }
-
-    @Override
-    void setLEDsAndButtons() {
-        
-    }
 }

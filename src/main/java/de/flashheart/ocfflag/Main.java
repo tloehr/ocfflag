@@ -1,6 +1,7 @@
 package de.flashheart.ocfflag;
 
 import de.flashheart.ocfflag.gamemodes.Game;
+import de.flashheart.ocfflag.gamemodes.GameSelector;
 import de.flashheart.ocfflag.gamemodes.OCF;
 import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.MySystem;
@@ -39,7 +40,7 @@ public class Main {
         frameDebug.setVisible(true);
 
 
-        setGame(new OCF(2));
+        setGame(new GameSelector());
     }
 
     public static Object getFromContext(String key) {
@@ -166,6 +167,8 @@ public class Main {
     }
 
     public static void setGame(Game game) {
+        if (currentGame != null) currentGame.stop_gamemode();
         currentGame = game;
+        currentGame.start_gamemode();
     }
 }

@@ -7,27 +7,30 @@ package de.flashheart.ocfflag.gui;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.misc.Configs;
+import de.flashheart.ocfflag.misc.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 /**
  * @author Torsten Löhr
  */
-public class FrameDebug extends JFrame {
-    private final Logger logger = Logger.getLogger(getClass());
-//    private MySystem mySystem;
+public class FrameDebug extends JFrame implements HasLogger {
+
+    //    private MySystem mySystem;
 //    private Font font;
 //    private Font font2;
+    private Level logLevel;
     private JDialog testDlg;
+    private Configs configs;
 //    public static final Icon IconPlay = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/player_play.png"));
 //    public static final Icon IconPause = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/player_pause.png"));
 //    public static final Icon IconGametime = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/clock.png"));
@@ -68,14 +71,12 @@ public class FrameDebug extends JFrame {
 
     private void initFrame() {
 //        mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
-        Configs configs = (Configs) Main.getFromContext("configs");
+        configs = (Configs) Main.getFromContext("configs");
 
 //        initFonts();
         btnTestDialog.setVisible(Tools.isBooleanFromContext(Configs.DEV_MODE));
-
+        logLevel = Level.toLevel(configs.get(Configs.LOGLEVEL));
         String title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber") + " [" + configs.getApplicationInfo("project.build.timestamp") + "]";
-
-        logger.info(title);
 
         setTitle(title);
 
@@ -91,8 +92,11 @@ public class FrameDebug extends JFrame {
 //        pbRed.setVisible(mySystem.getREACTION_TIME() > 0);
 
 //        lblPole.setFont(font2.deriveFont(80f).deriveFont(Font.BOLD));
-                                                                                                      
+
+        tbDebug.setSelected(logLevel.equals(Level.DEBUG));
+
         if (Tools.isArm()) setExtendedState(MAXIMIZED_BOTH);
+        btnShutdown.setEnabled(Tools.isArm());
     }
 
 //    private void initFonts() {
@@ -113,6 +117,7 @@ public class FrameDebug extends JFrame {
         return btnSwitchGame;
     }
 
+
     public JButton getBtnShutdown() {
         return btnShutdown;
     }
@@ -129,6 +134,27 @@ public class FrameDebug extends JFrame {
                 testDlg = null;
             }
         });
+    }
+
+    private void tbDebugItemStateChanged(ItemEvent e) {
+        if (e.getStateChange() != ItemEvent.SELECTED) return;
+        logLevel = Level.DEBUG;
+        configs.put(Configs.LOGLEVEL, logLevel.toString());
+    }
+
+    private void tbInfoItemStateChanged(ItemEvent e) {
+        if (e.getStateChange() != ItemEvent.SELECTED) return;
+        logLevel = Level.INFO;
+        configs.put(Configs.LOGLEVEL, logLevel.toString());
+    }
+
+    public Level getLogLevel() {
+        return logLevel;
+    }
+
+    private void btnQuitActionPerformed(ActionEvent e) {
+        Main.prepareShutdown();
+        System.exit(0);
     }
 
     private void initComponents() {
@@ -157,8 +183,8 @@ public class FrameDebug extends JFrame {
         panel6 = new JPanel();
         pbYellow = new JProgressBar();
         panel7 = new JPanel();
-        btnA = new JButton();
         btnB = new JButton();
+        btnA = new JButton();
         btnC = new JButton();
         btnD = new JButton();
         panel5 = new JPanel();
@@ -171,6 +197,9 @@ public class FrameDebug extends JFrame {
         btnQuit = new JButton();
         btnSwitchGame = new JButton();
         btnShutdown = new JButton();
+        panel1 = new JPanel();
+        tbDebug = new JToggleButton();
+        tbInfo = new JToggleButton();
 
         //======== this ========
         setTitle("RLG System");
@@ -310,26 +339,26 @@ public class FrameDebug extends JFrame {
                         "4*(default:grow)",
                         "pref"));
 
-                    //---- btnA ----
-                    btnA.setText("A");
-                    btnA.setIcon(null);
-                    btnA.setVerticalTextPosition(SwingConstants.BOTTOM);
-                    btnA.setHorizontalTextPosition(SwingConstants.CENTER);
-                    btnA.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
-                    btnA.setToolTipText(null);
-                    panel7.add(btnA, CC.xy(1, 1));
-
                     //---- btnB ----
                     btnB.setIcon(null);
                     btnB.setToolTipText(null);
                     btnB.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
                     btnB.setVerticalTextPosition(SwingConstants.BOTTOM);
                     btnB.setHorizontalTextPosition(SwingConstants.CENTER);
-                    btnB.setText("B");
-                    panel7.add(btnB, CC.xy(2, 1));
+                    btnB.setText("K1");
+                    panel7.add(btnB, CC.xy(1, 1));
+
+                    //---- btnA ----
+                    btnA.setText("K2");
+                    btnA.setIcon(null);
+                    btnA.setVerticalTextPosition(SwingConstants.BOTTOM);
+                    btnA.setHorizontalTextPosition(SwingConstants.CENTER);
+                    btnA.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                    btnA.setToolTipText(null);
+                    panel7.add(btnA, CC.xy(2, 1));
 
                     //---- btnC ----
-                    btnC.setText("C");
+                    btnC.setText("K3");
                     btnC.setIcon(null);
                     btnC.setToolTipText(null);
                     btnC.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
@@ -338,7 +367,7 @@ public class FrameDebug extends JFrame {
                     panel7.add(btnC, CC.xy(3, 1));
 
                     //---- btnD ----
-                    btnD.setText("D");
+                    btnD.setText("K4");
                     btnD.setIcon(null);
                     btnD.setToolTipText(null);
                     btnD.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
@@ -392,6 +421,7 @@ public class FrameDebug extends JFrame {
                     btnQuit.setText(null);
                     btnQuit.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/player_pause.png")));
                     btnQuit.setToolTipText("Programm beenden");
+                    btnQuit.addActionListener(e -> btnQuitActionPerformed(e));
                     panel3.add(btnQuit);
 
                     //---- btnSwitchGame ----
@@ -405,6 +435,26 @@ public class FrameDebug extends JFrame {
                     btnShutdown.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/exit.png")));
                     btnShutdown.setToolTipText("Programm beenden");
                     panel3.add(btnShutdown);
+
+                    //======== panel1 ========
+                    {
+                        panel1.setBorder(new TitledBorder("LOG-LEVEL"));
+                        panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+
+                        //---- tbDebug ----
+                        tbDebug.setText("DEBUG");
+                        tbDebug.setSelected(true);
+                        tbDebug.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/48x48/led-green-on.png")));
+                        tbDebug.setIcon(null);
+                        tbDebug.addItemListener(e -> tbDebugItemStateChanged(e));
+                        panel1.add(tbDebug);
+
+                        //---- tbInfo ----
+                        tbInfo.setText("INFO");
+                        tbInfo.addItemListener(e -> tbInfoItemStateChanged(e));
+                        panel1.add(tbInfo);
+                    }
+                    panel3.add(panel1);
                 }
                 panel5.add(panel3);
             }
@@ -413,6 +463,11 @@ public class FrameDebug extends JFrame {
         contentPane.add(mainView);
         setSize(890, 660);
         setLocationRelativeTo(null);
+
+        //---- buttonGroup1 ----
+        ButtonGroup buttonGroup1 = new ButtonGroup();
+        buttonGroup1.add(tbDebug);
+        buttonGroup1.add(tbInfo);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -524,8 +579,8 @@ public class FrameDebug extends JFrame {
     private JPanel panel6;
     private JProgressBar pbYellow;
     private JPanel panel7;
-    private JButton btnA;
     private JButton btnB;
+    private JButton btnA;
     private JButton btnC;
     private JButton btnD;
     private JPanel panel5;
@@ -538,5 +593,8 @@ public class FrameDebug extends JFrame {
     private JButton btnQuit;
     private JButton btnSwitchGame;
     private JButton btnShutdown;
+    private JPanel panel1;
+    private JToggleButton tbDebug;
+    private JToggleButton tbInfo;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
