@@ -1,50 +1,36 @@
 package de.flashheart.ocfflag.gamemodes;
 
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.misc.Configs;
 
 import java.io.IOException;
 
 public class GameSelector extends Game {
-    String[] gamemodes = new String[]{"OCF2", "OCF3", "OCF4", "SPWN"};
-    final int OCF2 = 0;
-    final int OCF3 = 1;
-    final int OCF4 = 2;
-    final int SPWN = 3;
+    String[] gamemodes;
+    //    final int OCF2 = 0;
+//    final int OCF3 = 1;
+//    final int OCF4 = 2;
+//    final int SPWN = 3;
     int game_index;
 
     @Override
     void initGame() {
-        k1.setText("Run selected game");
+        k1.setText(" ");
         k2.setText("game++");
         k3.setText("game--");
-        k4.setText("");
+        k4.setText("CHANGE GAME");
+        gamemodes = configs.get(Configs.RLGS_GAMEMODES).split("\\,");
         game_index = 0;
+        setDisplay();
     }
 
     @Override
-    void button_k1_pressed() {
-        Game game = null;
-        switch (game_index) {
-            case OCF2: {
-                game = new OCF(2);
-                break;
-            }
-            case OCF3: {
-                game = new OCF(3);
-                break;
-            }
-            case OCF4: {
-                game = new OCF(4);
-                break;
-            }
-            case SPWN: {
-                game = new SpawnCounter();
-                break;
-            }
-            default: {
-
-            }
-        }
+    void button_k4_pressed() {
+        Game game = this;
+        if (gamemodes[game_index].equalsIgnoreCase("ocf2")) game = new OCF(2);
+        if (gamemodes[game_index].equalsIgnoreCase("ocf3")) game = new OCF(3);
+        if (gamemodes[game_index].equalsIgnoreCase("ocf4")) game = new OCF(4);
+        if (gamemodes[game_index].equalsIgnoreCase("spwn")) game = new SpawnCounter();
         Main.setGame(game);
     }
 

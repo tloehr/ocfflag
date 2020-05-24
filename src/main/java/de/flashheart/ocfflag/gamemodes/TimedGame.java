@@ -135,10 +135,9 @@ public abstract class TimedGame extends Game implements Runnable {
     }
 
     @Override
-    void change_game() {
+    public void stop_gamemode() {
+        super.stop_gamemode();
         thread.interrupt();
-        super.change_game();
-
     }
 
     abstract void game_cycle() throws Exception;
@@ -168,7 +167,7 @@ public abstract class TimedGame extends Game implements Runnable {
                 game_cycle();
                 Thread.sleep(SLEEP_PER_CYCLE);
             } catch (InterruptedException ie) {
-                getLogger().debug(this + " interrupted!");
+                getLogger().info(this + " interrupted!");
             } catch (Exception e) {
                 getLogger().fatal(e);
                 e.printStackTrace();

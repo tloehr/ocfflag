@@ -1,5 +1,8 @@
 package de.flashheart.ocfflag.misc;
 
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.RaspiPin;
+import com.pi4j.wiringpi.Gpio;
 import de.flashheart.ocfflag.Main;
 import org.apache.log4j.Level;
 
@@ -54,6 +57,10 @@ public class Configs implements HasLogger {
 
 
     // Spielmodus-Eigene Einstellungen
+
+    public static final String RLGS_GAMEMODES = "rlgs_gamemodes";
+
+
     // OCF
     public static final String OCF_GAMETIME = "ocf_gametime";
     public static final String OCF_COLORCHANGE_SIGNAL = "ocf_colorchange_signal";
@@ -166,6 +173,7 @@ public class Configs implements HasLogger {
         applicationContext = new Properties(); // inhalte der application.properties (von Maven)
 
         // defaults
+        configs.put(RLGS_GAMEMODES, "OCF2,OCF3,OCF4,SPWN");
         configs.put(MATCHID, "1");
         configs.put(SLEEP_PER_CYCLE, "500");
         configs.put(LOGLEVEL, "debug");
@@ -179,7 +187,7 @@ public class Configs implements HasLogger {
         configs.put(BUTTON_C, "GPIO 13");
         configs.put(BUTTON_D, "GPIO 14");
 
-        configs.put(BUTTON_RED, "GPIO 21");
+        configs.put(BUTTON_RED, RaspiPin.GPIO_21.getName());
         configs.put(BUTTON_BLUE, "GPIO 22");
         configs.put(BUTTON_GREEN, "GPIO 23");
         configs.put(BUTTON_YELLOW, "GPIO 24");
@@ -229,8 +237,8 @@ public class Configs implements HasLogger {
 
         configs.put(DISPLAY_RED_I2C, "0x72");
         configs.put(DISPLAY_BLUE_I2C, "0x71");
-        configs.put(DISPLAY_WHITE_I2C, "0x73");
-        configs.put(DISPLAY_YELLOW_I2C, "0x70");
+        configs.put(DISPLAY_WHITE_I2C, "0x70");
+        configs.put(DISPLAY_YELLOW_I2C, "0x73");
         configs.put(DISPLAY_GREEN_I2C, "0x74");
 
         configs.put(FLAG_RGB_WHITE, "white");
@@ -345,6 +353,7 @@ public class Configs implements HasLogger {
         for (String time : listTimes) list.add(Long.parseLong(time));
         return list.toArray(new Long[list.size()]);
     }
+
 
 
 }

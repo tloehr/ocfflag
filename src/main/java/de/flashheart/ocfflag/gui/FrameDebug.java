@@ -14,6 +14,10 @@ import org.apache.log4j.Level;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Element;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -24,7 +28,7 @@ import java.awt.event.WindowEvent;
  * @author Torsten Löhr
  */
 public class FrameDebug extends JFrame implements HasLogger {
-
+    private final int MAX_LOG_LINES = 200;
     //    private MySystem mySystem;
 //    private Font font;
 //    private Font font2;
@@ -38,6 +42,32 @@ public class FrameDebug extends JFrame implements HasLogger {
 
     public FrameDebug() {
         initComponents();
+        // das hier sorgt dafür, dass das logfenster nicht mehr als 200 Zeilen hat.
+        // sonst kriegen wir irgendwann einen OUT_OF_MEMORY
+        txtLogger.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                SwingUtilities.invokeLater(() -> {
+                    Element root = e.getDocument().getDefaultRootElement();
+                    while (root.getElementCount() > MAX_LOG_LINES) {
+                        Element firstLine = root.getElement(0);
+                        try {
+                            e.getDocument().remove(0, firstLine.getEndOffset());
+                        } catch (BadLocationException ble) {
+                            getLogger().error(ble);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+            }
+        });
         initFrame();
     }
 
@@ -70,33 +100,19 @@ public class FrameDebug extends JFrame implements HasLogger {
     }
 
     private void initFrame() {
-//        mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
         configs = (Configs) Main.getFromContext("configs");
 
 //        initFonts();
-        btnTestDialog.setVisible(Tools.isBooleanFromContext(Configs.DEV_MODE));
+
         logLevel = Level.toLevel(configs.get(Configs.LOGLEVEL));
-        String title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber") + " [" + configs.getApplicationInfo("project.build.timestamp") + "]";
+        String title = "RLG-System " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber") + " [" + configs.getApplicationInfo("project.build.timestamp") + "]";
 
         setTitle(title);
-
-
-//        btnRed.setFont(font.deriveFont(24f).deriveFont(Font.BOLD));
-//        btnBlue.setFont(font.deriveFont(24f).deriveFont(Font.BOLD));
-//        btnGreen.setFont(font.deriveFont(24f).deriveFont(Font.BOLD));
-//        btnYellow.setFont(font.deriveFont(24f).deriveFont(Font.BOLD));
-
-//        pbBlue.setVisible(mySystem.getREACTION_TIME() > 0);
-//        pbGreen.setVisible(mySystem.getREACTION_TIME() > 0);
-//        pbYellow.setVisible(mySystem.getREACTION_TIME() > 0);
-//        pbRed.setVisible(mySystem.getREACTION_TIME() > 0);
-
-//        lblPole.setFont(font2.deriveFont(80f).deriveFont(Font.BOLD));
-
         tbDebug.setSelected(logLevel.equals(Level.DEBUG));
+        btnShutdown.setEnabled(Tools.isArm());
+        btnTestDialog.setEnabled(Tools.isArm() && Tools.isBooleanFromContext(Configs.DEV_MODE));
 
         if (Tools.isArm()) setExtendedState(MAXIMIZED_BOTH);
-        btnShutdown.setEnabled(Tools.isArm());
     }
 
 //    private void initFonts() {
@@ -112,11 +128,6 @@ public class FrameDebug extends JFrame implements HasLogger {
     public JButton getBtnQuit() {
         return btnQuit;
     }
-
-    public JButton getBtnSwitchGame() {
-        return btnSwitchGame;
-    }
-
 
     public JButton getBtnShutdown() {
         return btnShutdown;
@@ -193,10 +204,11 @@ public class FrameDebug extends JFrame implements HasLogger {
         panel3 = new JPanel();
         ledGreen = new MyLED();
         ledWhite = new MyLED();
-        btnTestDialog = new JButton();
+        hSpacer1 = new JPanel(null);
         btnQuit = new JButton();
-        btnSwitchGame = new JButton();
+        btnTestDialog = new JButton();
         btnShutdown = new JButton();
+        hSpacer2 = new JPanel(null);
         panel1 = new JPanel();
         tbDebug = new JToggleButton();
         tbInfo = new JToggleButton();
@@ -412,23 +424,21 @@ public class FrameDebug extends JFrame implements HasLogger {
                     ledWhite.setToolTipText("Internet Statistik gesendet");
                     panel3.add(ledWhite);
 
-                    //---- btnTestDialog ----
-                    btnTestDialog.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/analyze.png")));
-                    btnTestDialog.addActionListener(e -> btnTestDialogActionPerformed(e));
-                    panel3.add(btnTestDialog);
+                    //---- hSpacer1 ----
+                    hSpacer1.setMaximumSize(new Dimension(32767, 64));
+                    panel3.add(hSpacer1);
 
                     //---- btnQuit ----
                     btnQuit.setText(null);
-                    btnQuit.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/player_pause.png")));
+                    btnQuit.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/endturn.png")));
                     btnQuit.setToolTipText("Programm beenden");
                     btnQuit.addActionListener(e -> btnQuitActionPerformed(e));
                     panel3.add(btnQuit);
 
-                    //---- btnSwitchGame ----
-                    btnSwitchGame.setText(null);
-                    btnSwitchGame.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/gaming_pad.png")));
-                    btnSwitchGame.setToolTipText("Programm beenden");
-                    panel3.add(btnSwitchGame);
+                    //---- btnTestDialog ----
+                    btnTestDialog.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/systemsettings.png")));
+                    btnTestDialog.addActionListener(e -> btnTestDialogActionPerformed(e));
+                    panel3.add(btnTestDialog);
 
                     //---- btnShutdown ----
                     btnShutdown.setText(null);
@@ -436,15 +446,20 @@ public class FrameDebug extends JFrame implements HasLogger {
                     btnShutdown.setToolTipText("Programm beenden");
                     panel3.add(btnShutdown);
 
+                    //---- hSpacer2 ----
+                    hSpacer2.setMaximumSize(new Dimension(32767, 64));
+                    panel3.add(hSpacer2);
+
                     //======== panel1 ========
                     {
                         panel1.setBorder(new TitledBorder("LOG-LEVEL"));
+                        panel1.setMaximumSize(new Dimension(168, 64));
                         panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
 
                         //---- tbDebug ----
                         tbDebug.setText("DEBUG");
                         tbDebug.setSelected(true);
-                        tbDebug.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/48x48/led-green-on.png")));
+                        tbDebug.setSelectedIcon(null);
                         tbDebug.setIcon(null);
                         tbDebug.addItemListener(e -> tbDebugItemStateChanged(e));
                         panel1.add(tbDebug);
@@ -589,10 +604,11 @@ public class FrameDebug extends JFrame implements HasLogger {
     private JPanel panel3;
     private MyLED ledGreen;
     private MyLED ledWhite;
-    private JButton btnTestDialog;
+    private JPanel hSpacer1;
     private JButton btnQuit;
-    private JButton btnSwitchGame;
+    private JButton btnTestDialog;
     private JButton btnShutdown;
+    private JPanel hSpacer2;
     private JPanel panel1;
     private JToggleButton tbDebug;
     private JToggleButton tbInfo;

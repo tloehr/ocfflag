@@ -2,7 +2,6 @@ package de.flashheart.ocfflag;
 
 import de.flashheart.ocfflag.gamemodes.Game;
 import de.flashheart.ocfflag.gamemodes.GameSelector;
-import de.flashheart.ocfflag.gamemodes.OCF;
 import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.misc.Configs;
@@ -36,7 +35,7 @@ public class Main {
         applicationContext.put(Configs.FRAME_DEBUG, frameDebug);
         applicationContext.put(Configs.MY_SYSTEM, new MySystem());
 
-        frameDebug.getBtnTestDialog().setVisible(Tools.isArm());
+//        frameDebug.getBtnTestDialog().setVisible(Tools.isArm());
         frameDebug.setVisible(true);
 
 
@@ -55,9 +54,6 @@ public class Main {
         return configs.get(key);
     }
 
-//    public static void addToConfigs(String key, String value) {
-//        configs.put(key, value);
-//    }
 
     /**
      * Diese Methode enthält alles was initialisiert werden muss, gleich ob wir das Programm auf einem Raspi ausführen
@@ -86,7 +82,7 @@ public class Main {
             logger.fatal(sw);
         });
 
-        String title = "ocfflag " + configs.getApplicationInfo("my.version") + " [" + configs.getApplicationInfo("buildNumber") + "]";
+        String title = "RLG-System " + configs.getApplicationInfo("my.version") + " [" + configs.getApplicationInfo("buildNumber") + "]";
 
         logger.info(title);
 
@@ -121,13 +117,13 @@ public class Main {
             cl = parser.parse(opts, args);
         } catch (ParseException ex) {
             HelpFormatter f = new HelpFormatter();
-            f.printHelp("ocfflag-1.1.jar [OPTION]", "ocfflag, Version " + configs.getApplicationInfo("my.version"), opts, footer);
+            f.printHelp("rlgs-1.1.jar [OPTION]", "RLGS, Version " + configs.getApplicationInfo("my.version"), opts, footer);
             System.exit(0);
         }
 
         if (cl.hasOption("h")) {
             HelpFormatter f = new HelpFormatter();
-            f.printHelp("ocfflag-1.1.jar [OPTION]", "ocfflag, Version " + configs.getApplicationInfo("my.version"), opts, footer);
+            f.printHelp("rlgs-1.1.jar [OPTION]", "RLGS, Version " + configs.getApplicationInfo("my.version"), opts, footer);
             System.exit(0);
         }
 
@@ -154,12 +150,7 @@ public class Main {
     public static void prepareShutdown() {
 
 //        messageProcessor.interrupt();
-        logger.info("\n  _____ _   _ ____     ___  _____    ___   ____ _____ _____ _             \n" +
-                " | ____| \\ | |  _ \\   / _ \\|  ___|  / _ \\ / ___|  ___|  ___| | __ _  __ _ \n" +
-                " |  _| |  \\| | | | | | | | | |_    | | | | |   | |_  | |_  | |/ _` |/ _` |\n" +
-                " | |___| |\\  | |_| | | |_| |  _|   | |_| | |___|  _| |  _| | | (_| | (_| |\n" +
-                " |_____|_| \\_|____/   \\___/|_|      \\___/ \\____|_|   |_|   |_|\\__,_|\\__, |\n" +
-                "                                                                    |___/ ");
+        logger.info("END OF RLGS");
     }
 
     public static Game getCurrentGame() {

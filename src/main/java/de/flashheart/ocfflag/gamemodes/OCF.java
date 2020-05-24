@@ -57,7 +57,7 @@ public class OCF extends TimedGame {
         k1.setText("RUN/PAUSE");
         k2.setText("SET GAMETIME");
         k3.setText("UNDO/RESET");
-        k4.setText("--");
+        k4.setText("CHANGE GAME");
 
         reset_timers();
         update_all_signals();
@@ -176,6 +176,14 @@ public class OCF extends TimedGame {
 
     }
 
+    /**
+     * Spiel wechseln. Aber nur im PREPARE Modus
+     */
+    @Override
+    void button_k4_pressed() {
+        if (game_state != TIMED_GAME_PREPARE) return;
+        super.button_k4_pressed();
+    }
 
     @Override
     void pause() {

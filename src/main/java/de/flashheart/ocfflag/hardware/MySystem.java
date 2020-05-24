@@ -138,7 +138,7 @@ public class MySystem implements HasLogger {
         Main.addToContext(Configs.BUTTON_YELLOW, new MyAbstractButton(GPIO, Configs.BUTTON_YELLOW, frameDebug.getBtnYellow(), REACTION_TIME, frameDebug.getPbYellow()));
         // System Buttons
         Main.addToContext(Configs.BUTTON_QUIT, new MyAbstractButton(null, null, frameDebug.getBtnQuit()));
-        Main.addToContext(Configs.BUTTON_SHUTDOWN, new MyAbstractButton(GPIO, Configs.BUTTON_SHUTDOWN, null, 0, null));
+        Main.addToContext(Configs.BUTTON_SHUTDOWN, new MyAbstractButton(GPIO, Configs.BUTTON_SHUTDOWN, frameDebug.getBtnShutdown(), 0, null));
 
 //        lcd_display = new MyLCD(frameDebug.getLcd_panel(), 20, 4);
 //        Main.addToContext("lcd_display", lcd_display);

@@ -7,6 +7,8 @@ import de.flashheart.ocfflag.hardware.MyAbstractButton;
 import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.HasLogger;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
 
 import java.io.IOException;
 
@@ -44,7 +46,7 @@ public abstract class Game implements HasLogger {
     Display7Segments4Digits display_yellow;
 
     MyAbstractButton button_quit;
-    MyAbstractButton button_change_game; // war früher SHUTDOWN
+    MyAbstractButton button_shutdown;
 
     MyAbstractButton button_blue;
     MyAbstractButton button_red;
@@ -57,7 +59,7 @@ public abstract class Game implements HasLogger {
     MyAbstractButton k4;
 
     // So wie es auf der Platine steht. K1..K4
-    String[] K_LABEL = new String[]{"dummy_for_index_0_never_used", "stdby act", "num teams", "game time", "reset"};
+    String[] K_LABEL = new String[]{"dummy_for_index_0_never_used", "K1", "K2", "K3", "K4"};
 
     Configs configs;
     MySystem mySystem;
@@ -78,7 +80,6 @@ public abstract class Game implements HasLogger {
         configs = (Configs) Main.getFromContext("configs");
         mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
     }
-
 
 
     /**
@@ -102,28 +103,24 @@ public abstract class Game implements HasLogger {
             button_green_pressed();
         });
         k1.setActionListener(e -> {
-            getLogger().debug("K1");
             button_k1_pressed();
         });
         k2.setActionListener(e -> {
-            getLogger().debug("K2");
             button_k2_pressed();
         });
         k3.setActionListener(e -> {
-            getLogger().debug("K3");
             button_k3_pressed();
         });
         k4.setActionListener(e -> {
-            getLogger().debug("K4");
             button_k4_pressed();
         });
         button_quit.setActionListener(e -> {
             getLogger().debug("GUI_button_quit");
             button_quit_pressed();
         });
-        button_change_game.setActionListener(e -> {
-            getLogger().debug("CHANGE_GAME");
-            change_game();
+        button_shutdown.setActionListener(e -> {
+            getLogger().debug("SHUTDOWN SYSTEM");
+            shutdown_system();
         });
     }
 
@@ -166,7 +163,7 @@ public abstract class Game implements HasLogger {
 
         // GUI Buttons
         button_quit = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_QUIT);
-        button_change_game = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_SHUTDOWN);
+        button_shutdown = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_SHUTDOWN);
 
         button_red = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_RED);
         button_blue = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_BLUE);
@@ -191,32 +188,26 @@ public abstract class Game implements HasLogger {
 
     }
 
+    void shutdown_system() {
+        Main.prepareShutdown();
+        try {
+            String line = Main.getFromConfigs(Configs.SHUTDOWN_COMMAND_LINE);
+            CommandLine commandLine = CommandLine.parse(line);
+            DefaultExecutor executor = new DefaultExecutor();
+            Main.prepareShutdown();
+            executor.setExitValue(1);
+            executor.execute(commandLine);
+        } catch (IOException exc) {
+            getLogger().error(exc);
+        }
+    }
+
     /**
      * wird von den eigentlichen Klassen implementiert um alle GameMode bezogenen Initialisierungen durchzuführen.
      */
     void initGame() {
 
     }
-
-    void change_game() {
-        getLogger().debug("change_game()");
-        stop_gamemode();
-        Main.setGame(new GameSelector());
-    }
-
-//    void shutdown_system(){
-//        Main.prepareShutdown();
-//        try {
-//            String line = Main.getFromConfigs(Configs.SHUTDOWN_COMMAND_LINE);
-//            CommandLine commandLine = CommandLine.parse(line);
-//            DefaultExecutor executor = new DefaultExecutor();
-//            Main.prepareShutdown();
-//            executor.setExitValue(1);
-//            executor.execute(commandLine);
-//        } catch (IOException exc) {
-//            getLogger().error(exc);
-//        }
-//    }
 
     void button_quit_pressed() {
         Main.prepareShutdown();
@@ -248,6 +239,9 @@ public abstract class Game implements HasLogger {
 
     void button_k4_pressed() {
         getLogger().debug("button_k4_pressed: " + k4.getText());
+        getLogger().debug("default: CHANGE GAME");
+        stop_gamemode();
+        Main.setGame(new GameSelector());
     }
 
     void button_k1_pressed() {

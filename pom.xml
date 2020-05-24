@@ -6,7 +6,7 @@
 
     <groupId>de.flashheart.ocfflag</groupId>
     <artifactId>ocfflag</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
 
     <properties>
         <!-- Generic properties -->
@@ -224,6 +224,17 @@
                         <goals>
                             <goal>exec</goal>
                         </goals>
+                    </execution>
+                    <execution><!-- Run our version calculation script -->
+                        <id>Upload to raspi</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>sh</executable>
+                            <commandlineArgs>handleResultJars.sh</commandlineArgs>
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>

@@ -263,23 +263,21 @@ new FormModel {
 							name: "ledWhite"
 							"toolTipText": "Internet Statistik gesendet"
 						} )
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnTestDialog"
-							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/analyze.png" )
-							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnTestDialogActionPerformed", true ) )
+						add( new FormComponent( "com.jformdesigner.designer.wrapper.HSpacer" ) {
+							name: "hSpacer1"
+							"maximumSize": &Dimension0 new java.awt.Dimension( 32767, 64 )
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnQuit"
 							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/player_pause.png" )
+							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/endturn.png" )
 							"toolTipText": "Programm beenden"
 							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnQuitActionPerformed", true ) )
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "btnSwitchGame"
-							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/gaming_pad.png" )
-							"toolTipText": "Programm beenden"
+							name: "btnTestDialog"
+							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/systemsettings.png" )
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnTestDialogActionPerformed", true ) )
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "btnShutdown"
@@ -287,15 +285,20 @@ new FormModel {
 							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/64x64/exit.png" )
 							"toolTipText": "Programm beenden"
 						} )
+						add( new FormComponent( "com.jformdesigner.designer.wrapper.HSpacer" ) {
+							name: "hSpacer2"
+							"maximumSize": #Dimension0
+						} )
 						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
 							name: "panel1"
 							"border": new javax.swing.border.TitledBorder( "LOG-LEVEL" )
+							"maximumSize": new java.awt.Dimension( 168, 64 )
 							add( new FormComponent( "javax.swing.JToggleButton" ) {
 								name: "tbDebug"
 								"text": "DEBUG"
 								"$buttonGroup": new FormReference( "buttonGroup1" )
 								"selected": true
-								"selectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/48x48/led-green-on.png" )
+								"selectedIcon": sfield com.jformdesigner.model.FormObject NULL_VALUE
 								"icon": sfield com.jformdesigner.model.FormObject NULL_VALUE
 								addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "tbDebugItemStateChanged", true ) )
 							} )
