@@ -1,8 +1,6 @@
 package de.flashheart.ocfflag.misc;
 
-import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.RaspiPin;
-import com.pi4j.wiringpi.Gpio;
 import de.flashheart.ocfflag.Main;
 import org.apache.log4j.Level;
 
@@ -135,23 +133,10 @@ public class Configs implements HasLogger {
 
     public static final String OUT_SIREN_START_STOP = "siren_start_stop"; // für start/stop signal
     public static final String OUT_SIREN_COLOR_CHANGE = "siren_color_change"; // für ereignis anzeige. z.B. Farbwechsel
+    public static final String OUT_SIREN_SHUTDOWN = "siren_shutdown"; // für ereignis anzeige. z.B. Farbwechsel
     public static final String OUT_HOLDDOWN_BUZZER = "siren_holddown_buzzer"; // ein einfacher Buzzer
 
     public static final String FRAME_DEBUG = "FrameDebug";
-
-
-    // Test reasons
-//    public static final String OUT_MF07  = "out_mf07";
-//    public static final String OUT_MF13  = "out_mf13";
-//    public static final String OUT_MF14  = "out_mf14";
-//    public static final String OUT_MF16  = "out_mf16";
-
-
-    //        Main.getPinHandler().setScheme("mf07", "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme("mf13", "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme("mf14", "5:on,1000;off,1000");
-//        Main.getPinHandler().setScheme("mf16", "5:on,1000;off,1000");
-
 
     public static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = "siren_to_announce_the_color_change";
 
@@ -191,9 +176,7 @@ public class Configs implements HasLogger {
         configs.put(BUTTON_BLUE, "GPIO 22");
         configs.put(BUTTON_GREEN, "GPIO 23");
         configs.put(BUTTON_YELLOW, "GPIO 24");
-
-
-        configs.put(BUTTON_SHUTDOWN, "GPIO 25"); // Bei RASPI2 muss es der GPIO25 sein, beim RASPI3 der GPIO28. Sehr seltsam.
+        configs.put(BUTTON_SHUTDOWN, "GPIO 28"); // Bei RASPI2 muss es der GPIO25 sein, beim RASPI3 der GPIO28. Sehr seltsam.
 
         // Alle anderen den MCP23017
 
@@ -206,14 +189,15 @@ public class Configs implements HasLogger {
 
 
         configs.put(OUT_FLAG_WHITE, "mf08");
-        configs.put(OUT_FLAG_RED, "mf13"); // actioncase mf09  // unused in ocfflag
-        configs.put(OUT_FLAG_BLUE, "mf14"); // actioncase mf10   // unused in ocfflag
-        configs.put(OUT_FLAG_GREEN, "mf16");
+        configs.put(OUT_FLAG_RED, "mf09"); // actioncase mf09  // unused in ocfflag
+        configs.put(OUT_FLAG_BLUE, "mf10"); // actioncase mf10   // unused in ocfflag
+        configs.put(OUT_FLAG_GREEN, "mf11");
         configs.put(OUT_FLAG_YELLOW, "mf12");
 
-        configs.put(OUT_SIREN_START_STOP, "mf09"); //mf09  // orig: rly01
-        configs.put(OUT_SIREN_COLOR_CHANGE, "mf10"); // ocfflag2 mf10  // rly02
-        configs.put(OUT_HOLDDOWN_BUZZER, "mf11");   // mf06
+        configs.put(OUT_SIREN_COLOR_CHANGE, "rly01"); // ocfflag2 mf10  // rly02
+        configs.put(OUT_SIREN_SHUTDOWN, "rly02"); // ocfflag2 mf10  // rly02
+        configs.put(OUT_SIREN_START_STOP, "rly03"); //mf09  // orig: rly01
+        configs.put(OUT_HOLDDOWN_BUZZER, "mf15");
         configs.put(SIRENS_ENABLED, "true");
 
 //        // RESERVE
@@ -353,7 +337,6 @@ public class Configs implements HasLogger {
         for (String time : listTimes) list.add(Long.parseLong(time));
         return list.toArray(new Long[list.size()]);
     }
-
 
 
 }
