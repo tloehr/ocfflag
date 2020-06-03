@@ -8,31 +8,37 @@ import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.hardware.Display7Segments4Digits;
+import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.misc.Configs;
+import de.flashheart.ocfflag.misc.HasLogger;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import org.jdesktop.swingx.*;
 
 /**
  * @author Torsten Löhr
  */
-public class DlgTest extends JDialog {
+public class DlgTest extends JDialog implements HasLogger {
     private final Configs configs;
     private final MySystem mySystem;
+
+    private String SCHEME = "5:on,1000;off,1000";
 
     public DlgTest(Window owner) {
         super(owner);
         configs = (Configs) Main.getFromContext("configs");
         mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
-        
+
         initComponents();
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+        pnlButtons.setLayout(new WrapLayout(WrapLayout.LEFT, 5,5));
 
 //        btnTestHardware.setEnabled(Tools.isArm());
 
@@ -62,6 +68,18 @@ public class DlgTest extends JDialog {
         cmbI2C.setModel(dcbm);
         cmbI2C.setSelectedIndex(0);
 
+        String[] mypins = new String[]{Configs.OUT_LED_GREEN, Configs.OUT_LED_WHITE, Configs.OUT_FLAG_RED,
+                Configs.OUT_FLAG_BLUE, Configs.OUT_FLAG_GREEN, Configs.OUT_FLAG_BLUE, Configs.OUT_FLAG_WHITE,
+                Configs.OUT_SIREN_COLOR_CHANGE, Configs.OUT_SIREN_START_STOP, Configs.OUT_SIREN_SHUTDOWN,
+                Configs.OUT_HOLDDOWN_BUZZER, Configs.OUT_LED_RED_BTN, Configs.OUT_LED_BLUE_BTN,
+                Configs.OUT_LED_GREEN_BTN, Configs.OUT_LED_YELLOW_BTN};
+
+        for (String p : mypins){
+            JButton j = new JButton(p);
+            j.addActionListener(e -> mySystem.getPinHandler().setScheme(p, SCHEME));
+            pnlButtons.add(j);
+        }
+        
         pack();
     }
 
@@ -75,30 +93,31 @@ public class DlgTest extends JDialog {
         }
 
 
-        mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN, "5:on,1000;off,1000");
-        mySystem.getPinHandler().setScheme(Configs.OUT_LED_WHITE, "5:on,1000;off,1000");
+//        mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN, SCHEME);
+//        mySystem.getPinHandler().setScheme(Configs.OUT_LED_WHITE, SCHEME);
+//
+//        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_RED, SCHEME);
+//        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, SCHEME);
+//        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, SCHEME);
+//        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, SCHEME);
+//        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, SCHEME);
 
-        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "5:on,1000;off,1000");
-        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_BLUE, "5:on,1000;off,1000");
-        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_GREEN, "5:on,1000;off,1000");
-        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_YELLOW, "5:on,1000;off,1000");
-        mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_WHITE, "5:on,1000;off,1000");
+//        if (cbSirens.isSelected()) {
+//            mySystem.getPinHandler().setScheme(Configs.OUT_SIREN_COLOR_CHANGE, SCHEME);
+//            mySystem.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, SCHEME);
+//            mySystem.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, SCHEME);
+//            mySystem.getPinHandler().setScheme(Configs.OUT_SIREN_SHUTDOWN, SCHEME);
+//        }
 
-        if (cbSirens.isSelected()) {
-            mySystem.getPinHandler().setScheme(Configs.OUT_SIREN_COLOR_CHANGE, "5:on,1000;off,1000");
-            mySystem.getPinHandler().setScheme(Configs.OUT_SIREN_START_STOP, "5:on,1000;off,1000");
-            mySystem.getPinHandler().setScheme(Configs.OUT_HOLDDOWN_BUZZER, "5:on,1000;off,1000");
-        }
-
-//        mySystem.getPinHandler().setScheme(Configs.OUT_MF07, "5:on,1000;off,1000");
-//        mySystem.getPinHandler().setScheme(Configs.OUT_MF13, "5:on,1000;off,1000");
-//        mySystem.getPinHandler().setScheme(Configs.OUT_MF14, "5:on,1000;off,1000");
-//        mySystem.getPinHandler().setScheme(Configs.OUT_MF16, "5:on,1000;off,1000");
-
-        mySystem.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "5:on,1000;off,1000");
-        mySystem.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "5:on,1000;off,1000");
-        mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, "5:on,1000;off,1000");
-        mySystem.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, "5:on,1000;off,1000");
+//        mySystem.getPinHandler().setScheme(Configs.OUT_MF07, SCHEME);
+//        mySystem.getPinHandler().setScheme(Configs.OUT_MF13, SCHEME);
+//        mySystem.getPinHandler().setScheme(Configs.OUT_MF14, SCHEME);
+//        mySystem.getPinHandler().setScheme(Configs.OUT_MF16, SCHEME);
+//
+//        mySystem.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, SCHEME);
+//        mySystem.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, SCHEME);
+//        mySystem.getPinHandler().setScheme(Configs.OUT_LED_GREEN_BTN, SCHEME);
+//        mySystem.getPinHandler().setScheme(Configs.OUT_LED_YELLOW_BTN, SCHEME);
 
     }
 
@@ -110,13 +129,13 @@ public class DlgTest extends JDialog {
         // TODO add your code here
     }
 
-   void writeToDisplay(String text) {
+    void writeToDisplay(String text) {
         if (text.isEmpty()) return;
         Display7Segments4Digits display = (Display7Segments4Digits) Main.getFromContext(cmbI2C.getSelectedItem().toString());
         try {
             display.setText(StringUtils.left(text, 4));
         } catch (IOException e) {
-            txtLog.append(e.getMessage()+"\n");
+            getLogger().error(e.getMessage());
         }
 
     }
@@ -145,8 +164,7 @@ public class DlgTest extends JDialog {
         btnBlueBrght = new JButton();
         btnGreenBrght = new JButton();
         btnYellowBrght = new JButton();
-        scrollPane1 = new JScrollPane();
-        txtLog = new JTextArea();
+        pnlButtons = new JPanel();
 
         //======== this ========
         Container contentPane = getContentPane();
@@ -161,7 +179,7 @@ public class DlgTest extends JDialog {
             {
                 testView.setLayout(new FormLayout(
                     "left:default:grow",
-                    "fill:default, $ugap, default, $ugap, $lgap, fill:default, 2*($lgap), fill:default:grow, $ugap"));
+                    "fill:default, $ugap, default, $ugap, fill:default, $lgap, fill:default:grow"));
 
                 //======== panel6 ========
                 {
@@ -243,17 +261,13 @@ public class DlgTest extends JDialog {
                     btnYellowBrght.addActionListener(e -> btnBrghtActionPerformed(e));
                     panel4.add(btnYellowBrght);
                 }
-                testView.add(panel4, CC.xy(1, 6));
+                testView.add(panel4, CC.xy(1, 5));
 
-                //======== scrollPane1 ========
+                //======== pnlButtons ========
                 {
-
-                    //---- txtLog ----
-                    txtLog.setBackground(Color.black);
-                    txtLog.setForeground(new Color(0, 255, 51));
-                    scrollPane1.setViewportView(txtLog);
+                    pnlButtons.setLayout(new VerticalLayout());
                 }
-                testView.add(scrollPane1, CC.xy(1, 9, CC.FILL, CC.FILL));
+                testView.add(pnlButtons, CC.xy(1, 7));
             }
             dialogPane.add(testView);
         }
@@ -283,7 +297,6 @@ public class DlgTest extends JDialog {
     private JButton btnBlueBrght;
     private JButton btnGreenBrght;
     private JButton btnYellowBrght;
-    private JScrollPane scrollPane1;
-    private JTextArea txtLog;
+    private JPanel pnlButtons;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

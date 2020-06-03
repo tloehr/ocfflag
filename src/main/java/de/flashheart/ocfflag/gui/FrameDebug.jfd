@@ -1,4 +1,4 @@
-JFDML JFormDesigner: "7.0.1.0.272" Java: "11.0.6" encoding: "UTF-8"
+JFDML JFormDesigner: "7.0.2.0.298" Java: "11.0.6" encoding: "UTF-8"
 
 new FormModel {
 	contentType: "form/swing"
@@ -13,7 +13,7 @@ new FormModel {
 				name: "mainView"
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 					"$columnSpecs": "relgap, default, labelcompgap, 70dlu:grow, labelcompgap, unrelgap, labelcompgap, 162dlu:grow, labelcompgap, unrelgap, labelcompgap, 70dlu:grow, labelcompgap, default, relgap"
-					"$rowSpecs": "relgap, pref, linegap, fill:default, linegap, pref, linegap, fill:default, linegap, pref"
+					"$rowSpecs": "relgap, pref, linegap, fill:default, linegap, pref, linegap, fill:default, linegap, pref, linegap, pref"
 				} ) {
 					name: "upperPanel"
 					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
@@ -26,21 +26,22 @@ new FormModel {
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
 						name: "btnRed"
-						"text": "Red"
+						"text": "00:00"
 						"foreground": sfield java.awt.Color red
-						"font": &Font0 new java.awt.Font( "Dialog", 3, 24 )
+						"font": &Font0 new java.awt.Font( "DSEG7 Classic", 3, 24 )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 4
 						"gridY": 2
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "lblPole"
 						"opaque": true
 						"background": sfield java.awt.Color white
-						"text": "Flagge"
+						"text": "00:00"
 						"foreground": sfield java.awt.Color black
 						"horizontalAlignment": 0
-						"font": new java.awt.Font( "Dialog", 3, 24 )
+						"font": #Font0
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 8
 						"gridHeight": 3
@@ -48,13 +49,14 @@ new FormModel {
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
 						name: "btnBlue"
-						"text": "Blue"
+						"text": "00:00"
 						"foreground": sfield java.awt.Color blue
 						"font": #Font0
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 						"gridX": 12
 						"gridY": 2
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					} )
 					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
 						name: "ledBlueButton"
@@ -94,12 +96,13 @@ new FormModel {
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
 						name: "btnGreen"
-						"text": "Green"
+						"text": "00:00"
 						"foreground": new java.awt.Color( 18, 110, 12, 255 )
 						"font": #Font0
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 4
 						"gridY": 6
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					} )
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
 						name: "pnlFlagLEDs"
@@ -135,13 +138,14 @@ new FormModel {
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
 						name: "btnYellow"
-						"text": "Yellow"
+						"text": "00:00"
 						"foreground": new java.awt.Color( 210, 199, 27, 255 )
 						"font": #Font0
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 						"gridY": 6
 						"gridX": 12
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					} )
 					add( new FormComponent( "de.flashheart.ocfflag.gui.MyLED" ) {
 						name: "ledYellowButton"
@@ -230,6 +234,60 @@ new FormModel {
 						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints TOP
 						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 						"gridX": 2
+					} )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
+						name: "panel2"
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "lblMessage1"
+							"opaque": true
+							"background": sfield java.awt.Color white
+							"text": "TXT1"
+							"foreground": sfield java.awt.Color black
+							"horizontalAlignment": 0
+							"font": &Font2 new java.awt.Font( "DSEG14 Classic", 3, 32 )
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "lblMessage2"
+							"opaque": true
+							"background": sfield java.awt.Color white
+							"text": "TXT2"
+							"foreground": sfield java.awt.Color black
+							"horizontalAlignment": 0
+							"font": #Font2
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "lblMessage3"
+							"opaque": true
+							"background": sfield java.awt.Color white
+							"text": "TXT3"
+							"foreground": sfield java.awt.Color black
+							"horizontalAlignment": 0
+							"font": #Font2
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "lblMessage4"
+							"opaque": true
+							"background": sfield java.awt.Color white
+							"text": "TXT4"
+							"foreground": sfield java.awt.Color black
+							"horizontalAlignment": 0
+							"font": #Font2
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "lblMessage5"
+							"opaque": true
+							"background": sfield java.awt.Color white
+							"text": "TXT5"
+							"foreground": sfield java.awt.Color black
+							"horizontalAlignment": 0
+							"font": #Font2
+						} )
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridY": 12
+						"gridWidth": 13
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+						"gridX": 2
+						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints CENTER
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {
 					"value": "North"

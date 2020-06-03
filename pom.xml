@@ -103,7 +103,14 @@
             <artifactId>ant-jsch</artifactId>
             <version>1.9.6</version>
         </dependency>
-<!--        <dependency>-->
+        <dependency>
+            <groupId>org.bidib.jbidib.swinglabs.swingx</groupId>
+            <artifactId>swingx-core</artifactId>
+            <version>1.6.5-1</version>
+        </dependency>
+        <!-- Thanks for using https://jar-download.com -->
+
+        <!--        <dependency>-->
 <!--            <groupId>org.springframework.boot</groupId>-->
 <!--            <artifactId>spring-boot-starter-data-rest</artifactId>-->
 <!--            <version>RELEASE</version>-->

@@ -110,7 +110,7 @@ public class FrameDebug extends JFrame implements HasLogger {
         setTitle(title);
         tbDebug.setSelected(logLevel.equals(Level.DEBUG));
         btnShutdown.setEnabled(Tools.isArm());
-        btnTestDialog.setEnabled(Tools.isArm() && Tools.isBooleanFromContext(Configs.DEV_MODE));
+//        btnTestDialog.setEnabled(Tools.isArm() && Tools.isBooleanFromContext(Configs.DEV_MODE));
 
         if (Tools.isArm()) setExtendedState(MAXIMIZED_BOTH);
     }
@@ -198,6 +198,12 @@ public class FrameDebug extends JFrame implements HasLogger {
         btnA = new JButton();
         btnC = new JButton();
         btnD = new JButton();
+        panel2 = new JPanel();
+        lblMessage1 = new JLabel();
+        lblMessage2 = new JLabel();
+        lblMessage3 = new JLabel();
+        lblMessage4 = new JLabel();
+        lblMessage5 = new JLabel();
         panel5 = new JPanel();
         logscroller = new JScrollPane();
         txtLogger = new JTextArea();
@@ -227,7 +233,7 @@ public class FrameDebug extends JFrame implements HasLogger {
             {
                 upperPanel.setLayout(new FormLayout(
                     "$rgap, default, $lcgap, 70dlu:grow, $lcgap, $ugap, $lcgap, 162dlu:grow, $lcgap, $ugap, $lcgap, 70dlu:grow, $lcgap, default, $rgap",
-                    "$rgap, pref, $lgap, fill:default, $lgap, pref, $lgap, fill:default, $lgap, pref"));
+                    "$rgap, pref, $lgap, fill:default, $lgap, pref, $lgap, fill:default, 2*($lgap, pref)"));
 
                 //---- ledRedButton ----
                 ledRedButton.setColor(Color.red);
@@ -235,25 +241,25 @@ public class FrameDebug extends JFrame implements HasLogger {
                 upperPanel.add(ledRedButton, CC.xy(2, 2));
 
                 //---- btnRed ----
-                btnRed.setText("Red");
+                btnRed.setText("00:00");
                 btnRed.setForeground(Color.red);
-                btnRed.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
-                upperPanel.add(btnRed, CC.xy(4, 2));
+                btnRed.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 24));
+                upperPanel.add(btnRed, CC.xy(4, 2, CC.DEFAULT, CC.FILL));
 
                 //---- lblPole ----
                 lblPole.setOpaque(true);
                 lblPole.setBackground(Color.white);
-                lblPole.setText("Flagge");
+                lblPole.setText("00:00");
                 lblPole.setForeground(Color.black);
                 lblPole.setHorizontalAlignment(SwingConstants.CENTER);
-                lblPole.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
+                lblPole.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 24));
                 upperPanel.add(lblPole, CC.xywh(8, 2, 1, 3));
 
                 //---- btnBlue ----
-                btnBlue.setText("Blue");
+                btnBlue.setText("00:00");
                 btnBlue.setForeground(Color.blue);
-                btnBlue.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
-                upperPanel.add(btnBlue, CC.xy(12, 2, CC.FILL, CC.DEFAULT));
+                btnBlue.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 24));
+                upperPanel.add(btnBlue, CC.xy(12, 2, CC.FILL, CC.FILL));
 
                 //---- ledBlueButton ----
                 ledBlueButton.setColor(Color.blue);
@@ -276,10 +282,10 @@ public class FrameDebug extends JFrame implements HasLogger {
                 upperPanel.add(ledGreenButton, CC.xy(2, 6));
 
                 //---- btnGreen ----
-                btnGreen.setText("Green");
+                btnGreen.setText("00:00");
                 btnGreen.setForeground(new Color(18, 110, 12));
-                btnGreen.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
-                upperPanel.add(btnGreen, CC.xy(4, 6));
+                btnGreen.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 24));
+                upperPanel.add(btnGreen, CC.xy(4, 6, CC.DEFAULT, CC.FILL));
 
                 //======== pnlFlagLEDs ========
                 {
@@ -313,10 +319,10 @@ public class FrameDebug extends JFrame implements HasLogger {
                 upperPanel.add(pnlFlagLEDs, CC.xywh(8, 6, 1, 3));
 
                 //---- btnYellow ----
-                btnYellow.setText("Yellow");
+                btnYellow.setText("00:00");
                 btnYellow.setForeground(new Color(210, 199, 27));
-                btnYellow.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 24));
-                upperPanel.add(btnYellow, CC.xy(12, 6, CC.FILL, CC.DEFAULT));
+                btnYellow.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 24));
+                upperPanel.add(btnYellow, CC.xy(12, 6, CC.FILL, CC.FILL));
 
                 //---- ledYellowButton ----
                 ledYellowButton.setColor(Color.yellow);
@@ -388,6 +394,57 @@ public class FrameDebug extends JFrame implements HasLogger {
                     panel7.add(btnD, CC.xy(4, 1));
                 }
                 upperPanel.add(panel7, CC.xywh(2, 10, 13, 1, CC.FILL, CC.TOP));
+
+                //======== panel2 ========
+                {
+                    panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+
+                    //---- lblMessage1 ----
+                    lblMessage1.setOpaque(true);
+                    lblMessage1.setBackground(Color.white);
+                    lblMessage1.setText("TXT1");
+                    lblMessage1.setForeground(Color.black);
+                    lblMessage1.setHorizontalAlignment(SwingConstants.CENTER);
+                    lblMessage1.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                    panel2.add(lblMessage1);
+
+                    //---- lblMessage2 ----
+                    lblMessage2.setOpaque(true);
+                    lblMessage2.setBackground(Color.white);
+                    lblMessage2.setText("TXT2");
+                    lblMessage2.setForeground(Color.black);
+                    lblMessage2.setHorizontalAlignment(SwingConstants.CENTER);
+                    lblMessage2.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                    panel2.add(lblMessage2);
+
+                    //---- lblMessage3 ----
+                    lblMessage3.setOpaque(true);
+                    lblMessage3.setBackground(Color.white);
+                    lblMessage3.setText("TXT3");
+                    lblMessage3.setForeground(Color.black);
+                    lblMessage3.setHorizontalAlignment(SwingConstants.CENTER);
+                    lblMessage3.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                    panel2.add(lblMessage3);
+
+                    //---- lblMessage4 ----
+                    lblMessage4.setOpaque(true);
+                    lblMessage4.setBackground(Color.white);
+                    lblMessage4.setText("TXT4");
+                    lblMessage4.setForeground(Color.black);
+                    lblMessage4.setHorizontalAlignment(SwingConstants.CENTER);
+                    lblMessage4.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                    panel2.add(lblMessage4);
+
+                    //---- lblMessage5 ----
+                    lblMessage5.setOpaque(true);
+                    lblMessage5.setBackground(Color.white);
+                    lblMessage5.setText("TXT5");
+                    lblMessage5.setForeground(Color.black);
+                    lblMessage5.setHorizontalAlignment(SwingConstants.CENTER);
+                    lblMessage5.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                    panel2.add(lblMessage5);
+                }
+                upperPanel.add(panel2, CC.xywh(2, 12, 13, 1, CC.CENTER, CC.FILL));
             }
             mainView.add(upperPanel, BorderLayout.NORTH);
 
@@ -598,6 +655,12 @@ public class FrameDebug extends JFrame implements HasLogger {
     private JButton btnA;
     private JButton btnC;
     private JButton btnD;
+    private JPanel panel2;
+    private JLabel lblMessage1;
+    private JLabel lblMessage2;
+    private JLabel lblMessage3;
+    private JLabel lblMessage4;
+    private JLabel lblMessage5;
     private JPanel panel5;
     private JScrollPane logscroller;
     private JTextArea txtLogger;
