@@ -193,20 +193,35 @@ public class FrameDebug extends JFrame implements HasLogger {
         pbGreen = new JProgressBar();
         panel6 = new JPanel();
         pbYellow = new JProgressBar();
-        panel7 = new JPanel();
-        btnB = new JButton();
-        btnA = new JButton();
-        btnC = new JButton();
-        btnD = new JButton();
-        panel2 = new JPanel();
+        panel5 = new JPanel();
+        panel8 = new JPanel();
+        pnlDisplays = new JPanel();
+        pnlLedDisplay = new JPanel();
+        lblTimeRed = new JLabel();
+        lblTimeBlue = new JLabel();
+        lblTimeWhite = new JLabel();
+        lblTimeGreen = new JLabel();
+        lblTimeYellow = new JLabel();
         lblMessage1 = new JLabel();
         lblMessage2 = new JLabel();
         lblMessage3 = new JLabel();
         lblMessage4 = new JLabel();
         lblMessage5 = new JLabel();
-        panel5 = new JPanel();
+        pnlLCD = new JPanel();
+        btnB = new JButton();
+        label1 = new JLabel();
+        btnC = new JButton();
+        label2 = new JLabel();
+        label3 = new JLabel();
+        btnA = new JButton();
+        label4 = new JLabel();
+        btnD = new JButton();
+        pnlLog = new JPanel();
         logscroller = new JScrollPane();
         txtLogger = new JTextArea();
+        panel1 = new JPanel();
+        tbDebug = new JToggleButton();
+        tbInfo = new JToggleButton();
         panel3 = new JPanel();
         ledGreen = new MyLED();
         ledWhite = new MyLED();
@@ -215,9 +230,9 @@ public class FrameDebug extends JFrame implements HasLogger {
         btnTestDialog = new JButton();
         btnShutdown = new JButton();
         hSpacer2 = new JPanel(null);
-        panel1 = new JPanel();
-        tbDebug = new JToggleButton();
-        tbInfo = new JToggleButton();
+        panel9 = new JPanel();
+        tbDisplay = new JToggleButton();
+        tbLogs = new JToggleButton();
 
         //======== this ========
         setTitle("RLG System");
@@ -233,7 +248,7 @@ public class FrameDebug extends JFrame implements HasLogger {
             {
                 upperPanel.setLayout(new FormLayout(
                     "$rgap, default, $lcgap, 70dlu:grow, $lcgap, $ugap, $lcgap, 162dlu:grow, $lcgap, $ugap, $lcgap, 70dlu:grow, $lcgap, default, $rgap",
-                    "$rgap, pref, $lgap, fill:default, $lgap, pref, $lgap, fill:default, 2*($lgap, pref)"));
+                    "$rgap, pref, $lgap, fill:default, $lgap, pref, $lgap, fill:default"));
 
                 //---- ledRedButton ----
                 ledRedButton.setColor(Color.red);
@@ -350,101 +365,6 @@ public class FrameDebug extends JFrame implements HasLogger {
                     panel6.add(pbYellow);
                 }
                 upperPanel.add(panel6, CC.xywh(12, 8, 3, 1, CC.DEFAULT, CC.TOP));
-
-                //======== panel7 ========
-                {
-                    panel7.setLayout(new FormLayout(
-                        "4*(default:grow)",
-                        "pref"));
-
-                    //---- btnB ----
-                    btnB.setIcon(null);
-                    btnB.setToolTipText(null);
-                    btnB.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
-                    btnB.setVerticalTextPosition(SwingConstants.BOTTOM);
-                    btnB.setHorizontalTextPosition(SwingConstants.CENTER);
-                    btnB.setText("K1");
-                    panel7.add(btnB, CC.xy(1, 1));
-
-                    //---- btnA ----
-                    btnA.setText("K2");
-                    btnA.setIcon(null);
-                    btnA.setVerticalTextPosition(SwingConstants.BOTTOM);
-                    btnA.setHorizontalTextPosition(SwingConstants.CENTER);
-                    btnA.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
-                    btnA.setToolTipText(null);
-                    panel7.add(btnA, CC.xy(2, 1));
-
-                    //---- btnC ----
-                    btnC.setText("K3");
-                    btnC.setIcon(null);
-                    btnC.setToolTipText(null);
-                    btnC.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
-                    btnC.setVerticalTextPosition(SwingConstants.BOTTOM);
-                    btnC.setHorizontalTextPosition(SwingConstants.CENTER);
-                    panel7.add(btnC, CC.xy(3, 1));
-
-                    //---- btnD ----
-                    btnD.setText("K4");
-                    btnD.setIcon(null);
-                    btnD.setToolTipText(null);
-                    btnD.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
-                    btnD.setVerticalTextPosition(SwingConstants.BOTTOM);
-                    btnD.setHorizontalTextPosition(SwingConstants.CENTER);
-                    panel7.add(btnD, CC.xy(4, 1));
-                }
-                upperPanel.add(panel7, CC.xywh(2, 10, 13, 1, CC.FILL, CC.TOP));
-
-                //======== panel2 ========
-                {
-                    panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
-
-                    //---- lblMessage1 ----
-                    lblMessage1.setOpaque(true);
-                    lblMessage1.setBackground(Color.white);
-                    lblMessage1.setText("TXT1");
-                    lblMessage1.setForeground(Color.black);
-                    lblMessage1.setHorizontalAlignment(SwingConstants.CENTER);
-                    lblMessage1.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
-                    panel2.add(lblMessage1);
-
-                    //---- lblMessage2 ----
-                    lblMessage2.setOpaque(true);
-                    lblMessage2.setBackground(Color.white);
-                    lblMessage2.setText("TXT2");
-                    lblMessage2.setForeground(Color.black);
-                    lblMessage2.setHorizontalAlignment(SwingConstants.CENTER);
-                    lblMessage2.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
-                    panel2.add(lblMessage2);
-
-                    //---- lblMessage3 ----
-                    lblMessage3.setOpaque(true);
-                    lblMessage3.setBackground(Color.white);
-                    lblMessage3.setText("TXT3");
-                    lblMessage3.setForeground(Color.black);
-                    lblMessage3.setHorizontalAlignment(SwingConstants.CENTER);
-                    lblMessage3.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
-                    panel2.add(lblMessage3);
-
-                    //---- lblMessage4 ----
-                    lblMessage4.setOpaque(true);
-                    lblMessage4.setBackground(Color.white);
-                    lblMessage4.setText("TXT4");
-                    lblMessage4.setForeground(Color.black);
-                    lblMessage4.setHorizontalAlignment(SwingConstants.CENTER);
-                    lblMessage4.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
-                    panel2.add(lblMessage4);
-
-                    //---- lblMessage5 ----
-                    lblMessage5.setOpaque(true);
-                    lblMessage5.setBackground(Color.white);
-                    lblMessage5.setText("TXT5");
-                    lblMessage5.setForeground(Color.black);
-                    lblMessage5.setHorizontalAlignment(SwingConstants.CENTER);
-                    lblMessage5.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
-                    panel2.add(lblMessage5);
-                }
-                upperPanel.add(panel2, CC.xywh(2, 12, 13, 1, CC.CENTER, CC.FILL));
             }
             mainView.add(upperPanel, BorderLayout.NORTH);
 
@@ -452,21 +372,223 @@ public class FrameDebug extends JFrame implements HasLogger {
             {
                 panel5.setLayout(new BoxLayout(panel5, BoxLayout.PAGE_AXIS));
 
-                //======== logscroller ========
+                //======== panel8 ========
                 {
-                    logscroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-                    logscroller.setAutoscrolls(true);
-                    logscroller.setPreferredSize(null);
+                    panel8.setLayout(new CardLayout());
 
-                    //---- txtLogger ----
-                    txtLogger.setForeground(Color.green);
-                    txtLogger.setBackground(Color.black);
-                    txtLogger.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
-                    txtLogger.setWrapStyleWord(true);
-                    txtLogger.setLineWrap(true);
-                    logscroller.setViewportView(txtLogger);
+                    //======== pnlDisplays ========
+                    {
+                        pnlDisplays.setLayout(new FormLayout(
+                            "default:grow",
+                            "pref, $lgap, fill:default:grow"));
+
+                        //======== pnlLedDisplay ========
+                        {
+                            pnlLedDisplay.setLayout(new GridLayout(2, 5, 5, 5));
+
+                            //---- lblTimeRed ----
+                            lblTimeRed.setOpaque(true);
+                            lblTimeRed.setBackground(Color.black);
+                            lblTimeRed.setText("00:00");
+                            lblTimeRed.setForeground(Color.red);
+                            lblTimeRed.setHorizontalAlignment(SwingConstants.CENTER);
+                            lblTimeRed.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                            pnlLedDisplay.add(lblTimeRed);
+
+                            //---- lblTimeBlue ----
+                            lblTimeBlue.setOpaque(true);
+                            lblTimeBlue.setBackground(Color.black);
+                            lblTimeBlue.setText("00:00");
+                            lblTimeBlue.setForeground(Color.blue);
+                            lblTimeBlue.setHorizontalAlignment(SwingConstants.CENTER);
+                            lblTimeBlue.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                            pnlLedDisplay.add(lblTimeBlue);
+
+                            //---- lblTimeWhite ----
+                            lblTimeWhite.setOpaque(true);
+                            lblTimeWhite.setBackground(Color.black);
+                            lblTimeWhite.setText("00:00");
+                            lblTimeWhite.setForeground(Color.white);
+                            lblTimeWhite.setHorizontalAlignment(SwingConstants.CENTER);
+                            lblTimeWhite.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                            pnlLedDisplay.add(lblTimeWhite);
+
+                            //---- lblTimeGreen ----
+                            lblTimeGreen.setOpaque(true);
+                            lblTimeGreen.setBackground(Color.black);
+                            lblTimeGreen.setText("00:00");
+                            lblTimeGreen.setForeground(Color.green);
+                            lblTimeGreen.setHorizontalAlignment(SwingConstants.CENTER);
+                            lblTimeGreen.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                            pnlLedDisplay.add(lblTimeGreen);
+
+                            //---- lblTimeYellow ----
+                            lblTimeYellow.setOpaque(true);
+                            lblTimeYellow.setBackground(Color.black);
+                            lblTimeYellow.setText("00:00");
+                            lblTimeYellow.setForeground(Color.yellow);
+                            lblTimeYellow.setHorizontalAlignment(SwingConstants.CENTER);
+                            lblTimeYellow.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                            pnlLedDisplay.add(lblTimeYellow);
+
+                            //---- lblMessage1 ----
+                            lblMessage1.setOpaque(true);
+                            lblMessage1.setBackground(Color.black);
+                            lblMessage1.setText("TXT1");
+                            lblMessage1.setForeground(Color.white);
+                            lblMessage1.setHorizontalAlignment(SwingConstants.CENTER);
+                            lblMessage1.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                            pnlLedDisplay.add(lblMessage1);
+
+                            //---- lblMessage2 ----
+                            lblMessage2.setOpaque(true);
+                            lblMessage2.setBackground(Color.black);
+                            lblMessage2.setText("TXT2");
+                            lblMessage2.setForeground(Color.white);
+                            lblMessage2.setHorizontalAlignment(SwingConstants.CENTER);
+                            lblMessage2.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                            pnlLedDisplay.add(lblMessage2);
+
+                            //---- lblMessage3 ----
+                            lblMessage3.setOpaque(true);
+                            lblMessage3.setBackground(Color.black);
+                            lblMessage3.setText("TXT3");
+                            lblMessage3.setForeground(Color.white);
+                            lblMessage3.setHorizontalAlignment(SwingConstants.CENTER);
+                            lblMessage3.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                            pnlLedDisplay.add(lblMessage3);
+
+                            //---- lblMessage4 ----
+                            lblMessage4.setOpaque(true);
+                            lblMessage4.setBackground(Color.black);
+                            lblMessage4.setText("TXT4");
+                            lblMessage4.setForeground(Color.white);
+                            lblMessage4.setHorizontalAlignment(SwingConstants.CENTER);
+                            lblMessage4.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                            pnlLedDisplay.add(lblMessage4);
+
+                            //---- lblMessage5 ----
+                            lblMessage5.setOpaque(true);
+                            lblMessage5.setBackground(Color.black);
+                            lblMessage5.setText("TXT5");
+                            lblMessage5.setForeground(Color.white);
+                            lblMessage5.setHorizontalAlignment(SwingConstants.CENTER);
+                            lblMessage5.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                            pnlLedDisplay.add(lblMessage5);
+                        }
+                        pnlDisplays.add(pnlLedDisplay, CC.xy(1, 1, CC.DEFAULT, CC.TOP));
+
+                        //======== pnlLCD ========
+                        {
+                            pnlLCD.setBackground(Color.blue);
+                            pnlLCD.setLayout(new FormLayout(
+                                "default, $lcgap, pref, $lcgap, default",
+                                "4*(fill:default)"));
+
+                            //---- btnB ----
+                            btnB.setIcon(null);
+                            btnB.setToolTipText(null);
+                            btnB.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                            btnB.setVerticalTextPosition(SwingConstants.BOTTOM);
+                            btnB.setHorizontalTextPosition(SwingConstants.CENTER);
+                            btnB.setText("K1");
+                            pnlLCD.add(btnB, CC.xy(1, 1));
+
+                            //---- label1 ----
+                            label1.setText("12345678901234567890");
+                            label1.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                            pnlLCD.add(label1, CC.xy(3, 1));
+
+                            //---- btnC ----
+                            btnC.setText("K3");
+                            btnC.setIcon(null);
+                            btnC.setToolTipText(null);
+                            btnC.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                            btnC.setVerticalTextPosition(SwingConstants.BOTTOM);
+                            btnC.setHorizontalTextPosition(SwingConstants.CENTER);
+                            pnlLCD.add(btnC, CC.xy(5, 1));
+
+                            //---- label2 ----
+                            label2.setText("12345678901234567890");
+                            label2.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                            pnlLCD.add(label2, CC.xy(3, 2));
+
+                            //---- label3 ----
+                            label3.setText("12345678901234567890");
+                            label3.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                            pnlLCD.add(label3, CC.xy(3, 3));
+
+                            //---- btnA ----
+                            btnA.setText("K2");
+                            btnA.setIcon(null);
+                            btnA.setVerticalTextPosition(SwingConstants.BOTTOM);
+                            btnA.setHorizontalTextPosition(SwingConstants.CENTER);
+                            btnA.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                            btnA.setToolTipText(null);
+                            pnlLCD.add(btnA, CC.xy(1, 4));
+
+                            //---- label4 ----
+                            label4.setText("12345678901234567890");
+                            label4.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                            pnlLCD.add(label4, CC.xy(3, 4));
+
+                            //---- btnD ----
+                            btnD.setText("K4");
+                            btnD.setIcon(null);
+                            btnD.setToolTipText(null);
+                            btnD.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                            btnD.setVerticalTextPosition(SwingConstants.BOTTOM);
+                            btnD.setHorizontalTextPosition(SwingConstants.CENTER);
+                            pnlLCD.add(btnD, CC.xy(5, 4));
+                        }
+                        pnlDisplays.add(pnlLCD, CC.xy(1, 3, CC.CENTER, CC.CENTER));
+                    }
+                    panel8.add(pnlDisplays, "card2");
+
+                    //======== pnlLog ========
+                    {
+                        pnlLog.setLayout(new BorderLayout());
+
+                        //======== logscroller ========
+                        {
+                            logscroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                            logscroller.setAutoscrolls(true);
+                            logscroller.setPreferredSize(null);
+
+                            //---- txtLogger ----
+                            txtLogger.setForeground(Color.green);
+                            txtLogger.setBackground(Color.black);
+                            txtLogger.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
+                            txtLogger.setWrapStyleWord(true);
+                            txtLogger.setLineWrap(true);
+                            logscroller.setViewportView(txtLogger);
+                        }
+                        pnlLog.add(logscroller, BorderLayout.CENTER);
+
+                        //======== panel1 ========
+                        {
+                            panel1.setBorder(new TitledBorder("LOG-LEVEL"));
+                            panel1.setMaximumSize(new Dimension(168, 64));
+                            panel1.setLayout(new BoxLayout(panel1, BoxLayout.PAGE_AXIS));
+
+                            //---- tbDebug ----
+                            tbDebug.setText("DEBUG");
+                            tbDebug.setSelected(true);
+                            tbDebug.setSelectedIcon(null);
+                            tbDebug.setIcon(null);
+                            tbDebug.addItemListener(e -> tbDebugItemStateChanged(e));
+                            panel1.add(tbDebug);
+
+                            //---- tbInfo ----
+                            tbInfo.setText("INFO");
+                            tbInfo.addItemListener(e -> tbInfoItemStateChanged(e));
+                            panel1.add(tbInfo);
+                        }
+                        pnlLog.add(panel1, BorderLayout.EAST);
+                    }
+                    panel8.add(pnlLog, "card1");
                 }
-                panel5.add(logscroller);
+                panel5.add(panel8);
 
                 //======== panel3 ========
                 {
@@ -507,26 +629,24 @@ public class FrameDebug extends JFrame implements HasLogger {
                     hSpacer2.setMaximumSize(new Dimension(32767, 64));
                     panel3.add(hSpacer2);
 
-                    //======== panel1 ========
+                    //======== panel9 ========
                     {
-                        panel1.setBorder(new TitledBorder("LOG-LEVEL"));
-                        panel1.setMaximumSize(new Dimension(168, 64));
-                        panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+                        panel9.setBorder(new TitledBorder("Screen"));
+                        panel9.setMaximumSize(new Dimension(168, 64));
+                        panel9.setLayout(new BoxLayout(panel9, BoxLayout.X_AXIS));
 
-                        //---- tbDebug ----
-                        tbDebug.setText("DEBUG");
-                        tbDebug.setSelected(true);
-                        tbDebug.setSelectedIcon(null);
-                        tbDebug.setIcon(null);
-                        tbDebug.addItemListener(e -> tbDebugItemStateChanged(e));
-                        panel1.add(tbDebug);
+                        //---- tbDisplay ----
+                        tbDisplay.setText("DISPLAY");
+                        tbDisplay.setSelected(true);
+                        tbDisplay.setSelectedIcon(null);
+                        tbDisplay.setIcon(null);
+                        panel9.add(tbDisplay);
 
-                        //---- tbInfo ----
-                        tbInfo.setText("INFO");
-                        tbInfo.addItemListener(e -> tbInfoItemStateChanged(e));
-                        panel1.add(tbInfo);
+                        //---- tbLogs ----
+                        tbLogs.setText("LOGS");
+                        panel9.add(tbLogs);
                     }
-                    panel3.add(panel1);
+                    panel3.add(panel9);
                 }
                 panel5.add(panel3);
             }
@@ -540,6 +660,11 @@ public class FrameDebug extends JFrame implements HasLogger {
         ButtonGroup buttonGroup1 = new ButtonGroup();
         buttonGroup1.add(tbDebug);
         buttonGroup1.add(tbInfo);
+
+        //---- buttonGroup2 ----
+        ButtonGroup buttonGroup2 = new ButtonGroup();
+        buttonGroup2.add(tbDisplay);
+        buttonGroup2.add(tbLogs);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -650,20 +775,35 @@ public class FrameDebug extends JFrame implements HasLogger {
     private JProgressBar pbGreen;
     private JPanel panel6;
     private JProgressBar pbYellow;
-    private JPanel panel7;
-    private JButton btnB;
-    private JButton btnA;
-    private JButton btnC;
-    private JButton btnD;
-    private JPanel panel2;
+    private JPanel panel5;
+    private JPanel panel8;
+    private JPanel pnlDisplays;
+    private JPanel pnlLedDisplay;
+    private JLabel lblTimeRed;
+    private JLabel lblTimeBlue;
+    private JLabel lblTimeWhite;
+    private JLabel lblTimeGreen;
+    private JLabel lblTimeYellow;
     private JLabel lblMessage1;
     private JLabel lblMessage2;
     private JLabel lblMessage3;
     private JLabel lblMessage4;
     private JLabel lblMessage5;
-    private JPanel panel5;
+    private JPanel pnlLCD;
+    private JButton btnB;
+    private JLabel label1;
+    private JButton btnC;
+    private JLabel label2;
+    private JLabel label3;
+    private JButton btnA;
+    private JLabel label4;
+    private JButton btnD;
+    private JPanel pnlLog;
     private JScrollPane logscroller;
     private JTextArea txtLogger;
+    private JPanel panel1;
+    private JToggleButton tbDebug;
+    private JToggleButton tbInfo;
     private JPanel panel3;
     private MyLED ledGreen;
     private MyLED ledWhite;
@@ -672,8 +812,8 @@ public class FrameDebug extends JFrame implements HasLogger {
     private JButton btnTestDialog;
     private JButton btnShutdown;
     private JPanel hSpacer2;
-    private JPanel panel1;
-    private JToggleButton tbDebug;
-    private JToggleButton tbInfo;
+    private JPanel panel9;
+    private JToggleButton tbDisplay;
+    private JToggleButton tbLogs;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
