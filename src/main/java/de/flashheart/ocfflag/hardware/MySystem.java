@@ -102,11 +102,11 @@ public class MySystem implements HasLogger {
         // so kann das Display7Segment4Digits direkt die Helligkeit aus den configs lesen
 
 
-        display_white = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_WHITE_I2C), frameDebug.getLblPole(), Configs.DISPLAY_WHITE_I2C);
-        display_red = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_RED_I2C), frameDebug.getBtnRed(), Configs.DISPLAY_RED_I2C);
-        display_blue = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_BLUE_I2C), frameDebug.getBtnBlue(), Configs.DISPLAY_BLUE_I2C);
-        display_green = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_GREEN_I2C), frameDebug.getBtnGreen(), Configs.DISPLAY_GREEN_I2C);
-        display_yellow = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_YELLOW_I2C), frameDebug.getBtnYellow(), Configs.DISPLAY_YELLOW_I2C);
+        display_white = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_WHITE_I2C), frameDebug.getLblTimeWhite(), Configs.DISPLAY_WHITE_I2C);
+        display_red = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_RED_I2C), frameDebug.getLblTimeRed(), Configs.DISPLAY_RED_I2C);
+        display_blue = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_BLUE_I2C), frameDebug.getLblTimeBlue(), Configs.DISPLAY_BLUE_I2C);
+        display_green = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_GREEN_I2C), frameDebug.getLblTimeGreen(), Configs.DISPLAY_GREEN_I2C);
+        display_yellow = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_YELLOW_I2C), frameDebug.getLblTimeYellow(), Configs.DISPLAY_YELLOW_I2C);
 
         display_white.setFourDigitsOnly(false);
         display_red.setFourDigitsOnly(false);
