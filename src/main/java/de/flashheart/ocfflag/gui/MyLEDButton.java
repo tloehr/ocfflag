@@ -3,10 +3,7 @@ package de.flashheart.ocfflag.gui;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Created by tloehr on 16.03.16.
- */
-public class MyLED extends JLabel implements HasState, HasColor {
+public class MyLEDButton extends JButton implements HasColor, HasState{
     private Icon imageOn;
     private Icon imageOff;
 
@@ -28,11 +25,11 @@ public class MyLED extends JLabel implements HasState, HasColor {
     private Color color;
     private boolean state;
 
-    public MyLED() {
+    public MyLEDButton() {
         this(null, Color.WHITE);
     }
 
-    public MyLED(String text, Color color) {
+    public MyLEDButton(String text, Color color) {
         super(text);
         this.color = color;
         setText(text);

@@ -172,19 +172,13 @@ public class FrameDebug extends JFrame implements HasLogger {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         mainView = new JPanel();
         upperPanel = new JPanel();
-        ledRedButton = new MyLED();
         btnRed = new JButton();
         btnBlue = new JButton();
-        ledBlueButton = new MyLED();
         pbRed = new JProgressBar();
         pbBlue = new JProgressBar();
-        ledGreenButton = new MyLED();
         btnGreen = new JButton();
         btnYellow = new JButton();
-        ledYellowButton = new MyLED();
-        panel4 = new JPanel();
         pbGreen = new JProgressBar();
-        panel6 = new JPanel();
         pbYellow = new JProgressBar();
         panel5 = new JPanel();
         panel8 = new JPanel();
@@ -248,88 +242,56 @@ public class FrameDebug extends JFrame implements HasLogger {
             //======== upperPanel ========
             {
                 upperPanel.setLayout(new FormLayout(
-                    "$rgap, default, $lcgap, 70dlu:grow, 2*($lcgap, $ugap), $lcgap, 70dlu:grow, $lcgap, default, $rgap",
-                    "$rgap, pref, $lgap, fill:default, $lgap, pref, $lgap, fill:default"));
-
-                //---- ledRedButton ----
-                ledRedButton.setColor(Color.red);
-                ledRedButton.setToolTipText("Red LED in Button");
-                upperPanel.add(ledRedButton, CC.xy(2, 2));
+                    "70dlu:grow, $ugap, 70dlu:grow",
+                    "$rgap, pref, fill:default, pref, default"));
 
                 //---- btnRed ----
                 btnRed.setText(null);
                 btnRed.setForeground(Color.red);
                 btnRed.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 24));
                 btnRed.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/led-red-off.png")));
-                upperPanel.add(btnRed, CC.xy(4, 2, CC.DEFAULT, CC.FILL));
+                upperPanel.add(btnRed, CC.xy(1, 2, CC.DEFAULT, CC.FILL));
 
                 //---- btnBlue ----
                 btnBlue.setText(null);
                 btnBlue.setForeground(Color.blue);
                 btnBlue.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 24));
                 btnBlue.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/led-blue-off.png")));
-                upperPanel.add(btnBlue, CC.xy(10, 2, CC.FILL, CC.FILL));
-
-                //---- ledBlueButton ----
-                ledBlueButton.setColor(Color.blue);
-                ledBlueButton.setToolTipText("Blue LED in Button");
-                upperPanel.add(ledBlueButton, CC.xy(12, 2));
+                upperPanel.add(btnBlue, CC.xy(3, 2, CC.FILL, CC.FILL));
 
                 //---- pbRed ----
                 pbRed.setStringPainted(true);
                 pbRed.setVisible(false);
-                upperPanel.add(pbRed, CC.xywh(2, 4, 3, 1, CC.DEFAULT, CC.FILL));
+                upperPanel.add(pbRed, CC.xy(1, 3, CC.DEFAULT, CC.FILL));
 
                 //---- pbBlue ----
                 pbBlue.setStringPainted(true);
                 pbBlue.setVisible(false);
-                upperPanel.add(pbBlue, CC.xywh(10, 4, 3, 1, CC.DEFAULT, CC.FILL));
-
-                //---- ledGreenButton ----
-                ledGreenButton.setColor(Color.green);
-                ledGreenButton.setToolTipText("Red LED in Button");
-                upperPanel.add(ledGreenButton, CC.xy(2, 6));
+                upperPanel.add(pbBlue, CC.xy(3, 3, CC.DEFAULT, CC.FILL));
 
                 //---- btnGreen ----
                 btnGreen.setText(null);
                 btnGreen.setForeground(new Color(18, 110, 12));
                 btnGreen.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 24));
                 btnGreen.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/led-green-off.png")));
-                upperPanel.add(btnGreen, CC.xy(4, 6, CC.DEFAULT, CC.FILL));
+                upperPanel.add(btnGreen, CC.xy(1, 4, CC.DEFAULT, CC.FILL));
 
                 //---- btnYellow ----
                 btnYellow.setText(null);
                 btnYellow.setForeground(new Color(210, 199, 27));
                 btnYellow.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 24));
                 btnYellow.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/led-yellow-off.png")));
-                upperPanel.add(btnYellow, CC.xy(10, 6, CC.FILL, CC.FILL));
+                upperPanel.add(btnYellow, CC.xy(3, 4, CC.FILL, CC.FILL));
 
-                //---- ledYellowButton ----
-                ledYellowButton.setColor(Color.yellow);
-                ledYellowButton.setToolTipText("Yellow LED in Button");
-                upperPanel.add(ledYellowButton, CC.xy(12, 6));
+                //---- pbGreen ----
+                pbGreen.setStringPainted(true);
+                pbGreen.setVisible(false);
+                upperPanel.add(pbGreen, CC.xy(1, 5));
 
-                //======== panel4 ========
-                {
-                    panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
-
-                    //---- pbGreen ----
-                    pbGreen.setStringPainted(true);
-                    pbGreen.setVisible(false);
-                    panel4.add(pbGreen);
-                }
-                upperPanel.add(panel4, CC.xywh(2, 8, 3, 1, CC.DEFAULT, CC.TOP));
-
-                //======== panel6 ========
-                {
-                    panel6.setLayout(new BoxLayout(panel6, BoxLayout.X_AXIS));
-
-                    //---- pbYellow ----
-                    pbYellow.setStringPainted(true);
-                    pbYellow.setVisible(false);
-                    panel6.add(pbYellow);
-                }
-                upperPanel.add(panel6, CC.xywh(10, 8, 3, 1, CC.DEFAULT, CC.TOP));
+                //---- pbYellow ----
+                pbYellow.setStringPainted(true);
+                pbYellow.setVisible(false);
+                upperPanel.add(pbYellow, CC.xy(3, 5));
             }
             mainView.add(upperPanel, BorderLayout.NORTH);
 
@@ -712,21 +674,23 @@ public class FrameDebug extends JFrame implements HasLogger {
         return btnRed;
     }
 
-    public MyLED getLedBlueButton() {
-        return ledBlueButton;
-    }
 
-    public MyLED getLedRedButton() {
-        return ledRedButton;
-    }
 
-    public MyLED getLedYellowButton() {
-        return ledYellowButton;
-    }
-
-    public MyLED getLedGreenButton() {
-        return ledGreenButton;
-    }
+//    public MyLED getLedBlueButton() {
+//        return ledBlueButton;
+//    }
+//
+//    public MyLED getLedRedButton() {
+//        return ledRedButton;
+//    }
+//
+//    public MyLED getLedYellowButton() {
+//        return ledYellowButton;
+//    }
+//
+//    public MyLED getLedGreenButton() {
+//        return ledGreenButton;
+//    }
 
     public MyLED getLedGreen() {
         return ledGreen;
@@ -783,19 +747,13 @@ public class FrameDebug extends JFrame implements HasLogger {
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JPanel mainView;
     private JPanel upperPanel;
-    private MyLED ledRedButton;
     private JButton btnRed;
     private JButton btnBlue;
-    private MyLED ledBlueButton;
     private JProgressBar pbRed;
     private JProgressBar pbBlue;
-    private MyLED ledGreenButton;
     private JButton btnGreen;
     private JButton btnYellow;
-    private MyLED ledYellowButton;
-    private JPanel panel4;
     private JProgressBar pbGreen;
-    private JPanel panel6;
     private JProgressBar pbYellow;
     private JPanel panel5;
     private JPanel panel8;

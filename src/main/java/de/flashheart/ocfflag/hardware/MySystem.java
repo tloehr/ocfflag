@@ -145,12 +145,14 @@ public class MySystem implements HasLogger {
 
         pinHandler.add(new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getLblPole(), Configs.OUT_RGB_FLAG));
 
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_RED_BTN, frameDebug.getLedRedButton()));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_BLUE_BTN, frameDebug.getLedBlueButton()));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_YELLOW_BTN, frameDebug.getLedYellowButton()));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_GREEN_BTN, frameDebug.getLedGreenButton()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_RED_BTN, frameDebug.getBtnRed()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_BLUE_BTN, frameDebug.getBtnBlue()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_GREEN_BTN, frameDebug.getBtnGreen()));
+        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_YELLOW_BTN, frameDebug.getBtnYellow()));
+
         pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_GREEN, frameDebug.getLedGreen()));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_WHITE, frameDebug.getLedWhite()));
+
         pinHandler.add(new MyPin(GPIO, Configs.OUT_FLAG_WHITE, frameDebug.getLedFlagWhite()));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_FLAG_RED, frameDebug.getLedFlagRed()));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_FLAG_BLUE, frameDebug.getLedFlagBlue()));
