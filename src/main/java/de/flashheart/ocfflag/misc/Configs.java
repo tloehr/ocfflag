@@ -83,6 +83,11 @@ public class Configs implements HasLogger {
     public static final String DISPLAY_GREEN_I2C = "display_green_i2c";
     public static final String DISPLAY_WHITE_I2C = "display_white_i2c";
 
+    public static final String DISPLAY_TXT1_I2C = "display_txt1_i2c";
+    public static final String DISPLAY_TXT2_I2C = "display_txt2_i2c";
+    public static final String DISPLAY_TXT3_I2C = "display_txt3_i2c";
+    public static final String DISPLAY_TXT4_I2C = "display_txt4_i2c";
+
     // Display Helligkeiten
     public static final String BRIGHTNESS_WHITE = "brightness_white";
     public static final String BRIGHTNESS_BLUE = "brightness_blue";
@@ -221,10 +226,16 @@ public class Configs implements HasLogger {
 
         configs.put(DISPLAY_RED_I2C, "0x72");
         configs.put(DISPLAY_BLUE_I2C, "0x71");
-        configs.put(DISPLAY_WHITE_I2C, "0x70");
         configs.put(DISPLAY_YELLOW_I2C, "0x73");
         configs.put(DISPLAY_GREEN_I2C, "0x74");
 
+        configs.put(DISPLAY_TXT1_I2C, "0x70");
+        configs.put(DISPLAY_TXT2_I2C, "0x75");
+        configs.put(DISPLAY_TXT3_I2C, "0x76");
+        configs.put(DISPLAY_TXT4_I2C, "0x77");
+
+        // deprecated - rgb will be removed in future releases
+        // colors for the rgb leds
         configs.put(FLAG_RGB_WHITE, "white");
         configs.put(FLAG_RGB_BLUE, "blue");
         configs.put(FLAG_RGB_GREEN, "green");

@@ -58,7 +58,7 @@ public class Display7Segments4Digits implements HasLogger {
         if (Tools.isArm()) {
             try {
                 getLogger().debug(Integer.decode(addr).toString());
-                segment = new SevenSegment(Integer.decode(addr), true);
+                segment = new SevenSegment(Integer.decode(addr));
 //                segment.setBrightness(Main.getConfigs().getInt(name));
             } catch (Exception e) {
                 getLogger().warn(e.getMessage());

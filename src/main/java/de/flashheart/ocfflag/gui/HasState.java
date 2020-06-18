@@ -4,5 +4,4 @@ public interface HasState {
 
     void setState(boolean on);
 
-    boolean isState();
 }

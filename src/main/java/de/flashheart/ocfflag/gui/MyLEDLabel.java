@@ -3,14 +3,14 @@ package de.flashheart.ocfflag.gui;
 import javax.swing.*;
 import java.awt.*;
 
-public class MyLEDButton extends JButton implements HasColor, HasState{
+public class MyLEDLabel extends JLabel implements HasColor, HasState{
     private MyLED myLED;
 
-    public MyLEDButton() {
+    public MyLEDLabel() {
         this(Color.WHITE);
     }
 
-    public MyLEDButton(Color color) {
+    public MyLEDLabel(Color color) {
         super();
         myLED = new MyLED(color);
         setState(false);

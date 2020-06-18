@@ -184,16 +184,11 @@ public class FrameDebug extends JFrame implements HasLogger {
         panel8 = new JPanel();
         pnlDisplays = new JPanel();
         pnlLedDisplay = new JPanel();
-        lblTimeRed = new JLabel();
-        lblTimeBlue = new JLabel();
         lblTimeWhite = new JLabel();
-        lblTimeGreen = new JLabel();
-        lblTimeYellow = new JLabel();
         lblMessage1 = new JLabel();
         lblMessage2 = new JLabel();
         lblMessage3 = new JLabel();
         lblMessage4 = new JLabel();
-        lblMessage5 = new JLabel();
         pnlFlagLEDs = new JPanel();
         ledFlagWhite = new MyLED();
         ledFlagRed = new MyLED();
@@ -201,15 +196,18 @@ public class FrameDebug extends JFrame implements HasLogger {
         ledFlagGreen = new MyLED();
         ledFlagYellow = new MyLED();
         pnlLCD = new JPanel();
-        label1 = new JLabel();
-        label2 = new JLabel();
-        label3 = new JLabel();
-        label4 = new JLabel();
-        panel2 = new JPanel();
         btnB = new JButton();
+        label1 = new JLabel();
+        lblTimeRed = new JLabel();
         btnA = new JButton();
+        label2 = new JLabel();
+        lblTimeBlue = new JLabel();
         btnC = new JButton();
+        label3 = new JLabel();
+        lblTimeGreen = new JLabel();
         btnD = new JButton();
+        label4 = new JLabel();
+        lblTimeYellow = new JLabel();
         lblPole = new JLabel();
         pnlLog = new JPanel();
         logscroller = new JScrollPane();
@@ -307,29 +305,11 @@ public class FrameDebug extends JFrame implements HasLogger {
                     {
                         pnlDisplays.setLayout(new FormLayout(
                             "default:grow, $ugap, default",
-                            "2*(pref, $lgap), 26dlu"));
+                            "pref, $lgap, 122dlu, $lgap, 26dlu"));
 
                         //======== pnlLedDisplay ========
                         {
                             pnlLedDisplay.setLayout(new GridLayout(2, 5, 5, 5));
-
-                            //---- lblTimeRed ----
-                            lblTimeRed.setOpaque(true);
-                            lblTimeRed.setBackground(Color.black);
-                            lblTimeRed.setText("00:00");
-                            lblTimeRed.setForeground(Color.red);
-                            lblTimeRed.setHorizontalAlignment(SwingConstants.CENTER);
-                            lblTimeRed.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
-                            pnlLedDisplay.add(lblTimeRed);
-
-                            //---- lblTimeBlue ----
-                            lblTimeBlue.setOpaque(true);
-                            lblTimeBlue.setBackground(Color.black);
-                            lblTimeBlue.setText("00:00");
-                            lblTimeBlue.setForeground(Color.blue);
-                            lblTimeBlue.setHorizontalAlignment(SwingConstants.CENTER);
-                            lblTimeBlue.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
-                            pnlLedDisplay.add(lblTimeBlue);
 
                             //---- lblTimeWhite ----
                             lblTimeWhite.setOpaque(true);
@@ -339,24 +319,6 @@ public class FrameDebug extends JFrame implements HasLogger {
                             lblTimeWhite.setHorizontalAlignment(SwingConstants.CENTER);
                             lblTimeWhite.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
                             pnlLedDisplay.add(lblTimeWhite);
-
-                            //---- lblTimeGreen ----
-                            lblTimeGreen.setOpaque(true);
-                            lblTimeGreen.setBackground(Color.black);
-                            lblTimeGreen.setText("00:00");
-                            lblTimeGreen.setForeground(Color.green);
-                            lblTimeGreen.setHorizontalAlignment(SwingConstants.CENTER);
-                            lblTimeGreen.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
-                            pnlLedDisplay.add(lblTimeGreen);
-
-                            //---- lblTimeYellow ----
-                            lblTimeYellow.setOpaque(true);
-                            lblTimeYellow.setBackground(Color.black);
-                            lblTimeYellow.setText("00:00");
-                            lblTimeYellow.setForeground(Color.yellow);
-                            lblTimeYellow.setHorizontalAlignment(SwingConstants.CENTER);
-                            lblTimeYellow.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
-                            pnlLedDisplay.add(lblTimeYellow);
 
                             //---- lblMessage1 ----
                             lblMessage1.setOpaque(true);
@@ -393,15 +355,6 @@ public class FrameDebug extends JFrame implements HasLogger {
                             lblMessage4.setHorizontalAlignment(SwingConstants.CENTER);
                             lblMessage4.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
                             pnlLedDisplay.add(lblMessage4);
-
-                            //---- lblMessage5 ----
-                            lblMessage5.setOpaque(true);
-                            lblMessage5.setBackground(Color.black);
-                            lblMessage5.setText("TXT5");
-                            lblMessage5.setForeground(Color.white);
-                            lblMessage5.setHorizontalAlignment(SwingConstants.CENTER);
-                            lblMessage5.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
-                            pnlLedDisplay.add(lblMessage5);
                         }
                         pnlDisplays.add(pnlLedDisplay, CC.xy(1, 1, CC.DEFAULT, CC.TOP));
 
@@ -439,69 +392,101 @@ public class FrameDebug extends JFrame implements HasLogger {
                         //======== pnlLCD ========
                         {
                             pnlLCD.setBackground(Color.blue);
-                            pnlLCD.setLayout(new BoxLayout(pnlLCD, BoxLayout.Y_AXIS));
+                            pnlLCD.setLayout(new FormLayout(
+                                "default, left:default:grow, default",
+                                "4*(fill:default)"));
+
+                            //---- btnB ----
+                            btnB.setIcon(null);
+                            btnB.setToolTipText(null);
+                            btnB.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                            btnB.setVerticalTextPosition(SwingConstants.BOTTOM);
+                            btnB.setHorizontalTextPosition(SwingConstants.CENTER);
+                            btnB.setText("K1");
+                            pnlLCD.add(btnB, CC.xy(1, 1));
 
                             //---- label1 ----
                             label1.setText("12345678901234567890");
                             label1.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
-                            pnlLCD.add(label1);
+                            pnlLCD.add(label1, CC.xy(2, 1));
+
+                            //---- lblTimeRed ----
+                            lblTimeRed.setOpaque(true);
+                            lblTimeRed.setBackground(Color.black);
+                            lblTimeRed.setText("00:00");
+                            lblTimeRed.setForeground(Color.red);
+                            lblTimeRed.setHorizontalAlignment(SwingConstants.CENTER);
+                            lblTimeRed.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                            pnlLCD.add(lblTimeRed, CC.xy(3, 1));
+
+                            //---- btnA ----
+                            btnA.setText("K2");
+                            btnA.setIcon(null);
+                            btnA.setVerticalTextPosition(SwingConstants.BOTTOM);
+                            btnA.setHorizontalTextPosition(SwingConstants.CENTER);
+                            btnA.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                            btnA.setToolTipText(null);
+                            pnlLCD.add(btnA, CC.xy(1, 2));
 
                             //---- label2 ----
                             label2.setText("12345678901234567890");
                             label2.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
-                            pnlLCD.add(label2);
+                            pnlLCD.add(label2, CC.xy(2, 2));
+
+                            //---- lblTimeBlue ----
+                            lblTimeBlue.setOpaque(true);
+                            lblTimeBlue.setBackground(Color.black);
+                            lblTimeBlue.setText("00:00");
+                            lblTimeBlue.setForeground(Color.blue);
+                            lblTimeBlue.setHorizontalAlignment(SwingConstants.CENTER);
+                            lblTimeBlue.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                            pnlLCD.add(lblTimeBlue, CC.xy(3, 2));
+
+                            //---- btnC ----
+                            btnC.setText("K3");
+                            btnC.setIcon(null);
+                            btnC.setToolTipText(null);
+                            btnC.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                            btnC.setVerticalTextPosition(SwingConstants.BOTTOM);
+                            btnC.setHorizontalTextPosition(SwingConstants.CENTER);
+                            pnlLCD.add(btnC, CC.xy(1, 3));
 
                             //---- label3 ----
                             label3.setText("12345678901234567890");
                             label3.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
-                            pnlLCD.add(label3);
+                            pnlLCD.add(label3, CC.xy(2, 3));
+
+                            //---- lblTimeGreen ----
+                            lblTimeGreen.setOpaque(true);
+                            lblTimeGreen.setBackground(Color.black);
+                            lblTimeGreen.setText("00:00");
+                            lblTimeGreen.setForeground(Color.green);
+                            lblTimeGreen.setHorizontalAlignment(SwingConstants.CENTER);
+                            lblTimeGreen.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                            pnlLCD.add(lblTimeGreen, CC.xy(3, 3));
+
+                            //---- btnD ----
+                            btnD.setText("K4");
+                            btnD.setIcon(null);
+                            btnD.setToolTipText(null);
+                            btnD.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+                            btnD.setVerticalTextPosition(SwingConstants.BOTTOM);
+                            btnD.setHorizontalTextPosition(SwingConstants.CENTER);
+                            pnlLCD.add(btnD, CC.xy(1, 4));
 
                             //---- label4 ----
                             label4.setText("12345678901234567890");
                             label4.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
-                            pnlLCD.add(label4);
+                            pnlLCD.add(label4, CC.xy(2, 4));
 
-                            //======== panel2 ========
-                            {
-                                panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
-
-                                //---- btnB ----
-                                btnB.setIcon(null);
-                                btnB.setToolTipText(null);
-                                btnB.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
-                                btnB.setVerticalTextPosition(SwingConstants.BOTTOM);
-                                btnB.setHorizontalTextPosition(SwingConstants.CENTER);
-                                btnB.setText("K1");
-                                panel2.add(btnB);
-
-                                //---- btnA ----
-                                btnA.setText("K2");
-                                btnA.setIcon(null);
-                                btnA.setVerticalTextPosition(SwingConstants.BOTTOM);
-                                btnA.setHorizontalTextPosition(SwingConstants.CENTER);
-                                btnA.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
-                                btnA.setToolTipText(null);
-                                panel2.add(btnA);
-
-                                //---- btnC ----
-                                btnC.setText("K3");
-                                btnC.setIcon(null);
-                                btnC.setToolTipText(null);
-                                btnC.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
-                                btnC.setVerticalTextPosition(SwingConstants.BOTTOM);
-                                btnC.setHorizontalTextPosition(SwingConstants.CENTER);
-                                panel2.add(btnC);
-
-                                //---- btnD ----
-                                btnD.setText("K4");
-                                btnD.setIcon(null);
-                                btnD.setToolTipText(null);
-                                btnD.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
-                                btnD.setVerticalTextPosition(SwingConstants.BOTTOM);
-                                btnD.setHorizontalTextPosition(SwingConstants.CENTER);
-                                panel2.add(btnD);
-                            }
-                            pnlLCD.add(panel2);
+                            //---- lblTimeYellow ----
+                            lblTimeYellow.setOpaque(true);
+                            lblTimeYellow.setBackground(Color.black);
+                            lblTimeYellow.setText("00:00");
+                            lblTimeYellow.setForeground(Color.yellow);
+                            lblTimeYellow.setHorizontalAlignment(SwingConstants.CENTER);
+                            lblTimeYellow.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 32));
+                            pnlLCD.add(lblTimeYellow, CC.xy(3, 4));
                         }
                         pnlDisplays.add(pnlLCD, CC.xy(1, 3, CC.FILL, CC.TOP));
 
@@ -660,17 +645,21 @@ public class FrameDebug extends JFrame implements HasLogger {
         return lblTimeYellow;
     }
 
-    public JLabel getLblPole() {
-        return lblPole;
+    public JPanel getPnlFlagLEDs() {
+        return pnlFlagLEDs;
     }
 
+    //    public JLabel getLblPole() {
+//        return lblPole;
+//    }
 
-    public JButton getBtnBlue() {
+
+    public MyLEDButton getBtnBlue() {
         return btnBlue;
     }
 
 
-    public JButton getBtnRed() {
+    public MyLEDButton getBtnRed() {
         return btnRed;
     }
 
@@ -692,19 +681,19 @@ public class FrameDebug extends JFrame implements HasLogger {
 //        return ledGreenButton;
 //    }
 
-    public MyLED getLedGreen() {
+    public MyLEDLabel getLedGreen() {
         return ledGreen;
     }
 
-    public MyLED getLedWhite() {
+    public MyLEDLabel getLedWhite() {
         return ledWhite;
     }
 
-    public JButton getBtnYellow() {
+    public MyLEDButton getBtnYellow() {
         return btnYellow;
     }
 
-    public JButton getBtnGreen() {
+    public MyLEDButton getBtnGreen() {
         return btnGreen;
     }
 
@@ -724,23 +713,23 @@ public class FrameDebug extends JFrame implements HasLogger {
         return btnD;
     }
 
-    public MyLED getLedFlagWhite() {
+    public MyLEDLabel getLedFlagWhite() {
         return ledFlagWhite;
     }
 
-    public MyLED getLedFlagRed() {
+    public MyLEDLabel getLedFlagRed() {
         return ledFlagRed;
     }
 
-    public MyLED getLedFlagBlue() {
+    public MyLEDLabel getLedFlagBlue() {
         return ledFlagBlue;
     }
 
-    public MyLED getLedFlagGreen() {
+    public MyLEDLabel getLedFlagGreen() {
         return ledFlagGreen;
     }
 
-    public MyLED getLedFlagYellow() {
+    public MyLEDLabel getLedFlagYellow() {
         return ledFlagYellow;
     }
 
@@ -759,16 +748,11 @@ public class FrameDebug extends JFrame implements HasLogger {
     private JPanel panel8;
     private JPanel pnlDisplays;
     private JPanel pnlLedDisplay;
-    private JLabel lblTimeRed;
-    private JLabel lblTimeBlue;
     private JLabel lblTimeWhite;
-    private JLabel lblTimeGreen;
-    private JLabel lblTimeYellow;
     private JLabel lblMessage1;
     private JLabel lblMessage2;
     private JLabel lblMessage3;
     private JLabel lblMessage4;
-    private JLabel lblMessage5;
     private JPanel pnlFlagLEDs;
     private MyLED ledFlagWhite;
     private MyLED ledFlagRed;
@@ -776,15 +760,18 @@ public class FrameDebug extends JFrame implements HasLogger {
     private MyLED ledFlagGreen;
     private MyLED ledFlagYellow;
     private JPanel pnlLCD;
-    private JLabel label1;
-    private JLabel label2;
-    private JLabel label3;
-    private JLabel label4;
-    private JPanel panel2;
     private JButton btnB;
+    private JLabel label1;
+    private JLabel lblTimeRed;
     private JButton btnA;
+    private JLabel label2;
+    private JLabel lblTimeBlue;
     private JButton btnC;
+    private JLabel label3;
+    private JLabel lblTimeGreen;
     private JButton btnD;
+    private JLabel label4;
+    private JLabel lblTimeYellow;
     private JLabel lblPole;
     private JPanel pnlLog;
     private JScrollPane logscroller;
@@ -803,5 +790,9 @@ public class FrameDebug extends JFrame implements HasLogger {
     private JPanel panel9;
     private JToggleButton tbDisplay;
     private JToggleButton tbLogs;
+
+    public JPanel getRGBPole() {
+        return pnlFlagLEDs;
+    }
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

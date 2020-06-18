@@ -15,22 +15,9 @@ import java.io.IOException;
  * https://github.com/OlivierLD/raspberry-pi4j-samples/blob/master/SevenSegDisplay/src/sevensegdisplay/LEDBackPack.java
  */
 public class LEDBackPack implements HasLogger {
-    /*
-    Prompt> sudo i2cdetect -y 1
-         0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
-    00:          -- -- -- -- -- -- -- -- -- -- -- -- --
-    10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    30: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    70: 70 -- -- -- -- -- -- --
-     */
-    // This next addresses is returned by "sudo i2cdetect -y 1", see above.
+  
     public final static int LEDBACKPACK_ADDRESS = 0x70;
-    private boolean verbose = false;
-
+  
     private I2CBus bus;
     private I2CDevice ledBackpack;
 
@@ -54,21 +41,12 @@ public class LEDBackPack implements HasLogger {
     }
 
     public LEDBackPack(int address) throws I2CFactory.UnsupportedBusNumberException {
-        this(address, false);
-    }
 
-    public LEDBackPack(int address, boolean v) throws I2CFactory.UnsupportedBusNumberException {
-
-        this.verbose = v;
         try {
             // Get i2c bus
             bus = I2CFactory.getInstance(I2CBus.BUS_1); // Depends on the RasPI version
-//            getLogger().debug("Connected to bus. OK.");
-
             // Get device itself
             ledBackpack = bus.getDevice(address);
-//            getLogger().debug("Connected to device. OK.");
-
             //Turn the oscillator on
             ledBackpack.write(HT16K33_REGISTER_SYSTEM_SETUP | 0x01, (byte) 0x00);
             // Turn blink off

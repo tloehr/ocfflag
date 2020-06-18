@@ -61,7 +61,7 @@ public class RGBBlinkModel implements GenericBlinkModel, HasLogger {
             }
         }
 
-        myRGBLed.setToolTipText("");
+//        myRGBLed.setToolTipText("");
         return null;
     }
 
@@ -97,13 +97,9 @@ public class RGBBlinkModel implements GenericBlinkModel, HasLogger {
             }
         }
 
-        myRGBLed.setToolTipText(textScheme);
+//        myRGBLed.setToolTipText(textScheme);
     }
 
-    @Override
-    public void setText(String text) {
-        myRGBLed.setToolTipText(text);
-    }
 
     /**
      * Erstellt ein Blinkkschema für die Flagge, mit der sich die restliche Spielzeit ablesen lässt.

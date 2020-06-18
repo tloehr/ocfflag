@@ -9,42 +9,20 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MyRGBLed {
-    private final JLabel lbl;
+
     private final Pin pinRed;
     private final Pin pinGreen;
     private final Pin pinBlue;
     private String name;
+    private JPanel panel;
 
-    public MyRGBLed(Pin pinRed, Pin pinGreen, Pin pinBlue, JLabel lbl, String name) {
-        this.lbl = lbl;
-
+    public MyRGBLed(Pin pinRed, Pin pinGreen, Pin pinBlue, JPanel panel, String name) {
+        this.panel = panel;
         this.pinRed = pinRed;
         this.pinGreen = pinGreen;
         this.pinBlue = pinBlue;
         this.name = name;
-
     }
-
-//    public void setText(String text) {
-//        if (lbl == null) return;
-//        lbl.setText(text);
-//    }
-
-//    public String getText() {
-//        if (lbl == null) return "--";
-//        return lbl.getText();
-//    }
-
-    public void setToolTipText(String text) {
-        if (lbl == null) return;
-        lbl.setToolTipText(text);
-    }
-
-    public String getToolTipText() {
-        if (lbl == null) return "";
-        return lbl.getToolTipText();
-    }
-
 
     public String getName() {
         return name;
@@ -55,10 +33,10 @@ public class MyRGBLed {
     }
 
     public void setRGB(int red, int green, int blue) {
-        if (lbl != null) {
+        if (panel != null) {
             Color color = new Color(red, green, blue);
-            lbl.setBackground(color);
-            lbl.setForeground(Tools.getContrastColor(color));
+            panel.setBackground(color);
+//            cmp.setForeground(Tools.getContrastColor(color));
         }
 
         if (pinRed != null) {

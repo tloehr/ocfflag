@@ -6,7 +6,7 @@ import java.awt.*;
 /**
  * Created by tloehr on 16.03.16.
  */
-public class MyLED extends JLabel implements HasState, HasColor {
+public class MyLED implements HasColor {
     private Icon imageOn;
     private Icon imageOff;
 
@@ -29,20 +29,14 @@ public class MyLED extends JLabel implements HasState, HasColor {
     private boolean state;
 
     public MyLED() {
-        this(null, Color.WHITE);
+        this(Color.WHITE);
     }
 
-    public MyLED(String text, Color color) {
-        super(text);
+    public MyLED(Color color) {
+        super();
         this.color = color;
-        setText(text);
         setColor(color);
-        setState(false);
-    }
-
-    @Override
-    public void setText(String text) {
-        setToolTipText(text); // kein Platz auf dem Bildschirm
+//        setState(false);
     }
 
     @Override
@@ -89,17 +83,13 @@ public class MyLED extends JLabel implements HasState, HasColor {
         }
     }
 
-    @Override
-    public void setState(boolean on) {
-        SwingUtilities.invokeLater(() -> {
-            setIcon(on ? imageOn : imageOff);
-            revalidate();
-            repaint();
-        });
+    public Icon getImageOn() {
+        return imageOn;
     }
 
-    @Override
-    public boolean isState() {
-        return state;
+    public Icon getImageOff() {
+        return imageOff;
     }
+
+
 }

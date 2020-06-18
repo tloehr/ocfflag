@@ -62,14 +62,11 @@ public class PinBlinkModel implements GenericBlinkModel, HasLogger {
             }
         }
 
-        setText("");
+
         return null;
     }
 
-    @Override
-    public void setText(String text) {
-        pin.setText(text);
-    }
+
 
 
     /**
@@ -110,7 +107,7 @@ public class PinBlinkModel implements GenericBlinkModel, HasLogger {
             }
         }
 
-        pin.setToolTipText(textScheme);
+
     }
 
 

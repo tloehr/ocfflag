@@ -9,6 +9,7 @@ import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.HasState;
 import de.flashheart.ocfflag.gui.MyLED;
 import de.flashheart.ocfflag.gui.MyLEDButton;
+import de.flashheart.ocfflag.gui.MyLEDLabel;
 import de.flashheart.ocfflag.misc.HasLogger;
 import org.apache.log4j.Logger;
 
@@ -21,27 +22,40 @@ import javax.swing.*;
  * Created by tloehr on 07.06.15.
  */
 public class MyPin implements HasLogger {
-    private final GpioPinDigitalOutput outputPin;
+    private GpioPinDigitalOutput outputPin;
     private final String name;
-    private HasState guiControlLED; // Diese MyLED wird zwecks debugging mit geschaltet.
+    private MyLEDButton guiButton;
+    private MyLEDLabel ledLabel;
     private int note = -1;
     private Synthesizer synthesizer = null;
     private MidiChannel[] channels;
 
-    public MyPin(GpioController gpio, String name, HasState guiControlLED) {
-        this(gpio, name, guiControlLED, -1, -1);
+    public MyPin(GpioController gpio, String name, MyLEDButton guiButton) {
+        this.name = name;
+        this.guiButton = guiButton;
+        init(gpio, -1);
     }
 
-    public MyPin(GpioController gpio, String name, HasState guiControlLED, int instrument, int note) {
+    public MyPin(GpioController gpio, String name, MyLEDLabel ledLabel) {
         this.name = name;
-        this.guiControlLED = guiControlLED;
-        this.note = note;
+        this.guiButton = guiButton;
+        init(gpio, -1);
+    }
 
+    public MyPin(GpioController gpio, String name, MyLEDButton guiButton, int instrument, int note) {
+        this.name = name;
+        this.note = note;
+        this.guiButton = guiButton;
+        init(gpio, instrument);
+
+    }
+
+    private void init(GpioController gpio, int instrument){
         if (gpio != null) {
             Pin pin = (Pin) Main.getFromContext(Main.getFromConfigs(name));
 
             if (pin.getProvider().equals(MCP23017GpioProvider.NAME)) {
-                this.outputPin = gpio.provisionDigitalOutputPin((MCP23017GpioProvider) Main.getFromContext("mcp23017_1"), pin, PinState.LOW);
+                outputPin = gpio.provisionDigitalOutputPin((MCP23017GpioProvider) Main.getFromContext("mcp23017_1"), pin, PinState.LOW);
             } else {
                 this.outputPin = gpio.provisionDigitalOutputPin(pin, PinState.LOW);
             }
@@ -68,21 +82,11 @@ public class MyPin implements HasLogger {
         return name;
     }
 
-//    public void setText(String text) {
-//        if (guiControlLED != null) guiControlLED.setText(text);
-//    }
-//
-//    public String getText() {
-//        return guiControlLED != null ? guiControlLED.getToolTipText() : "";
-//    }
-//
-//    public void setToolTipText(String text) {
-//        if (guiControlLED != null) guiControlLED.setToolTipText(text);
-//    }
 
     public void setState(boolean on) {
         if (outputPin != null) outputPin.setState(on ? PinState.HIGH : PinState.LOW);
-        if (guiControlLED != null) guiControlLED.setState(on);
+        if (guiButton != null) guiButton.setState(on);
+        if (ledLabel != null) ledLabel.setState(on);
 
         if (synthesizer != null) {
             if (on) channels[0].noteOn(note, 90);

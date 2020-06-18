@@ -9,7 +9,7 @@ import java.util.Map;
 
 
 /**
- * https://github.com/OlivierLD/raspberry-pi4j-samples/blob/master/SevenSegDisplay/src/sevensegdisplay/SevenSegment.java
+ * https://github.com/OlivierLD/raspberry-coffee
  */
 public class SevenSegment
 {
@@ -165,11 +165,7 @@ public class SevenSegment
     }
     public SevenSegment(int addr) throws I2CFactory.UnsupportedBusNumberException
     {
-        display = new LEDBackPack(addr, false);
-    }
-    public SevenSegment(int addr, boolean b) throws I2CFactory.UnsupportedBusNumberException
-    {
-        display = new LEDBackPack(addr, b);
+        display = new LEDBackPack(addr);
     }
 
     /*

@@ -27,7 +27,7 @@ public class DlgTest extends JDialog implements HasLogger {
     private final Configs configs;
     private final MySystem mySystem;
 
-    private String SCHEME = "5:on,1000;off,1000";
+    private String SCHEME = "1:on,500;off,500";
 
     public DlgTest(Window owner) {
         super(owner);
@@ -57,7 +57,7 @@ public class DlgTest extends JDialog implements HasLogger {
 
         DefaultComboBoxModel<String> dcbm = new DefaultComboBoxModel<>();
 
-//        Main.getApplicationContext().g
+
 
         dcbm.addElement(Configs.DISPLAY_WHITE_I2C);
         dcbm.addElement(Configs.DISPLAY_RED_I2C);
@@ -67,6 +67,8 @@ public class DlgTest extends JDialog implements HasLogger {
 
         cmbI2C.setModel(dcbm);
         cmbI2C.setSelectedIndex(0);
+
+        String[] myleds_displays = new String[]{Configs.DISPLAY_RED_I2C, Configs.DISPLAY_BLUE_I2C, Configs.DISPLAY_GREEN_I2C, Configs.DISPLAY_YELLOW_I2C, Configs.DISPLAY_RED_I2C, };
 
         String[] mypins = new String[]{Configs.OUT_LED_GREEN, Configs.OUT_LED_WHITE, Configs.OUT_FLAG_RED,
                 Configs.OUT_FLAG_BLUE, Configs.OUT_FLAG_GREEN, Configs.OUT_FLAG_BLUE, Configs.OUT_FLAG_WHITE,
@@ -149,9 +151,6 @@ public class DlgTest extends JDialog implements HasLogger {
         dialogPane = new JPanel();
         testView = new JPanel();
         panel6 = new JPanel();
-        btnTestHardware = new JButton();
-        txtFlagColor = new JTextField();
-        cbSirens = new JCheckBox();
         panel1 = new JPanel();
         cmbI2C = new JComboBox();
         hSpacer1 = new JPanel(null);
@@ -184,22 +183,6 @@ public class DlgTest extends JDialog implements HasLogger {
                 //======== panel6 ========
                 {
                     panel6.setLayout(new BoxLayout(panel6, BoxLayout.X_AXIS));
-
-                    //---- btnTestHardware ----
-                    btnTestHardware.setText("Test Hardware");
-                    btnTestHardware.setFont(new Font(Font.DIALOG, Font.PLAIN, 20));
-                    btnTestHardware.addActionListener(e -> btnTestHardwareActionPerformed(e));
-                    panel6.add(btnTestHardware);
-
-                    //---- txtFlagColor ----
-                    txtFlagColor.setText("#ff8000");
-                    txtFlagColor.addActionListener(e -> txtFlagColorActionPerformed(e));
-                    panel6.add(txtFlagColor);
-
-                    //---- cbSirens ----
-                    cbSirens.setText("include sirens");
-                    cbSirens.setSelected(true);
-                    panel6.add(cbSirens);
                 }
                 testView.add(panel6, CC.xy(1, 1));
 
@@ -282,9 +265,6 @@ public class DlgTest extends JDialog implements HasLogger {
     private JPanel dialogPane;
     private JPanel testView;
     private JPanel panel6;
-    private JButton btnTestHardware;
-    private JTextField txtFlagColor;
-    private JCheckBox cbSirens;
     private JPanel panel1;
     private JComboBox cmbI2C;
     private JPanel hSpacer1;
