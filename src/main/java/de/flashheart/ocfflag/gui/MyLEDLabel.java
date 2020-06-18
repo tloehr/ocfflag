@@ -3,8 +3,9 @@ package de.flashheart.ocfflag.gui;
 import javax.swing.*;
 import java.awt.*;
 
-public class MyLEDLabel extends JLabel implements HasColor, HasState{
+public class MyLEDLabel extends JLabel implements HasColor, HasState {
     private MyLED myLED;
+    private boolean state;
 
     public MyLEDLabel() {
         this(Color.WHITE);
@@ -13,7 +14,9 @@ public class MyLEDLabel extends JLabel implements HasColor, HasState{
     public MyLEDLabel(Color color) {
         super();
         myLED = new MyLED(color);
-        setState(false);
+        setText(null);
+        state = false;
+        render();
     }
 
     @Override
@@ -24,12 +27,18 @@ public class MyLEDLabel extends JLabel implements HasColor, HasState{
     @Override
     public void setColor(Color color) {
         myLED.setColor(color);
+        render();
     }
 
     @Override
     public void setState(boolean on) {
+        state = on;
+        render();
+    }
+
+    private void render() {
         SwingUtilities.invokeLater(() -> {
-            setIcon(on ? myLED.getImageOn() : myLED.getImageOff());
+            setIcon(state ? myLED.getImageOn() : myLED.getImageOff());
             revalidate();
             repaint();
         });

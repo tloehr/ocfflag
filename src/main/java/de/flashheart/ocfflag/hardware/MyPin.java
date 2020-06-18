@@ -38,7 +38,7 @@ public class MyPin implements HasLogger {
 
     public MyPin(GpioController gpio, String name, MyLEDLabel ledLabel) {
         this.name = name;
-        this.guiButton = guiButton;
+        this.ledLabel = ledLabel;
         init(gpio, -1);
     }
 

@@ -29,16 +29,10 @@ import java.awt.event.WindowEvent;
  */
 public class FrameDebug extends JFrame implements HasLogger {
     private final int MAX_LOG_LINES = 200;
-    //    private MySystem mySystem;
-//    private Font font;
-//    private Font font2;
+
     private Level logLevel;
     private JDialog testDlg;
     private Configs configs;
-//    public static final Icon IconPlay = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/player_play.png"));
-//    public static final Icon IconPause = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/player_pause.png"));
-//    public static final Icon IconGametime = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/clock.png"));
-//    public static final Icon IconUNDO = new ImageIcon(FrameDebug.class.getResource("/artwork/64x64/reload.png"));
 
     public FrameDebug() {
         initComponents();
@@ -172,12 +166,12 @@ public class FrameDebug extends JFrame implements HasLogger {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         mainView = new JPanel();
         upperPanel = new JPanel();
-        btnRed = new JButton();
-        btnBlue = new JButton();
+        btnRed = new MyLEDButton();
+        btnBlue = new MyLEDButton();
         pbRed = new JProgressBar();
         pbBlue = new JProgressBar();
-        btnGreen = new JButton();
-        btnYellow = new JButton();
+        btnGreen = new MyLEDButton();
+        btnYellow = new MyLEDButton();
         pbGreen = new JProgressBar();
         pbYellow = new JProgressBar();
         panel5 = new JPanel();
@@ -189,12 +183,12 @@ public class FrameDebug extends JFrame implements HasLogger {
         lblMessage2 = new JLabel();
         lblMessage3 = new JLabel();
         lblMessage4 = new JLabel();
-        pnlFlagLEDs = new JPanel();
-        ledFlagWhite = new MyLED();
-        ledFlagRed = new MyLED();
-        ledFlagBlue = new MyLED();
-        ledFlagGreen = new MyLED();
-        ledFlagYellow = new MyLED();
+        pnlFlagLED = new JPanel();
+        ledFlagWhite = new MyLEDLabel();
+        ledFlagRed = new MyLEDLabel();
+        ledFlagBlue = new MyLEDLabel();
+        ledFlagGreen = new MyLEDLabel();
+        ledFlagYellow = new MyLEDLabel();
         pnlLCD = new JPanel();
         btnB = new JButton();
         label1 = new JLabel();
@@ -208,7 +202,6 @@ public class FrameDebug extends JFrame implements HasLogger {
         btnD = new JButton();
         label4 = new JLabel();
         lblTimeYellow = new JLabel();
-        lblPole = new JLabel();
         pnlLog = new JPanel();
         logscroller = new JScrollPane();
         txtLogger = new JTextArea();
@@ -216,8 +209,8 @@ public class FrameDebug extends JFrame implements HasLogger {
         tbDebug = new JToggleButton();
         tbInfo = new JToggleButton();
         panel3 = new JPanel();
-        ledGreen = new MyLED();
-        ledWhite = new MyLED();
+        ledGreen = new MyLEDLabel();
+        ledWhite = new MyLEDLabel();
         hSpacer1 = new JPanel(null);
         btnQuit = new JButton();
         btnTestDialog = new JButton();
@@ -358,36 +351,36 @@ public class FrameDebug extends JFrame implements HasLogger {
                         }
                         pnlDisplays.add(pnlLedDisplay, CC.xy(1, 1, CC.DEFAULT, CC.TOP));
 
-                        //======== pnlFlagLEDs ========
+                        //======== pnlFlagLED ========
                         {
-                            pnlFlagLEDs.setLayout(new BoxLayout(pnlFlagLEDs, BoxLayout.Y_AXIS));
+                            pnlFlagLED.setLayout(new BoxLayout(pnlFlagLED, BoxLayout.PAGE_AXIS));
 
                             //---- ledFlagWhite ----
-                            ledFlagWhite.setToolTipText("Yellow LED in Button");
+                            ledFlagWhite.setToolTipText(null);
                             ledFlagWhite.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/led-white-off.png")));
-                            pnlFlagLEDs.add(ledFlagWhite);
+                            pnlFlagLED.add(ledFlagWhite);
 
                             //---- ledFlagRed ----
                             ledFlagRed.setColor(Color.red);
-                            ledFlagRed.setToolTipText("Red LED in Button");
-                            pnlFlagLEDs.add(ledFlagRed);
+                            ledFlagRed.setToolTipText(null);
+                            pnlFlagLED.add(ledFlagRed);
 
                             //---- ledFlagBlue ----
                             ledFlagBlue.setColor(Color.blue);
-                            ledFlagBlue.setToolTipText("Blue LED in Button");
-                            pnlFlagLEDs.add(ledFlagBlue);
+                            ledFlagBlue.setToolTipText(null);
+                            pnlFlagLED.add(ledFlagBlue);
 
                             //---- ledFlagGreen ----
                             ledFlagGreen.setColor(Color.green);
-                            ledFlagGreen.setToolTipText("Red LED in Button");
-                            pnlFlagLEDs.add(ledFlagGreen);
+                            ledFlagGreen.setToolTipText(null);
+                            pnlFlagLED.add(ledFlagGreen);
 
                             //---- ledFlagYellow ----
                             ledFlagYellow.setColor(Color.yellow);
-                            ledFlagYellow.setToolTipText("Yellow LED in Button");
-                            pnlFlagLEDs.add(ledFlagYellow);
+                            ledFlagYellow.setToolTipText(null);
+                            pnlFlagLED.add(ledFlagYellow);
                         }
-                        pnlDisplays.add(pnlFlagLEDs, CC.xywh(3, 1, 1, 3, CC.DEFAULT, CC.CENTER));
+                        pnlDisplays.add(pnlFlagLED, CC.xywh(3, 1, 1, 3, CC.DEFAULT, CC.CENTER));
 
                         //======== pnlLCD ========
                         {
@@ -489,15 +482,6 @@ public class FrameDebug extends JFrame implements HasLogger {
                             pnlLCD.add(lblTimeYellow, CC.xy(3, 4));
                         }
                         pnlDisplays.add(pnlLCD, CC.xy(1, 3, CC.FILL, CC.TOP));
-
-                        //---- lblPole ----
-                        lblPole.setOpaque(true);
-                        lblPole.setBackground(Color.white);
-                        lblPole.setText(null);
-                        lblPole.setForeground(Color.black);
-                        lblPole.setHorizontalAlignment(SwingConstants.CENTER);
-                        lblPole.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 24));
-                        pnlDisplays.add(lblPole, CC.xywh(1, 5, 3, 1, CC.DEFAULT, CC.FILL));
                     }
                     panel8.add(pnlDisplays, "card2");
 
@@ -646,7 +630,7 @@ public class FrameDebug extends JFrame implements HasLogger {
     }
 
     public JPanel getPnlFlagLEDs() {
-        return pnlFlagLEDs;
+        return pnlFlagLED;
     }
 
     //    public JLabel getLblPole() {
@@ -736,12 +720,12 @@ public class FrameDebug extends JFrame implements HasLogger {
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JPanel mainView;
     private JPanel upperPanel;
-    private JButton btnRed;
-    private JButton btnBlue;
+    private MyLEDButton btnRed;
+    private MyLEDButton btnBlue;
     private JProgressBar pbRed;
     private JProgressBar pbBlue;
-    private JButton btnGreen;
-    private JButton btnYellow;
+    private MyLEDButton btnGreen;
+    private MyLEDButton btnYellow;
     private JProgressBar pbGreen;
     private JProgressBar pbYellow;
     private JPanel panel5;
@@ -753,12 +737,12 @@ public class FrameDebug extends JFrame implements HasLogger {
     private JLabel lblMessage2;
     private JLabel lblMessage3;
     private JLabel lblMessage4;
-    private JPanel pnlFlagLEDs;
-    private MyLED ledFlagWhite;
-    private MyLED ledFlagRed;
-    private MyLED ledFlagBlue;
-    private MyLED ledFlagGreen;
-    private MyLED ledFlagYellow;
+    private JPanel pnlFlagLED;
+    private MyLEDLabel ledFlagWhite;
+    private MyLEDLabel ledFlagRed;
+    private MyLEDLabel ledFlagBlue;
+    private MyLEDLabel ledFlagGreen;
+    private MyLEDLabel ledFlagYellow;
     private JPanel pnlLCD;
     private JButton btnB;
     private JLabel label1;
@@ -772,7 +756,6 @@ public class FrameDebug extends JFrame implements HasLogger {
     private JButton btnD;
     private JLabel label4;
     private JLabel lblTimeYellow;
-    private JLabel lblPole;
     private JPanel pnlLog;
     private JScrollPane logscroller;
     private JTextArea txtLogger;
@@ -780,8 +763,8 @@ public class FrameDebug extends JFrame implements HasLogger {
     private JToggleButton tbDebug;
     private JToggleButton tbInfo;
     private JPanel panel3;
-    private MyLED ledGreen;
-    private MyLED ledWhite;
+    private MyLEDLabel ledGreen;
+    private MyLEDLabel ledWhite;
     private JPanel hSpacer1;
     private JButton btnQuit;
     private JButton btnTestDialog;
@@ -790,9 +773,5 @@ public class FrameDebug extends JFrame implements HasLogger {
     private JPanel panel9;
     private JToggleButton tbDisplay;
     private JToggleButton tbLogs;
-
-    public JPanel getRGBPole() {
-        return pnlFlagLEDs;
-    }
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -5,6 +5,7 @@ import java.awt.*;
 
 public class MyLEDButton extends JButton implements HasColor, HasState{
     private MyLED myLED;
+    private boolean state;
 
     public MyLEDButton() {
         this(Color.WHITE);
@@ -13,7 +14,9 @@ public class MyLEDButton extends JButton implements HasColor, HasState{
     public MyLEDButton(Color color) {
         super();
         myLED = new MyLED(color);
-        setState(false);
+        state = false;
+        setText(null);
+        render();
     }
 
     @Override
@@ -23,13 +26,18 @@ public class MyLEDButton extends JButton implements HasColor, HasState{
 
     @Override
     public void setColor(Color color) {
-        myLED.setColor(color);
+        myLED.setColor(color); render();
     }
 
     @Override
     public void setState(boolean on) {
+        state = on;
+        render();
+    }
+
+    private void render(){
         SwingUtilities.invokeLater(() -> {
-            setIcon(on ? myLED.getImageOn() : myLED.getImageOff());
+            setIcon(state ? myLED.getImageOn() : myLED.getImageOff());
             revalidate();
             repaint();
         });

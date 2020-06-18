@@ -93,6 +93,7 @@ public class PinHandler implements HasLogger {
     }
 
     public void setScheme(String name, String scheme) {
+        getLogger().debug(String.format("%s -- %s", name, scheme));
         setScheme(name, null, scheme);
     }
 

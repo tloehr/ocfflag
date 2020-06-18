@@ -23,7 +23,7 @@ import java.io.IOException;
 public class MySystem implements HasLogger {
     private long REACTION_TIME = 0;
     private GpioController GPIO;
-    private final int MCP23017_1 = Integer.decode("0x20");//0x20;
+    private final int MCP23017_1 = Integer.decode("0x20");
     private final FrameDebug frameDebug;
     // GPIO_08 und GPIO_09 NICHT verwenden. Sind die I2C Ports
 
@@ -143,7 +143,7 @@ public class MySystem implements HasLogger {
 //        lcd_display = new MyLCD(frameDebug.getLcd_panel(), 20, 4);
 //        Main.addToContext("lcd_display", lcd_display);
 
-        pinHandler.add(new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getRGBPole(), Configs.OUT_RGB_FLAG));
+        pinHandler.add(new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getPnlFlagLEDs(), Configs.OUT_RGB_FLAG));
 
         pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_RED_BTN, frameDebug.getBtnRed()));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_BLUE_BTN, frameDebug.getBtnBlue()));
