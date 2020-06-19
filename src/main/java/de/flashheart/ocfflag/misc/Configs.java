@@ -47,7 +47,8 @@ public class Configs implements HasLogger {
     public static final String FLAG_RGB_YELLOW = "flag_rgb_yellow";
 
 
-    public static final String LCD_DISPLAY = "lcd_display";
+    public static final String LCD_DISPLAY = "lcd";
+    public static final String I2CLCD = "i2clcd";
 
 
     // Application Context Keys - irgendwo müssen sie ja stehen

@@ -3,7 +3,7 @@ package de.flashheart.ocfflag.gui;
 import javax.swing.*;
 import java.awt.*;
 
-public class MyLEDButton extends JButton implements HasColor, HasState{
+public class MyLEDButton extends JButton implements HasColor, HasState {
     private MyLED myLED;
     private boolean state;
 
@@ -26,7 +26,8 @@ public class MyLEDButton extends JButton implements HasColor, HasState{
 
     @Override
     public void setColor(Color color) {
-        myLED.setColor(color); render();
+        myLED.setColor(color);
+        render();
     }
 
     @Override
@@ -35,7 +36,7 @@ public class MyLEDButton extends JButton implements HasColor, HasState{
         render();
     }
 
-    private void render(){
+    private void render() {
         SwingUtilities.invokeLater(() -> {
             setIcon(state ? myLED.getImageOn() : myLED.getImageOff());
             revalidate();

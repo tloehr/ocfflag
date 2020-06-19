@@ -16,6 +16,7 @@ import de.flashheart.ocfflag.misc.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Diese Klasse enthält alles was mit der Harware zu tun hat. Da wird auch die gesamte Initialisierung vorgenommen.
@@ -24,6 +25,7 @@ public class MySystem implements HasLogger {
     private long REACTION_TIME = 0;
     private GpioController GPIO;
     private final int MCP23017_1 = Integer.decode("0x20");
+    private final int I2CLCD = Integer.decode("0x27");
     private final FrameDebug frameDebug;
     // GPIO_08 und GPIO_09 NICHT verwenden. Sind die I2C Ports
 
@@ -199,25 +201,17 @@ public class MySystem implements HasLogger {
             return;
         }
 
+        I2CLCD i2clcd;
+        try {
+            i2clcd = new I2CLCD(I2CFactory.getInstance(I2CBus.BUS_1).getDevice(I2CLCD));
+            i2clcd.init();
+//            Main.addToContext("i2clcd", i2clcd);
+        } catch (Exception e) {
+            getLogger().warn(e);
+            i2clcd = null;
 
-//        I2CDevice _device = null;
-//        I2CLCD _lcd = null;
-//
-//        try {
-//            I2CBus bus = I2CFactory.getInstance(I2CBus.BUS_1);
-//            _device = bus.getDevice(0x27);
-//            _lcd = new I2CLCD(_device);
-//            _lcd.init();
-//            _lcd.backlight(true);
-//            Main.addToContext("lcd", _lcd);
-//        } catch (Exception ex) {
-//            System.out.println(ex.toString());
-//        }
-//
-//        MyLCD myLCD = new MyLCD(20, 4);
-//        Main.addToContext("mylcd", myLCD);
-//        myLCD.setCenteredLine(0, 1, configs.getBuildInfo("my.projectname"));
-//        myLCD.setCenteredLine(0, 2, String.format("v%s.%s", configs.getBuildInfo("my.version"), configs.getBuildInfo("buildNumber")));
+        }
+        Main.addToContext(Configs.LCD_DISPLAY, Optional.ofNullable(i2clcd));
 
         SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
         SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);

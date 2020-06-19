@@ -70,7 +70,7 @@ public class Main {
         logger = Logger.getLogger("Main");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            prepareShutdown();
+            ((MySystem) Main.getFromContext(Configs.MY_SYSTEM)).shutdown();
         }));
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
@@ -145,12 +145,6 @@ public class Main {
         addToContext(Configs.IGNORE_GPIO_IN_ARM_MODE, new Boolean(cl.hasOption("n")));
         addToContext(Configs.DEV_MODE, new Boolean(cl.hasOption("n")));
 
-    }
-
-    public static void prepareShutdown() {
-
-//        messageProcessor.interrupt();
-        logger.info("END OF RLGS");
     }
 
     public static Game getCurrentGame() {

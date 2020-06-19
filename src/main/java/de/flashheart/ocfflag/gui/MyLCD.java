@@ -1,6 +1,8 @@
-package de.flashheart.ocfflag.hardware;
+package de.flashheart.ocfflag.gui;
 
+import de.flashheart.ocfflag.hardware.I2CLCD;
 import de.flashheart.ocfflag.misc.HasLogger;
+import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
@@ -12,42 +14,34 @@ public class MyLCD implements Runnable, HasLogger {
     public static final char LCD_DEGREE_SYMBOL = 223;
     public static final char LCD_UMLAUT_A = 0xe4;
     private final int COLS = 20, ROWS = 4;
-    //    private final JPanel panel;
+
     private final Thread thread;
     private final int SECONDS_PER_PAGE = 3;
 
     private final ArrayList<LCDPage> pages;
-    //    private final ArrayList<JLabel> linelist; // für die GUI Darstellung
+    private final ArrayList<JLabel> lines; // für die GUI Darstellung
     private int active_page;
     private long loopcounter = 0;
     private int prev_page = 0;
     private ReentrantLock lock;
-    private Optional<JPanel> guipanel;
-    private Optional<I2CLCD> lcd;
-    ArrayList<JLabel> lines;
-//    public MyLCD(JPanel panel) {
+    private final Optional<I2CLCD> i2CLCD;
 
-    public MyLCD(Optional<JPanel> opt_panel, Optional<I2CLCD> opt_lcd) {
-        lines = new ArrayList<>();
-        guipanel = opt_panel;
-        lcd = opt_lcd;
+    public MyLCD(Optional<I2CLCD> i2CLCD) {
 
-        guipanel.ifPresent(jPanel -> {
-            for (int r = 0; r < ROWS; r++) {
-                lines.add(new JLabel());
-                jPanel.add(lines.get(r));
-            }
-        });
-
-
-        // hier gehts weiter
+        this.i2CLCD = i2CLCD;
         lock = new ReentrantLock();
 
+
         thread = new Thread(this);
+        lines = new ArrayList<>(ROWS);
         pages = new ArrayList<>();
         pages.add(new LCDPage()); // there is always one page.
 
         thread.start();
+    }
+
+    public void add(JLabel... labels) {
+        lines.addAll(Arrays.asList(labels));
     }
 
     public void reset() {
@@ -113,18 +107,18 @@ public class MyLCD implements Runnable, HasLogger {
     private void page_to_display() {
         LCDPage currentPage = pages.get(active_page);
         // Schreibt alle Zeilen der aktiven Seite.
-        for (int row = 0; row < ROWS; row++) {
-            final String line = currentPage.getLine(row).isEmpty() ? StringUtils.repeat(" ", COLS) : StringUtils.rightPad(currentPage.getLine(row), COLS);
-            getLogger().debug("VISIBLE PAGE #" + (active_page) + " Line" + row + ": " + line);
-            lines.forEach(jLabel -> {
-                jLabel.setText(line);
-            });
-            if (lcd.isPresent()) lcd.get().display_string(line, row + 1);
+        for (int r = 0; r < ROWS; r++) {
+            String line = currentPage.getLine(r).isEmpty() ? StringUtils.repeat(" ", 16) : StringUtils.rightPad(currentPage.getLine(r), 16);
+            getLogger().debug("VISIBLE PAGE #" + (active_page) + " Line" + r + ": " + line);
+            if (i2CLCD.isPresent()) i2CLCD.get().display_string(line, r + 1);
         }
-        guipanel.ifPresent(jPanel -> SwingUtilities.invokeLater(() -> {
-            jPanel.revalidate();
-            jPanel.repaint();
-        }));
+        SwingUtilities.invokeLater(() -> {
+            lines.forEach(jLabel -> {
+                jLabel.revalidate();
+                jLabel.repaint();
+            });
+        });
+
     }
 
     private void clearPage() {
@@ -170,6 +164,7 @@ public class MyLCD implements Runnable, HasLogger {
 
     @Override
     public void run() {
+
         while (!thread.isInterrupted()) {
             try {
                 lock.lock();
@@ -209,6 +204,7 @@ public class MyLCD implements Runnable, HasLogger {
 
         public LCDPage() {
             this.lines = new ArrayList<>(ROWS);
+
             clear();
         }
 
@@ -231,4 +227,3 @@ public class MyLCD implements Runnable, HasLogger {
     }
 
 }
-
