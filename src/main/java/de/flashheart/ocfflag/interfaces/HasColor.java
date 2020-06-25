@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.gui;
+package de.flashheart.ocfflag.interfaces;
 
 import java.awt.*;
 

@@ -7,9 +7,8 @@ package de.flashheart.ocfflag.gui;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.HasLogger;
+import de.flashheart.ocfflag.interfaces.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.log4j.Level;
 
@@ -94,10 +93,26 @@ public class FrameDebug extends JFrame implements HasLogger {
         return txtLogger;
     }
 
+    public JLabel getLine1() {
+        return line1;
+    }
+
+    public JLabel getLine2() {
+        return line2;
+    }
+
+    public JLabel getLine3() {
+        return line3;
+    }
+
+    public JLabel getLine4() {
+        return line4;
+    }
+
     private void initFrame() {
         configs = (Configs) Main.getFromContext("configs");
 
-        ((MyLCD) Main.getFromContext(Configs.LCD_DISPLAY)).add(line1, line2, line3, line4);
+        ((MyLCD) Main.getFromContext(Configs.LCD_HARDWARE)).add(line1, line2, line3, line4);
 
         logLevel = Level.toLevel(configs.get(Configs.LOGLEVEL));
         String title = "RLG-System " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber") + " [" + configs.getApplicationInfo("project.build.timestamp") + "]";

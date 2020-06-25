@@ -1,6 +1,7 @@
-package de.flashheart.ocfflag.hardware;
+package de.flashheart.ocfflag.gui;
 
-import de.flashheart.ocfflag.misc.HasLogger;
+import de.flashheart.ocfflag.hardware.SevenSegment;
+import de.flashheart.ocfflag.interfaces.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.lang3.StringUtils;
 

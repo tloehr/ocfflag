@@ -1,14 +1,12 @@
 package de.flashheart.ocfflag.gamemodes;
 
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.Display7Segments4Digits;
-import de.flashheart.ocfflag.hardware.LEDBackPack;
+import de.flashheart.ocfflag.gui.Display7Segments4Digits;
+import de.flashheart.ocfflag.hardware.HT16K33;
 import de.flashheart.ocfflag.hardware.MyAbstractButton;
 import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.HasLogger;
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
+import de.flashheart.ocfflag.interfaces.HasLogger;
 
 import java.io.IOException;
 
@@ -189,17 +187,7 @@ public abstract class Game implements HasLogger {
     }
 
     void shutdown_system() {
-        Main.prepareShutdown();
-        try {
-            String line = Main.getFromConfigs(Configs.SHUTDOWN_COMMAND_LINE);
-            CommandLine commandLine = CommandLine.parse(line);
-            DefaultExecutor executor = new DefaultExecutor();
-            Main.prepareShutdown();
-            executor.setExitValue(1);
-            executor.execute(commandLine);
-        } catch (IOException exc) {
-            getLogger().error(exc);
-        }
+        ((MySystem) Main.getFromContext(Configs.MY_SYSTEM)).shutdown();
     }
 
     /**
@@ -210,7 +198,7 @@ public abstract class Game implements HasLogger {
     }
 
     void button_quit_pressed() {
-        Main.prepareShutdown();
+        shutdown_system();
         System.exit(0);
     }
 
@@ -377,11 +365,11 @@ public abstract class Game implements HasLogger {
 
     void all_off() {
         try {
-            display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
-            display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
-            display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
-            display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
-            display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+            display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
+            display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
+            display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
+            display_green.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
+            display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
         } catch (IOException e) {
             getLogger().error(e);
         }

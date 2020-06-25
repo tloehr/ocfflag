@@ -6,17 +6,13 @@ import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.gui.HasState;
-import de.flashheart.ocfflag.gui.MyLED;
 import de.flashheart.ocfflag.gui.MyLEDButton;
 import de.flashheart.ocfflag.gui.MyLEDLabel;
-import de.flashheart.ocfflag.misc.HasLogger;
-import org.apache.log4j.Logger;
+import de.flashheart.ocfflag.interfaces.HasLogger;
 
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Synthesizer;
-import javax.swing.*;
 
 /**
  * Created by tloehr on 07.06.15.

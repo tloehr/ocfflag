@@ -1,5 +1,7 @@
 package de.flashheart.ocfflag.gui;
 
+import de.flashheart.ocfflag.interfaces.HasColor;
+
 import javax.swing.*;
 import java.awt.*;
 

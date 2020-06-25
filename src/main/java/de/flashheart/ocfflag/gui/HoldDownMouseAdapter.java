@@ -1,9 +1,9 @@
-package de.flashheart.ocfflag.hardware;
+package de.flashheart.ocfflag.gui;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.HasLogger;
+import de.flashheart.ocfflag.interfaces.HasLogger;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -12,9 +12,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.EventListener;
-import java.util.Optional;
 
 /**
  * https://stackoverflow.com/questions/6828684/java-mouseevent-check-if-pressed-down

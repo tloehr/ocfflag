@@ -233,7 +233,7 @@ public class OCF extends TimedGame {
 
 
             if (game_state == TIMED_GAME_PAUSED) {
-                display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                 set_blinking_led_green("∞:on,500;off,500");
                 setFlagSignals();
             }
@@ -241,29 +241,29 @@ public class OCF extends TimedGame {
             if (game_state == TIMED_GAME_RUNNING) {
                 mySystem.getPinHandler().off(Configs.OUT_LED_GREEN);
                 mySystem.getPinHandler().off(Configs.OUT_LED_WHITE);
-                display_white.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_OFF);
+                display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
 
                 if (flag_state.equals(RED_ACTIVATED)) {
                     try {
-                        display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
+                        display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
                     } catch (IOException e) {
                         getLogger().error(e);
                     }
                 } else if (flag_state.equals(BLUE_ACTIVATED)) {
                     try {
-                        display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
+                        display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
                     } catch (IOException e) {
                         getLogger().error(e);
                     }
                 } else if (flag_state.equals(GREEN_ACTIVATED)) {
                     try {
-                        display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
+                        display_green.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
                     } catch (IOException e) {
                         getLogger().error(e);
                     }
                 } else if (flag_state.equals(YELLOW_ACTIVATED)) {
                     try {
-                        display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_2HZ);
+                        display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
                     } catch (IOException e) {
                         getLogger().error(e);
                     }
@@ -273,25 +273,25 @@ public class OCF extends TimedGame {
             if (game_state == TIMED_GAME_OVER) {
                 if (isDrawgame()) {
                     getLogger().info("Draw Game");
-                    display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
-                    display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                    display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
+                    display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                     if (num_teams >= 3)
-                        display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                        display_green.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                     if (num_teams >= 4)
-                        display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                        display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                 } else {
                     List<String> winners = getWinners();
                     if (winners.contains("red")) {
-                        display_red.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                        display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                     }
                     if (winners.contains("blue")) {
-                        display_blue.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                        display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                     }
                     if (winners.contains("green")) {
-                        display_green.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                        display_green.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                     }
                     if (winners.contains("yellow")) {
-                        display_yellow.setBlinkRate(LEDBackPack.HT16K33_BLINKRATE_HALFHZ);
+                        display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                     }
                 }
             }

@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.hardware;
+package de.flashheart.ocfflag.gui;
 
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
@@ -6,7 +6,7 @@ import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.HasLogger;
+import de.flashheart.ocfflag.interfaces.HasLogger;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

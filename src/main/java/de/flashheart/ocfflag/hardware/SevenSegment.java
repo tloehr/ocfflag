@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class SevenSegment
 {
-    private LEDBackPack display = null;
+    private HT16K33 display = null;
     /*
      *  The seven segments of each digit are represented by 7 bits on a byte:
      *
@@ -57,7 +57,7 @@ public class SevenSegment
     //  0x76, 0x6e, 0x5b, 0x39, 0x80, 0x0F, 0x80, 0x08  /* x y z { | } ~    */
 
 
-    public LEDBackPack getDisplay() {
+    public HT16K33 getDisplay() {
         return display;
     }
 
@@ -161,11 +161,11 @@ public class SevenSegment
 
     public SevenSegment() throws I2CFactory.UnsupportedBusNumberException
     {
-        display = new LEDBackPack(0x70);
+        display = new HT16K33(0x70);
     }
     public SevenSegment(int addr) throws I2CFactory.UnsupportedBusNumberException
     {
-        display = new LEDBackPack(addr);
+        display = new HT16K33(addr);
     }
 
     /*

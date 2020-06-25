@@ -10,10 +10,15 @@ import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
 import com.pi4j.wiringpi.SoftPwm;
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.gui.Display7Segments4Digits;
 import de.flashheart.ocfflag.gui.FrameDebug;
+import de.flashheart.ocfflag.gui.MyLCD;
+import de.flashheart.ocfflag.gui.MyRGBLed;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.HasLogger;
+import de.flashheart.ocfflag.interfaces.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -142,8 +147,8 @@ public class MySystem implements HasLogger {
         Main.addToContext(Configs.BUTTON_QUIT, new MyAbstractButton(null, null, frameDebug.getBtnQuit()));
         Main.addToContext(Configs.BUTTON_SHUTDOWN, new MyAbstractButton(GPIO, Configs.BUTTON_SHUTDOWN, frameDebug.getBtnShutdown(), 0, null));
 
-//        lcd_display = new MyLCD(frameDebug.getLcd_panel(), 20, 4);
-//        Main.addToContext("lcd_display", lcd_display);
+
+        Main.addToContext(Configs.LCD_MODEL, new MyLCD(20, 4, frameDebug.getLine1(), frameDebug.getLine2(),frameDebug.getLine3(),frameDebug.getLine4()));
 
         pinHandler.add(new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getPnlFlagLEDs(), Configs.OUT_RGB_FLAG));
 
@@ -165,14 +170,10 @@ public class MySystem implements HasLogger {
         pinHandler.add(new MyPin(GPIO, Configs.OUT_SIREN_COLOR_CHANGE, null, 50, 90));
         pinHandler.add(new MyPin(GPIO, Configs.OUT_SIREN_START_STOP, null, 70, 60));
 
-//        currentGame = new OCF(4);
-//        currentGame = new SpawnCounter();
-
     }
 
     public void shutdown() {
         pinHandler.off();
-
         if (GPIO != null) {
             SoftPwm.softPwmStop(POLE_RGB_RED.getAddress());
             SoftPwm.softPwmStop(POLE_RGB_GREEN.getAddress());
@@ -183,6 +184,13 @@ public class MySystem implements HasLogger {
                 display_red.clear();
                 if (display_green != null) display_green.clear();
                 if (display_yellow != null) display_yellow.clear();
+
+                String line = Main.getFromConfigs(Configs.SHUTDOWN_COMMAND_LINE);
+                CommandLine commandLine = CommandLine.parse(line);
+                DefaultExecutor executor = new DefaultExecutor();
+                executor.setExitValue(1);
+                executor.execute(commandLine);
+
             } catch (IOException e) {
                 getLogger().error(e);
             }
@@ -211,7 +219,7 @@ public class MySystem implements HasLogger {
             i2clcd = null;
 
         }
-        Main.addToContext(Configs.LCD_DISPLAY, Optional.ofNullable(i2clcd));
+        Main.addToContext(Configs.LCD_HARDWARE, Optional.ofNullable(i2clcd));
 
         SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
         SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);

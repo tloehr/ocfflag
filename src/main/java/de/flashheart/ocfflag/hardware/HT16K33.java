@@ -4,9 +4,7 @@ package de.flashheart.ocfflag.hardware;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
-import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.misc.HasLogger;
-import org.apache.log4j.Logger;
+import de.flashheart.ocfflag.interfaces.HasLogger;
 
 import java.io.IOException;
 
@@ -14,7 +12,7 @@ import java.io.IOException;
  * I2C Required for this one
  * https://github.com/OlivierLD/raspberry-pi4j-samples/blob/master/SevenSegDisplay/src/sevensegdisplay/LEDBackPack.java
  */
-public class LEDBackPack implements HasLogger {
+public class HT16K33 implements HasLogger {
   
     public final static int LEDBACKPACK_ADDRESS = 0x70;
   
@@ -36,11 +34,11 @@ public class LEDBackPack implements HasLogger {
     //                       1st digit, 2nd digit, column, 3rd digit, 4th digit, ?,      ?,      ?     Probably for the 8x8 led matrix
     private int[] buffer = {0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000};
 
-    public LEDBackPack() throws I2CFactory.UnsupportedBusNumberException {
+    public HT16K33() throws I2CFactory.UnsupportedBusNumberException {
         this(LEDBACKPACK_ADDRESS);
     }
 
-    public LEDBackPack(int address) throws I2CFactory.UnsupportedBusNumberException {
+    public HT16K33(int address) throws I2CFactory.UnsupportedBusNumberException {
 
         try {
             // Get i2c bus

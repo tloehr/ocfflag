@@ -8,10 +8,9 @@ import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.hardware.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.HasLogger;
+import de.flashheart.ocfflag.interfaces.HasLogger;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;

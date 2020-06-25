@@ -68,10 +68,10 @@ public class Main {
 
         Logger.getRootLogger().setLevel(logLevel);
         logger = Logger.getLogger("Main");
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            ((MySystem) Main.getFromContext(Configs.MY_SYSTEM)).shutdown();
-        }));
+//
+//        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+//            ((MySystem) Main.getFromContext(Configs.MY_SYSTEM)).shutdown();
+//        }));
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
             StringWriter sw = new StringWriter();

@@ -1,6 +1,7 @@
 package de.flashheart.ocfflag.hardware;
 
-import de.flashheart.ocfflag.misc.HasLogger;
+import de.flashheart.ocfflag.gui.MyRGBLed;
+import de.flashheart.ocfflag.interfaces.HasLogger;
 
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;

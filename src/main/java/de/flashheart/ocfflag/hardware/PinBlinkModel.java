@@ -2,8 +2,7 @@ package de.flashheart.ocfflag.hardware;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.HasLogger;
-import org.apache.log4j.Logger;
+import de.flashheart.ocfflag.interfaces.HasLogger;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

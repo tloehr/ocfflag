@@ -2,6 +2,7 @@ package de.flashheart.ocfflag.misc;
 
 import com.pi4j.io.gpio.RaspiPin;
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.interfaces.HasLogger;
 import org.apache.log4j.Level;
 
 import java.awt.*;
@@ -47,7 +48,8 @@ public class Configs implements HasLogger {
     public static final String FLAG_RGB_YELLOW = "flag_rgb_yellow";
 
 
-    public static final String LCD_DISPLAY = "lcd";
+    public static final String LCD_HARDWARE = "lcd";
+    public static final String LCD_MODEL = "lcdmodel";
     public static final String I2CLCD = "i2clcd";
 
 

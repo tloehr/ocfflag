@@ -1,4 +1,4 @@
-package de.flashheart.ocfflag.misc;
+package de.flashheart.ocfflag.interfaces;
 
 
 import org.apache.log4j.Logger;

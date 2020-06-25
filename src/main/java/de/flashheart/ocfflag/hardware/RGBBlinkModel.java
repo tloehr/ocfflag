@@ -1,8 +1,9 @@
 package de.flashheart.ocfflag.hardware;
 
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.gui.MyRGBLed;
 import de.flashheart.ocfflag.misc.Configs;
-import de.flashheart.ocfflag.misc.HasLogger;
+import de.flashheart.ocfflag.interfaces.HasLogger;
 import de.flashheart.ocfflag.misc.Tools;
 
 import java.awt.*;
