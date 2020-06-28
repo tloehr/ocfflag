@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.flashheart.ocfflag</groupId>
-    <artifactId>ocfflag</artifactId>
+    <groupId>de.flashheart.rlgs</groupId>
+    <artifactId>rlgs</artifactId>
     <version>1.2.2</version>
 
     <properties>
@@ -27,7 +27,6 @@
         <project.build.timestamp>${maven.build.timestamp}</project.build.timestamp>
 
         <my.version>${project.version}</my.version>
-
     </properties>
 
     <dependencies>
@@ -107,6 +106,12 @@
             <groupId>org.bidib.jbidib.swinglabs.swingx</groupId>
             <artifactId>swingx-core</artifactId>
             <version>1.6.5-1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>29.0-jre</version>
         </dependency>
         <!-- Thanks for using https://jar-download.com -->
 
@@ -250,42 +255,42 @@
 <!--            </plugin>-->
 
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
-                <executions>
-                    <execution>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <!-- ensure the target directory exists on the Raspberry Pi -->
-                                <sshexec host="${pi.host}" port="${pi.port}" username="${pi.user}"
-                                         password="${pi.password}"
-                                         trust="true" failonerror="false" verbose="true"
-                                         command="mkdir --parents ${pi.deployDirectory}"/>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-antrun-plugin</artifactId>-->
+<!--                <version>1.8</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>install</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>run</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <tasks>-->
+<!--                                &lt;!&ndash; ensure the target directory exists on the Raspberry Pi &ndash;&gt;-->
+<!--                                <sshexec host="${pi.host}" port="${pi.port}" username="${pi.user}"-->
+<!--                                         password="${pi.password}"-->
+<!--                                         trust="true" failonerror="false" verbose="true"-->
+<!--                                         command="mkdir &#45;&#45;parents ${pi.deployDirectory}"/>-->
 
-                                <!-- copy the JAR file to the Raspberry Pi -->
-                                <scp
-                                        file="${project.build.directory}/${project.build.finalName}-jar-with-dependencies.jar"
-                                        todir="${pi.user}:${pi.password}@${pi.host}:${pi.deployDirectory}"
-                                        port="${pi.port}" trust="true" verbose="true" failonerror="true">
-                                </scp>
+<!--                                &lt;!&ndash; copy the JAR file to the Raspberry Pi &ndash;&gt;-->
+<!--                                <scp-->
+<!--                                        file="${project.build.directory}/${project.build.finalName}-jar-with-dependencies.jar"-->
+<!--                                        todir="${pi.user}:${pi.password}@${pi.host}:${pi.deployDirectory}"-->
+<!--                                        port="${pi.port}" trust="true" verbose="true" failonerror="true">-->
+<!--                                </scp>-->
 
-                                <!-- run the JAR file on the Raspberry Pi -->
-                                <sshexec host="${pi.host}" port="${pi.port}" username="${pi.user}"
-                                         password="${pi.password}" trust="true" failonerror="false"
-                                         verbose="true"
-                                         command="java -jar ${pi.deployDirectory}/${project.build.finalName}-jar-with-dependencies.jar"/>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
+<!--                                &lt;!&ndash; run the JAR file on the Raspberry Pi &ndash;&gt;-->
+<!--                                <sshexec host="${pi.host}" port="${pi.port}" username="${pi.user}"-->
+<!--                                         password="${pi.password}" trust="true" failonerror="false"-->
+<!--                                         verbose="true"-->
+<!--                                         command="java -jar ${pi.deployDirectory}/${project.build.finalName}-jar-with-dependencies.jar"/>-->
+<!--                            </tasks>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
 
-            </plugin>
+<!--            </plugin>-->
 
 
             <plugin>

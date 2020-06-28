@@ -48,10 +48,16 @@ public class Configs implements HasLogger {
     public static final String FLAG_RGB_YELLOW = "flag_rgb_yellow";
 
 
-    public static final String LCD_HARDWARE = "lcd";
+    public static final String LCD_HARDWARE = "lcdhardware";
     public static final String LCD_MODEL = "lcdmodel";
-    public static final String I2CLCD = "i2clcd";
+    public static final String LCD_I2C_ADDRESS = "lcdi2c";
 
+
+    public static final String ALPHA_LED1_I2C = "alpha_led1_i2c";
+    public static final String ALPHA_LED2_I2C = "alpha_led2_i2c";
+    public static final String ALPHA_LED3_I2C = "alpha_led3_i2c";
+    public static final String ALPHA_LED4_I2C = "alpha_led4_i2c";
+    public static final String ALPHA_LED_MODEL = "alpha_led_mode";
 
     // Application Context Keys - irgendwo müssen sie ja stehen
 //    public static final String AC_BTN_A = "flag_rgb_yellow";
@@ -86,10 +92,6 @@ public class Configs implements HasLogger {
     public static final String DISPLAY_GREEN_I2C = "display_green_i2c";
     public static final String DISPLAY_WHITE_I2C = "display_white_i2c";
 
-    public static final String DISPLAY_TXT1_I2C = "display_txt1_i2c";
-    public static final String DISPLAY_TXT2_I2C = "display_txt2_i2c";
-    public static final String DISPLAY_TXT3_I2C = "display_txt3_i2c";
-    public static final String DISPLAY_TXT4_I2C = "display_txt4_i2c";
 
     // Display Helligkeiten
     public static final String BRIGHTNESS_WHITE = "brightness_white";
@@ -208,6 +210,8 @@ public class Configs implements HasLogger {
         configs.put(OUT_HOLDDOWN_BUZZER, "mf15");
         configs.put(SIRENS_ENABLED, "true");
 
+        configs.put(LCD_I2C_ADDRESS, "0x27");
+
 //        // RESERVE
 //        configs.put(OUT_MF07, "mf07");
 //        configs.put(OUT_MF13, "mf13");
@@ -232,10 +236,10 @@ public class Configs implements HasLogger {
         configs.put(DISPLAY_YELLOW_I2C, "0x73");
         configs.put(DISPLAY_GREEN_I2C, "0x74");
 
-        configs.put(DISPLAY_TXT1_I2C, "0x70");
-        configs.put(DISPLAY_TXT2_I2C, "0x75");
-        configs.put(DISPLAY_TXT3_I2C, "0x76");
-        configs.put(DISPLAY_TXT4_I2C, "0x77");
+        configs.put(ALPHA_LED1_I2C, "0x70");
+        configs.put(ALPHA_LED2_I2C, "0x75");
+        configs.put(ALPHA_LED3_I2C, "0x76");
+        configs.put(ALPHA_LED4_I2C, "0x77");
 
         // deprecated - rgb will be removed in future releases
         // colors for the rgb leds

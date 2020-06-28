@@ -10,17 +10,16 @@ import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
 import com.pi4j.wiringpi.SoftPwm;
 import de.flashheart.ocfflag.Main;
-import de.flashheart.ocfflag.gui.Display7Segments4Digits;
-import de.flashheart.ocfflag.gui.FrameDebug;
-import de.flashheart.ocfflag.gui.MyLCD;
-import de.flashheart.ocfflag.gui.MyRGBLed;
-import de.flashheart.ocfflag.misc.Configs;
+import de.flashheart.ocfflag.gui.*;
 import de.flashheart.ocfflag.interfaces.HasLogger;
+import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 
+import javax.swing.*;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -30,7 +29,7 @@ public class MySystem implements HasLogger {
     private long REACTION_TIME = 0;
     private GpioController GPIO;
     private final int MCP23017_1 = Integer.decode("0x20");
-    private final int I2CLCD = Integer.decode("0x27");
+
     private final FrameDebug frameDebug;
     // GPIO_08 und GPIO_09 NICHT verwenden. Sind die I2C Ports
 
@@ -128,6 +127,20 @@ public class MySystem implements HasLogger {
         Main.addToContext(display_yellow.getName(), display_yellow);
         Main.addToContext("mcp23017_1", mcp23017_1);
 
+        Main.addToContext(Configs.LCD_MODEL, new MyLCD(frameDebug.getLine1(), frameDebug.getLine2(), frameDebug.getLine3(), frameDebug.getLine4()));
+
+
+        // Alpha LEDS werden zu einem Model zusammengefasst.
+        Main.addToContext(Configs.ALPHA_LED_MODEL, new MyLEDMessage(
+                Arrays.asList(new Optional[]{
+                        (Optional<AlphaSegment>) Main.getFromContext(Configs.ALPHA_LED1_I2C),
+                        (Optional<AlphaSegment>) Main.getFromContext(Configs.ALPHA_LED2_I2C),
+                        (Optional<AlphaSegment>) Main.getFromContext(Configs.ALPHA_LED3_I2C),
+                        (Optional<AlphaSegment>) Main.getFromContext(Configs.ALPHA_LED4_I2C)
+
+                }),
+                Arrays.asList(new JLabel[]{frameDebug.getLblTXT1(), frameDebug.getLblTXT2(), frameDebug.getLblTXT3(), frameDebug.getLblTXT4()}))
+        );
 
         // Platine K2
         Main.addToContext(Configs.BUTTON_A, new MyAbstractButton(GPIO, Configs.BUTTON_A, frameDebug.getBtnA(), 0l, null));   // former: num teams
@@ -147,8 +160,7 @@ public class MySystem implements HasLogger {
         Main.addToContext(Configs.BUTTON_QUIT, new MyAbstractButton(null, null, frameDebug.getBtnQuit()));
         Main.addToContext(Configs.BUTTON_SHUTDOWN, new MyAbstractButton(GPIO, Configs.BUTTON_SHUTDOWN, frameDebug.getBtnShutdown(), 0, null));
 
-
-        Main.addToContext(Configs.LCD_MODEL, new MyLCD(20, 4, frameDebug.getLine1(), frameDebug.getLine2(),frameDebug.getLine3(),frameDebug.getLine4()));
+        Main.addToContext(Configs.LCD_MODEL, new MyLCD(20, 4, frameDebug.getLine1(), frameDebug.getLine2(), frameDebug.getLine3(), frameDebug.getLine4()));
 
         pinHandler.add(new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getPnlFlagLEDs(), Configs.OUT_RGB_FLAG));
 
@@ -197,6 +209,18 @@ public class MySystem implements HasLogger {
         }
     }
 
+    private Optional<AlphaSegment> init_alpha_segment(String i2caddress) {
+        AlphaSegment alphaSegment;
+        try {
+            alphaSegment = new AlphaSegment(Integer.decode(i2caddress));
+        } catch (Exception e) {
+            getLogger().warn(e);
+            alphaSegment = null;
+
+        }
+        return Optional.ofNullable(alphaSegment);
+    }
+
 
     private void initRaspi() {
         if (!Tools.isArm()) return;
@@ -211,7 +235,8 @@ public class MySystem implements HasLogger {
 
         I2CLCD i2clcd;
         try {
-            i2clcd = new I2CLCD(I2CFactory.getInstance(I2CBus.BUS_1).getDevice(I2CLCD));
+            int lcdaddr = Integer.decode(Main.getFromConfigs(Configs.LCD_I2C_ADDRESS));
+            i2clcd = new I2CLCD(I2CFactory.getInstance(I2CBus.BUS_1).getDevice(lcdaddr));
             i2clcd.init();
 //            Main.addToContext("i2clcd", i2clcd);
         } catch (Exception e) {
@@ -220,6 +245,8 @@ public class MySystem implements HasLogger {
 
         }
         Main.addToContext(Configs.LCD_HARDWARE, Optional.ofNullable(i2clcd));
+
+        Arrays.asList(new String[]{Configs.ALPHA_LED1_I2C, Configs.ALPHA_LED2_I2C, Configs.ALPHA_LED3_I2C, Configs.ALPHA_LED4_I2C}).forEach(key -> Main.addToContext(key, init_alpha_segment(Main.getFromConfigs(key))));
 
         SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
         SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);

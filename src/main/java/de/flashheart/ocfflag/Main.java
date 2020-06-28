@@ -3,6 +3,7 @@ package de.flashheart.ocfflag;
 import de.flashheart.ocfflag.gamemodes.Game;
 import de.flashheart.ocfflag.gamemodes.GameSelector;
 import de.flashheart.ocfflag.gui.FrameDebug;
+import de.flashheart.ocfflag.gui.MyLCD;
 import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
@@ -34,10 +35,9 @@ public class Main {
         FrameDebug frameDebug = new FrameDebug();
         applicationContext.put(Configs.FRAME_DEBUG, frameDebug);
         applicationContext.put(Configs.MY_SYSTEM, new MySystem());
-
-//        frameDebug.getBtnTestDialog().setVisible(Tools.isArm());
+        
+        ((MyLCD) Main.getFromContext(Configs.LCD_MODEL)).start();
         frameDebug.setVisible(true);
-
 
         setGame(new GameSelector());
     }
