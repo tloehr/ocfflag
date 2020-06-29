@@ -38,30 +38,30 @@ public class FrameDebug extends JFrame implements HasLogger {
         initComponents();
         // das hier sorgt dafür, dass das logfenster nicht mehr als 200 Zeilen hat.
         // sonst kriegen wir irgendwann einen OUT_OF_MEMORY
-        txtLogger.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                SwingUtilities.invokeLater(() -> {
-                    Element root = e.getDocument().getDefaultRootElement();
-                    while (root.getElementCount() > MAX_LOG_LINES) {
-                        Element firstLine = root.getElement(0);
-                        try {
-                            e.getDocument().remove(0, firstLine.getEndOffset());
-                        } catch (BadLocationException ble) {
-                            getLogger().error(ble);
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-            }
-        });
+//        txtLogger.getDocument().addDocumentListener(new DocumentListener() {
+//            @Override
+//            public void insertUpdate(DocumentEvent e) {
+//                SwingUtilities.invokeLater(() -> {
+//                    Element root = e.getDocument().getDefaultRootElement();
+//                    while (root.getElementCount() > MAX_LOG_LINES) {
+//                        Element firstLine = root.getElement(0);
+//                        try {
+//                            e.getDocument().remove(0, firstLine.getEndOffset());
+//                        } catch (BadLocationException ble) {
+//                            getLogger().error(ble);
+//                        }
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void removeUpdate(DocumentEvent e) {
+//            }
+//
+//            @Override
+//            public void changedUpdate(DocumentEvent e) {
+//            }
+//        });
         initFrame();
     }
 
@@ -653,6 +653,12 @@ public class FrameDebug extends JFrame implements HasLogger {
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
+//    @Override
+//    public void setVisible(boolean b) {
+//        getLogger().debug("visible1");
+//        super.setVisible(b);
+//        getLogger().debug("visible2");
+//    }
 
     public JLabel getLblTimeRed() {
         return lblTimeRed;
