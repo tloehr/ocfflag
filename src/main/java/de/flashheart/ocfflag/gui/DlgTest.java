@@ -30,7 +30,7 @@ public class DlgTest extends JDialog implements HasLogger {
 
     public DlgTest(Window owner) {
         super(owner);
-        configs = (Configs) Main.getFromContext("configs");
+        configs = (Configs) Main.getFromContext(Configs.THE_CONFIGS);
         mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
 
         initComponents();

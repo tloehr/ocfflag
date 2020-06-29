@@ -16,21 +16,28 @@ public class MyLCD extends Pageable {
     private final List<JLabel> jLabels; // für die GUI Darstellung
     private final Optional<I2CLCD> i2CLCD;
 
-    public MyLCD(JLabel... labels) {
-        this(20, 4, labels);
-        visible_page = add_page("RLG-System v", Main.getFromConfigs("my.version").toString(), "empty line ;-)", Main.getFromConfigs("buildNumber").toString());
-    }
+//    public MyLCD(JLabel... labels) {
+//        this(20, 4, labels);
+//
+//    }
 
     public MyLCD(int cols, int rows, JLabel... labels) {
         super(cols, rows);
         i2CLCD = Optional.ofNullable((I2CLCD) Main.getFromContext(Configs.LCD_HARDWARE));
         i2CLCD.ifPresent(i2clcd -> i2clcd.init());
         jLabels = Arrays.asList(labels);
+        Configs configs = (Configs) Main.getFromContext(Configs.THE_CONFIGS);
+        visible_page = add_page("RLG-System v", configs.getApplicationInfo("my.version"), "empty line ;-)", configs.getApplicationInfo(("buildNumber")));
     }
 
     @Override
     protected void render_line(int line, String text) {
-        jLabels.get(line).setText(text);
+        SwingUtilities.invokeLater(() -> {
+            jLabels.get(line).setText(text);
+            jLabels.get(line).revalidate();
+            jLabels.get(line).repaint();
+        });
+
         i2CLCD.ifPresent(i2clcd -> i2clcd.display_string(text, line));
     }
 

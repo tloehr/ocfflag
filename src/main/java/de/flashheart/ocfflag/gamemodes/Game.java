@@ -75,7 +75,7 @@ public abstract class Game implements HasLogger {
 
     Game(int num_teams) {
         this.num_teams = num_teams;
-        configs = (Configs) Main.getFromContext("configs");
+        configs = (Configs) Main.getFromContext(Configs.THE_CONFIGS);
         mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
     }
 

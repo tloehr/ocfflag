@@ -127,8 +127,7 @@ public class MySystem implements HasLogger {
         Main.addToContext(display_yellow.getName(), display_yellow);
         Main.addToContext("mcp23017_1", mcp23017_1);
 
-        Main.addToContext(Configs.LCD_MODEL, new MyLCD(frameDebug.getLine1(), frameDebug.getLine2(), frameDebug.getLine3(), frameDebug.getLine4()));
-
+        Main.addToContext(Configs.LCD_MODEL, new MyLCD(20, 4, frameDebug.getLine1(), frameDebug.getLine2(), frameDebug.getLine3(), frameDebug.getLine4()));
 
         // Alpha LEDS werden zu einem Model zusammengefasst.
         Main.addToContext(Configs.ALPHA_LED_MODEL, new MyLEDMessage(
@@ -160,7 +159,7 @@ public class MySystem implements HasLogger {
         Main.addToContext(Configs.BUTTON_QUIT, new MyAbstractButton(null, null, frameDebug.getBtnQuit()));
         Main.addToContext(Configs.BUTTON_SHUTDOWN, new MyAbstractButton(GPIO, Configs.BUTTON_SHUTDOWN, frameDebug.getBtnShutdown(), 0, null));
 
-        Main.addToContext(Configs.LCD_MODEL, new MyLCD(20, 4, frameDebug.getLine1(), frameDebug.getLine2(), frameDebug.getLine3(), frameDebug.getLine4()));
+//        Main.addToContext(Configs.LCD_MODEL, new MyLCD(20, 4, frameDebug.getLine1(), frameDebug.getLine2(), frameDebug.getLine3(), frameDebug.getLine4()));
 
         pinHandler.add(new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getPnlFlagLEDs(), Configs.OUT_RGB_FLAG));
 

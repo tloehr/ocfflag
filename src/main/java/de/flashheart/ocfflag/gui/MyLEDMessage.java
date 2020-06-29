@@ -4,6 +4,7 @@ import com.google.common.base.Splitter;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.AlphaSegment;
 import de.flashheart.ocfflag.hardware.Pageable;
+import de.flashheart.ocfflag.misc.Configs;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
@@ -19,23 +20,31 @@ public class MyLEDMessage extends Pageable {
         super(jLabels.size() * 4, 1);
         this.segments = segments;
         this.jLabels = jLabels;
-        visible_page = add_page("RLGS v" + Main.getFromConfigs("my.version").toString());
+        Configs configs = (Configs) Main.getFromContext(Configs.THE_CONFIGS);
+        visible_page = add_page("RLGS v" + configs.getApplicationInfo("my.version"));
     }
 
     @Override
     protected void render_line(int line, String text) {
         int lineno = 0;
         for (String chunk : Splitter.fixedLength(4).splitToList(StringUtils.left(StringUtils.rightPad(text, cols), cols))) {
-            jLabels.get(lineno).setText(chunk);
+            getLogger().debug(chunk);
+            final int mylineno = lineno;
+//            SwingUtilities.invokeLater(() -> {
+//                jLabels.get(mylineno).setText(chunk);
+//                jLabels.get(mylineno).revalidate();
+//                jLabels.get(mylineno).repaint();
+//            });
+//
+//            segments.get(mylineno).ifPresent(alphaSegment -> {
+//                try {
+//                    alphaSegment.write(chunk);
+//                } catch (IOException e) {
+//                    getLogger().error(e);
+//                }
+//            });
 
-            segments.get(lineno).ifPresent(alphaSegment -> {
-                try {
-                    alphaSegment.write(chunk);
-                } catch (IOException e) {
-                    getLogger().error(e);
-                }
-            });
-            
+            lineno++;
         }
     }
 }

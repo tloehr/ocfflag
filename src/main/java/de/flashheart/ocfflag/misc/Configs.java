@@ -13,6 +13,7 @@ import java.util.Properties;
 import java.util.UUID;
 
 public class Configs implements HasLogger {
+    public static final String THE_CONFIGS = "the_configs";
     public static final String SHUTDOWN_COMMAND_LINE = "shutdown_cmd_line";
     public static final String MY_SYSTEM = "mysystem";
     public static final String IGNORE_GPIO_IN_ARM_MODE = "ignore_gpios";

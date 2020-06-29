@@ -111,7 +111,7 @@ public class RGBBlinkModel implements GenericBlinkModel, HasLogger {
      */
     public static String getGametimeBlinkingScheme(Color color, long timestamp) {
         String scheme = PinHandler.FOREVER + ":";
-        Configs configs = (Configs) Main.getFromContext("configs");
+        Configs configs = (Configs) Main.getFromContext(Configs.THE_CONFIGS);
         if (configs.is(Configs.OCF_TIME_ANNOUNCER)) {
             LocalDateTime remainingTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp),
                     TimeZone.getTimeZone("UTC").toZoneId());

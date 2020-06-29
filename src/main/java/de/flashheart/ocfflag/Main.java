@@ -4,6 +4,7 @@ import de.flashheart.ocfflag.gamemodes.Game;
 import de.flashheart.ocfflag.gamemodes.GameSelector;
 import de.flashheart.ocfflag.gui.FrameDebug;
 import de.flashheart.ocfflag.gui.MyLCD;
+import de.flashheart.ocfflag.gui.MyLEDMessage;
 import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
@@ -37,6 +38,8 @@ public class Main {
         applicationContext.put(Configs.MY_SYSTEM, new MySystem());
         
         ((MyLCD) Main.getFromContext(Configs.LCD_MODEL)).start();
+        ((MyLEDMessage) Main.getFromContext(Configs.ALPHA_LED_MODEL)).start();
+
         frameDebug.setVisible(true);
 
         setGame(new GameSelector());
@@ -64,7 +67,7 @@ public class Main {
     private static void initBaseSystem(String[] args) throws IOException {
         System.setProperty("logs", Tools.getWorkingPath());
         configs = new Configs();
-        applicationContext.put("configs", configs);
+        applicationContext.put(Configs.THE_CONFIGS, configs);
 
         Logger.getRootLogger().setLevel(logLevel);
         logger = Logger.getLogger("Main");
@@ -142,8 +145,8 @@ public class Main {
             System.exit(0);
         }
 
-        addToContext(Configs.IGNORE_GPIO_IN_ARM_MODE, new Boolean(cl.hasOption("n")));
-        addToContext(Configs.DEV_MODE, new Boolean(cl.hasOption("n")));
+        addToContext(Configs.IGNORE_GPIO_IN_ARM_MODE, cl.hasOption("n"));
+        addToContext(Configs.DEV_MODE, cl.hasOption("n"));
 
     }
 

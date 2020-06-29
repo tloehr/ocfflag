@@ -35,7 +35,6 @@ public abstract class Pageable implements Runnable, HasLogger {
     }
 
 
-
     public void start() {
         thread.start();
     }
@@ -45,6 +44,7 @@ public abstract class Pageable implements Runnable, HasLogger {
         lock.lock();
         int pageid = number_of_pages;
         try {
+            pages_have_been_updated = true;
             int line = 0;
             for (String s : lines) {
                 pages.put(pageid, line, s);
@@ -94,6 +94,7 @@ public abstract class Pageable implements Runnable, HasLogger {
         pages_have_been_updated = false;
         // Schreibt alle Zeilen der aktiven Seite.
         for (int r = 0; r < rows; r++) {
+
             String line = pages.get(pageid, r).toString().isEmpty() ? StringUtils.repeat(" ", cols) : StringUtils.rightPad(pages.get(pageid, r).toString(), cols);
             render_line(r, line);
             getLogger().debug("VISIBLE PAGE #" + (pageid) + " Line" + r + ": " + line);
@@ -115,7 +116,7 @@ public abstract class Pageable implements Runnable, HasLogger {
                         pages_have_been_updated = pages_have_been_updated || prevpage != visible_page;
                     }
 
-                        render_page(visible_page);
+                    render_page(visible_page);
                 } catch (Exception ex) {
                     getLogger().error(ex);
                 } finally {
@@ -124,7 +125,7 @@ public abstract class Pageable implements Runnable, HasLogger {
                 Thread.sleep(100);
                 loopcounter++;
             } catch (InterruptedException ie) {
-                 getLogger().debug(ie);
+                getLogger().debug(ie);
             }
         }
     }
