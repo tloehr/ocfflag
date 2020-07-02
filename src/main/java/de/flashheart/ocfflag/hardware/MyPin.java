@@ -9,64 +9,69 @@ import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.MyLEDButton;
 import de.flashheart.ocfflag.gui.MyLEDLabel;
 import de.flashheart.ocfflag.interfaces.HasLogger;
+import de.flashheart.ocfflag.misc.Configs;
 
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Synthesizer;
+import java.util.Optional;
 
 /**
  * Created by tloehr on 07.06.15.
  */
 public class MyPin implements HasLogger {
-    private GpioPinDigitalOutput outputPin;
+    private Optional<GpioPinDigitalOutput> outputPin;
     private final String name;
-    private MyLEDButton guiButton;
-    private MyLEDLabel ledLabel;
+    private Optional<MyLEDButton> guiButton;
+    private Optional<MyLEDLabel> ledLabel;
     private int note = -1;
-    private Synthesizer synthesizer = null;
+    private Optional<Synthesizer> synthesizer;
     private MidiChannel[] channels;
 
-    public MyPin(GpioController gpio, String name, MyLEDButton guiButton) {
+    public MyPin(String name, MyLEDButton guiButton) {
         this.name = name;
-        this.guiButton = guiButton;
-        init(gpio, -1);
+        this.guiButton = Optional.of(guiButton);
+        init(-1);
     }
 
-    public MyPin(GpioController gpio, String name, MyLEDLabel ledLabel) {
+    public MyPin( String name, MyLEDLabel ledLabel) {
         this.name = name;
-        this.ledLabel = ledLabel;
-        init(gpio, -1);
+        this.ledLabel = Optional.of(ledLabel);
+        init(-1);
     }
 
-    public MyPin(GpioController gpio, String name, MyLEDButton guiButton, int instrument, int note) {
+    public MyPin(String name, MyLEDButton guiButton, int instrument, int note) {
         this.name = name;
         this.note = note;
-        this.guiButton = guiButton;
-        init(gpio, instrument);
+        this.guiButton = Optional.of(guiButton);
+        init(instrument);
 
     }
 
-    private void init(GpioController gpio, int instrument){
-        if (gpio != null) {
+    private void init( int instrument){
+
+        Optional<GpioController> gpio = (Optional<GpioController>) Main.getFromContext(Configs.GPIOCONTROLLER);
+
+        if (gpio.isPresent()) {
             Pin pin = (Pin) Main.getFromContext(Main.getFromConfigs(name));
 
             if (pin.getProvider().equals(MCP23017GpioProvider.NAME)) {
-                outputPin = gpio.provisionDigitalOutputPin((MCP23017GpioProvider) Main.getFromContext("mcp23017_1"), pin, PinState.LOW);
+                outputPin = gpio.get().provisionDigitalOutputPin((MCP23017GpioProvider) Main.getFromContext("mcp23017_1"), pin, PinState.LOW);
             } else {
-                this.outputPin = gpio.provisionDigitalOutputPin(pin, PinState.LOW);
+                this.outputPin = gpio.get().provisionDigitalOutputPin(pin, PinState.LOW);
             }
-            if (outputPin != null) outputPin.setState(PinState.LOW);
+            outputPin.ifPresent(gpioPinDigitalOutput -> gpioPinDigitalOutput.setState(PinState.LOW));
         } else {
             this.outputPin = null;
             // Die Tonerzeugung ist nur zum Testen auf normalen Rechnern
             // und nicht auf dem RASPI. Da muss keine Rechenzeit verschwendet werden.
             try {
                 if (instrument > 0) {
-                    synthesizer = MidiSystem.getSynthesizer();
-                    synthesizer.open();
-                    channels = synthesizer.getChannels();
+                    synthesizer = Optional.of(MidiSystem.getSynthesizer());
+                    synthesizer.get().open();
+                    channels = synthesizer.get().getChannels();
                     channels[0].programChange(instrument);
-                    synthesizer.loadAllInstruments(synthesizer.getDefaultSoundbank());
+                    synthesizer.get().loadAllInstruments(synthesizer.get().getDefaultSoundbank());
                 }
             } catch (javax.sound.midi.MidiUnavailableException e) {
                 synthesizer = null;
@@ -80,9 +85,9 @@ public class MyPin implements HasLogger {
 
 
     public void setState(boolean on) {
-        if (outputPin != null) outputPin.setState(on ? PinState.HIGH : PinState.LOW);
-        if (guiButton != null) guiButton.setState(on);
-        if (ledLabel != null) ledLabel.setState(on);
+        outputPin.ifPresent(gpioPinDigitalOutput -> gpioPinDigitalOutput.setState(on ? PinState.HIGH : PinState.LOW));
+        guiButton.ifPresent(myLEDButton -> myLEDButton.setState(on));
+        ledLabel.ifPresent(ledLabel1 -> ledLabel1.setState(on));
 
         if (synthesizer != null) {
             if (on) channels[0].noteOn(note, 90);

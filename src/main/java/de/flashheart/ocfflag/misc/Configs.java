@@ -18,10 +18,12 @@ public class Configs implements HasLogger {
     public static final String MY_SYSTEM = "mysystem";
     public static final String IGNORE_GPIO_IN_ARM_MODE = "ignore_gpios";
     public static final String DEV_MODE = "dev_mode";
+    public static final String GPIOCONTROLLER = "gpiocontroller";
+    public static final String I2CBUS = "i2cbus";
+    public static final String MCP23017_1 = "mcp23017_1";
 
     private final SortedProperties configs;
     private final Properties applicationContext;
-
 
     public static final String MATCHID = "matchid";
     public static final String MYUUID = "uuid";
@@ -153,6 +155,10 @@ public class Configs implements HasLogger {
 
     // nur für die RGB Flagge als Key für den PinHandler. Habs hier hin gepackt, damit das einheitlich ist.
     public static final String OUT_RGB_FLAG = "rgbflag";
+    public static final String RGB_PIN_RED = "rgb_pin_red";
+    public static final String RGB_PIN_GREEN = "rgb_pin_green";
+    public static final String RGB_PIN_BLUE = "rgb_pin_blue";
+
 
     public static HashMap<String, Color> getColors() {
         HashMap<String, Color> colors = new HashMap<>();

@@ -33,14 +33,8 @@ public class Main {
                 UIManager.getCrossPlatformLookAndFeelClassName());
 
 
-        FrameDebug frameDebug = new FrameDebug();
-        applicationContext.put(Configs.FRAME_DEBUG, frameDebug);
         applicationContext.put(Configs.MY_SYSTEM, new MySystem());
-        
-        ((MyLCD) Main.getFromContext(Configs.LCD_MODEL)).start();
-        ((MyLEDMessage) Main.getFromContext(Configs.ALPHA_LED_MODEL)).start();
-
-        frameDebug.setVisible(true);
+        ((FrameDebug) Main.getFromContext(Configs.FRAME_DEBUG)).setVisible(true);
 
         setGame(new GameSelector());
     }

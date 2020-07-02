@@ -1,11 +1,9 @@
 package de.flashheart.ocfflag.hardware;
 
 import com.pi4j.gpio.extension.mcp.MCP23017GpioProvider;
-import com.pi4j.gpio.extension.mcp.MCP23017Pin;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
 import com.pi4j.wiringpi.SoftPwm;
@@ -27,53 +25,9 @@ import java.util.Optional;
  */
 public class MySystem implements HasLogger {
     private long REACTION_TIME = 0;
-    private GpioController GPIO;
-    private final int MCP23017_1 = Integer.decode("0x20");
 
     private final FrameDebug frameDebug;
-    // GPIO_08 und GPIO_09 NICHT verwenden. Sind die I2C Ports
 
-    // 4 Ports für ein Relais Board.
-    // Schaltet im default bei HIGH
-    // wenn ein LOW Relais Board verwendet wird muss der Umweg über ein Darlington Array auf Masse gewählt werden
-    /* rly01, J1 External Box */ private final Pin RLY01 = RaspiPin.GPIO_07;
-    /* rly02, J1 External Box */ private final Pin RLY02 = RaspiPin.GPIO_00;
-    /* rly03, J1 External Box */ private final Pin RLY03 = RaspiPin.GPIO_02;
-    /* rly04, J1 External Box */ private final Pin RLY04 = RaspiPin.GPIO_25;
-
-    // Mosfets via MCP23017
-    /* J1 External Box */ private final Pin MF01 = MCP23017Pin.GPIO_B0;
-    /* J1 External Box */ private final Pin MF02 = MCP23017Pin.GPIO_B1;
-    /* P1 Display Port */ private final Pin MF03 = MCP23017Pin.GPIO_B2;
-    /* J1 External Box */ private final Pin MF04 = MCP23017Pin.GPIO_B3;
-    /* J1 External Box */ private final Pin MF05 = MCP23017Pin.GPIO_B4;
-    /* P1 Display Port */ private final Pin MF06 = MCP23017Pin.GPIO_B5;
-    /* J1 External Box */ private final Pin MF07 = MCP23017Pin.GPIO_B6;
-    /* J1 External Box */ private final Pin MF08 = MCP23017Pin.GPIO_B7;
-    /* J1 External Box */ private final Pin MF09 = MCP23017Pin.GPIO_A0;
-    /* J1 External Box */ private final Pin MF10 = MCP23017Pin.GPIO_A1;
-    /* J1 External Box */ private final Pin MF11 = MCP23017Pin.GPIO_A2;
-    /* J1 External Box */ private final Pin MF12 = MCP23017Pin.GPIO_A3;
-    /* J1 External Box */ private final Pin MF13 = MCP23017Pin.GPIO_A4;
-    /* J1 External Box */ private final Pin MF14 = MCP23017Pin.GPIO_A5;
-    /* J1 External Box */ private final Pin MF15 = MCP23017Pin.GPIO_A6;
-    /* on mainboard */ private final Pin MF16 = MCP23017Pin.GPIO_A7;
-
-    private final Pin SIREN_START_STOP = RLY01;
-    private final Pin SIREN_COLOR_CHANGE = RLY02;
-    private final Pin SIREN_HOLDOWN_BUZZER = MF15;
-
-
-    // Rechte Seite des JP8 Headers
-    // RGB Flagge, das muss direkt auf den Raspi gelegt werden, nicht über den MCP23017,
-    // sonst funktioniert das PWM nicht.
-    // RJ45
-    // ist hardgecoded. Kann nicht verändert werden.
-    /* rgb-red   */ private final Pin POLE_RGB_RED = RaspiPin.GPIO_01;
-    /* rgb-green */ private final Pin POLE_RGB_GREEN = RaspiPin.GPIO_04;
-    /* rgb-blue  */ private final Pin POLE_RGB_BLUE = RaspiPin.GPIO_05;
-
-    private MCP23017GpioProvider mcp23017_1 = null;
 
     // Interne Hardware Abstraktion.
     private Display7Segments4Digits display_blue;
@@ -85,10 +39,17 @@ public class MySystem implements HasLogger {
     private PinHandler pinHandler; // One handler, to rule them all...
 
     public MySystem() {
-        frameDebug = (FrameDebug) Main.getFromContext(Configs.FRAME_DEBUG);
+
+        GPIO = Optional.empty();
+        i2CBus = Optional.empty();
+        mcp23017_1 = Optional.empty();
+
+
+        frameDebug = new FrameDebug();
+        Main.addToContext(Configs.FRAME_DEBUG, frameDebug);
         pinHandler = new PinHandler();
         initRaspi();
-        initGameSystem();
+        initGameModels();
     }
 
     public PinHandler getPinHandler() {
@@ -103,16 +64,15 @@ public class MySystem implements HasLogger {
      * in dieser Methode werden alle "Verdrahtungen" zwischen der Hardware und der OnScreen Darstellung vorgenommen.
      * Anschließen wird die Spielmechanik durch das Erzeugen eines "GAMES" gestartet.
      */
-    private void initGameSystem() {
+    private void initGameModels() {
         // die internal names auf den Brightness Key zu setzen ist ein kleiner Trick. Die namen müssen und eindeutig sein
         // so kann das Display7Segment4Digits direkt die Helligkeit aus den configs lesen
 
-
-        display_white = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_WHITE_I2C), frameDebug.getLblTimeWhite(), Configs.DISPLAY_WHITE_I2C);
-        display_red = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_RED_I2C), frameDebug.getLblTimeRed(), Configs.DISPLAY_RED_I2C);
-        display_blue = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_BLUE_I2C), frameDebug.getLblTimeBlue(), Configs.DISPLAY_BLUE_I2C);
-        display_green = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_GREEN_I2C), frameDebug.getLblTimeGreen(), Configs.DISPLAY_GREEN_I2C);
-        display_yellow = new Display7Segments4Digits(Main.getFromConfigs(Configs.DISPLAY_YELLOW_I2C), frameDebug.getLblTimeYellow(), Configs.DISPLAY_YELLOW_I2C);
+        display_white = new Display7Segments4Digits(frameDebug.getLblTimeWhite(), Configs.DISPLAY_WHITE_I2C);
+        display_red = new Display7Segments4Digits(frameDebug.getLblTimeRed(), Configs.DISPLAY_RED_I2C);
+        display_blue = new Display7Segments4Digits(frameDebug.getLblTimeBlue(), Configs.DISPLAY_BLUE_I2C);
+        display_green = new Display7Segments4Digits(frameDebug.getLblTimeGreen(), Configs.DISPLAY_GREEN_I2C);
+        display_yellow = new Display7Segments4Digits(frameDebug.getLblTimeYellow(), Configs.DISPLAY_YELLOW_I2C);
 
         display_white.setFourDigitsOnly(false);
         display_red.setFourDigitsOnly(false);
@@ -142,44 +102,44 @@ public class MySystem implements HasLogger {
         );
 
         // Platine K2
-        Main.addToContext(Configs.BUTTON_A, new MyAbstractButton(GPIO, Configs.BUTTON_A, frameDebug.getBtnA(), 0l, null));   // former: num teams
+        Main.addToContext(Configs.BUTTON_A, new MyAbstractButton(Configs.BUTTON_A, frameDebug.getBtnA(), 0l, null));   // former: num teams
         // Platine K3
-        Main.addToContext(Configs.BUTTON_B, new MyAbstractButton(GPIO, Configs.BUTTON_B, frameDebug.getBtnB(), 0l, null));  // former: game time
+        Main.addToContext(Configs.BUTTON_B, new MyAbstractButton(Configs.BUTTON_B, frameDebug.getBtnB(), 0l, null));  // former: game time
         // Platine K1
-        Main.addToContext(Configs.BUTTON_C, new MyAbstractButton(GPIO, Configs.BUTTON_C, frameDebug.getBtnC(), 0l, null));  // former: play / pause
+        Main.addToContext(Configs.BUTTON_C, new MyAbstractButton(Configs.BUTTON_C, frameDebug.getBtnC(), 0l, null));  // former: play / pause
         // Platine K4
-        Main.addToContext(Configs.BUTTON_D, new MyAbstractButton(GPIO, Configs.BUTTON_D, frameDebug.getBtnD(), 0l, null));  // former: RESET / Undo
+        Main.addToContext(Configs.BUTTON_D, new MyAbstractButton(Configs.BUTTON_D, frameDebug.getBtnD(), 0l, null));  // former: RESET / Undo
 
         // Player Buttons
-        Main.addToContext(Configs.BUTTON_RED, new MyAbstractButton(GPIO, Configs.BUTTON_RED, frameDebug.getBtnRed(), REACTION_TIME, frameDebug.getPbRed()));
-        Main.addToContext(Configs.BUTTON_BLUE, new MyAbstractButton(GPIO, Configs.BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, frameDebug.getPbBlue()));
-        Main.addToContext(Configs.BUTTON_GREEN, new MyAbstractButton(GPIO, Configs.BUTTON_GREEN, frameDebug.getBtnGreen(), REACTION_TIME, frameDebug.getPbGreen()));
-        Main.addToContext(Configs.BUTTON_YELLOW, new MyAbstractButton(GPIO, Configs.BUTTON_YELLOW, frameDebug.getBtnYellow(), REACTION_TIME, frameDebug.getPbYellow()));
+        Main.addToContext(Configs.BUTTON_RED, new MyAbstractButton(Configs.BUTTON_RED, frameDebug.getBtnRed(), REACTION_TIME, frameDebug.getPbRed()));
+        Main.addToContext(Configs.BUTTON_BLUE, new MyAbstractButton(Configs.BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, frameDebug.getPbBlue()));
+        Main.addToContext(Configs.BUTTON_GREEN, new MyAbstractButton(Configs.BUTTON_GREEN, frameDebug.getBtnGreen(), REACTION_TIME, frameDebug.getPbGreen()));
+        Main.addToContext(Configs.BUTTON_YELLOW, new MyAbstractButton(Configs.BUTTON_YELLOW, frameDebug.getBtnYellow(), REACTION_TIME, frameDebug.getPbYellow()));
         // System Buttons
         Main.addToContext(Configs.BUTTON_QUIT, new MyAbstractButton(null, null, frameDebug.getBtnQuit()));
-        Main.addToContext(Configs.BUTTON_SHUTDOWN, new MyAbstractButton(GPIO, Configs.BUTTON_SHUTDOWN, frameDebug.getBtnShutdown(), 0, null));
+        Main.addToContext(Configs.BUTTON_SHUTDOWN, new MyAbstractButton(Configs.BUTTON_SHUTDOWN, frameDebug.getBtnShutdown(), 0, null));
 
 //        Main.addToContext(Configs.LCD_MODEL, new MyLCD(20, 4, frameDebug.getLine1(), frameDebug.getLine2(), frameDebug.getLine3(), frameDebug.getLine4()));
 
-        pinHandler.add(new MyRGBLed(GPIO == null ? null : POLE_RGB_RED, GPIO == null ? null : POLE_RGB_GREEN, GPIO == null ? null : POLE_RGB_BLUE, frameDebug.getPnlFlagLEDs(), Configs.OUT_RGB_FLAG));
+        pinHandler.add(new MyRGBLed(frameDebug.getPnlFlagLEDs(), Configs.OUT_RGB_FLAG));
 
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_RED_BTN, frameDebug.getBtnRed()));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_BLUE_BTN, frameDebug.getBtnBlue()));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_GREEN_BTN, frameDebug.getBtnGreen()));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_YELLOW_BTN, frameDebug.getBtnYellow()));
+        pinHandler.add(new MyPin(Configs.OUT_LED_RED_BTN, frameDebug.getBtnRed()));
+        pinHandler.add(new MyPin(Configs.OUT_LED_BLUE_BTN, frameDebug.getBtnBlue()));
+        pinHandler.add(new MyPin(Configs.OUT_LED_GREEN_BTN, frameDebug.getBtnGreen()));
+        pinHandler.add(new MyPin(Configs.OUT_LED_YELLOW_BTN, frameDebug.getBtnYellow()));
 
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_GREEN, frameDebug.getLedGreen()));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_LED_WHITE, frameDebug.getLedWhite()));
+        pinHandler.add(new MyPin(Configs.OUT_LED_GREEN, frameDebug.getLedGreen()));
+        pinHandler.add(new MyPin(Configs.OUT_LED_WHITE, frameDebug.getLedWhite()));
 
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_FLAG_WHITE, frameDebug.getLedFlagWhite()));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_FLAG_RED, frameDebug.getLedFlagRed()));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_FLAG_BLUE, frameDebug.getLedFlagBlue()));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_FLAG_GREEN, frameDebug.getLedFlagGreen()));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_FLAG_YELLOW, frameDebug.getLedFlagYellow()));
+        pinHandler.add(new MyPin(Configs.OUT_FLAG_WHITE, frameDebug.getLedFlagWhite()));
+        pinHandler.add(new MyPin(Configs.OUT_FLAG_RED, frameDebug.getLedFlagRed()));
+        pinHandler.add(new MyPin(Configs.OUT_FLAG_BLUE, frameDebug.getLedFlagBlue()));
+        pinHandler.add(new MyPin(Configs.OUT_FLAG_GREEN, frameDebug.getLedFlagGreen()));
+        pinHandler.add(new MyPin(Configs.OUT_FLAG_YELLOW, frameDebug.getLedFlagYellow()));
 
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_HOLDDOWN_BUZZER, null, 70, 30));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_SIREN_COLOR_CHANGE, null, 50, 90));
-        pinHandler.add(new MyPin(GPIO, Configs.OUT_SIREN_START_STOP, null, 70, 60));
+        pinHandler.add(new MyPin(Configs.OUT_HOLDDOWN_BUZZER, null, 70, 30));
+        pinHandler.add(new MyPin(Configs.OUT_SIREN_COLOR_CHANGE, null, 50, 90));
+        pinHandler.add(new MyPin(Configs.OUT_SIREN_START_STOP, null, 70, 60));
 
     }
 
@@ -209,47 +169,127 @@ public class MySystem implements HasLogger {
     }
 
     private Optional<AlphaSegment> init_alpha_segment(String i2caddress) {
+        if (!Tools.isArm()) return Optional.empty();
+
         AlphaSegment alphaSegment;
         try {
             alphaSegment = new AlphaSegment(Integer.decode(i2caddress));
         } catch (Exception e) {
             getLogger().warn(e);
             alphaSegment = null;
-
         }
         return Optional.ofNullable(alphaSegment);
     }
 
 
     private void initRaspi() {
-        if (!Tools.isArm()) return;
 
-        GPIO = GpioFactory.getInstance();
-        try {
-            mcp23017_1 = new MCP23017GpioProvider(I2CBus.BUS_1, MCP23017_1);
-        } catch (I2CFactory.UnsupportedBusNumberException | IOException e) {
-            GPIO = null;
-            return;
+        // GPIO_08 und GPIO_09 NICHT verwenden. Sind die I2C Ports
+
+        // 4 Ports für ein Relais Board.
+        // Schaltet im default bei HIGH
+        // wenn ein LOW Relais Board verwendet wird muss der Umweg über ein Darlington Array auf Masse gewählt werden
+        /* rly01, J1 External Box */
+        Optional<Pin> RLY01 = Optional.empty(); //RaspiPin.GPIO_07;
+        /* rly02, J1 External Box */
+        Optional<Pin> RLY02 = Optional.empty(); //RaspiPin.GPIO_00;
+        /* rly03, J1 External Box */
+        Optional<Pin> RLY03 = Optional.empty(); //RaspiPin.GPIO_02;
+        /* rly04, J1 External Box */
+        Optional<Pin> RLY04 = Optional.empty(); //RaspiPin.GPIO_25;
+
+        // Mosfets via MCP23017
+        /* J1 External Box */
+        Optional<Pin> MF01 = Optional.empty(); // MCP23017Pin.GPIO_B0;
+        /* J1 External Box */
+        Optional<Pin> MF02 = Optional.empty(); //MCP23017Pin.GPIO_B1;
+        /* P1 Display Port */
+        Optional<Pin> MF03 = Optional.empty(); //MCP23017Pin.GPIO_B2;
+        /* J1 External Box */
+        Optional<Pin> MF04 = Optional.empty(); //MCP23017Pin.GPIO_B3;
+        /* J1 External Box */
+        Optional<Pin> MF05 = Optional.empty(); //MCP23017Pin.GPIO_B4;
+        /* P1 Display Port */
+        Optional<Pin> MF06 = Optional.empty(); //MCP23017Pin.GPIO_B5;
+        /* J1 External Box */
+        Optional<Pin> MF07 = Optional.empty(); //MCP23017Pin.GPIO_B6;
+        /* J1 External Box */
+        Optional<Pin> MF08 = Optional.empty(); //MCP23017Pin.GPIO_B7;
+        /* J1 External Box */
+        Optional<Pin> MF09 = Optional.empty(); //MCP23017Pin.GPIO_A0;
+        /* J1 External Box */
+        Optional<Pin> MF10 = Optional.empty(); //MCP23017Pin.GPIO_A1;
+        /* J1 External Box */
+        Optional<Pin> MF11 = Optional.empty(); //MCP23017Pin.GPIO_A2;
+        /* J1 External Box */
+        Optional<Pin> MF12 = Optional.empty(); //MCP23017Pin.GPIO_A3;
+        /* J1 External Box */
+        Optional<Pin> MF13 = Optional.empty(); //MCP23017Pin.GPIO_A4;
+        /* J1 External Box */
+        Optional<Pin> MF14 = Optional.empty(); //MCP23017Pin.GPIO_A5;
+        /* J1 External Box */
+        Optional<Pin> MF15 = Optional.empty(); //MCP23017Pin.GPIO_A6;
+        /* on mainboard */
+        Optional<Pin> MF16 = Optional.empty(); //MCP23017Pin.GPIO_A7;
+
+        Optional<Pin> SIREN_START_STOP = RLY01;
+        Optional<Pin> SIREN_COLOR_CHANGE = RLY02;
+        Optional<Pin> SIREN_HOLDOWN_BUZZER = MF15;
+
+
+        // Rechte Seite des JP8 Headers
+        // RGB Flagge, das muss direkt auf den Raspi gelegt werden, nicht über den MCP23017,
+        // sonst funktioniert das PWM nicht.
+        // RJ45
+        // ist hardgecoded. Kann nicht verändert werden.
+        /* rgb-red   */
+        Optional<Pin> POLE_RGB_RED = Optional.empty(); // RaspiPin.GPIO_01;
+        /* rgb-green */
+        Optional<Pin> POLE_RGB_GREEN = Optional.empty(); //RaspiPin.GPIO_04;
+        /* rgb-blue  */
+        Optional<Pin> POLE_RGB_BLUE = Optional.empty(); //RaspiPin.GPIO_05;
+
+        Optional<MCP23017GpioProvider> mcp23017_1 = Optional.empty();
+        Optional<GpioController> GPIO = Optional.empty();
+        Optional<I2CBus> i2CBus = Optional.empty();
+
+        if (Tools.isArm()) {
+            try {
+                GPIO = Optional.of(GpioFactory.getInstance());
+                i2CBus = Optional.of(I2CFactory.getInstance(I2CBus.BUS_1));
+                mcp23017_1 = Optional.of(new MCP23017GpioProvider(i2CBus.get(), Integer.decode("0x20")));
+
+                /* rgb-red   */
+                 Optional<Pin> POLE_RGB_RED = Optional.empty(); // RaspiPin.GPIO_01;
+                /* rgb-green */
+                 Optional<Pin> POLE_RGB_GREEN = Optional.empty(); //RaspiPin.GPIO_04;
+                /* rgb-blue  */
+                 Optional<Pin> POLE_RGB_BLUE = Optional.empty(); //RaspiPin.GPIO_05;
+
+                I2CLCD i2clcd = new I2CLCD(i2CBus.get().getDevice(Integer.decode(Main.getFromConfigs(Configs.LCD_I2C_ADDRESS))));
+                i2clcd.init();
+                Main.addToContext(Configs.LCD_HARDWARE, Optional.of(i2clcd));
+
+                SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
+                SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
+                SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);
+
+
+
+            } catch (I2CFactory.UnsupportedBusNumberException | IOException e) {
+                GPIO = Optional.empty();
+                mcp23017_1 = null;
+                Main.addToContext(Configs.LCD_HARDWARE, Optional.empty());
+            }
         }
 
-        I2CLCD i2clcd;
-        try {
-            int lcdaddr = Integer.decode(Main.getFromConfigs(Configs.LCD_I2C_ADDRESS));
-            i2clcd = new I2CLCD(I2CFactory.getInstance(I2CBus.BUS_1).getDevice(lcdaddr));
-            i2clcd.init();
-//            Main.addToContext("i2clcd", i2clcd);
-        } catch (Exception e) {
-            getLogger().warn(e);
-            i2clcd = null;
+        Main.addToContext(Configs.GPIOCONTROLLER, GPIO);
+        Main.addToContext(Configs.I2CBUS, i2CBus);
+        Main.addToContext(Configs.MCP23017_1, mcp23017_1);
 
-        }
-        Main.addToContext(Configs.LCD_HARDWARE, Optional.ofNullable(i2clcd));
-
-        Arrays.asList(new String[]{Configs.ALPHA_LED1_I2C, Configs.ALPHA_LED2_I2C, Configs.ALPHA_LED3_I2C, Configs.ALPHA_LED4_I2C}).forEach(key -> Main.addToContext(key, init_alpha_segment(Main.getFromConfigs(key))));
-
-        SoftPwm.softPwmCreate(POLE_RGB_RED.getAddress(), 0, 255);
-        SoftPwm.softPwmCreate(POLE_RGB_GREEN.getAddress(), 0, 255);
-        SoftPwm.softPwmCreate(POLE_RGB_BLUE.getAddress(), 0, 255);
+        Main.addToContext(Configs.RGB_PIN_RED, POLE_RGB_RED);
+        Main.addToContext(Configs.RGB_PIN_GREEN, POLE_RGB_GREEN);
+        Main.addToContext(Configs.RGB_PIN_BLUE, POLE_RGB_BLUE);
 
         Main.addToContext("mf01", MF01);
         Main.addToContext("mf02", MF02);
@@ -271,5 +311,7 @@ public class MySystem implements HasLogger {
         Main.addToContext("rly02", RLY02);
         Main.addToContext("rly03", RLY03);
         Main.addToContext("rly04", RLY04);
+
+        Arrays.asList(new String[]{Configs.ALPHA_LED1_I2C, Configs.ALPHA_LED2_I2C, Configs.ALPHA_LED3_I2C, Configs.ALPHA_LED4_I2C}).forEach(key -> Main.addToContext(key, init_alpha_segment(Main.getFromConfigs(key))));
     }
 }

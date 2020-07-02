@@ -30,19 +30,19 @@ public class MyLEDMessage extends Pageable {
         for (String chunk : Splitter.fixedLength(4).splitToList(StringUtils.left(StringUtils.rightPad(text, cols), cols))) {
             getLogger().debug(chunk);
             final int mylineno = lineno;
-//            SwingUtilities.invokeLater(() -> {
-//                jLabels.get(mylineno).setText(chunk);
-//                jLabels.get(mylineno).revalidate();
-//                jLabels.get(mylineno).repaint();
-//            });
-//
-//            segments.get(mylineno).ifPresent(alphaSegment -> {
-//                try {
-//                    alphaSegment.write(chunk);
-//                } catch (IOException e) {
-//                    getLogger().error(e);
-//                }
-//            });
+            SwingUtilities.invokeLater(() -> {
+                jLabels.get(mylineno).setText(chunk);
+                jLabels.get(mylineno).revalidate();
+                jLabels.get(mylineno).repaint();
+            });
+
+            segments.get(mylineno).ifPresent(alphaSegment -> {
+                try {
+                    alphaSegment.write(chunk);
+                } catch (IOException e) {
+                    getLogger().error(e);
+                }
+            });
 
             lineno++;
         }

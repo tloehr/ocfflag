@@ -48,17 +48,18 @@ public class Display7Segments4Digits implements HasLogger {
         return name;
     }
 
-    public Display7Segments4Digits(String addr, JLabel lblSegment, String name) {
-        this(addr, name);
-        this.lblSegment = lblSegment;
-        btnSegment = null;
-    }
+//    public Display7Segments4Digits(String addr, JLabel lblSegment, String name) {
+//        this(addr, name);
+//        this.lblSegment = lblSegment;
+//        btnSegment = null;
+//    }
 
-    private Display7Segments4Digits(String addr, String name) {
+    public Display7Segments4Digits(JLabel lblSegment, String name) {
         this.name = name;
+        this.lblSegment = lblSegment;
         if (Tools.isArm()) {
             try {
-                getLogger().debug(Integer.decode(addr).toString());
+//                getLogger().debug(Integer.decode(addr).toString());
                 segment = new SevenSegment(Integer.decode(addr));
 //                segment.setBrightness(Main.getConfigs().getInt(name));
             } catch (Exception e) {
@@ -69,11 +70,11 @@ public class Display7Segments4Digits implements HasLogger {
         }
     }
 
-    public Display7Segments4Digits(String addr, JButton btnSegment, String name) {
-        this(addr, name);
-        this.btnSegment = btnSegment;
-        lblSegment = null;
-    }
+//    public Display7Segments4Digits(String addr, JButton btnSegment, String name) {
+//        this(addr, name);
+//        this.btnSegment = btnSegment;
+//        lblSegment = null;
+//    }
 
     public void setColon(boolean colon) {
         this.colon = colon;

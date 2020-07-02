@@ -24,31 +24,32 @@ public class MyAbstractButton implements HasLogger {
     private static final int DEBOUNCE = 200; //ms
     private long reactiontime = 0;
     private final JProgressBar pb;
-    private final Optional<GpioPinDigitalInput> hardwareButton;
+    private final Optional<GpioPinDigitalInput> buttonGPIO;
     private final Optional<JButton> guiButton;
     private Optional<HoldDownMouseAdapter> holdDownMouseAdapter;
     private Optional<HoldDownButtonHandler> holdDownButtonHandler;
     private Optional<EventListener> guiListener; // for later removal
     private String text = "";
 
-    public MyAbstractButton(GpioController gpio, Pin pin, JButton guiButton) {
+    public MyAbstractButton(Optional<GpioController> gpio, Pin pin, JButton guiButton) {
         this(gpio, pin, guiButton, 0l, null);
     }
 
     // todo: die reactiontime muss aus dem Constructor raus. Das kann später von Mode zu Mode variieren
-    public MyAbstractButton(GpioController gpio, Pin pin, JButton guiButton, long reactiontime, JProgressBar pb) {
+    public MyAbstractButton(Optional<GpioController> gpio, Pin pin, JButton guiButton, long reactiontime, JProgressBar pb) {
         guiListener = Optional.empty();
-
         this.reactiontime = reactiontime;
         this.pb = pb;
         holdDownMouseAdapter = Optional.empty();
         holdDownButtonHandler = Optional.empty();
-        hardwareButton = gpio == null ? Optional.empty() : Optional.of(gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP));
-        hardwareButton.ifPresent(gpioPinDigitalInput -> gpioPinDigitalInput.setDebounce(DEBOUNCE));
+
+        NPE
+        buttonGPIO = gpio.isPresent() ? Optional.empty() : Optional.of(gpio.get().provisionDigitalInputPin(pin, PinPullResistance.PULL_UP));
+        buttonGPIO.ifPresent(gpioPinDigitalInput -> gpioPinDigitalInput.setDebounce(DEBOUNCE));
         this.guiButton = Optional.ofNullable(guiButton);
     }
 
-    public MyAbstractButton(GpioController gpio, String configsKeyForPin, JButton guiButton, long reactionTime, JProgressBar pb) {
+    public MyAbstractButton(Optional<GpioController> gpio, String configsKeyForPin, JButton guiButton, long reactionTime, JProgressBar pb) {
         this(gpio, RaspiPin.getPinByName(Main.getFromConfigs(configsKeyForPin)), guiButton, reactionTime, pb);
     }
 
@@ -86,17 +87,17 @@ public class MyAbstractButton implements HasLogger {
             }
         }
 
-        if (hardwareButton.isPresent()) {
-            hardwareButton.get().removeAllListeners();
+        if (buttonGPIO.isPresent()) {
+            buttonGPIO.get().removeAllListeners();
 
             if (reactiontime == 0) {
-                hardwareButton.get().addListener((GpioPinListenerDigital) event -> {
+                buttonGPIO.get().addListener((GpioPinListenerDigital) event -> {
                     if (event.getState() != PinState.LOW) return;
                     actionListener.actionPerformed(new ActionEvent(this, 1, "action!"));
                 });
             } else {
                 holdDownButtonHandler = Optional.of(new HoldDownButtonHandler(reactiontime, actionListener, guiButton, pb));
-                hardwareButton.get().addListener(holdDownButtonHandler.get());
+                buttonGPIO.get().addListener(holdDownButtonHandler.get());
             }
         }
     }

@@ -2,8 +2,8 @@ package de.flashheart.ocfflag.gui;
 
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.wiringpi.SoftPwm;
-import de.flashheart.ocfflag.misc.Tools;
-import org.apache.log4j.Logger;
+import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.misc.Configs;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,12 +16,18 @@ public class MyRGBLed {
     private String name;
     private JPanel panel;
 
-    public MyRGBLed(Pin pinRed, Pin pinGreen, Pin pinBlue, JPanel panel, String name) {
-        this.panel = panel;
-        this.pinRed = pinRed;
-        this.pinGreen = pinGreen;
-        this.pinBlue = pinBlue;
+    public MyRGBLed(JPanel panel, String name) {
         this.name = name;
+        this.panel = panel;
+        if (Main.getFromContext(Configs.RGB_PIN_RED) != null) {
+            pinRed = (Pin) Main.getFromContext(Configs.RGB_PIN_RED);
+            pinGreen = (Pin) Main.getFromContext(Configs.RGB_PIN_GREEN);
+            pinBlue = (Pin) Main.getFromContext(Configs.RGB_PIN_BLUE);
+        } else {
+            pinRed = null;
+            pinGreen = null;
+            pinBlue = null;
+        }
     }
 
     public String getName() {
@@ -36,7 +42,6 @@ public class MyRGBLed {
         if (panel != null) {
             Color color = new Color(red, green, blue);
             panel.setBackground(color);
-//            cmp.setForeground(Tools.getContrastColor(color));
         }
 
         if (pinRed != null) {

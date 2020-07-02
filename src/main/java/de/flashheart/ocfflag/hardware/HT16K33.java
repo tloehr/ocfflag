@@ -34,12 +34,7 @@ public class HT16K33 implements HasLogger {
     //                       1st digit, 2nd digit, column, 3rd digit, 4th digit, ?,      ?,      ?     Probably for the 8x8 led matrix
     private int[] buffer = {0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000};
 
-    public HT16K33()   {
-        this(LEDBACKPACK_ADDRESS);
-    }
-
     public HT16K33(int address)   {
-
         try {
             // Get i2c bus
             bus = I2CFactory.getInstance(I2CBus.BUS_1); // Depends on the RasPI version

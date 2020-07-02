@@ -65,6 +65,8 @@ public class FrameDebug extends JFrame implements HasLogger {
         initFrame();
     }
 
+
+
     public JProgressBar getPbRed() {
         return pbRed;
     }
@@ -130,7 +132,14 @@ public class FrameDebug extends JFrame implements HasLogger {
         if (Tools.isArm()) setExtendedState(MAXIMIZED_BOTH);
     }
 
-//    private void initFonts() {
+    @Override
+    public void setVisible(boolean b) {
+        ((MyLCD) Main.getFromContext(Configs.LCD_MODEL)).start();
+        ((MyLEDMessage) Main.getFromContext(Configs.ALPHA_LED_MODEL)).start();
+        super.setVisible(b);
+    }
+
+    //    private void initFonts() {
 //        try {
 //            font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/DSEG14Classic-Regular.ttf"));
 ////            font2 = new JLabel().getFont();
