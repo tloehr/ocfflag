@@ -34,7 +34,7 @@ public class MyPin implements HasLogger {
         init(-1);
     }
 
-    public MyPin( String name, MyLEDLabel ledLabel) {
+    public MyPin(String name, MyLEDLabel ledLabel) {
         this.name = name;
         this.ledLabel = Optional.of(ledLabel);
         init(-1);
@@ -48,35 +48,34 @@ public class MyPin implements HasLogger {
 
     }
 
-    private void init( int instrument){
-
+    private void init(int instrument) {
         Optional<GpioController> gpio = (Optional<GpioController>) Main.getFromContext(Configs.GPIOCONTROLLER);
+        outputPin = Optional.empty();
+        synthesizer = Optional.empty();
 
-        if (gpio.isPresent()) {
-            Pin pin = (Pin) Main.getFromContext(Main.getFromConfigs(name));
-
-            if (pin.getProvider().equals(MCP23017GpioProvider.NAME)) {
-                outputPin = gpio.get().provisionDigitalOutputPin((MCP23017GpioProvider) Main.getFromContext("mcp23017_1"), pin, PinState.LOW);
+        Optional<Pin> pin = (Optional<Pin>) Main.getFromContext(name);
+        pin.ifPresent(pin1 -> {
+            if (pin1.getProvider().equals(MCP23017GpioProvider.NAME)) {
+                outputPin = Optional.of(gpio.get().provisionDigitalOutputPin((MCP23017GpioProvider) Main.getFromContext(Configs.MCP23017_1), pin1, PinState.LOW));
             } else {
-                this.outputPin = gpio.get().provisionDigitalOutputPin(pin, PinState.LOW);
+                outputPin = Optional.of(gpio.get().provisionDigitalOutputPin(pin1, PinState.LOW));
             }
-            outputPin.ifPresent(gpioPinDigitalOutput -> gpioPinDigitalOutput.setState(PinState.LOW));
-        } else {
-            this.outputPin = null;
-            // Die Tonerzeugung ist nur zum Testen auf normalen Rechnern
-            // und nicht auf dem RASPI. Da muss keine Rechenzeit verschwendet werden.
-            try {
-                if (instrument > 0) {
-                    synthesizer = Optional.of(MidiSystem.getSynthesizer());
-                    synthesizer.get().open();
-                    channels = synthesizer.get().getChannels();
-                    channels[0].programChange(instrument);
-                    synthesizer.get().loadAllInstruments(synthesizer.get().getDefaultSoundbank());
-                }
-            } catch (javax.sound.midi.MidiUnavailableException e) {
-                synthesizer = null;
+        });
+
+        // Die Tonerzeugung ist nur zum Testen auf normalen Rechnern
+        // und nicht auf dem RASPI. Da muss keine Rechenzeit verschwendet werden.
+        try {
+            if (instrument > 0) {
+                synthesizer = Optional.of(MidiSystem.getSynthesizer());
+                synthesizer.get().open();
+                channels = synthesizer.get().getChannels();
+                channels[0].programChange(instrument);
+                synthesizer.get().loadAllInstruments(synthesizer.get().getDefaultSoundbank());
             }
+        } catch (javax.sound.midi.MidiUnavailableException e) {
+            getLogger().warn(e);
         }
+
     }
 
     public String getName() {
@@ -89,9 +88,9 @@ public class MyPin implements HasLogger {
         guiButton.ifPresent(myLEDButton -> myLEDButton.setState(on));
         ledLabel.ifPresent(ledLabel1 -> ledLabel1.setState(on));
 
-        if (synthesizer != null) {
+        synthesizer.ifPresent(synthesizer1 -> {
             if (on) channels[0].noteOn(note, 90);
             else channels[0].noteOff(note);
-        }
+        });
     }
 }

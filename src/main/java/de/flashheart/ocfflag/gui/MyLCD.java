@@ -16,14 +16,9 @@ public class MyLCD extends Pageable {
     private final List<JLabel> jLabels; // für die GUI Darstellung
     private final Optional<I2CLCD> i2CLCD;
 
-//    public MyLCD(JLabel... labels) {
-//        this(20, 4, labels);
-//
-//    }
-
     public MyLCD(int cols, int rows, JLabel... labels) {
         super(cols, rows);
-        i2CLCD = Optional.ofNullable((I2CLCD) Main.getFromContext(Configs.LCD_HARDWARE));
+        i2CLCD = (Optional<I2CLCD>) Main.getFromContext(Configs.LCD_HARDWARE);
         i2CLCD.ifPresent(i2clcd -> i2clcd.init());
         jLabels = Arrays.asList(labels);
         Configs configs = (Configs) Main.getFromContext(Configs.THE_CONFIGS);
