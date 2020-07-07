@@ -224,21 +224,21 @@ public class MySystem implements HasLogger {
         );
 
         // Platine K2
-        Main.addToContext(Configs.BUTTON_A, new MyAbstractButton(Configs.BUTTON_A, frameDebug.getBtnA(), 0l, null));   // former: num teams
+        Main.addToContext(Configs.BUTTON_A, new MyAbstractButton(Configs.BUTTON_A, frameDebug.getBtnA(), 0l, Optional.empty()));   // former: num teams
         // Platine K3
-        Main.addToContext(Configs.BUTTON_B, new MyAbstractButton(Configs.BUTTON_B, frameDebug.getBtnB(), 0l, null));  // former: game time
+        Main.addToContext(Configs.BUTTON_B, new MyAbstractButton(Configs.BUTTON_B, frameDebug.getBtnB(), 0l, Optional.empty()));  // former: game time
         // Platine K1
-        Main.addToContext(Configs.BUTTON_C, new MyAbstractButton(Configs.BUTTON_C, frameDebug.getBtnC(), 0l, null));  // former: play / pause
+        Main.addToContext(Configs.BUTTON_C, new MyAbstractButton(Configs.BUTTON_C, frameDebug.getBtnC(), 0l, Optional.empty()));  // former: play / pause
         // Platine K4
-        Main.addToContext(Configs.BUTTON_D, new MyAbstractButton(Configs.BUTTON_D, frameDebug.getBtnD(), 0l, null));  // former: RESET / Undo
+        Main.addToContext(Configs.BUTTON_D, new MyAbstractButton(Configs.BUTTON_D, frameDebug.getBtnD(), 0l, Optional.empty()));  // former: RESET / Undo
 
         // Player Buttons
-        Main.addToContext(Configs.BUTTON_RED, new MyAbstractButton(Configs.BUTTON_RED, frameDebug.getBtnRed(), REACTION_TIME, frameDebug.getPbRed()));
-        Main.addToContext(Configs.BUTTON_BLUE, new MyAbstractButton(Configs.BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, frameDebug.getPbBlue()));
-        Main.addToContext(Configs.BUTTON_GREEN, new MyAbstractButton(Configs.BUTTON_GREEN, frameDebug.getBtnGreen(), REACTION_TIME, frameDebug.getPbGreen()));
-        Main.addToContext(Configs.BUTTON_YELLOW, new MyAbstractButton(Configs.BUTTON_YELLOW, frameDebug.getBtnYellow(), REACTION_TIME, frameDebug.getPbYellow()));
+        Main.addToContext(Configs.BUTTON_RED, new MyAbstractButton(Configs.BUTTON_RED, frameDebug.getBtnRed(), REACTION_TIME, Optional.of(frameDebug.getPbRed())));
+        Main.addToContext(Configs.BUTTON_BLUE, new MyAbstractButton(Configs.BUTTON_BLUE, frameDebug.getBtnBlue(), REACTION_TIME, Optional.of(frameDebug.getPbBlue())));
+        Main.addToContext(Configs.BUTTON_GREEN, new MyAbstractButton(Configs.BUTTON_GREEN, frameDebug.getBtnGreen(), REACTION_TIME, Optional.of(frameDebug.getPbGreen())));
+        Main.addToContext(Configs.BUTTON_YELLOW, new MyAbstractButton(Configs.BUTTON_YELLOW, frameDebug.getBtnYellow(), REACTION_TIME, Optional.of(frameDebug.getPbYellow())));
         // System Buttons
-        Main.addToContext(Configs.BUTTON_QUIT, new MyAbstractButton(null, null, frameDebug.getBtnQuit()));
+        Main.addToContext(Configs.BUTTON_QUIT, new MyAbstractButton(frameDebug.getBtnQuit()));
         Main.addToContext(Configs.BUTTON_SHUTDOWN, new MyAbstractButton(Configs.BUTTON_SHUTDOWN, frameDebug.getBtnShutdown(), 0, null));
 
 //        Main.addToContext(Configs.LCD_MODEL, new MyLCD(20, 4, frameDebug.getLine1(), frameDebug.getLine2(), frameDebug.getLine3(), frameDebug.getLine4()));

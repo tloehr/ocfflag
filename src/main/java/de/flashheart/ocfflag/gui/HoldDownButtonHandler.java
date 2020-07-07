@@ -16,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Optional;
 
 /**
  * https://stackoverflow.com/questions/6828684/java-mouseevent-check-if-pressed-down
@@ -30,14 +31,14 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
     //    private final Action action;
     private final ActionListener actionListener;
     private final Object source;
-    private final JProgressBar pb;
+    private final Optional<JProgressBar> pb;
     private ArrayList<BigDecimal> beeperTimes;
 
     private String scheme = "1:on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,50;off,50;on,2000;off,0";
     private int beeptime_ms = 50;
     private boolean enabled = true;
 
-    public HoldDownButtonHandler(long reactiontime, ActionListener actionListener, Object source, JProgressBar pb) {
+    public HoldDownButtonHandler(long reactiontime, ActionListener actionListener, Object source, Optional<JProgressBar> pb) {
         mySystem = (MySystem) Main.getFromContext(Configs.MY_SYSTEM);
         this.reactiontime = reactiontime;
         this.actionListener = actionListener;
@@ -51,7 +52,7 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
                 scheme += "on," + beeptime_ms + ";off," + beeptime_ms + ";";
             }
             scheme += "on,1000;off,0";
-            if (pb != null) pb.setValue(0);
+            pb.ifPresent(jProgressBar -> jProgressBar.setValue(0));
         }
     }
 
@@ -82,7 +83,7 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
         getLogger().debug("button released");
         if (reactiontime > 0) mySystem.getPinHandler().off(Configs.OUT_HOLDDOWN_BUZZER);
         holding = 0l;
-        if (pb != null) pb.setValue(0);
+        pb.ifPresent(jProgressBar -> jProgressBar.setValue(0));
         reactedupon = false;
         mouseDown = false;
 
@@ -110,7 +111,7 @@ public class HoldDownButtonHandler extends MouseAdapter implements GpioPinListen
 
                     getLogger().debug(progress);
 
-                    if (pb != null) pb.setValue(progress.intValue());
+                    pb.ifPresent(jProgressBar -> jProgressBar.setValue(progress.intValue()));
 
                     try {
                         Thread.sleep(100);

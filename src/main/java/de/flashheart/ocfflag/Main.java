@@ -3,8 +3,6 @@ package de.flashheart.ocfflag;
 import de.flashheart.ocfflag.gamemodes.Game;
 import de.flashheart.ocfflag.gamemodes.GameSelector;
 import de.flashheart.ocfflag.gui.FrameDebug;
-import de.flashheart.ocfflag.gui.MyLCD;
-import de.flashheart.ocfflag.gui.MyLEDMessage;
 import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
@@ -40,7 +38,7 @@ public class Main {
     }
 
     public static Object getFromContext(String key) {
-        return applicationContext.get(key);
+        return applicationContext.get(Tools.catchNull(key));
     }
 
     public static void addToContext(String key, Object value) {
