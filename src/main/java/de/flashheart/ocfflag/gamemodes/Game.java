@@ -5,10 +5,8 @@ import de.flashheart.ocfflag.gui.Display7Segments4Digits;
 import de.flashheart.ocfflag.hardware.HT16K33;
 import de.flashheart.ocfflag.hardware.MyAbstractButton;
 import de.flashheart.ocfflag.hardware.MySystem;
-import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.interfaces.HasLogger;
-
-import java.io.IOException;
+import de.flashheart.ocfflag.misc.Configs;
 
 public abstract class Game implements HasLogger {
     public static final String RESUMED = "RESUMED";
@@ -364,15 +362,13 @@ public abstract class Game implements HasLogger {
     }
 
     void all_off() {
-        try {
-            display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
-            display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
-            display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
-            display_green.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
-            display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
-        } catch (IOException e) {
-            getLogger().error(e);
-        }
+
+        display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
+        display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
+        display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
+        display_green.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
+        display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
+
         off_blue_button();
         off_red_button();
         off_green_button();

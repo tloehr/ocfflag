@@ -7,27 +7,16 @@ import de.flashheart.ocfflag.misc.Configs;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Optional;
 
 public class MyRGBLed {
 
-    private final Pin pinRed;
-    private final Pin pinGreen;
-    private final Pin pinBlue;
     private String name;
     private JPanel panel;
 
     public MyRGBLed(JPanel panel, String name) {
         this.name = name;
         this.panel = panel;
-        if (Main.getFromContext(Configs.RGB_PIN_RED) != null) {
-            pinRed = (Pin) Main.getFromContext(Configs.RGB_PIN_RED);
-            pinGreen = (Pin) Main.getFromContext(Configs.RGB_PIN_GREEN);
-            pinBlue = (Pin) Main.getFromContext(Configs.RGB_PIN_BLUE);
-        } else {
-            pinRed = null;
-            pinGreen = null;
-            pinBlue = null;
-        }
     }
 
     public String getName() {
@@ -39,15 +28,12 @@ public class MyRGBLed {
     }
 
     public void setRGB(int red, int green, int blue) {
-        if (panel != null) {
-            Color color = new Color(red, green, blue);
-            panel.setBackground(color);
-        }
+        Color color = new Color(red, green, blue);
+        panel.setBackground(color);
 
-        if (pinRed != null) {
-            SoftPwm.softPwmWrite(pinRed.getAddress(), red);
-            SoftPwm.softPwmWrite(pinGreen.getAddress(), green);
-            SoftPwm.softPwmWrite(pinBlue.getAddress(), blue);
-        }
+        ((Optional<Pin>) Main.getFromContext(Configs.RGB_PIN_RED)).ifPresent(pin -> SoftPwm.softPwmWrite(pin.getAddress(), red));
+        ((Optional<Pin>) Main.getFromContext(Configs.RGB_PIN_GREEN)).ifPresent(pin -> SoftPwm.softPwmWrite(pin.getAddress(), green));
+        ((Optional<Pin>) Main.getFromContext(Configs.RGB_PIN_BLUE)).ifPresent(pin -> SoftPwm.softPwmWrite(pin.getAddress(), blue));
+
     }
 }

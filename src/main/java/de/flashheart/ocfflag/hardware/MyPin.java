@@ -40,10 +40,10 @@ public class MyPin implements HasLogger {
         init(-1);
     }
 
-    public MyPin(String name, MyLEDButton guiButton, int instrument, int note) {
+    public MyPin(String name, int instrument, int note) {
         this.name = name;
         this.note = note;
-        this.guiButton = Optional.of(guiButton);
+        this.guiButton = Optional.empty();
         init(instrument);
 
     }
@@ -53,7 +53,7 @@ public class MyPin implements HasLogger {
         outputPin = Optional.empty();
         synthesizer = Optional.empty();
 
-        Optional<Pin> pin = (Optional<Pin>) Main.getFromContext(name);
+        Optional<Pin> pin = (Optional<Pin>) Main.getFromContext(Main.getFromConfigs(name));
         pin.ifPresent(pin1 -> {
             if (pin1.getProvider().equals(MCP23017GpioProvider.NAME)) {
                 outputPin = Optional.of(gpio.get().provisionDigitalOutputPin((MCP23017GpioProvider) Main.getFromContext(Configs.MCP23017_1), pin1, PinState.LOW));

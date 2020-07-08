@@ -53,26 +53,21 @@ public class MySystem implements HasLogger {
 
     public void shutdown() {
         pinHandler.off();
-        Optional<GpioController> GPIO = (Optional<GpioController>) Main.getFromContext(Configs.GPIOCONTROLLER);
+        Optional<GpioController> gpioController = (Optional<GpioController>) Main.getFromContext(Configs.GPIOCONTROLLER);
 
 
         ((Optional<Pin>) Main.getFromContext(Configs.RGB_PIN_RED)).ifPresent(pin -> SoftPwm.softPwmStop(pin.getAddress()));
         ((Optional<Pin>) Main.getFromContext(Configs.RGB_PIN_GREEN)).ifPresent(pin -> SoftPwm.softPwmStop(pin.getAddress()));
         ((Optional<Pin>) Main.getFromContext(Configs.RGB_PIN_BLUE)).ifPresent(pin -> SoftPwm.softPwmStop(pin.getAddress()));
 
-        ((Optional<Pin>) Main.getFromContext(Configs.DISPLAY_WHITE_I2C)).ifPresent(pin -> SoftPwm.softPwmStop(pin.getAddress()));
+        ((Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_WHITE_I2C)).clear();
+        ((Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_RED_I2C)).clear();
+        ((Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_BLUE_I2C)).clear();
+        ((Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_GREEN_I2C)).clear();
+        ((Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_YELLOW_I2C)).clear();
 
-        if (GPIO != null) {
-
-            SoftPwm.softPwmStop(POLE_RGB_RED.getAddress());
-            SoftPwm.softPwmStop(POLE_RGB_GREEN.getAddress());
-            SoftPwm.softPwmStop(POLE_RGB_BLUE.getAddress());
+        if (gpioController.isPresent()) {
             try {
-                display_white.clear();
-                display_blue.clear();
-                display_red.clear();
-                if (display_green != null) display_green.clear();
-                if (display_yellow != null) display_yellow.clear();
 
                 String line = Main.getFromConfigs(Configs.SHUTDOWN_COMMAND_LINE);
                 CommandLine commandLine = CommandLine.parse(line);
@@ -260,8 +255,8 @@ public class MySystem implements HasLogger {
         pinHandler.add(new MyPin(Configs.OUT_FLAG_GREEN, frameDebug.getLedFlagGreen()));
         pinHandler.add(new MyPin(Configs.OUT_FLAG_YELLOW, frameDebug.getLedFlagYellow()));
 
-        pinHandler.add(new MyPin(Configs.OUT_HOLDDOWN_BUZZER, null, 70, 30));
-        pinHandler.add(new MyPin(Configs.OUT_SIREN_COLOR_CHANGE, null, 50, 90));
-        pinHandler.add(new MyPin(Configs.OUT_SIREN_START_STOP, null, 70, 60));
+        pinHandler.add(new MyPin(Configs.OUT_HOLDDOWN_BUZZER, 70, 30));
+        pinHandler.add(new MyPin(Configs.OUT_SIREN_COLOR_CHANGE, 50, 90));
+        pinHandler.add(new MyPin(Configs.OUT_SIREN_START_STOP, 70, 60));
     }
 }

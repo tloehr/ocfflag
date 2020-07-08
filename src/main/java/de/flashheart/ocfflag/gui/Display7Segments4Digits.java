@@ -130,7 +130,7 @@ public class Display7Segments4Digits implements HasLogger {
 
     }
 
-    public void setBlinkRate(int rate) throws IOException {
+    public void setBlinkRate(int rate) {
         segment.ifPresent(sevenSegment -> {
             try {
                 sevenSegment.getDisplay().setBlinkRate(rate);
@@ -156,7 +156,7 @@ public class Display7Segments4Digits implements HasLogger {
         if (segment != null) fullDisplay(text.split(""));
     }
 
-    public void clear() throws IOException {
+    public void clear() {
         lblSegment.setText("--");
         segment.ifPresent(sevenSegment -> {
             try {

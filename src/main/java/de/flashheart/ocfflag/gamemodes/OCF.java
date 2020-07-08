@@ -244,29 +244,13 @@ public class OCF extends TimedGame {
                 display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
 
                 if (flag_state.equals(RED_ACTIVATED)) {
-                    try {
-                        display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
-                    } catch (IOException e) {
-                        getLogger().error(e);
-                    }
+                    display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
                 } else if (flag_state.equals(BLUE_ACTIVATED)) {
-                    try {
-                        display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
-                    } catch (IOException e) {
-                        getLogger().error(e);
-                    }
+                    display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
                 } else if (flag_state.equals(GREEN_ACTIVATED)) {
-                    try {
-                        display_green.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
-                    } catch (IOException e) {
-                        getLogger().error(e);
-                    }
+                    display_green.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
                 } else if (flag_state.equals(YELLOW_ACTIVATED)) {
-                    try {
-                        display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
-                    } catch (IOException e) {
-                        getLogger().error(e);
-                    }
+                    display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
                 }
             }
 
