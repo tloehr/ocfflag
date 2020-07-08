@@ -1,8 +1,10 @@
 package de.flashheart.ocfflag.gui;
 
+import com.pi4j.io.gpio.GpioController;
+import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.SevenSegment;
 import de.flashheart.ocfflag.interfaces.HasLogger;
-import de.flashheart.ocfflag.misc.Tools;
+import de.flashheart.ocfflag.misc.Configs;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.TimeZone;
 
 /**
@@ -19,9 +22,9 @@ import java.util.TimeZone;
  */
 public class Display7Segments4Digits implements HasLogger {
     private final String name;
-    JButton btnSegment = null;
+    //    JButton btnSegment = null;
     JLabel lblSegment = null;
-    SevenSegment segment = null;
+    Optional<SevenSegment> segment;
     private boolean colon = true;
     private long lastTimeSet = 0;
     private final DateTimeFormatter text_time_format = DateTimeFormatter.ofPattern("mmss");
@@ -43,38 +46,24 @@ public class Display7Segments4Digits implements HasLogger {
     }
 
 
-
     public String getName() {
         return name;
     }
 
-//    public Display7Segments4Digits(String addr, JLabel lblSegment, String name) {
-//        this(addr, name);
-//        this.lblSegment = lblSegment;
-//        btnSegment = null;
-//    }
-
     public Display7Segments4Digits(JLabel lblSegment, String name) {
         this.name = name;
         this.lblSegment = lblSegment;
-        if (Tools.isArm()) {
+        segment = Optional.empty();
+        ((Optional<GpioController>) Main.getFromContext(Configs.GPIOCONTROLLER)).ifPresent(gpioController -> {
             try {
-//                getLogger().debug(Integer.decode(addr).toString());
-                segment = new SevenSegment(Integer.decode(addr));
-//                segment.setBrightness(Main.getConfigs().getInt(name));
+                segment = Optional.of(new SevenSegment(Integer.decode(Main.getFromConfigs(name))));
             } catch (Exception e) {
                 getLogger().warn(e.getMessage());
-                getLogger().warn("can't find display at " + addr + ". will be ignored.");
-                segment = null;
+                getLogger().warn("can't find display at " + Main.getFromConfigs(name) + ". will be ignored.");
+                segment = Optional.empty();
             }
-        }
+        });
     }
-
-//    public Display7Segments4Digits(String addr, JButton btnSegment, String name) {
-//        this(addr, name);
-//        this.btnSegment = btnSegment;
-//        lblSegment = null;
-//    }
 
     public void setColon(boolean colon) {
         this.colon = colon;
@@ -115,18 +104,8 @@ public class Display7Segments4Digits implements HasLogger {
 
         String common_time = ldt.format(common_time_format);
 
-        // Bildschirm Darstellung
-        if (lblSegment != null) {
-            lblSegment.setToolTipText(common_time);
-//            lblSegment.setText(common_time);
-            lblSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : common_time);
-        }
-
-        if (btnSegment != null) {
-            btnSegment.setToolTipText(common_time);
-//            btnSegment.setText(common_time);
-            btnSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : common_time);
-        }
+        lblSegment.setToolTipText(common_time);
+        lblSegment.setText(fourDigitsOnly ? strMinutes + (colon ? ":" : " ") + strSeconds : common_time);
 
         // Hardware 7Segment
         if (segment != null) {
@@ -140,14 +119,25 @@ public class Display7Segments4Digits implements HasLogger {
 
     }
 
-    public void setBrightness(int brightness) throws IOException {
-        if (segment == null) return;
-        segment.setBrightness(brightness);
+    public void setBrightness(int brightness) {
+        segment.ifPresent(sevenSegment -> {
+            try {
+                sevenSegment.setBrightness(brightness);
+            } catch (IOException e) {
+                getLogger().warn(e);
+            }
+        });
+
     }
 
     public void setBlinkRate(int rate) throws IOException {
-        if (segment == null) return;
-        segment.getDisplay().setBlinkRate(rate);
+        segment.ifPresent(sevenSegment -> {
+            try {
+                sevenSegment.getDisplay().setBlinkRate(rate);
+            } catch (IOException e) {
+                getLogger().warn(e);
+            }
+        });
     }
 
     public void setText(int number) throws IOException {
@@ -163,19 +153,18 @@ public class Display7Segments4Digits implements HasLogger {
             lblSegment.setText(StringUtils.left(text, 2) + (colon ? ":" : " ") + StringUtils.right(text, 2));
         }
 
-        if (btnSegment != null) {
-            btnSegment.setText(StringUtils.left(text, 2) + (colon ? ":" : " ") + StringUtils.right(text, 2));
-        }
         if (segment != null) fullDisplay(text.split(""));
     }
 
     public void clear() throws IOException {
-        if (lblSegment != null)
-            lblSegment.setText("--");
-        if (btnSegment != null)
-            btnSegment.setText("--");
-        if (segment == null) return;
-        segment.clear();
+        lblSegment.setText("--");
+        segment.ifPresent(sevenSegment -> {
+            try {
+                sevenSegment.clear();
+            } catch (IOException e) {
+                getLogger().warn(e);
+            }
+        });
     }
 
     private String[] scrollLeft(String[] row, String c) {
@@ -186,30 +175,41 @@ public class Display7Segments4Digits implements HasLogger {
         return newSa;
     }
 
-    private void fullDisplay(String[] row) throws IOException {
-        segment.setColon(colon);
-        segment.writeDigitRaw(0, row[0]);
-        segment.writeDigitRaw(1, row[1]);
-        segment.writeDigitRaw(3, row[2]);
-        segment.writeDigitRaw(4, row[3]);
+    private void fullDisplay(String[] row) {
+        segment.ifPresent(sevenSegment -> {
+            try {
+                sevenSegment.setColon(colon);
+                sevenSegment.writeDigitRaw(0, row[0]);
+                sevenSegment.writeDigitRaw(1, row[1]);
+                sevenSegment.writeDigitRaw(3, row[2]);
+                sevenSegment.writeDigitRaw(4, row[3]);
+            } catch (IOException e) {
+                getLogger().warn(e);
+            }
+        });
     }
 
     private void fullDisplay(int[] row, boolean[] dots) throws IOException {
-        segment.setColon(colon);
-        segment.writeDigit(0, row[0], dots[0]);
-        segment.writeDigit(1, row[1], dots[1]);
-        segment.writeDigit(3, row[2], dots[2]);
-        segment.writeDigit(4, row[3], dots[3]);
-
+        segment.ifPresent(sevenSegment -> {
+            try {
+                sevenSegment.setColon(colon);
+                sevenSegment.writeDigit(0, row[0], dots[0]);
+                sevenSegment.writeDigit(1, row[1], dots[1]);
+                sevenSegment.writeDigit(3, row[2], dots[2]);
+                sevenSegment.writeDigit(4, row[3], dots[3]);
+            } catch (IOException e) {
+                getLogger().warn(e);
+            }
+        });
     }
 
-    /**
-     * Wenn das Programm nur im Simulator läuft (also nicht auf einem Raspi), dann ist das Display immer funktionstüchtig.
-     * Auf einem Raspi, darf es aber keinen Init Fehler gegeben haben. Ansonsten müssen wir es weglassen.
-     *
-     * @return
-     */
-    public boolean isFullyUsable() {
-        return !Tools.isArm() || segment != null;
-    }
+//    /**
+//     * Wenn das Programm nur im Simulator läuft (also nicht auf einem Raspi), dann ist das Display immer funktionstüchtig.
+//     * Auf einem Raspi, darf es aber keinen Init Fehler gegeben haben. Ansonsten müssen wir es weglassen.
+//     *
+//     * @return
+//     */
+//    public boolean isFullyUsable() {
+//        return !Tools.isArm() || segment != null;
+//    }
 }

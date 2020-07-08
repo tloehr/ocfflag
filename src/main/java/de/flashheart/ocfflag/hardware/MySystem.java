@@ -63,6 +63,7 @@ public class MySystem implements HasLogger {
         ((Optional<Pin>) Main.getFromContext(Configs.DISPLAY_WHITE_I2C)).ifPresent(pin -> SoftPwm.softPwmStop(pin.getAddress()));
 
         if (GPIO != null) {
+
             SoftPwm.softPwmStop(POLE_RGB_RED.getAddress());
             SoftPwm.softPwmStop(POLE_RGB_GREEN.getAddress());
             SoftPwm.softPwmStop(POLE_RGB_BLUE.getAddress());
