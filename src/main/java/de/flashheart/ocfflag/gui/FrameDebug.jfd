@@ -173,7 +173,7 @@ new FormModel {
 								"opaque": true
 								"background": sfield java.awt.Color black
 								"text": "00:00"
-								"foreground": sfield java.awt.Color blue
+								"foreground": new java.awt.Color( 102, 102, 255, 255 )
 								"horizontalAlignment": 0
 								"font": #Font2
 							} )

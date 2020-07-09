@@ -36,8 +36,7 @@ public class RGBBlinkModel implements GenericBlinkModel, HasLogger {
     }
 
     @Override
-    public String call() throws Exception {
-
+    public String call() {
         if (repeat == 0) {
             myRGBLed.off();
             return null;

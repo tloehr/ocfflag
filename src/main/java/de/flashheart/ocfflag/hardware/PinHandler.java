@@ -27,9 +27,7 @@ public class PinHandler implements HasLogger {
         pinMap = new HashMap<>();
         futures = new HashMap<>();
 
-
         executorService = Executors.newFixedThreadPool(20);
-
     }
 
     /**

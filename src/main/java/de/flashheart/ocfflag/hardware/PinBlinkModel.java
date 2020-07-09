@@ -14,8 +14,7 @@ import java.util.TimeZone;
  * Created by tloehr on 14.07.16.
  */
 public class PinBlinkModel implements GenericBlinkModel, HasLogger {
-    public static final String SCHEME_TEST_REGEX = "^(\\d+|∞):(((on|off){1},\\d+)+(;((on|off){1},\\d+))*)$";
-
+//    public static final String SCHEME_TEST_REGEX = "^(\\d+|∞):(((on|off){1},\\d+)+(;((on|off){1},\\d+))*)$";
 
     MyPin pin;
     private ArrayList<PinScheduleEvent> onOffScheme;
@@ -24,15 +23,14 @@ public class PinBlinkModel implements GenericBlinkModel, HasLogger {
     String infinity = "\u221E";
 
     public PinBlinkModel(MyPin pin) {
-
         this.onOffScheme = new ArrayList<>();
         this.pin = pin;
         this.repeat = Integer.MAX_VALUE;
     }
 
     @Override
-    public String call() throws Exception {
-//        getLogger().debug(" working on:" + pin.getName() + " [" + pin.getText() + "]  onOffScheme.size()=" + onOffScheme.size());
+    public String call() {
+
 
         if (repeat == 0) {
             pin.setState(false);

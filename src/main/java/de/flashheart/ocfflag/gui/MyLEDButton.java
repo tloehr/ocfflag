@@ -1,13 +1,12 @@
 package de.flashheart.ocfflag.gui;
 
 import de.flashheart.ocfflag.interfaces.HasColor;
-import de.flashheart.ocfflag.interfaces.HasLogger;
 import de.flashheart.ocfflag.interfaces.HasState;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class MyLEDButton extends JButton implements HasColor, HasState{
+public class MyLEDButton extends JButton implements HasColor, HasState {
     private MyLED myLED;
     private boolean state;
 

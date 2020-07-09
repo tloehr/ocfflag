@@ -26,17 +26,22 @@ public class MyLEDMessage extends Pageable {
 
     @Override
     protected void render_line(int line, String text) {
-        int lineno = 0;
-        for (String chunk : Splitter.fixedLength(4).splitToList(StringUtils.left(StringUtils.rightPad(text, cols), cols))) {
-            getLogger().debug(chunk);
-            final int mylineno = lineno;
+        List<String> chunks = Splitter.fixedLength(4).splitToList(StringUtils.left(StringUtils.rightPad(text, cols,'_'), cols));
+        // Die Anzahl der gui Labels ist immer maßgeblich für die Anzahl der versorgten Displays.
+        for (int part_of_message = 0; part_of_message < jLabels.size(); part_of_message++) {
+//            String chunk = StringUtils.rightPad(part_of_message >= chunks.size() ? "____" : chunks.get(part_of_message), 4, '_');
+            String chunk = chunks.get(part_of_message);
+            getLogger().debug(chunks.get(part_of_message));
+
+            final JLabel jLabel = jLabels.get(part_of_message);
+
             SwingUtilities.invokeLater(() -> {
-                jLabels.get(mylineno).setText(chunk);
-                jLabels.get(mylineno).revalidate();
-                jLabels.get(mylineno).repaint();
+                jLabel.setText(chunk);
+                jLabel.revalidate();
+                jLabel.repaint();
             });
 
-            segments.get(mylineno).ifPresent(alphaSegment -> {
+            segments.get(part_of_message).ifPresent(alphaSegment -> {
                 try {
                     alphaSegment.write(chunk);
                 } catch (IOException e) {
@@ -44,7 +49,6 @@ public class MyLEDMessage extends Pageable {
                 }
             });
 
-            lineno++;
         }
     }
 }

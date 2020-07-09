@@ -31,11 +31,13 @@ public class MyPin implements HasLogger {
     public MyPin(String name, MyLEDButton guiButton) {
         this.name = name;
         this.guiButton = Optional.of(guiButton);
+        this.ledLabel = Optional.empty();
         init(-1);
     }
 
     public MyPin(String name, MyLEDLabel ledLabel) {
         this.name = name;
+        this.guiButton = Optional.empty();
         this.ledLabel = Optional.of(ledLabel);
         init(-1);
     }
@@ -44,6 +46,7 @@ public class MyPin implements HasLogger {
         this.name = name;
         this.note = note;
         this.guiButton = Optional.empty();
+        this.ledLabel = Optional.empty();
         init(instrument);
 
     }

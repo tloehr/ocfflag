@@ -94,8 +94,7 @@ public abstract class Pageable implements Runnable, HasLogger {
         pages_have_been_updated = false;
         // Schreibt alle Zeilen der aktiven Seite.
         for (int r = 0; r < rows; r++) {
-
-            String line = pages.get(pageid, r).toString().isEmpty() ? StringUtils.repeat(" ", cols) : StringUtils.rightPad(pages.get(pageid, r).toString(), cols);
+            String line = pages.get(pageid, r).toString().isEmpty() ? StringUtils.repeat("_", cols) : pages.get(pageid, r).toString();
             render_line(r, line);
             getLogger().debug("VISIBLE PAGE #" + (pageid) + " Line" + r + ": " + line);
         }

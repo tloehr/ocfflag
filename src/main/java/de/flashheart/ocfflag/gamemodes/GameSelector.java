@@ -63,6 +63,10 @@ public class GameSelector extends Game {
         try {
             getLogger().debug(gamemodes[game_index]);
             display_white.setText(gamemodes[game_index]);
+
+            set_blinking_red_button("∞:on,500;off,500");
+            set_blinking_blue_button("∞:on,500;off,500");
+
         } catch (IOException e) {
             getLogger().error(e);
         }

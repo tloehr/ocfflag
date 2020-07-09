@@ -22,7 +22,7 @@ public class MyLCD extends Pageable {
         i2CLCD.ifPresent(i2clcd -> i2clcd.init());
         jLabels = Arrays.asList(labels);
         Configs configs = (Configs) Main.getFromContext(Configs.THE_CONFIGS);
-        visible_page = add_page("RLG-System v", configs.getApplicationInfo("my.version"), "empty line ;-)", configs.getApplicationInfo(("buildNumber")));
+        visible_page = add_page("RLG-System", "v." + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber"), "", "");
     }
 
     @Override

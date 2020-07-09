@@ -246,7 +246,7 @@ public class FrameDebug extends JFrame implements HasLogger {
         //======== this ========
         setTitle("RLG System");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        Container contentPane = getContentPane();
+        var contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 
         //======== mainView ========
@@ -387,7 +387,7 @@ public class FrameDebug extends JFrame implements HasLogger {
                         lblTimeBlue.setOpaque(true);
                         lblTimeBlue.setBackground(Color.black);
                         lblTimeBlue.setText("00:00");
-                        lblTimeBlue.setForeground(Color.blue);
+                        lblTimeBlue.setForeground(new Color(102, 102, 255));
                         lblTimeBlue.setHorizontalAlignment(SwingConstants.CENTER);
                         lblTimeBlue.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 32));
                         panel2.add(lblTimeBlue);
@@ -588,7 +588,7 @@ public class FrameDebug extends JFrame implements HasLogger {
         setLocationRelativeTo(null);
 
         //---- buttonGroup2 ----
-        ButtonGroup buttonGroup2 = new ButtonGroup();
+        var buttonGroup2 = new ButtonGroup();
         buttonGroup2.add(tbDisplay);
         buttonGroup2.add(tbLogs);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
