@@ -10,6 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Eine Klasse die ein LCD Display darstellt. Auf dem Bildschirm und (falls vorhanden) auch in Hardware.
+ */
 public class MyLCD extends Pageable {
     public static final char LCD_DEGREE_SYMBOL = 223;
     public static final char LCD_UMLAUT_A = 0xe4;

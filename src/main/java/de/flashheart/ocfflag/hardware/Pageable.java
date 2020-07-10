@@ -7,6 +7,20 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Diese Klasse ist ein PARENT für display Klassen, die verschiedene Screens
+ * der reihe nach im sekundentakt darstellen.
+ * Die Seiten Funktionalität wird hier implementiert. Die Klassen, die
+ * sich hier von ableiten sind für die konkreten Anwendungsfälle zuständig.
+ * Jede Sekunde wird der nächste Bildschirm dargestellt. Wenn es denn mehr als einen
+ * gibt.
+ *
+ * Die Displays sind mehrzeilg und stellen Strings dar. Die Methode render_page wird
+ * jede Sekunde aufgerufen und geht dann die einzelnen Zeilen durch.
+ *
+ * Die Methode render_line wird dann von den Kindklassen implementiert.
+ *
+ */
 public abstract class Pageable implements Runnable, HasLogger {
     protected final int rows, cols;
     private int seconds_per_page = 1;

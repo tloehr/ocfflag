@@ -106,6 +106,10 @@ public class AlphaSegment extends HT16K33 {
         ALPHA_SEG_CHARS.put("~", 1312);
     }
 
+    public AlphaSegment(String address) {
+        super(address);
+    }
+
     public AlphaSegment(int address) {
         super(address);
     }
