@@ -142,12 +142,7 @@ public abstract class TimedGame extends Game implements Runnable {
 
     abstract void game_cycle() throws Exception;
 
-    void update_all_signals() {
-        all_off();
-        setDisplay();
-        setLEDsAndButtons();
-        setFlagSignals();
-    }
+
 
     @Override
     public boolean isGameRunning() {

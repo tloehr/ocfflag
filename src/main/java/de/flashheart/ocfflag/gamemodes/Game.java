@@ -2,6 +2,7 @@ package de.flashheart.ocfflag.gamemodes;
 
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.Display7Segments4Digits;
+import de.flashheart.ocfflag.gui.LCDTextDisplay;
 import de.flashheart.ocfflag.hardware.HT16K33;
 import de.flashheart.ocfflag.hardware.MyAbstractButton;
 import de.flashheart.ocfflag.hardware.MySystem;
@@ -55,7 +56,7 @@ public abstract class Game implements HasLogger {
     MyAbstractButton k4;
 
     // So wie es auf der Platine steht. K1..K4
-    String[] K_LABEL = new String[]{"dummy_for_index_0_never_used", "K1", "K2", "K3", "K4"};
+//    String[] K_LABEL = new String[]{"dummy_for_index_0_never_used", "K1", "K2", "K3", "K4"};
 
     Configs configs;
     MySystem mySystem;
@@ -177,10 +178,19 @@ public abstract class Game implements HasLogger {
         k3 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_K3);
         k4 = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_K4);
 
-        k1.setText(K_LABEL[1]);
-        k2.setText(K_LABEL[2]);
-        k3.setText(K_LABEL[3]);
-        k4.setText(K_LABEL[4]);
+        set_config_buttons_labels("K1", "K2", "K3", "K4");
+
+    }
+
+    protected void set_config_buttons_labels(String k1text, String k2text, String k3text, String k4text) {
+        k1.setText(k1text);
+        k2.setText(k2text);
+        k3.setText(k3text);
+        k4.setText(k4text);
+
+        // Schreibe die neue Belegung der Config-Tasten auf das LCD Display
+        int lcdpage_for_config_buttons = Integer.parseInt(Main.getFromContext(Configs.LCDPAGE_FOR_CONFIG_BUTTONS).toString());
+        ((LCDTextDisplay) Main.getFromContext(Configs.LCD_TEXT_DISPLAY)).update_page(lcdpage_for_config_buttons, k1text, k2text, k3text, k4text);
 
     }
 
@@ -191,9 +201,8 @@ public abstract class Game implements HasLogger {
     /**
      * wird von den eigentlichen Klassen implementiert um alle GameMode bezogenen Initialisierungen durchzuführen.
      */
-    void initGame() {
 
-    }
+    abstract void initGame();
 
     void button_quit_pressed() {
         shutdown_system();
@@ -231,7 +240,7 @@ public abstract class Game implements HasLogger {
     }
 
     void button_k1_pressed() {
-        getLogger().debug("button_k4_pressed: " + k1.getText());
+        getLogger().debug("button_k1_pressed: " + k1.getText());
     }
 
     void button_k2_pressed() {
@@ -239,7 +248,7 @@ public abstract class Game implements HasLogger {
     }
 
     void button_k3_pressed() {
-        getLogger().debug("button_k4_pressed: " + k3.getText());
+        getLogger().debug("button_k3_pressed: " + k3.getText());
     }
 
     void set_blinking_red_button(String scheme) {
@@ -349,16 +358,17 @@ public abstract class Game implements HasLogger {
         mySystem.getPinHandler().setScheme(siren_key, Main.getFromConfigs(siren_scheme));
     }
 
-    void setDisplay() {
+    abstract void setDisplay();
 
-    }
+    abstract void setFlagSignals();
 
-    void setFlagSignals() {
+    abstract void setLEDsAndButtons();
 
-    }
-
-    void setLEDsAndButtons() {
-
+    void update_all_signals() {
+        all_off();
+        setDisplay();
+        setLEDsAndButtons();
+        setFlagSignals();
     }
 
     void all_off() {

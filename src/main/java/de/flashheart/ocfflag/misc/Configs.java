@@ -21,6 +21,7 @@ public class Configs implements HasLogger {
     public static final String GPIOCONTROLLER = "gpiocontroller";
     public static final String I2CBUS = "i2cbus";
     public static final String MCP23017_1 = "mcp23017_1";
+    public static final String LCDPAGE_FOR_CONFIG_BUTTONS = "lcdpage_for_config_buttons";
 
     private final SortedProperties configs;
     private final Properties applicationContext;
@@ -52,7 +53,8 @@ public class Configs implements HasLogger {
 
 
     public static final String LCD_HARDWARE = "lcdhardware";
-    public static final String LCD_MODEL = "lcdmodel";
+    public static final String LCD_TEXT_DISPLAY = "lcdtextdisplay";
+    public static final String LED_TEXT_DISPLAY = "ledtextdisplay";
     public static final String LCD_I2C_ADDRESS = "lcdi2c";
 
 
@@ -60,7 +62,6 @@ public class Configs implements HasLogger {
     public static final String ALPHA_LED2_I2C = "alpha_led2_i2c";
     public static final String ALPHA_LED3_I2C = "alpha_led3_i2c";
     public static final String ALPHA_LED4_I2C = "alpha_led4_i2c";
-    public static final String ALPHA_LED_MODEL = "alpha_led_mode";
 
     // Application Context Keys - irgendwo müssen sie ja stehen
 //    public static final String AC_BTN_A = "flag_rgb_yellow";

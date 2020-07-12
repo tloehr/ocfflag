@@ -54,10 +54,8 @@ public class OCF extends TimedGame {
         preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
         preset_times = configs.getGameTimes();
         matchlength = preset_times[preset_gametime_position] * 60000;
-        k1.setText("RUN/PAUSE");
-        k2.setText("SET GAMETIME");
-        k3.setText("UNDO/RESET");
-        k4.setText("CHANGE GAME");
+
+        set_config_buttons_labels("RUN/PAUSE", "SET GAMETIME", "UNDO/RESET", "CHANGE GAME");
 
         reset_timers();
         update_all_signals();
@@ -93,6 +91,7 @@ public class OCF extends TimedGame {
      */
     @Override
     void button_k1_pressed() {
+        super.button_k1_pressed();
         if (game_state == TIMED_GAME_RUNNING) {
             pause();
         } else if (game_state == TIMED_GAME_PAUSED) {

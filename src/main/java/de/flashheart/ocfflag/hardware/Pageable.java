@@ -23,7 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public abstract class Pageable implements Runnable, HasLogger {
     protected final int rows, cols;
-    private int seconds_per_page = 1;
+    private int seconds_per_page = 3;
 
     private final MultiKeyMap pages;
     //    private final ArrayList<JLabel> linelist; // für die GUI Darstellung
@@ -53,6 +53,9 @@ public abstract class Pageable implements Runnable, HasLogger {
         thread.start();
     }
 
+    public int add_page() {
+        return add_page("","","","");
+    }
 
     protected int add_page(String... lines) {
         lock.lock();
@@ -79,7 +82,7 @@ public abstract class Pageable implements Runnable, HasLogger {
         update_page(visible_page, lines);
     }
 
-    protected void update_page(int pageid, String... lines) {
+    public void update_page(int pageid, String... lines) {
         lock.lock();
         try {
             pages_have_been_updated = true;
@@ -93,7 +96,7 @@ public abstract class Pageable implements Runnable, HasLogger {
         }
     }
 
-    protected void del_page(int pageid) {
+    public void del_page(int pageid) {
         lock.lock();
         try {
             pages.remove(pageid);
@@ -108,9 +111,11 @@ public abstract class Pageable implements Runnable, HasLogger {
         pages_have_been_updated = false;
         // Schreibt alle Zeilen der aktiven Seite.
         for (int r = 0; r < rows; r++) {
-            String line = pages.get(pageid, r).toString().isEmpty() ? StringUtils.repeat("_", cols) : pages.get(pageid, r).toString();
-            render_line(r, line);
-            getLogger().debug("VISIBLE PAGE #" + (pageid) + " Line" + r + ": " + line);
+            String line = pages.get(pageid, r).toString().isEmpty() ? StringUtils.repeat(" ", cols) : pages.get(pageid, r).toString();
+            // wir schreiben immer die ganze Zeile. Daher fülle ich mit leerzeichen auf, falls nötig.
+            final String padded = StringUtils.rightPad(line, cols);
+            render_line(r, StringUtils.left(padded, cols));
+            getLogger().debug("VISIBLE PAGE #" + (pageid) + " Line" + r + ": " + padded);
         }
     }
 

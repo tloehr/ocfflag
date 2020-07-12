@@ -7,21 +7,14 @@ import java.io.IOException;
 
 public class GameSelector extends Game {
     String[] gamemodes;
-    //    final int OCF2 = 0;
-//    final int OCF3 = 1;
-//    final int OCF4 = 2;
-//    final int SPWN = 3;
     int game_index;
 
     @Override
     void initGame() {
-        k1.setText(" ");
-        k2.setText("game++");
-        k3.setText("game--");
-        k4.setText("CHANGE GAME");
+        set_config_buttons_labels("", "game++", "game--", "CHANGE GAME");
         gamemodes = configs.get(Configs.RLGS_GAMEMODES).split("\\,");
         game_index = 0;
-        setDisplay();
+        update_all_signals();
     }
 
     @Override
@@ -38,14 +31,14 @@ public class GameSelector extends Game {
     void button_k2_pressed() {
         game_index++;
         if (game_index >= gamemodes.length) game_index = 0;
-        setDisplay();
+        update_all_signals();
     }
 
     @Override
     void button_k3_pressed() {
         game_index--;
         if (game_index < 0) game_index = gamemodes.length - 1;
-        setDisplay();
+        update_all_signals();
     }
 
     @Override
@@ -64,12 +57,24 @@ public class GameSelector extends Game {
             getLogger().debug(gamemodes[game_index]);
             display_white.setText(gamemodes[game_index]);
 
-            set_blinking_red_button("∞:on,500;off,500");
-            set_blinking_blue_button("∞:on,500;off,500");
+
 
         } catch (IOException e) {
             getLogger().error(e);
         }
+    }
+
+    @Override
+    void setFlagSignals() {
+
+    }
+
+    @Override
+    void setLEDsAndButtons() {
+        set_blinking_red_button("∞:on,500;off,500");
+        set_blinking_blue_button("∞:on,500;off,500");
+        set_blinking_green_button("∞:on,500;off,500");
+        set_blinking_yellow_button("∞:on,500;off,500");
     }
 
 }

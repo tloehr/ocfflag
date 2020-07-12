@@ -206,7 +206,8 @@ public class MySystem implements HasLogger {
         Main.addToContext(Configs.DISPLAY_YELLOW_I2C, display_yellow);
 
         // LCD Display
-        Main.addToContext(Configs.LCD_MODEL, new MyLCD(20, 4, frameDebug.getLine1(), frameDebug.getLine2(), frameDebug.getLine3(), frameDebug.getLine4()));
+        LCDTextDisplay lcdTextDisplay = new LCDTextDisplay(20, 4, frameDebug.getLine1(), frameDebug.getLine2(), frameDebug.getLine3(), frameDebug.getLine4());
+        Main.addToContext(Configs.LCD_TEXT_DISPLAY, lcdTextDisplay);
 
         // 14-Segment
         Main.addToContext(Configs.ALPHA_LED1_I2C, init_alpha_segment(gpioController, Configs.ALPHA_LED1_I2C));
@@ -215,7 +216,7 @@ public class MySystem implements HasLogger {
         Main.addToContext(Configs.ALPHA_LED4_I2C, init_alpha_segment(gpioController, Configs.ALPHA_LED4_I2C));
 
         // Alpha LEDS werden zu einem Model zusammengefasst.
-        Main.addToContext(Configs.ALPHA_LED_MODEL, new MyLEDMessage(
+        Main.addToContext(Configs.LED_TEXT_DISPLAY, new LEDTextDisplay(
                 Arrays.asList(new Optional[]{
                         (Optional<AlphaSegment>) Main.getFromContext(Configs.ALPHA_LED1_I2C),
                         (Optional<AlphaSegment>) Main.getFromContext(Configs.ALPHA_LED2_I2C),

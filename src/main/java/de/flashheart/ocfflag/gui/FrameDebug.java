@@ -14,10 +14,6 @@ import org.apache.log4j.Level;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Element;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -134,8 +130,8 @@ public class FrameDebug extends JFrame implements HasLogger {
 
     @Override
     public void setVisible(boolean b) {
-        ((MyLCD) Main.getFromContext(Configs.LCD_MODEL)).start();
-        ((MyLEDMessage) Main.getFromContext(Configs.ALPHA_LED_MODEL)).start();
+        ((LCDTextDisplay) Main.getFromContext(Configs.LCD_TEXT_DISPLAY)).start();
+        ((LEDTextDisplay) Main.getFromContext(Configs.LED_TEXT_DISPLAY)).start();
         super.setVisible(b);
     }
 
