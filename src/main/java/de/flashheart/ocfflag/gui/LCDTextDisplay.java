@@ -4,11 +4,8 @@ import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.hardware.I2CLCD;
 import de.flashheart.ocfflag.hardware.Pageable;
 import de.flashheart.ocfflag.misc.Configs;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -28,14 +25,6 @@ public class LCDTextDisplay extends Pageable {
         i2CLCD.ifPresent(i2clcd -> i2clcd.init());
         jLabels = Arrays.asList(labels);
         Configs configs = (Configs) Main.getFromContext(Configs.THE_CONFIGS);
-
-        InetAddress ip = InetAddress.getLoopbackAddress();
-        try {
-            ip = InetAddress.getLocalHost();
-            visible_page = add_page("RLG-System", "v." + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber"), ip.getHostAddress(), ip.getHostName());
-        } catch (UnknownHostException e) {
-            visible_page = add_page("RLG-System", "v." + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber"), "", "no-network");
-        }
     }
 
     @Override
@@ -51,4 +40,16 @@ public class LCDTextDisplay extends Pageable {
         i2CLCD.ifPresent(i2clcd -> i2clcd.display_string(text, line));
     }
 
+//    @Override
+//    public void reset_display() {
+//        super.reset_display();
+//        Configs configs = (Configs) Main.getFromContext(Configs.THE_CONFIGS);
+//        try {
+//            InetAddress ip = InetAddress.getLocalHost();
+//            update_page(visible_page, "RLG-System", "v." + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber"), ip.getHostAddress(), ip.getHostName());
+//        } catch (UnknownHostException e) {
+////            ip = InetAddress.getLoopbackAddress();
+//            update_page(visible_page, "RLG-System", "v." + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber"), "", "no-network");
+//        }
+//    }
 }

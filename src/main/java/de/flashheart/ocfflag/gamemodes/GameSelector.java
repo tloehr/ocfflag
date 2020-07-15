@@ -12,10 +12,13 @@ public class GameSelector extends Game {
     @Override
     void initGame() {
         set_config_buttons_labels("", "game++", "game--", "CHANGE GAME");
+        lcdTextDisplay.update_page(0,"Welcome to the","Real Life","Gaming System","");
+        ledTextDisplay.setText("Select a game");
         gamemodes = configs.get(Configs.RLGS_GAMEMODES).split("\\,");
         game_index = 0;
         update_all_signals();
     }
+
 
     @Override
     void button_k4_pressed() {
@@ -43,7 +46,7 @@ public class GameSelector extends Game {
 
     @Override
     public String getName() {
-        return "GameSelector";
+        return "Game Selector";
     }
 
     @Override
@@ -57,7 +60,10 @@ public class GameSelector extends Game {
             getLogger().debug(gamemodes[game_index]);
             display_white.setText(gamemodes[game_index]);
 
-
+            if (gamemodes[game_index].equalsIgnoreCase("ocf2")) ledTextDisplay.setText("Operation Cedar Falls 2 Teams");
+            if (gamemodes[game_index].equalsIgnoreCase("ocf3")) ledTextDisplay.setText("Operation Cedar Falls 3 Teams");
+            if (gamemodes[game_index].equalsIgnoreCase("ocf4")) ledTextDisplay.setText("Operation Cedar Falls 4 Teams");
+            if (gamemodes[game_index].equalsIgnoreCase("spwn")) ledTextDisplay.setText("Spawn Counter");
 
         } catch (IOException e) {
             getLogger().error(e);

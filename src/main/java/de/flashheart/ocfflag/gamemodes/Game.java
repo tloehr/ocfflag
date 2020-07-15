@@ -3,6 +3,7 @@ package de.flashheart.ocfflag.gamemodes;
 import de.flashheart.ocfflag.Main;
 import de.flashheart.ocfflag.gui.Display7Segments4Digits;
 import de.flashheart.ocfflag.gui.LCDTextDisplay;
+import de.flashheart.ocfflag.gui.LEDTextDisplay;
 import de.flashheart.ocfflag.hardware.HT16K33;
 import de.flashheart.ocfflag.hardware.MyAbstractButton;
 import de.flashheart.ocfflag.hardware.MySystem;
@@ -36,6 +37,10 @@ public abstract class Game implements HasLogger {
     public static final String RESULT_MULTI_WINNERS = "RESULT_MULTI_WINNERS";
     public static final String[] GAME_OVER_EVENTS = new String[]{"GAME_ABORTED", "GAME_OVER", "EXPLODED", "DEFENDED"};
 
+    String shortname;
+    String name;
+    int SETUP_BUTTON_PAGE;
+
     Display7Segments4Digits display_blue;
     Display7Segments4Digits display_red;
     Display7Segments4Digits display_white;
@@ -49,6 +54,9 @@ public abstract class Game implements HasLogger {
     MyAbstractButton button_red;
     MyAbstractButton button_green;
     MyAbstractButton button_yellow;
+
+    LEDTextDisplay ledTextDisplay;
+    LCDTextDisplay lcdTextDisplay;
 
     MyAbstractButton k1;
     MyAbstractButton k2;
@@ -83,6 +91,8 @@ public abstract class Game implements HasLogger {
      * hier werden alle Event-Listeners verknüpft.
      */
     void initSoftware() {
+        lcdTextDisplay.reset_display();
+        SETUP_BUTTON_PAGE = lcdTextDisplay.add_page();
         button_blue.setActionListener(e -> {
             getLogger().debug("GUI_button_blue");
             button_blue_pressed();
@@ -158,6 +168,9 @@ public abstract class Game implements HasLogger {
         display_yellow = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_YELLOW_I2C);
         display_white = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_WHITE_I2C);
 
+        ledTextDisplay = (LEDTextDisplay) Main.getFromContext(Configs.LED_TEXT_DISPLAY);
+        lcdTextDisplay = (LCDTextDisplay) Main.getFromContext(Configs.LCD_TEXT_DISPLAY);
+
         // GUI Buttons
         button_quit = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_QUIT);
         button_shutdown = (MyAbstractButton) Main.getFromContext(Configs.BUTTON_SHUTDOWN);
@@ -189,8 +202,11 @@ public abstract class Game implements HasLogger {
         k4.setText(k4text);
 
         // Schreibe die neue Belegung der Config-Tasten auf das LCD Display
-        int lcdpage_for_config_buttons = Integer.parseInt(Main.getFromContext(Configs.LCDPAGE_FOR_CONFIG_BUTTONS).toString());
-        ((LCDTextDisplay) Main.getFromContext(Configs.LCD_TEXT_DISPLAY)).update_page(lcdpage_for_config_buttons, k1text, k2text, k3text, k4text);
+//        int lcdpage_for_config_buttons = Integer.parseInt(Main.getFromContext(Configs.LCDPAGE_FOR_CONFIG_BUTTONS).toString());
+//        ((LCDTextDisplay) Main.getFromContext(Configs.LCD_TEXT_DISPLAY)).update_page(lcdpage_for_config_buttons, k1text, k2text, k3text, k4text);
+
+        lcdTextDisplay.update_page(SETUP_BUTTON_PAGE, k1text, k2text, k3text, k4text);
+
 
     }
 
