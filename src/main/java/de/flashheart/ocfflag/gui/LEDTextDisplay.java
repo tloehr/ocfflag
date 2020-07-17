@@ -83,7 +83,7 @@ public class LEDTextDisplay implements Runnable, HasLogger {
 
     public void setText(String text) {
         SlideText slideText = new SlideText(text, MAX_CHARS_PER_DISPLAY * jLabels.size());
-        frames = slideText.getFrames(false);
+        frames = slideText.getFrames();
         frame = -1;
         direction_forward = true;
     }

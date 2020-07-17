@@ -1,8 +1,11 @@
 package de.flashheart.ocfflag.gamemodes;
 
 import de.flashheart.ocfflag.Main;
+import de.flashheart.ocfflag.hardware.PinHandler;
+import de.flashheart.ocfflag.hardware.RGBScheduleElement;
 import de.flashheart.ocfflag.misc.Configs;
 
+import java.awt.*;
 import java.io.IOException;
 
 public class GameSelector extends Game {
@@ -12,7 +15,7 @@ public class GameSelector extends Game {
     @Override
     void initGame() {
         set_config_buttons_labels("", "game++", "game--", "CHANGE GAME");
-        lcdTextDisplay.update_page(0,"Welcome to the","Real Life","Gaming System","");
+        lcdTextDisplay.update_page(0, "Welcome to the", "Real Life", "Gaming System", "");
         ledTextDisplay.setText("Select a game");
         gamemodes = configs.get(Configs.RLGS_GAMEMODES).split("\\,");
         game_index = 0;
@@ -65,6 +68,7 @@ public class GameSelector extends Game {
             if (gamemodes[game_index].equalsIgnoreCase("ocf4")) ledTextDisplay.setText("Operation Cedar Falls 4 Teams");
             if (gamemodes[game_index].equalsIgnoreCase("spwn")) ledTextDisplay.setText("Spawn Counter");
 
+//            ledTextDisplay.setText("Sixteen Chars 16");
         } catch (IOException e) {
             getLogger().error(e);
         }
@@ -72,7 +76,21 @@ public class GameSelector extends Game {
 
     @Override
     void setFlagSignals() {
+        set_blinking_flag_white("∞:off,0;on,350;off,6400");
+        set_blinking_flag_red("∞:off,350;on,350;off,6050");
+        set_blinking_flag_blue("∞:off,700;on,350;off,5700");
+        set_blinking_flag_green("∞:off,1050;on,350;off,5350");
+        set_blinking_flag_yellow("∞:off,1400;on,350;off,5000");
 
+        String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
+                new RGBScheduleElement(Configs.FLAG_RGB_WHITE, 350l) + ";" +
+                new RGBScheduleElement(Configs.FLAG_RGB_RED, 350l) + ";" +
+                new RGBScheduleElement(Configs.FLAG_RGB_BLUE, 350l) + ";" +
+                new RGBScheduleElement(Configs.FLAG_RGB_GREEN, 350l) + ";" +
+                new RGBScheduleElement(Configs.FLAG_RGB_YELLOW, 350l) + ";" +
+                new RGBScheduleElement(Color.BLACK, 5000l);
+
+        set_blinking_flag_rgb(pregamePoleColorScheme);
     }
 
     @Override

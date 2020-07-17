@@ -6,6 +6,7 @@ import de.flashheart.ocfflag.misc.Configs;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
 
 public abstract class TimedGame extends Game implements Runnable {
@@ -19,6 +20,8 @@ public abstract class TimedGame extends Game implements Runnable {
     long cycle_counter = 0l; // zum abzählen, damit die logs nicht zu oft geschrieben werden.
     int the_last_minute_when_timesignal_changed;
     final Thread thread;
+
+    final DateTimeFormatter common_time_format = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     /**
      * In der methode run() wird in regelmässigen Abständen die Restspielzeit remaining neu berechnet. Dabei rechnen wir

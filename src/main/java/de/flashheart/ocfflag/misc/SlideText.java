@@ -20,23 +20,33 @@ public class SlideText {
     }
 
     public String[] getFrames() {
-        return getFrames(true, true);
-    }
-
-    public String[] getFrames(boolean blanks) {
-        return getFrames(blanks, blanks);
-    }
-
-    public String[] getFrames(boolean blanksOntheLeft, boolean blanksOntheRight) {
-        String text = this.text;
-        if (blanksOntheLeft) {
-            for (int i = 0; i < max; i++) {
-                text = " " + text;
-            }
+        String[] frames;
+        if (text.length() == max) { // dann soll es blinken statt zu sliden
+            frames = new String[]{text, " ".repeat(max)};
+        } else {
+            frames = getFrames(true, true);
         }
-        if (blanksOntheRight) {
-            for (int i = 0; i < max; i++) {
-                text = text + " ";
+        return frames;
+    }
+
+//    public String[] getFrames(boolean blanks) {
+//        return getFrames(blanks, blanks);
+//    }
+
+    private String[] getFrames(boolean blanksOntheLeft, boolean blanksOntheRight) {
+        String text = this.text;
+
+        if (max > text.length()) { // nur wenn text kleiner als der Frame ist
+            int blanks = max-text.length();
+            if (blanksOntheLeft) {
+                for (int i = 0; i < blanks; i++) {
+                    text = " " + text;
+                }
+            }
+            if (blanksOntheRight) {
+                for (int i = 0; i < blanks; i++) {
+                    text = text + " ";
+                }
             }
         }
 

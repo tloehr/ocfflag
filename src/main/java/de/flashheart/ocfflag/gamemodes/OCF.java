@@ -230,11 +230,10 @@ public class OCF extends TimedGame {
             if (num_teams < 4) display_yellow.clear();
             else display_yellow.setTime(time_yellow);
 
-
             if (game_state == TIMED_GAME_PAUSED) {
                 display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                 set_blinking_led_green("∞:on,500;off,500");
-                setFlagSignals();
+//                setFlagSignals();
             }
 
             if (game_state == TIMED_GAME_RUNNING) {
@@ -532,6 +531,10 @@ public class OCF extends TimedGame {
             display_blue.setTime(time_blue);
             if (num_teams >= 3) display_green.setTime(time_green);
             if (num_teams >= 4) display_yellow.setTime(time_yellow);
+
+            LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining),
+                    TimeZone.getTimeZone("UTC").toZoneId());
+            ledTextDisplay.setText("### " + common_time_format.format(ldt) + " ###");
 
             if (remaining == 0) {
                 game_over();
