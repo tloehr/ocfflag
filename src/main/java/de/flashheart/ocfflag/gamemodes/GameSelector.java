@@ -16,6 +16,9 @@ public class GameSelector extends Game {
     void initGame() {
         set_config_buttons_labels("", "game++", "game--", "CHANGE GAME");
         lcdTextDisplay.update_page(0, "Welcome to the", "Real Life", "Gaming System", "");
+
+        while (lcdTextDisplay.getNumber_of_pages() > 2) lcdTextDisplay.del_page(3);
+
         ledTextDisplay.setText("Select a game");
         gamemodes = configs.get(Configs.RLGS_GAMEMODES).split("\\,");
         game_index = 0;

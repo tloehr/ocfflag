@@ -21,6 +21,7 @@ public class SlideText {
 
     public String[] getFrames() {
         String[] frames;
+        // todo blank page
         if (text.length() == max) { // dann soll es blinken statt zu sliden
             frames = new String[]{text, " ".repeat(max)};
         } else {

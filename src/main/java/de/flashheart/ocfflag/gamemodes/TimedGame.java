@@ -14,6 +14,7 @@ public abstract class TimedGame extends Game implements Runnable {
     final int TIMED_GAME_RUNNING = 1;
     final int TIMED_GAME_PAUSED = 2;
     final int TIMED_GAME_OVER = 3;
+    private int PAGE_GAMESTATES;
 
     long matchlength, matchtime, remaining, pausing_since, last_cycle_started_at, time_difference_since_last_cycle;
     long SLEEP_PER_CYCLE;
@@ -40,6 +41,12 @@ public abstract class TimedGame extends Game implements Runnable {
         thread = new Thread(this);
         last_cycle_started_at = System.currentTimeMillis();
         thread.start();
+    }
+
+    @Override
+    void initGame() {
+        while (lcdTextDisplay.getNumber_of_pages() > 2) lcdTextDisplay.del_page(3);
+        PAGE_GAMESTATES = lcdTextDisplay.add_page("", "", "", "");
     }
 
     void update_timers() {
@@ -90,13 +97,17 @@ public abstract class TimedGame extends Game implements Runnable {
         pausing_since = 0l;
     }
 
+    abstract String get_game_state();
+
     /**
      * das Spiel wird in den Pausezustand versetzt
      */
     void pause() {
         getLogger().info("pause()");
+        lcdTextDisplay.update_page(PAGE_GAMESTATES, "Spielzustand", get_game_state(), "", "");
         pausing_since = System.currentTimeMillis();
         game_state = TIMED_GAME_PAUSED;
+        lcdTextDisplay.update_page(0, "Operation", "Cedar", "Falls", num_teams + " Teams");
         update_all_signals();
     }
 
@@ -118,6 +129,7 @@ public abstract class TimedGame extends Game implements Runnable {
     void game_over() {
         getLogger().info("game_over()");
         game_state = TIMED_GAME_OVER;
+        lcdTextDisplay.update_page(PAGE_GAMESTATES, "Spielzustand", get_game_state(), "", "");
         update_all_signals();
     }
 
@@ -126,6 +138,7 @@ public abstract class TimedGame extends Game implements Runnable {
      */
     void start() {
         game_state = TIMED_GAME_RUNNING;
+        lcdTextDisplay.update_page(PAGE_GAMESTATES, "Spielzustand", get_game_state(), "", "");
         update_all_signals();
     }
 
@@ -134,6 +147,7 @@ public abstract class TimedGame extends Game implements Runnable {
      */
     void prepare() {
         game_state = TIMED_GAME_PREPARE;
+        lcdTextDisplay.update_page(PAGE_GAMESTATES,"Spielzustand", get_game_state(), "", "");
         reset_timers();
     }
 
@@ -143,9 +157,9 @@ public abstract class TimedGame extends Game implements Runnable {
         thread.interrupt();
     }
 
-    abstract void game_cycle() throws Exception;
+    abstract void show_timers();
 
-
+    abstract void game_cycle();
 
     @Override
     public boolean isGameRunning() {
@@ -161,8 +175,13 @@ public abstract class TimedGame extends Game implements Runnable {
             last_cycle_started_at = now;
 
             try {
-                update_timers();
-                game_cycle();
+
+                if (game_state == TIMED_GAME_RUNNING) {
+                    update_timers();
+                    show_timers();
+                    game_cycle();
+                }
+
                 Thread.sleep(SLEEP_PER_CYCLE);
             } catch (InterruptedException ie) {
                 getLogger().info(this + " interrupted!");

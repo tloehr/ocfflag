@@ -42,7 +42,7 @@ public class LEDTextDisplay implements Runnable, HasLogger {
                     loopcounter++;
 
                     if (frames.length > 1) { // gibts nur einen Frame, machen wir hier gar nix
-                        if (loopcounter > 3) { // famit erreiche ich, dass der 1,5 sekunden an den rändern stehen bleibt.
+                        if (loopcounter > 3) { // damit erreiche ich, dass der 1,5 sekunden an den rändern stehen bleibt.
                             if (direction_forward) {
                                 frame++;
                                 if (frame >= frames.length) {
@@ -98,7 +98,7 @@ public class LEDTextDisplay implements Runnable, HasLogger {
             final JLabel jLabel = jLabels.get(part_of_message);
 
             SwingUtilities.invokeLater(() -> {
-                jLabel.setText(chunk.replace(' ', '_'));
+                jLabel.setText(chunk);
                 jLabel.revalidate();
                 jLabel.repaint();
             });

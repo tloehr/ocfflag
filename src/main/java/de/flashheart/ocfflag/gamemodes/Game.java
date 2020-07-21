@@ -37,8 +37,6 @@ public abstract class Game implements HasLogger {
     public static final String RESULT_MULTI_WINNERS = "RESULT_MULTI_WINNERS";
     public static final String[] GAME_OVER_EVENTS = new String[]{"GAME_ABORTED", "GAME_OVER", "EXPLODED", "DEFENDED"};
 
-    String shortname;
-    String name;
     int SETUP_BUTTON_PAGE;
 
     Display7Segments4Digits display_blue;

@@ -20,7 +20,6 @@ public class OCF extends TimedGame {
 
     private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getFromConfigs(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
 
-    private final String MODES[] = new String[]{"Spiel-Vorbereitung", "Spiel läuft", "PAUSE", "GAME OVER"};
 
     private final int SAVEPOINT_NONE = 0;
     private final int SAVEPOINT_PREVIOUS = 1;
@@ -48,15 +47,32 @@ public class OCF extends TimedGame {
 
 
     @Override
+    String get_game_state() {
+        String result;
+        switch (game_state) {
+            case TIMED_GAME_RUNNING:
+                result = "Spiel läuft";
+            case TIMED_GAME_OVER:
+                result = "GAME OVER";
+            case TIMED_GAME_PREPARE:
+                result = "Spiel-Vorbereitung";
+            case TIMED_GAME_PAUSED:
+                result = "PAUSE";
+            default:
+                result = "ERROR";
+        }
+        return result;
+    }
+
+    @Override
     void initGame() {
+        super.initGame();
         winners = new ArrayList<>();
-//        title = "ocfflag " + configs.getApplicationInfo("my.version") + "." + configs.getApplicationInfo("buildNumber");
         preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
         preset_times = configs.getGameTimes();
         matchlength = preset_times[preset_gametime_position] * 60000;
-
+        lcdTextDisplay.update_page(0, "Operation", "Cedar", "Falls", num_teams + " Teams");
         set_config_buttons_labels("RUN/PAUSE", "SET GAMETIME", "UNDO/RESET", "CHANGE GAME");
-
         reset_timers();
         update_all_signals();
     }
@@ -218,68 +234,58 @@ public class OCF extends TimedGame {
     }
 
     @Override
+    void update_all_signals() {
+        super.update_all_signals();
+        show_timers();
+    }
+
+    @Override
     void setDisplay() {
-        try {
-            display_white.setTime(remaining);
-            display_red.setTime(time_red);
-            display_blue.setTime(time_blue);
+        if (game_state == TIMED_GAME_PAUSED) {
+            display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
+            set_blinking_led_green("∞:on,500;off,500");
+        }
 
-            if (num_teams < 3) display_green.clear();
-            else display_green.setTime(time_green);
+        if (game_state == TIMED_GAME_RUNNING) {
+            mySystem.getPinHandler().off(Configs.OUT_LED_GREEN);
+            mySystem.getPinHandler().off(Configs.OUT_LED_WHITE);
+            display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
 
-            if (num_teams < 4) display_yellow.clear();
-            else display_yellow.setTime(time_yellow);
-
-            if (game_state == TIMED_GAME_PAUSED) {
-                display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
-                set_blinking_led_green("∞:on,500;off,500");
-//                setFlagSignals();
+            if (flag_state.equals(RED_ACTIVATED)) {
+                display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
+            } else if (flag_state.equals(BLUE_ACTIVATED)) {
+                display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
+            } else if (flag_state.equals(GREEN_ACTIVATED)) {
+                display_green.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
+            } else if (flag_state.equals(YELLOW_ACTIVATED)) {
+                display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
             }
+        }
 
-            if (game_state == TIMED_GAME_RUNNING) {
-                mySystem.getPinHandler().off(Configs.OUT_LED_GREEN);
-                mySystem.getPinHandler().off(Configs.OUT_LED_WHITE);
-                display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
-
-                if (flag_state.equals(RED_ACTIVATED)) {
-                    display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
-                } else if (flag_state.equals(BLUE_ACTIVATED)) {
-                    display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
-                } else if (flag_state.equals(GREEN_ACTIVATED)) {
-                    display_green.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
-                } else if (flag_state.equals(YELLOW_ACTIVATED)) {
-                    display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
-                }
-            }
-
-            if (game_state == TIMED_GAME_OVER) {
-                if (isDrawgame()) {
-                    getLogger().info("Draw Game");
+        if (game_state == TIMED_GAME_OVER) {
+            if (isDrawgame()) {
+                getLogger().info("Draw Game");
+                display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
+                display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
+                if (num_teams >= 3)
+                    display_green.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
+                if (num_teams >= 4)
+                    display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
+            } else {
+                List<String> winners = getWinners();
+                if (winners.contains("red")) {
                     display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
+                }
+                if (winners.contains("blue")) {
                     display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
-                    if (num_teams >= 3)
-                        display_green.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
-                    if (num_teams >= 4)
-                        display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
-                } else {
-                    List<String> winners = getWinners();
-                    if (winners.contains("red")) {
-                        display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
-                    }
-                    if (winners.contains("blue")) {
-                        display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
-                    }
-                    if (winners.contains("green")) {
-                        display_green.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
-                    }
-                    if (winners.contains("yellow")) {
-                        display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
-                    }
+                }
+                if (winners.contains("green")) {
+                    display_green.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
+                }
+                if (winners.contains("yellow")) {
+                    display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                 }
             }
-        } catch (IOException e) {
-            getLogger().fatal(e);
-            System.exit(1);
         }
     }
 
@@ -505,40 +511,49 @@ public class OCF extends TimedGame {
         return winners;
     }
 
-    /**
-     * Dieser Block wird vom Thread der Superklasse ausgeführt. Danach wird eine Pause von SLEEP_PER_CYCLE in ms eingelegt.
-     *
-     * @throws Exception
-     */
     @Override
-    void game_cycle() throws Exception {
-
-        if (game_state == TIMED_GAME_RUNNING) {
-
-            // Zeit zum entsprechenden Team addieren.
-            if (flag_state.equals(RED_ACTIVATED)) {
-                time_red += time_difference_since_last_cycle;
-            } else if (flag_state.equals(BLUE_ACTIVATED)) {
-                time_blue += time_difference_since_last_cycle;
-            } else if (flag_state.equals(GREEN_ACTIVATED)) {
-                time_green += time_difference_since_last_cycle;
-            } else if (flag_state.equals(YELLOW_ACTIVATED)) {
-                time_yellow += time_difference_since_last_cycle;
-            }
-
+    void show_timers() {
+        try {
             display_white.setTime(remaining);
             display_red.setTime(time_red);
             display_blue.setTime(time_blue);
             if (num_teams >= 3) display_green.setTime(time_green);
             if (num_teams >= 4) display_yellow.setTime(time_yellow);
 
-            LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining),
-                    TimeZone.getTimeZone("UTC").toZoneId());
-            ledTextDisplay.setText("### " + common_time_format.format(ldt) + " ###");
+        } catch (IOException e) {
+            getLogger().error(e);
+        }
 
-            if (remaining == 0) {
-                game_over();
-            }
+        LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining),
+                TimeZone.getTimeZone("UTC").toZoneId());
+        ledTextDisplay.setText("### " + common_time_format.format(ldt) + " ###");
+    }
+
+    /**
+     * Dieser Block wird vom Thread der Superklasse ausgeführt. Danach wird eine Pause von SLEEP_PER_CYCLE in ms eingelegt.
+     *
+     * @throws Exception
+     */
+    @Override
+    void game_cycle() {
+        if (remaining == 0) {
+            game_over();
+        }
+    }
+
+    @Override
+    void update_timers() {
+        super.update_timers();
+
+        // Zeit zum entsprechenden Team addieren.
+        if (flag_state.equals(RED_ACTIVATED)) {
+            time_red += time_difference_since_last_cycle;
+        } else if (flag_state.equals(BLUE_ACTIVATED)) {
+            time_blue += time_difference_since_last_cycle;
+        } else if (flag_state.equals(GREEN_ACTIVATED)) {
+            time_green += time_difference_since_last_cycle;
+        } else if (flag_state.equals(YELLOW_ACTIVATED)) {
+            time_yellow += time_difference_since_last_cycle;
         }
     }
 

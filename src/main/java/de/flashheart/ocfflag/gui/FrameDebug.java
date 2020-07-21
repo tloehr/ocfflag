@@ -273,10 +273,10 @@ public class FrameDebug extends JFrame implements HasLogger {
                     //---- lblTimeRed ----
                     lblTimeRed.setOpaque(true);
                     lblTimeRed.setBackground(Color.black);
-                    lblTimeRed.setText("00:00");
+                    lblTimeRed.setText("00:00:00");
                     lblTimeRed.setForeground(Color.red);
                     lblTimeRed.setHorizontalAlignment(SwingConstants.CENTER);
-                    lblTimeRed.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 32));
+                    lblTimeRed.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 32));
                     panel1.add(lblTimeRed);
                 }
                 upperPanel.add(panel1, CC.xy(1, 2));
@@ -295,10 +295,10 @@ public class FrameDebug extends JFrame implements HasLogger {
                     //---- lblTimeBlue ----
                     lblTimeBlue.setOpaque(true);
                     lblTimeBlue.setBackground(Color.black);
-                    lblTimeBlue.setText("00:00");
+                    lblTimeBlue.setText("00:00:00");
                     lblTimeBlue.setForeground(new Color(153, 153, 255));
                     lblTimeBlue.setHorizontalAlignment(SwingConstants.CENTER);
-                    lblTimeBlue.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 32));
+                    lblTimeBlue.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 32));
                     panel4.add(lblTimeBlue);
                 }
                 upperPanel.add(panel4, CC.xy(3, 2));
@@ -327,10 +327,10 @@ public class FrameDebug extends JFrame implements HasLogger {
                     //---- lblTimeGreen ----
                     lblTimeGreen.setOpaque(true);
                     lblTimeGreen.setBackground(Color.black);
-                    lblTimeGreen.setText("00:00");
+                    lblTimeGreen.setText("00:00:00");
                     lblTimeGreen.setForeground(Color.green);
                     lblTimeGreen.setHorizontalAlignment(SwingConstants.CENTER);
-                    lblTimeGreen.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 32));
+                    lblTimeGreen.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 32));
                     panel6.add(lblTimeGreen);
                 }
                 upperPanel.add(panel6, CC.xy(1, 4));
@@ -349,10 +349,10 @@ public class FrameDebug extends JFrame implements HasLogger {
                     //---- lblTimeYellow ----
                     lblTimeYellow.setOpaque(true);
                     lblTimeYellow.setBackground(Color.black);
-                    lblTimeYellow.setText("00:00");
+                    lblTimeYellow.setText("00:00:00");
                     lblTimeYellow.setForeground(Color.yellow);
                     lblTimeYellow.setHorizontalAlignment(SwingConstants.CENTER);
-                    lblTimeYellow.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 32));
+                    lblTimeYellow.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 32));
                     panel7.add(lblTimeYellow);
                 }
                 upperPanel.add(panel7, CC.xy(3, 4));
@@ -389,7 +389,7 @@ public class FrameDebug extends JFrame implements HasLogger {
                         lblTXT1.setText("TXT1");
                         lblTXT1.setForeground(Color.white);
                         lblTXT1.setHorizontalAlignment(SwingConstants.CENTER);
-                        lblTXT1.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 42));
+                        lblTXT1.setFont(new Font(Font.MONOSPACED, Font.BOLD | Font.ITALIC, 42));
                         pnlLedDisplay.add(lblTXT1);
 
                         //---- lblTXT2 ----
@@ -398,7 +398,7 @@ public class FrameDebug extends JFrame implements HasLogger {
                         lblTXT2.setText("TXT2");
                         lblTXT2.setForeground(Color.white);
                         lblTXT2.setHorizontalAlignment(SwingConstants.CENTER);
-                        lblTXT2.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 42));
+                        lblTXT2.setFont(new Font(Font.MONOSPACED, Font.BOLD | Font.ITALIC, 42));
                         pnlLedDisplay.add(lblTXT2);
 
                         //---- lblTXT3 ----
@@ -407,7 +407,7 @@ public class FrameDebug extends JFrame implements HasLogger {
                         lblTXT3.setText("TXT3");
                         lblTXT3.setForeground(Color.white);
                         lblTXT3.setHorizontalAlignment(SwingConstants.CENTER);
-                        lblTXT3.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 42));
+                        lblTXT3.setFont(new Font(Font.MONOSPACED, Font.BOLD | Font.ITALIC, 42));
                         pnlLedDisplay.add(lblTXT3);
 
                         //---- lblTXT4 ----
@@ -416,17 +416,17 @@ public class FrameDebug extends JFrame implements HasLogger {
                         lblTXT4.setText("TXT4");
                         lblTXT4.setForeground(Color.white);
                         lblTXT4.setHorizontalAlignment(SwingConstants.CENTER);
-                        lblTXT4.setFont(new Font("DSEG14 Classic", Font.BOLD | Font.ITALIC, 42));
+                        lblTXT4.setFont(new Font(Font.MONOSPACED, Font.BOLD | Font.ITALIC, 42));
                         pnlLedDisplay.add(lblTXT4);
                         pnlLedDisplay.add(hSpacer3);
 
                         //---- lblTimeWhite ----
                         lblTimeWhite.setOpaque(true);
                         lblTimeWhite.setBackground(Color.black);
-                        lblTimeWhite.setText("00:00");
+                        lblTimeWhite.setText("00:00:00");
                         lblTimeWhite.setForeground(Color.white);
                         lblTimeWhite.setHorizontalAlignment(SwingConstants.CENTER);
-                        lblTimeWhite.setFont(new Font("DSEG7 Classic", Font.BOLD | Font.ITALIC, 32));
+                        lblTimeWhite.setFont(new Font(Font.DIALOG, Font.BOLD | Font.ITALIC, 32));
                         pnlLedDisplay.add(lblTimeWhite);
                     }
                     pnlDisplays.add(pnlLedDisplay, CC.xy(1, 1, CC.DEFAULT, CC.TOP));

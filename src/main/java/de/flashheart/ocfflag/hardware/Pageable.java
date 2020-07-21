@@ -33,6 +33,9 @@ public abstract class Pageable implements Runnable, HasLogger {
 
     protected abstract void render_line(int line, String text);
 
+    public int getNumber_of_pages() {
+        return number_of_pages;
+    }
 
     public Pageable(int cols, int rows) {
         this.rows = rows;

@@ -24,7 +24,7 @@ public class LCDTextDisplay extends Pageable {
         i2CLCD = (Optional<I2CLCD>) Main.getFromContext(Configs.LCD_HARDWARE);
         i2CLCD.ifPresent(i2clcd -> i2clcd.init());
         jLabels = Arrays.asList(labels);
-        Configs configs = (Configs) Main.getFromContext(Configs.THE_CONFIGS);
+//        Configs configs = (Configs) Main.getFromContext(Configs.THE_CONFIGS);
     }
 
     @Override
