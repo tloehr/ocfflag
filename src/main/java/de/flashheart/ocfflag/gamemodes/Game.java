@@ -61,9 +61,6 @@ public abstract class Game implements HasLogger {
     MyAbstractButton k3;
     MyAbstractButton k4;
 
-    // So wie es auf der Platine steht. K1..K4
-//    String[] K_LABEL = new String[]{"dummy_for_index_0_never_used", "K1", "K2", "K3", "K4"};
-
     Configs configs;
     MySystem mySystem;
     int num_teams;
@@ -204,7 +201,6 @@ public abstract class Game implements HasLogger {
 //        ((LCDTextDisplay) Main.getFromContext(Configs.LCD_TEXT_DISPLAY)).update_page(lcdpage_for_config_buttons, k1text, k2text, k3text, k4text);
 
         lcdTextDisplay.update_page(SETUP_BUTTON_PAGE, k1text, k2text, k3text, k4text);
-
 
     }
 
@@ -368,7 +364,6 @@ public abstract class Game implements HasLogger {
 
 
     void set_siren_scheme(String siren_key, String siren_scheme) {
-
         mySystem.getPinHandler().setScheme(siren_key, Main.getFromConfigs(siren_scheme));
     }
 

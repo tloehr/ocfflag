@@ -14,7 +14,7 @@ public abstract class TimedGame extends Game implements Runnable {
     final int TIMED_GAME_RUNNING = 1;
     final int TIMED_GAME_PAUSED = 2;
     final int TIMED_GAME_OVER = 3;
-    private int PAGE_GAMESTATES;
+//    int PAGE_GAMESTATES;
 
     long matchlength, matchtime, remaining, pausing_since, last_cycle_started_at, time_difference_since_last_cycle;
     long SLEEP_PER_CYCLE;
@@ -46,8 +46,9 @@ public abstract class TimedGame extends Game implements Runnable {
     @Override
     void initGame() {
         while (lcdTextDisplay.getNumber_of_pages() > 2) lcdTextDisplay.del_page(3);
-        PAGE_GAMESTATES = lcdTextDisplay.add_page("", "", "", "");
+//        PAGE_GAMESTATES = lcdTextDisplay.add_page("", "", "", "");
     }
+
 
     void update_timers() {
         if (game_state != TIMED_GAME_RUNNING) return;
@@ -58,7 +59,78 @@ public abstract class TimedGame extends Game implements Runnable {
             getLogger().debug(String.format("game_state %s, flag_state %s", game_state, flag_state));
             getLogger().debug(String.format("Matchlength: %d, remaining: %d, time_difference_since_last_cycle: %d", matchlength, remaining, time_difference_since_last_cycle));
         }
+    }
 
+    /**
+     * setzt die restliche Spielzeit auf die Gesamtspielzeit zurück
+     */
+    void reset_timers() {
+        getLogger().info("reset_timers()");
+        remaining = matchlength;
+        matchtime = 0l;
+        last_cycle_started_at = 0l;
+        flag_state = FLAG_NEUTRAL;
+        pausing_since = 0l;
+    }
+
+    abstract String get_game_state();
+
+    /**
+     * das Spiel wird in den Pausezustand versetzt
+     */
+    void pause() {
+        getLogger().info("pause()");
+        pausing_since = System.currentTimeMillis();
+        game_state = TIMED_GAME_PAUSED;
+        update_all_signals();
+    }
+
+    /**
+     * das Spiel wird nach dem Pausezustand fortgesetzt
+     */
+    void resume() {
+        getLogger().info("resume()");
+        pausing_since = 0l;
+        game_state = TIMED_GAME_RUNNING;
+        update_all_signals();
+    }
+
+    /**
+     * das Spiel wird beendet.
+     */
+    void game_over() {
+        getLogger().info("game_over()");
+        game_state = TIMED_GAME_OVER;
+        update_all_signals();
+    }
+
+    /**
+     * das Spiel beginnt
+     */
+    void start() {
+        game_state = TIMED_GAME_RUNNING;
+        update_all_signals();
+    }
+
+    /**
+     * Spiel wird in den Vorbereitungsmodus versetzt
+     */
+    void prepare() {
+        game_state = TIMED_GAME_PREPARE;
+        reset_timers();
+        update_all_signals();
+    }
+
+    @Override
+    public void stop_gamemode() {
+        super.stop_gamemode();
+        thread.interrupt();
+    }
+
+    /**
+     * Methode zur Darstellung von allem was mit Zeiten verbunden ist.
+     */
+    void show_timers(){
         // jede Minute soll das Zeitsignal aktualisiert werden. Daher prüfe ich, ob
         // eine neue Minute angebrochen ist.
         int thisMinuteOfDay = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining), TimeZone.getTimeZone("UTC").toZoneId()).getMinute();
@@ -85,79 +157,11 @@ public abstract class TimedGame extends Game implements Runnable {
         }
     }
 
-    /**
-     * setzt die restliche Spielzeit auf die Gesamtspielzeit zurück
-     */
-    void reset_timers() {
-        getLogger().info("reset_timers()");
-        remaining = matchlength;
-        matchtime = 0l;
-        last_cycle_started_at = 0l;
-        flag_state = FLAG_NEUTRAL;
-        pausing_since = 0l;
-    }
-
-    abstract String get_game_state();
-
-    /**
-     * das Spiel wird in den Pausezustand versetzt
-     */
-    void pause() {
-        getLogger().info("pause()");
-        lcdTextDisplay.update_page(PAGE_GAMESTATES, "Spielzustand", get_game_state(), "", "");
-        pausing_since = System.currentTimeMillis();
-        game_state = TIMED_GAME_PAUSED;
-        lcdTextDisplay.update_page(0, "Operation", "Cedar", "Falls", num_teams + " Teams");
-        update_all_signals();
-    }
-
-    /**
-     * das Spiel wird nach dem Pausezustand fortgesetzt
-     */
-    void resume() {
-        getLogger().info("resume()");
-//        long pause = System.currentTimeMillis() - pausing_since;
-//        last_cycle_started_at = last_cycle_started_at + pause; // verschieben des Zeitpunkts um die Pausenzeit
-        pausing_since = 0l;
-        game_state = TIMED_GAME_RUNNING;
-        update_all_signals();
-    }
-
-    /**
-     * das Spiel wird beendet.
-     */
-    void game_over() {
-        getLogger().info("game_over()");
-        game_state = TIMED_GAME_OVER;
-        lcdTextDisplay.update_page(PAGE_GAMESTATES, "Spielzustand", get_game_state(), "", "");
-        update_all_signals();
-    }
-
-    /**
-     * das Spiel beginnt
-     */
-    void start() {
-        game_state = TIMED_GAME_RUNNING;
-        lcdTextDisplay.update_page(PAGE_GAMESTATES, "Spielzustand", get_game_state(), "", "");
-        update_all_signals();
-    }
-
-    /**
-     * Spiel wird in den Vorbereitungsmodus versetzt
-     */
-    void prepare() {
-        game_state = TIMED_GAME_PREPARE;
-        lcdTextDisplay.update_page(PAGE_GAMESTATES,"Spielzustand", get_game_state(), "", "");
-        reset_timers();
-    }
-
     @Override
-    public void stop_gamemode() {
-        super.stop_gamemode();
-        thread.interrupt();
+    void update_all_signals() {
+        super.update_all_signals();
+        show_timers();
     }
-
-    abstract void show_timers();
 
     abstract void game_cycle();
 

@@ -20,7 +20,6 @@ public class OCF extends TimedGame {
 
     private static final String SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE = Main.getFromConfigs(Configs.SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE);
 
-
     private final int SAVEPOINT_NONE = 0;
     private final int SAVEPOINT_PREVIOUS = 1;
     private final int SAVEPOINT_RESET = 2;
@@ -51,13 +50,17 @@ public class OCF extends TimedGame {
         String result;
         switch (game_state) {
             case TIMED_GAME_RUNNING:
-                result = "Spiel läuft";
+                result = ">> GAME RUNNING <<";
+                break;
             case TIMED_GAME_OVER:
-                result = "GAME OVER";
+                result = ">> GAME OVER <<";
+                break;
             case TIMED_GAME_PREPARE:
-                result = "Spiel-Vorbereitung";
+                result = ">> PREPARE <<";
+                break;
             case TIMED_GAME_PAUSED:
-                result = "PAUSE";
+                result = ">> GAME PAUSED <<";
+                break;
             default:
                 result = "ERROR";
         }
@@ -71,7 +74,6 @@ public class OCF extends TimedGame {
         preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
         preset_times = configs.getGameTimes();
         matchlength = preset_times[preset_gametime_position] * 60000;
-        lcdTextDisplay.update_page(0, "Operation", "Cedar", "Falls", num_teams + " Teams");
         set_config_buttons_labels("RUN/PAUSE", "SET GAMETIME", "UNDO/RESET", "CHANGE GAME");
         reset_timers();
         update_all_signals();
@@ -202,9 +204,9 @@ public class OCF extends TimedGame {
 
     @Override
     void pause() {
-        super.pause();
         SELECTED_SAVEPOINT = SAVEPOINT_NONE;
         currentSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
+        super.pause();
     }
 
     @Override
@@ -234,13 +236,13 @@ public class OCF extends TimedGame {
     }
 
     @Override
-    void update_all_signals() {
-        super.update_all_signals();
-        show_timers();
-    }
-
-    @Override
     void setDisplay() {
+
+//        lcdTextDisplay.update_page(PAGE_GAMESTATES, "Spielzustand", get_game_state(), "", "");
+        lcdTextDisplay.update_page(0, "Operation", "Cedar Falls", num_teams + " Teams", get_game_state());
+        LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining), TimeZone.getTimeZone("UTC").toZoneId());
+        ledTextDisplay.setText(common_time_format.format(ldt), get_game_state());
+
         if (game_state == TIMED_GAME_PAUSED) {
             display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
             set_blinking_led_green("∞:on,500;off,500");
@@ -526,7 +528,7 @@ public class OCF extends TimedGame {
 
         LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining),
                 TimeZone.getTimeZone("UTC").toZoneId());
-        ledTextDisplay.setText("### " + common_time_format.format(ldt) + " ###");
+        ledTextDisplay.updateText(common_time_format.format(ldt), get_game_state());
     }
 
     /**

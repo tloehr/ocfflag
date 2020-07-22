@@ -82,10 +82,24 @@ public class LEDTextDisplay implements Runnable, HasLogger {
     }
 
     public void setText(String text) {
-        SlideText slideText = new SlideText(text, MAX_CHARS_PER_DISPLAY * jLabels.size());
+        setText(text, " ");
+    }
+
+    public void setText(String text, String second_page_text) {
+        SlideText slideText = new SlideText(text, MAX_CHARS_PER_DISPLAY * jLabels.size(), Optional.of(second_page_text));
         frames = slideText.getFrames();
         frame = -1;
         direction_forward = true;
+    }
+
+    /**
+     * Wie setText() jedoch, wird die Frame Reihenfolge nicht geändert.
+     * @param text
+     * @param second_page_text
+     */
+    public void updateText(String text, String second_page_text){
+        SlideText slideText = new SlideText(text, MAX_CHARS_PER_DISPLAY * jLabels.size(), Optional.of(second_page_text));
+        frames = slideText.getFrames();
     }
 
     private void write_to_display(String text) {
