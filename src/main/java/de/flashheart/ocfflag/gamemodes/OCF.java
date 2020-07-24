@@ -245,7 +245,7 @@ public class OCF extends TimedGame {
 
         if (game_state == TIMED_GAME_PAUSED) {
             display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
-            set_blinking_led_green("∞:on,500;off,500");
+//            set_blinking_led_green("∞:on,500;off,500");
         }
 
         if (game_state == TIMED_GAME_RUNNING) {
@@ -294,26 +294,23 @@ public class OCF extends TimedGame {
     @Override
     void setLEDsAndButtons() {
         if (game_state == TIMED_GAME_PREPARE) {
-            if (num_teams == 3) {
+            if (num_teams == 2) {
+                set_blinking_red_button("∞:on,250;off,250");
+                set_blinking_blue_button("∞:off,250;on,250");
+                off_green_button();
+                off_yellow_button();
+            } else if (num_teams == 3) {
                 set_blinking_red_button("∞:on,250;off,500");
                 set_blinking_blue_button("∞:off,250;on,250;off,250");
+                set_blinking_green_button("∞:off,500;on,250");
+                off_yellow_button();
             } else if (num_teams == 4) {
                 set_blinking_red_button("∞:on,250;off,750");
                 set_blinking_blue_button("∞:off,250;on,250;off,500");
-            } else {
-                set_blinking_red_button("∞:on,250;off,250");
-                set_blinking_blue_button("∞:off,250;on,250");
-            }
-            if (num_teams < 3) off_green_button();
-            else if (num_teams == 3) {
-                set_blinking_green_button("∞:off,500;on,250");
-            } else if (num_teams == 4) {
                 set_blinking_green_button("∞:off,500;on,250;off,250");
+                set_blinking_yellow_button("∞:off,750;on,250");
             }
-            if (num_teams < 4) off_yellow_button();
-            else set_blinking_yellow_button("∞:off,750;on,250");
-
-            set_blinking_led_green("∞:on,1000;off,1000");
+//            set_blinking_led_green("∞:on,1000;off,1000");
         }
 
         if (game_state == TIMED_GAME_RUNNING) {

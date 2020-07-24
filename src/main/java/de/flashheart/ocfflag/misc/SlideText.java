@@ -30,49 +30,26 @@ public class SlideText {
     public String[] getFrames() {
         String[] frames;
         if (text.length() <= max) { // dann soll es blinken statt zu sliden
-            frames = new String[]{StringUtils.center(text, max), StringUtils.left(StringUtils.leftPad(second_page_text.orElse(" "), max), max)};
+            String pad = second_page_text.orElse(" ".repeat(max));
+            pad = StringUtils.left(pad, max);
+            frames = new String[]{StringUtils.center(text, max), pad};
         } else {
-            frames = getFrames(true, true);
+            // ich möchte nur genau so viele slides, wie nötig. Der Text soll
+            // nicht rausrollen.
+            //
+            // vorher: int slides = text.length() - 1;
+            int slides = Math.max(1, text.length() - max + 1);
+            frames = new String[slides];
+            for (int i = 0; i < slides; i++) {
+                if (i + max < text.length()) {
+                    frames[i] = text.substring(i, i + max);
+                } else {
+                    frames[i] = text.substring(i);
+                }
+            }
         }
         return frames;
     }
 
-//    public String[] getFrames(boolean blanks) {
-//        return getFrames(blanks, blanks);
-//    }
-
-    private String[] getFrames(boolean blanksOntheLeft, boolean blanksOntheRight) {
-        String text = this.text;
-
-        if (max > text.length()) { // nur wenn text kleiner als der Frame ist
-            int blanks = max - text.length();
-            if (blanksOntheLeft) {
-                for (int i = 0; i < blanks; i++) {
-                    text = " " + text;
-                }
-            }
-            if (blanksOntheRight) {
-                for (int i = 0; i < blanks; i++) {
-                    text = text + " ";
-                }
-            }
-        }
-
-        // ich möchte nur genau so viele slides, wie nötig. Der Text soll
-        // nicht rausrollen.
-        // 
-        // vorher: int slides = text.length() - 1;
-
-        int slides = Math.max(1, text.length() - max + 1);
-        String[] arr = new String[slides];
-        for (int i = 0; i < slides; i++) {
-            if (i + max < text.length()) {
-                arr[i] = text.substring(i, i + max);
-            } else {
-                arr[i] = text.substring(i);
-            }
-        }
-        return arr;
-    }
 
 }

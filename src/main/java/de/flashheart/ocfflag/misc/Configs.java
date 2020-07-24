@@ -21,7 +21,6 @@ public class Configs implements HasLogger {
     public static final String GPIOCONTROLLER = "gpiocontroller";
     public static final String I2CBUS = "i2cbus";
     public static final String MCP23017_1 = "mcp23017_1";
-    public static final String LCDPAGE_FOR_CONFIG_BUTTONS = "lcdpage_for_config_buttons";
 
     private final SortedProperties configs;
     private final Properties applicationContext;

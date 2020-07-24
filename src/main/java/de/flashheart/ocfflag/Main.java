@@ -148,13 +148,13 @@ public class Main {
     }
 
     public static void setGame(Game game) {
-        int lcdpage_for_config_buttons = Integer.parseInt(applicationContext.getOrDefault(Configs.LCDPAGE_FOR_CONFIG_BUTTONS, "-1").toString());
-        if (lcdpage_for_config_buttons == -1) {
-            // es gibt noch keine Seite für die Config-Tasten.
-            // wird jetzt einmal erstellt, und dann für alle verwendet.
-            lcdpage_for_config_buttons = ((LCDTextDisplay) getFromContext(Configs.LCD_TEXT_DISPLAY)).add_page();
-            applicationContext.put(Configs.LCDPAGE_FOR_CONFIG_BUTTONS, lcdpage_for_config_buttons);
-        }
+//        int lcdpage_for_config_buttons = Integer.parseInt(applicationContext.getOrDefault(Configs.LCDPAGE_FOR_CONFIG_BUTTONS, "-1").toString());
+//        if (lcdpage_for_config_buttons == -1) {
+//            // es gibt noch keine Seite für die Config-Tasten.
+//            // wird jetzt einmal erstellt, und dann für alle verwendet.
+//            lcdpage_for_config_buttons = ((LCDTextDisplay) getFromContext(Configs.LCD_TEXT_DISPLAY)).add_page();
+//            applicationContext.put(Configs.LCDPAGE_FOR_CONFIG_BUTTONS, lcdpage_for_config_buttons);
+//        }
         if (currentGame != null) currentGame.stop_gamemode();
         currentGame = game;
         currentGame.start_gamemode();

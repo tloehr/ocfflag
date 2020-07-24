@@ -17,9 +17,10 @@ public class GameSelector extends Game {
         set_config_buttons_labels("", "game++", "game--", "CHANGE GAME");
         lcdTextDisplay.update_page(0, "Welcome to the", "Real Life", "Gaming System", "");
 
+        // alle überzähligen Seiten entfernen
         while (lcdTextDisplay.getNumber_of_pages() > 2) lcdTextDisplay.del_page(3);
 
-        ledTextDisplay.setText("Select a game");
+//        ledTextDisplay.setText("Select a game");
         gamemodes = configs.get(Configs.RLGS_GAMEMODES).split("\\,");
         game_index = 0;
         update_all_signals();
@@ -66,12 +67,32 @@ public class GameSelector extends Game {
             getLogger().debug(gamemodes[game_index]);
             display_white.setText(gamemodes[game_index]);
 
-            if (gamemodes[game_index].equalsIgnoreCase("ocf2")) ledTextDisplay.setText("Operation Cedar Falls 2 Teams");
-            if (gamemodes[game_index].equalsIgnoreCase("ocf3")) ledTextDisplay.setText("Operation Cedar Falls 3 Teams");
-            if (gamemodes[game_index].equalsIgnoreCase("ocf4")) ledTextDisplay.setText("Operation Cedar Falls 4 Teams");
-            if (gamemodes[game_index].equalsIgnoreCase("spwn")) ledTextDisplay.setText("Spawn Counter");
+            if (gamemodes[game_index].equalsIgnoreCase("ocf2")) {
+                ledTextDisplay.setText("OCF2");
+                display_red.setTime(0l);
+                display_blue.setTime(0l);
+                display_green.clear();
+                display_yellow.clear();
+            } else if (gamemodes[game_index].equalsIgnoreCase("ocf3")) {
+                ledTextDisplay.setText("OCF3");
+                display_red.setTime(0l);
+                display_blue.setTime(0l);
+                display_green.setTime(0l);
+                display_yellow.clear();
+            } else if (gamemodes[game_index].equalsIgnoreCase("ocf4")) {
+                ledTextDisplay.setText("OCF4");
+                display_red.setTime(0l);
+                display_blue.setTime(0l);
+                display_green.setTime(0l);
+                display_yellow.setTime(0l);
+            } else if (gamemodes[game_index].equalsIgnoreCase("spwn")) {
+                ledTextDisplay.setText("Spawn Counter");
+                display_red.setTime(0l);
+                display_blue.setTime(0l);
+                display_green.setTime(0l);
+                display_yellow.setTime(0l);
+            }
 
-//            ledTextDisplay.setText("Sixteen Chars 16");
         } catch (IOException e) {
             getLogger().error(e);
         }
@@ -79,29 +100,94 @@ public class GameSelector extends Game {
 
     @Override
     void setFlagSignals() {
-        set_blinking_flag_white("∞:off,0;on,350;off,6400");
-        set_blinking_flag_red("∞:off,350;on,350;off,6050");
-        set_blinking_flag_blue("∞:off,700;on,350;off,5700");
-        set_blinking_flag_green("∞:off,1050;on,350;off,5350");
-        set_blinking_flag_yellow("∞:off,1400;on,350;off,5000");
 
-        String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
-                new RGBScheduleElement(Configs.FLAG_RGB_WHITE, 350l) + ";" +
-                new RGBScheduleElement(Configs.FLAG_RGB_RED, 350l) + ";" +
-                new RGBScheduleElement(Configs.FLAG_RGB_BLUE, 350l) + ";" +
-                new RGBScheduleElement(Configs.FLAG_RGB_GREEN, 350l) + ";" +
-                new RGBScheduleElement(Configs.FLAG_RGB_YELLOW, 350l) + ";" +
-                new RGBScheduleElement(Color.BLACK, 5000l);
 
-        set_blinking_flag_rgb(pregamePoleColorScheme);
+        if (gamemodes[game_index].equalsIgnoreCase("ocf2")) {
+            set_blinking_flag_white("∞:on,350;off,3700");
+            set_blinking_flag_red("∞:off,350;on,350;off,3350");
+            set_blinking_flag_blue("∞:off,700;on,350;off,3000");
+
+            String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_WHITE, 350l) + ";" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_RED, 350l) + ";" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_BLUE, 350l) + ";" +
+                    new RGBScheduleElement(Color.BLACK, 5000l);
+
+            set_blinking_flag_rgb(pregamePoleColorScheme);
+
+        } else if (gamemodes[game_index].equalsIgnoreCase("ocf3")) {
+
+            set_blinking_flag_white("∞:on,350;off,4050");
+            set_blinking_flag_red("∞:off,350;on,350;off,3700");
+            set_blinking_flag_blue("∞:off,700;on,350;off,3350");
+            set_blinking_flag_green("∞:off,1050;on,350;off,3000");
+
+            String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_WHITE, 350l) + ";" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_RED, 350l) + ";" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_BLUE, 350l) + ";" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_GREEN, 350l) + ";" +
+                    new RGBScheduleElement(Color.BLACK, 5000l);
+
+            set_blinking_flag_rgb(pregamePoleColorScheme);
+
+        } else if (gamemodes[game_index].equalsIgnoreCase("ocf4")) {
+            set_blinking_flag_white("∞:off,0;on,350;off,6400");
+            set_blinking_flag_red("∞:off,350;on,350;off,6050");
+            set_blinking_flag_blue("∞:off,700;on,350;off,5700");
+            set_blinking_flag_green("∞:off,1050;on,350;off,5350");
+            set_blinking_flag_yellow("∞:off,1400;on,350;off,5000");
+
+            String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_WHITE, 350l) + ";" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_RED, 350l) + ";" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_BLUE, 350l) + ";" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_GREEN, 350l) + ";" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_YELLOW, 350l) + ";" +
+                    new RGBScheduleElement(Color.BLACK, 5000l);
+
+            set_blinking_flag_rgb(pregamePoleColorScheme);
+        } else {
+            set_blinking_red_button("∞:on,500;off,500");
+            set_blinking_blue_button("∞:on,500;off,500");
+            set_blinking_green_button("∞:on,500;off,500");
+            set_blinking_yellow_button("∞:on,500;off,500");
+
+            String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_WHITE, 350l) + ";" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_RED, 350l) + ";" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_BLUE, 350l) + ";" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_GREEN, 350l) + ";" +
+                    new RGBScheduleElement(Configs.FLAG_RGB_YELLOW, 350l) + ";" +
+                    new RGBScheduleElement(Color.BLACK, 5000l);
+
+            set_blinking_flag_rgb(pregamePoleColorScheme);
+        }
     }
 
     @Override
     void setLEDsAndButtons() {
-        set_blinking_red_button("∞:on,500;off,500");
-        set_blinking_blue_button("∞:on,500;off,500");
-        set_blinking_green_button("∞:on,500;off,500");
-        set_blinking_yellow_button("∞:on,500;off,500");
+        if (gamemodes[game_index].equalsIgnoreCase("ocf2")) {
+            set_blinking_red_button("∞:on,250;off,250");
+            set_blinking_blue_button("∞:off,250;on,250");
+            off_green_button();
+            off_yellow_button();
+        } else if (gamemodes[game_index].equalsIgnoreCase("ocf3")) {
+            set_blinking_red_button("∞:on,250;off,500");
+            set_blinking_blue_button("∞:off,250;on,250;off,250");
+            set_blinking_green_button("∞:off,500;on,250");
+            off_yellow_button();
+        } else if (gamemodes[game_index].equalsIgnoreCase("ocf4")) {
+            set_blinking_red_button("∞:on,250;off,750");
+            set_blinking_blue_button("∞:off,250;on,250;off,500");
+            set_blinking_green_button("∞:off,500;on,250;off,250");
+            set_blinking_yellow_button("∞:off,750;on,250");
+        } else {
+            set_blinking_red_button("∞:on,500;off,500");
+            set_blinking_blue_button("∞:on,500;off,500");
+            set_blinking_green_button("∞:on,500;off,500");
+            set_blinking_yellow_button("∞:on,500;off,500");
+        }
     }
 
 }
