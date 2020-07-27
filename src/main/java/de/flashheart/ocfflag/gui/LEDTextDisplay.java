@@ -22,7 +22,7 @@ public class LEDTextDisplay implements Runnable, HasLogger {
     private boolean direction_forward = true;
     private final ReentrantLock lock;
     private final Thread thread;
-    String[] frames;
+    String[] frames = new String[]{};
 
     public LEDTextDisplay(List<Optional<AlphaSegment>> segments, List<JLabel> jLabels) {
         this.segments = segments;
@@ -38,9 +38,7 @@ public class LEDTextDisplay implements Runnable, HasLogger {
             try {
                 lock.lock();
                 try {
-
                     loopcounter++;
-
                     if (frames.length > 1) { // gibts nur einen Frame, machen wir hier gar nix
                         if (loopcounter > 3) { // damit erreiche ich, dass der 1,5 sekunden an den rändern stehen bleibt.
                             if (direction_forward) {
@@ -62,10 +60,10 @@ public class LEDTextDisplay implements Runnable, HasLogger {
                     } else {
                         frame = 0;
                     }
-                    write_to_display(frames[frame]);
-
+                    write_to_display(frames.length == 0 ? "" : frames[frame]);
                 } catch (Exception ex) {
                     getLogger().error(ex);
+                    ex.printStackTrace();
                 } finally {
                     lock.unlock();
                 }
@@ -81,23 +79,29 @@ public class LEDTextDisplay implements Runnable, HasLogger {
         thread.start();
     }
 
-    public void setText(String text) {
-        setText(text, " ");
+    public void set_text(String text) {
+        set_text(text, " ");
     }
 
-    public void setText(String text, String second_page_text) {
+    public void set_text(String text, String second_page_text) {
         SlideText slideText = new SlideText(text, MAX_CHARS_PER_DISPLAY * jLabels.size(), Optional.of(second_page_text));
         frames = slideText.getFrames();
         frame = -1;
         direction_forward = true;
     }
 
+    public void set_single_text(String text) {
+        frames = new String[]{StringUtils.center(text, MAX_CHARS)};
+        frame = 0;
+    }
+
     /**
      * Wie setText() jedoch, wird die Frame Reihenfolge nicht geändert.
+     *
      * @param text
      * @param second_page_text
      */
-    public void updateText(String text, String second_page_text){
+    public void update_text(String text, String second_page_text) {
         SlideText slideText = new SlideText(text, MAX_CHARS_PER_DISPLAY * jLabels.size(), Optional.of(second_page_text));
         frames = slideText.getFrames();
     }
@@ -107,8 +111,6 @@ public class LEDTextDisplay implements Runnable, HasLogger {
         // Die Anzahl der gui Labels ist immer maßgeblich für die Anzahl der versorgten Displays.
         for (int part_of_message = 0; part_of_message < jLabels.size(); part_of_message++) {
             String chunk = chunks.get(part_of_message);
-            getLogger().debug(chunks.get(part_of_message));
-
             final JLabel jLabel = jLabels.get(part_of_message);
 
             SwingUtilities.invokeLater(() -> {
@@ -121,10 +123,9 @@ public class LEDTextDisplay implements Runnable, HasLogger {
                 try {
                     alphaSegment.write(chunk);
                 } catch (IOException e) {
-                    getLogger().error(e);
+                    getLogger().warn(e);
                 }
             });
-
         }
     }
 }

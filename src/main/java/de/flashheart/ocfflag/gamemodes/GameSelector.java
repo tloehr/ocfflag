@@ -68,25 +68,25 @@ public class GameSelector extends Game {
             display_white.setText(gamemodes[game_index]);
 
             if (gamemodes[game_index].equalsIgnoreCase("ocf2")) {
-                ledTextDisplay.setText("OCF2");
+                ledTextDisplay.set_text("OCF2");
                 display_red.setTime(0l);
                 display_blue.setTime(0l);
                 display_green.clear();
                 display_yellow.clear();
             } else if (gamemodes[game_index].equalsIgnoreCase("ocf3")) {
-                ledTextDisplay.setText("OCF3");
+                ledTextDisplay.set_text("OCF3");
                 display_red.setTime(0l);
                 display_blue.setTime(0l);
                 display_green.setTime(0l);
                 display_yellow.clear();
             } else if (gamemodes[game_index].equalsIgnoreCase("ocf4")) {
-                ledTextDisplay.setText("OCF4");
+                ledTextDisplay.set_text("OCF4");
                 display_red.setTime(0l);
                 display_blue.setTime(0l);
                 display_green.setTime(0l);
                 display_yellow.setTime(0l);
             } else if (gamemodes[game_index].equalsIgnoreCase("spwn")) {
-                ledTextDisplay.setText("Spawn Counter");
+                ledTextDisplay.set_text("Spawn Counter");
                 display_red.setTime(0l);
                 display_blue.setTime(0l);
                 display_green.setTime(0l);

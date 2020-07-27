@@ -157,11 +157,11 @@ public abstract class TimedGame extends Game implements Runnable {
         }
     }
 
-    @Override
-    void update_all_signals() {
-        super.update_all_signals();
-        show_timers();
-    }
+//    @Override
+//    void update_all_signals() {
+//        super.update_all_signals();
+//        show_timers();
+//    }
 
     abstract void game_cycle();
 

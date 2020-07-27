@@ -125,7 +125,7 @@ public abstract class Pageable implements Runnable, HasLogger {
             // wir schreiben immer die ganze Zeile. Daher fülle ich mit leerzeichen auf, falls nötig.
             final String padded = StringUtils.rightPad(line, cols);
             render_line(r, StringUtils.left(padded, cols));
-            getLogger().debug("VISIBLE PAGE #" + (pageid) + " Line" + r + ": " + padded);
+//            getLogger().debug("VISIBLE PAGE #" + (pageid) + " Line" + r + ": " + padded);
         }
     }
 

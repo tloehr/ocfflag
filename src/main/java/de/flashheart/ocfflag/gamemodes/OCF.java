@@ -6,7 +6,6 @@ import de.flashheart.ocfflag.misc.Configs;
 import de.flashheart.ocfflag.misc.Tools;
 
 import java.awt.*;
-import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,7 +23,7 @@ public class OCF extends TimedGame {
     private final int SAVEPOINT_PREVIOUS = 1;
     private final int SAVEPOINT_RESET = 2;
     private final int SAVEPOINT_CURRENT = 3;
-    private final String SAVEPOINTS[] = new String[]{"", "SPIELZUG ZURÜCK", "RESET", "KEINE ÄNDERUNG"};
+    private final String SAVEPOINTS[] = new String[]{"", "PREVIOUS", "RESET GAME", "CURRENT"};
     private ArrayList<String> winners;
     private long time_blue, time_red, time_yellow, time_green;
     private int SELECTED_SAVEPOINT = SAVEPOINT_NONE;
@@ -50,7 +49,7 @@ public class OCF extends TimedGame {
         String result;
         switch (game_state) {
             case TIMED_GAME_RUNNING:
-                result = ">> GAME RUNNING <<";
+                result = ">> RUNNING <<";
                 break;
             case TIMED_GAME_OVER:
                 result = ">> GAME OVER <<";
@@ -59,7 +58,7 @@ public class OCF extends TimedGame {
                 result = ">> PREPARE <<";
                 break;
             case TIMED_GAME_PAUSED:
-                result = ">> GAME PAUSED <<";
+                result = ">> PAUSED <<";
                 break;
             default:
                 result = "ERROR";
@@ -91,6 +90,7 @@ public class OCF extends TimedGame {
         }
         if (game_state == TIMED_GAME_RUNNING) {
             if (!flag_state.equals(FLAGSTATE)) {
+                getLogger().debug(String.format("FLAGSTATE %s SELECTED", FLAGSTATE));
                 lastSavePoint = new SavePointOCF(flag_state, remaining, time_blue, time_red, time_yellow, time_green);
                 flag_state = FLAGSTATE;
                 mySystem.getPinHandler().setScheme(SIREN_TO_ANNOUNCE_THE_COLOR_CHANGE, Main.getFromConfigs(Configs.OCF_COLORCHANGE_SIGNAL));
@@ -134,6 +134,11 @@ public class OCF extends TimedGame {
             matchlength = preset_times[preset_gametime_position] * 60000;
             reset_timers();
             update_all_signals();
+            display_white.setTime(remaining);
+
+            LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining),
+                    TimeZone.getTimeZone("UTC").toZoneId());
+            ledTextDisplay.update_text(common_time_format.format(ldt), get_game_state());
         } else {
             getLogger().debug("NOT IN PREGAME: IGNORING");
         }
@@ -238,17 +243,18 @@ public class OCF extends TimedGame {
     @Override
     void setDisplay() {
 
-//        lcdTextDisplay.update_page(PAGE_GAMESTATES, "Spielzustand", get_game_state(), "", "");
-        lcdTextDisplay.update_page(0, "Operation", "Cedar Falls", num_teams + " Teams", get_game_state());
-        LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining), TimeZone.getTimeZone("UTC").toZoneId());
-        ledTextDisplay.setText(common_time_format.format(ldt), get_game_state());
+
+//        LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining), TimeZone.getTimeZone("UTC").toZoneId());
+//        ledTextDisplay.set_text(common_time_format.format(ldt), get_game_state());
 
         if (game_state == TIMED_GAME_PAUSED) {
             display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
+            lcdTextDisplay.update_page(0, "SELECTED SAVEPOINT", SAVEPOINTS[SELECTED_SAVEPOINT], "", get_game_state());
 //            set_blinking_led_green("∞:on,500;off,500");
         }
 
         if (game_state == TIMED_GAME_RUNNING) {
+
             mySystem.getPinHandler().off(Configs.OUT_LED_GREEN);
             mySystem.getPinHandler().off(Configs.OUT_LED_WHITE);
             display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
@@ -265,18 +271,21 @@ public class OCF extends TimedGame {
         }
 
         if (game_state == TIMED_GAME_OVER) {
+
             if (isDrawgame()) {
-                getLogger().info("Draw Game");
                 display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                 display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                 if (num_teams >= 3)
                     display_green.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                 if (num_teams >= 4)
                     display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
+
+                lcdTextDisplay.update_page(0, "UNENTSCHIEDEN", "", "", get_game_state());
             } else {
                 List<String> winners = getWinners();
                 if (winners.contains("red")) {
                     display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
+
                 }
                 if (winners.contains("blue")) {
                     display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
@@ -287,7 +296,10 @@ public class OCF extends TimedGame {
                 if (winners.contains("yellow")) {
                     display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                 }
+                lcdTextDisplay.update_page(0, "Siegerteam(s)", winners.toString(),"", get_game_state());
             }
+
+
         }
     }
 
@@ -512,20 +524,18 @@ public class OCF extends TimedGame {
 
     @Override
     void show_timers() {
-        try {
-            display_white.setTime(remaining);
-            display_red.setTime(time_red);
-            display_blue.setTime(time_blue);
-            if (num_teams >= 3) display_green.setTime(time_green);
-            if (num_teams >= 4) display_yellow.setTime(time_yellow);
 
-        } catch (IOException e) {
-            getLogger().error(e);
-        }
+        display_white.setTime(remaining);
+        display_red.setTime(time_red);
+        display_blue.setTime(time_blue);
+        if (num_teams >= 3) display_green.setTime(time_green);
+        if (num_teams >= 4) display_yellow.setTime(time_yellow);
 
         LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining),
                 TimeZone.getTimeZone("UTC").toZoneId());
-        ledTextDisplay.updateText(common_time_format.format(ldt), get_game_state());
+        ledTextDisplay.update_text(common_time_format.format(ldt), "");
+        lcdTextDisplay.update_page(0, flag_state, "Remaining time", common_time_format.format(ldt), get_game_state());
+
     }
 
     /**
