@@ -13,7 +13,7 @@ public class GameSelector extends Game {
     int game_index;
 
     @Override
-    void initGame() {
+    void init_game() {
         set_config_buttons_labels("", "game++", "game--", "CHANGE GAME");
         lcdTextDisplay.update_page(0, "Welcome to the", "Real Life", "Gaming System", "");
 
@@ -24,6 +24,11 @@ public class GameSelector extends Game {
         gamemodes = configs.get(Configs.RLGS_GAMEMODES).split("\\,");
         game_index = 0;
         update_all_signals();
+    }
+
+    @Override
+    void button_teamcolor_pressed(String FLAGSTATE) {
+        getLogger().debug("I Don't care about this buttons right now.");
     }
 
 
@@ -62,7 +67,7 @@ public class GameSelector extends Game {
     }
 
     @Override
-    void setDisplay() {
+    void set_display() {
         try {
             getLogger().debug(gamemodes[game_index]);
             display_white.setText(gamemodes[game_index]);
@@ -99,9 +104,7 @@ public class GameSelector extends Game {
     }
 
     @Override
-    void setFlagSignals() {
-
-
+    void set_flag_signals() {
         if (gamemodes[game_index].equalsIgnoreCase("ocf2")) {
             set_blinking_flag_white("∞:on,350;off,3700");
             set_blinking_flag_red("∞:off,350;on,350;off,3350");
@@ -166,7 +169,7 @@ public class GameSelector extends Game {
     }
 
     @Override
-    void setLEDsAndButtons() {
+    void set_leds_and_buttons() {
         if (gamemodes[game_index].equalsIgnoreCase("ocf2")) {
             set_blinking_red_button("∞:on,250;off,250");
             set_blinking_blue_button("∞:off,250;on,250");

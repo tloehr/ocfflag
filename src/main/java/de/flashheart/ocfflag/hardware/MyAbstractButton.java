@@ -69,7 +69,8 @@ public class MyAbstractButton implements HasLogger {
     }
 
     /**
-     * Es gibt immer nur einen ActionListener. Jeder Set entfernt den vorherigen, wenn es einen gibt.
+     * Es gibt immer nur einen ActionListener. Jeder Set entfernt den vorherigen, wenn es einen neuen gibt.
+     * Dadurch erspare ich mir die Probleme mit wachsenden Listenern, wenn ein neue Game Klasse initialisiert wird.
      *
      * @param actionListener
      */

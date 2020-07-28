@@ -21,15 +21,15 @@ public class SpawnCounter extends Game {
 
 
     @Override
-    void initHardware() {
-        super.initHardware();
+    void init_hardware() {
+        super.init_hardware();
         set_config_buttons_labels("C reset/=0", "B +10", "D +100", "CHANGE GAME");
         spawn_counter = configs.getInt(Configs.SPWN_START_TICKETS);
     }
 
 
     @Override
-    void initGame() {
+    void init_game() {
         button_quit.setActionListener(e -> {
             getLogger().debug("GUI_button_quit");
             button_quit_pressed();
@@ -81,7 +81,7 @@ public class SpawnCounter extends Game {
 
 
     @Override
-    void setDisplay() {
+    void set_display() {
         try {
             display_white.setText(spawn_counter);
             display_green.clear();
@@ -95,7 +95,7 @@ public class SpawnCounter extends Game {
     }
 
     @Override
-    void setFlagSignals() {
+    void set_flag_signals() {
         if (spawn_counter == 0) {
             mySystem.getPinHandler().off(Configs.OUT_FLAG_WHITE);
             mySystem.getPinHandler().setScheme(Configs.OUT_FLAG_RED, "∞:on,1000;off,1000");
@@ -112,7 +112,7 @@ public class SpawnCounter extends Game {
     }
 
     @Override
-    void setLEDsAndButtons() {
+    void set_leds_and_buttons() {
         mySystem.getPinHandler().setScheme(Configs.OUT_LED_RED_BTN, "∞:on,1000;off,1000");
         mySystem.getPinHandler().setScheme(Configs.OUT_LED_BLUE_BTN, "∞:on,1000;off,1000");
         mySystem.getPinHandler().off(Configs.OUT_LED_GREEN_BTN);

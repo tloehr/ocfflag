@@ -44,12 +44,14 @@ public abstract class TimedGame extends Game implements Runnable {
     }
 
     @Override
-    void initGame() {
+    void init_game() {
         while (lcdTextDisplay.getNumber_of_pages() > 2) lcdTextDisplay.del_page(3);
 //        PAGE_GAMESTATES = lcdTextDisplay.add_page("", "", "", "");
     }
 
-
+    /**
+     * wird in dem RUN cycle ausgeführt
+     */
     void update_timers() {
         if (game_state != TIMED_GAME_RUNNING) return;
         remaining = remaining - time_difference_since_last_cycle;
@@ -127,41 +129,8 @@ public abstract class TimedGame extends Game implements Runnable {
         thread.interrupt();
     }
 
-    /**
-     * Methode zur Darstellung von allem was mit Zeiten verbunden ist.
-     */
-    void show_timers(){
-        // jede Minute soll das Zeitsignal aktualisiert werden. Daher prüfe ich, ob
-        // eine neue Minute angebrochen ist.
-        int thisMinuteOfDay = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining), TimeZone.getTimeZone("UTC").toZoneId()).getMinute();
-        if (thisMinuteOfDay != the_last_minute_when_timesignal_changed) {
-            the_last_minute_when_timesignal_changed = thisMinuteOfDay;
-            if (flag_state.equals(FLAG_NEUTRAL)) {
-                set_blinking_flag_rgb("NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
-                set_blinking_flag_white(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-            } else {
-                if (flag_state.equals(RED_ACTIVATED)) {
-                    set_blinking_flag_rgb("RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
-                    set_blinking_flag_red(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                } else if (flag_state.equals(BLUE_ACTIVATED)) {
-                    set_blinking_flag_rgb("BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
-                    set_blinking_flag_blue(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                } else if (flag_state.equals(GREEN_ACTIVATED)) {
-                    set_blinking_flag_rgb("GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
-                    set_blinking_flag_green(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                } else if (flag_state.equals(YELLOW_ACTIVATED)) {
-                    set_blinking_flag_rgb("YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_YELLOW, remaining));
-                    set_blinking_flag_yellow(PinBlinkModel.getGametimeBlinkingScheme(remaining));
-                }
-            }
-        }
-    }
+    abstract void show_timers();
 
-//    @Override
-//    void update_all_signals() {
-//        super.update_all_signals();
-//        show_timers();
-//    }
 
     abstract void game_cycle();
 
@@ -179,13 +148,11 @@ public abstract class TimedGame extends Game implements Runnable {
             last_cycle_started_at = now;
 
             try {
-
                 if (game_state == TIMED_GAME_RUNNING) {
                     update_timers();
-                    show_timers();
+                    if (cycle_counter % 2 == 0) show_timers();
                     game_cycle();
                 }
-
                 Thread.sleep(SLEEP_PER_CYCLE);
             } catch (InterruptedException ie) {
                 getLogger().info(this + " interrupted!");

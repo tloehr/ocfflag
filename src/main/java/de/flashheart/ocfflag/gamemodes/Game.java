@@ -10,6 +10,10 @@ import de.flashheart.ocfflag.hardware.MySystem;
 import de.flashheart.ocfflag.interfaces.HasLogger;
 import de.flashheart.ocfflag.misc.Configs;
 
+/**
+ * Das hier ist die Basis Klasse alle Spiel-Modi. Sie initialisiert alle Hardware und Konfigurations Zugriffe.
+ *
+ */
 public abstract class Game implements HasLogger {
     public static final String RESUMED = "RESUMED";
     public static final String FUSED = "FUSED";
@@ -85,7 +89,7 @@ public abstract class Game implements HasLogger {
     /**
      * hier werden alle Event-Listeners verknüpft.
      */
-    void initSoftware() {
+    void init_software() {
         lcdTextDisplay.reset_display();
         SETUP_BUTTON_PAGE = lcdTextDisplay.add_page();
         button_blue.setActionListener(e -> {
@@ -137,9 +141,9 @@ public abstract class Game implements HasLogger {
     public void start_gamemode() {
         getLogger().debug("\n\n==================================================");
         getLogger().debug("starting gamemode: " + getName());
-        initHardware();
-        initSoftware();
-        initGame();
+        init_hardware();
+        init_software();
+        init_game();
     }
 
     /**
@@ -155,7 +159,7 @@ public abstract class Game implements HasLogger {
     /**
      * initialisiert sämtliche Hardware-Komponenten
      */
-    void initHardware() {
+    void init_hardware() {
 
         display_red = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_RED_I2C);
         display_blue = (Display7Segments4Digits) Main.getFromContext(Configs.DISPLAY_BLUE_I2C);
@@ -212,7 +216,7 @@ public abstract class Game implements HasLogger {
      * wird von den eigentlichen Klassen implementiert um alle GameMode bezogenen Initialisierungen durchzuführen.
      */
 
-    abstract void initGame();
+    abstract void init_game();
 
     void button_quit_pressed() {
         shutdown_system();
@@ -224,9 +228,8 @@ public abstract class Game implements HasLogger {
         button_teamcolor_pressed(RED_ACTIVATED);
     }
 
-    void button_teamcolor_pressed(String FLAGSTATE) {
-    }
-
+    abstract void button_teamcolor_pressed(String FLAGSTATE);
+    
     void button_blue_pressed() {
         getLogger().debug("button_blue_pressed");
         button_teamcolor_pressed(BLUE_ACTIVATED);
@@ -367,17 +370,20 @@ public abstract class Game implements HasLogger {
         mySystem.getPinHandler().setScheme(siren_key, Main.getFromConfigs(siren_scheme));
     }
 
-    abstract void setDisplay();
+    abstract void set_display();
 
-    abstract void setFlagSignals();
+    abstract void set_flag_signals();
 
-    abstract void setLEDsAndButtons();
+    abstract void set_leds_and_buttons();
 
+    /**
+     * diese Methode wird nur bei größeren Änderungen der Situation ausgeführt.
+     */
     void update_all_signals() {
         all_off();
-        setDisplay();
-        setLEDsAndButtons();
-        setFlagSignals();
+        set_display();
+        set_leds_and_buttons();
+        set_flag_signals();
     }
 
     void all_off() {

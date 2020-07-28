@@ -67,8 +67,8 @@ public class OCF extends TimedGame {
     }
 
     @Override
-    void initGame() {
-        super.initGame();
+    void init_game() {
+        super.init_game();
         winners = new ArrayList<>();
         preset_gametime_position = Integer.parseInt(Main.getFromConfigs(Configs.OCF_GAMETIME));
         preset_times = configs.getGameTimes();
@@ -195,7 +195,7 @@ public class OCF extends TimedGame {
         time_yellow = savePointOCF.getTime_yellow();
 
         update_all_signals();
-
+        show_timers();
     }
 
     /**
@@ -241,20 +241,14 @@ public class OCF extends TimedGame {
     }
 
     @Override
-    void setDisplay() {
+    void set_display() {
 
-
-//        LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining), TimeZone.getTimeZone("UTC").toZoneId());
-//        ledTextDisplay.set_text(common_time_format.format(ldt), get_game_state());
-
-        if (game_state == TIMED_GAME_PAUSED) {
+        if (game_state == TIMED_GAME_PREPARE) {
+            lcdTextDisplay.update_page(0, "Operation", "Cedar Falls", "Center Flag", num_teams + " Teams");
+        } else if (game_state == TIMED_GAME_PAUSED) {
             display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
-            lcdTextDisplay.update_page(0, "SELECTED SAVEPOINT", SAVEPOINTS[SELECTED_SAVEPOINT], "", get_game_state());
-//            set_blinking_led_green("∞:on,500;off,500");
-        }
-
-        if (game_state == TIMED_GAME_RUNNING) {
-
+            ledTextDisplay.set_text(SAVEPOINTS[SELECTED_SAVEPOINT]);
+        } else if (game_state == TIMED_GAME_RUNNING) {
             mySystem.getPinHandler().off(Configs.OUT_LED_GREEN);
             mySystem.getPinHandler().off(Configs.OUT_LED_WHITE);
             display_white.setBlinkRate(HT16K33.HT16K33_BLINKRATE_OFF);
@@ -268,10 +262,7 @@ public class OCF extends TimedGame {
             } else if (flag_state.equals(YELLOW_ACTIVATED)) {
                 display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_2HZ);
             }
-        }
-
-        if (game_state == TIMED_GAME_OVER) {
-
+        } else if (game_state == TIMED_GAME_OVER) {
             if (isDrawgame()) {
                 display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                 display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
@@ -285,7 +276,6 @@ public class OCF extends TimedGame {
                 List<String> winners = getWinners();
                 if (winners.contains("red")) {
                     display_red.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
-
                 }
                 if (winners.contains("blue")) {
                     display_blue.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
@@ -296,15 +286,13 @@ public class OCF extends TimedGame {
                 if (winners.contains("yellow")) {
                     display_yellow.setBlinkRate(HT16K33.HT16K33_BLINKRATE_HALFHZ);
                 }
-                lcdTextDisplay.update_page(0, "Siegerteam(s)", winners.toString(),"", get_game_state());
+                lcdTextDisplay.update_page(0, "Siegerteam(s)", winners.toString(), "", get_game_state());
             }
-
-
         }
     }
 
     @Override
-    void setLEDsAndButtons() {
+    void set_leds_and_buttons() {
         if (game_state == TIMED_GAME_PREPARE) {
             if (num_teams == 2) {
                 set_blinking_red_button("∞:on,250;off,250");
@@ -322,7 +310,6 @@ public class OCF extends TimedGame {
                 set_blinking_green_button("∞:off,500;on,250;off,250");
                 set_blinking_yellow_button("∞:off,750;on,250");
             }
-//            set_blinking_led_green("∞:on,1000;off,1000");
         }
 
         if (game_state == TIMED_GAME_RUNNING) {
@@ -388,8 +375,9 @@ public class OCF extends TimedGame {
     }
 
     @Override
-    void setFlagSignals() {
-        if (game_state == TIMED_GAME_PREPARE || game_state == TIMED_GAME_PAUSED) {
+    void set_flag_signals() {
+
+        if (game_state == TIMED_GAME_PREPARE) {
             String pregamePoleColorScheme = PinHandler.FOREVER + ":" +
                     new RGBScheduleElement(Configs.FLAG_RGB_WHITE, 350l) + ";" +
                     new RGBScheduleElement(Configs.FLAG_RGB_RED, 350l) + ";" +
@@ -416,9 +404,7 @@ public class OCF extends TimedGame {
                 set_blinking_flag_red("∞:off,350;on,350;off,3350");
                 set_blinking_flag_blue("∞:off,700;on,350;off,3000");
             }
-        }
-
-        if (game_state == TIMED_GAME_RUNNING) {
+        } else if (game_state == TIMED_GAME_RUNNING || game_state == TIMED_GAME_PAUSED) {
             if (flag_state.equals(FLAG_NEUTRAL)) {
                 set_blinking_flag_rgb("NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
                 set_blinking_flag_white(PinBlinkModel.getGametimeBlinkingScheme(remaining));
@@ -438,9 +424,7 @@ public class OCF extends TimedGame {
                 set_blinking_flag_rgb("YELLOW ACTIVATED", RGBBlinkModel.getGametimeBlinkingScheme(myyellow, remaining));
                 set_blinking_flag_yellow(PinBlinkModel.getGametimeBlinkingScheme(remaining));
             }
-        }
-
-        if (game_state == TIMED_GAME_OVER) {
+        } else if (game_state == TIMED_GAME_OVER) {
             if (isDrawgame()) {
                 set_blinking_flag_rgb("DRAW GAME", PinHandler.FOREVER + ":" + new RGBScheduleElement(Color.WHITE, 1000l) + ";" + new RGBScheduleElement(Color.BLACK, 1000l));
                 set_blinking_flag_white("∞:on,1000;off,1000");
@@ -525,6 +509,31 @@ public class OCF extends TimedGame {
     @Override
     void show_timers() {
 
+        // jede Minute soll das Zeitsignal aktualisiert werden. Daher prüfe ich, ob
+        // eine neue Minute angebrochen ist.
+        int thisMinuteOfDay = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining), TimeZone.getTimeZone("UTC").toZoneId()).getMinute();
+        if (thisMinuteOfDay != the_last_minute_when_timesignal_changed) {
+            the_last_minute_when_timesignal_changed = thisMinuteOfDay;
+            if (flag_state.equals(FLAG_NEUTRAL)) {
+                set_blinking_flag_rgb("NEUTRAL", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_WHITE, remaining));
+                set_blinking_flag_white(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+            } else {
+                if (flag_state.equals(RED_ACTIVATED)) {
+                    set_blinking_flag_rgb("RED", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_RED, remaining));
+                    set_blinking_flag_red(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                } else if (flag_state.equals(BLUE_ACTIVATED)) {
+                    set_blinking_flag_rgb("BLUE", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_BLUE, remaining));
+                    set_blinking_flag_blue(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                } else if (flag_state.equals(GREEN_ACTIVATED)) {
+                    set_blinking_flag_rgb("GREEN", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_GREEN, remaining));
+                    set_blinking_flag_green(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                } else if (flag_state.equals(YELLOW_ACTIVATED)) {
+                    set_blinking_flag_rgb("YELLOW", RGBBlinkModel.getGametimeBlinkingScheme(Configs.FLAG_RGB_YELLOW, remaining));
+                    set_blinking_flag_yellow(PinBlinkModel.getGametimeBlinkingScheme(remaining));
+                }
+            }
+        }
+
         display_white.setTime(remaining);
         display_red.setTime(time_red);
         display_blue.setTime(time_blue);
@@ -533,7 +542,7 @@ public class OCF extends TimedGame {
 
         LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(remaining),
                 TimeZone.getTimeZone("UTC").toZoneId());
-        ledTextDisplay.update_text(common_time_format.format(ldt), "");
+        ledTextDisplay.update_text(common_time_format.format(ldt), game_state == TIMED_GAME_PAUSED ? SAVEPOINTS[SELECTED_SAVEPOINT] : "");
         lcdTextDisplay.update_page(0, flag_state, "Remaining time", common_time_format.format(ldt), get_game_state());
 
     }
